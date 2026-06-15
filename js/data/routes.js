@@ -295,13 +295,13 @@ var ROUTE_DATA = {
     gym: {
       leader: [
         {
-          name: POKEMON.staryu, level: 25, moveId: MOVES.water.special.surf,
+          name: POKEMON.staryu, level: 22, moveId: MOVES.water.special.surf,
           overrides: {
             evs: { hp: 32, def: 32, spd: 32, spa: 32 },
           },
         },
         {
-          name: POKEMON.starmie, level: 28, moveId: MOVES.psychic.special.confusion,
+          name: POKEMON.starmie, level: 25, moveId: MOVES.psychic.special.confusion,
           overrides: {
             evs: { hp: 32, def: 32, spd: 32, spa: 32},
           },

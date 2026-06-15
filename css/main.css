@@ -73,8 +73,8 @@
 
   /* Campo de combate */
   --combat-field-height:   300px;  /* altura total del escenario */
-  --combat-sprite-foe-size:    128px;  /* sprite del rival */
-  --combat-sprite-player-size: 192px;  /* sprite del jugador (más grande = más cerca) */
+  --combat-sprite-foe-size:    162px;  /* sprite del rival */
+  --combat-sprite-player-size: 220px;  /* sprite del jugador (más grande = más cerca) */
 
   /* HUD de combate (badge nombre/vida) */
   --combat-hud-min-width:  180px;

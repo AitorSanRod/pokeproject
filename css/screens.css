@@ -472,13 +472,13 @@
 
 .combat-foe {
   position: absolute;
-  top: 8px;
+  top: 30px;
   right: var(--sp-lg);
 }
 
 .combat-player {
   position: absolute;
-  bottom: 0px;
+  bottom: -35px;
   left: var(--sp-lg);
 }
 
