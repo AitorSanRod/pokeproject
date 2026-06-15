@@ -79,7 +79,8 @@ var ROUTE_DATA = {
   'route-2': {
     bg: 'assets/bg/route-2.png',
     combatBg: 'assets/bg/combate.png',
-    rewardPokemon: [POKEMON.caterpie, POKEMON.weedle, POKEMON.pidgey, POKEMON.rattata, POKEMON.mr_mime],
+    rewardPokemon: [POKEMON.caterpie, POKEMON.weedle, POKEMON.pidgey, POKEMON.rattata],
+    rewardExtras: [ITEM.leftovers],
     wild: [
       { name: POKEMON.rattata, rate: 35, minLv: 3, maxLv: 5, moveId: MOVES.normal.physical.tackle },
       { name: POKEMON.pidgey, rate: 30, minLv: 3, maxLv: 5, moveId: MOVES.flying.physical.peck },
@@ -242,7 +243,7 @@ var ROUTE_DATA = {
     bg: 'assets/bg/mt-moon.png',
     combatBg: 'assets/bg/combate-cueva.png',
     rewardPokemon: [POKEMON.zubat, POKEMON.clefairy, POKEMON.geodude],
-    rewardExtras: [ITEM.sitrus_berry],
+    rewardExtras: [ITEM.sitrus_berry, ITEM.leftovers],
     wild: [
       { name: POKEMON.zubat, rate: 30, minLv: 14, maxLv: 21, moveId: MOVES.flying.physical.peck },
       { name: POKEMON.zubat, rate: 30, minLv: 14, maxLv: 21, moveId: MOVES.poison.physical.poison_jab },
@@ -294,13 +295,13 @@ var ROUTE_DATA = {
     gym: {
       leader: [
         {
-          name: POKEMON.staryu, level: 28, moveId: MOVES.water.special.surf,
+          name: POKEMON.staryu, level: 25, moveId: MOVES.water.special.surf,
           overrides: {
             evs: { hp: 32, def: 32, spd: 32, spa: 32 },
           },
         },
         {
-          name: POKEMON.starmie, level: 25, moveId: MOVES.psychic.special.confusion,
+          name: POKEMON.starmie, level: 28, moveId: MOVES.psychic.special.confusion,
           overrides: {
             evs: { hp: 32, def: 32, spd: 32, spa: 32},
           },
@@ -319,7 +320,7 @@ var ROUTE_DATA = {
   'espacio-raro': {
     bg: 'assets/bg/espacio-raro.png',
     combatBg: 'assets/bg/combate-espacio-raro.png',
-    rewardPokemon: [POKEMON.mewtwo],
+    rewardPokemon: [POKEMON.mew],
     wild: [
       { name: POKEMON.mewtwo, rate: 100, minLv: 35, maxLv: 50, moveId: MOVES.psychic.special.trick }
     ],

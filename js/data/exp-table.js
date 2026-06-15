@@ -1,7 +1,16 @@
 var EXP_TABLE = {
   BASE_EXP_REQUIRED: 10,
 
-  MULTIPLIERS: { wild: 1.0, trainer: 1.5, gym: 2.0 },
+  MULTIPLIERS: { wild: 1.0, trainer: 1.2, gym: 1.5 },
+
+  // Penalización de experiencia por diferencia de nivel.
+  // Si el pokemon ACTIVO del jugador tiene más de `levelDiff` niveles que el
+  // pokemon rival derrotado, TODO el equipo gana `multiplier` × la exp normal
+  // (independientemente del tipo de combate: salvaje, entrenador o gimnasio).
+  EXP_PENALTY: {
+    levelDiff: 3,    // diferencia de nivel a partir de la cual se aplica la penalización
+    multiplier: 0.4, // multiplicador de exp aplicado si se supera levelDiff
+  },
 
   // EXP base al ser derrotado — fuente: PokeAPI / Gen 1 oficial
   POKEMON_BASE_EXP: {

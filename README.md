@@ -35,6 +35,8 @@ movimientos, efectos, estados, evoluciones, recompensas y pantallas.
 20. [Validación de daño y efectividad de tipos](#20-validación-de-daño-y-efectividad-de-tipos)
 21. [Rutas tipo 'information' y pantalla final personalizable](#21-rutas-tipo-information-y-pantalla-final-personalizable)
 22. [Orden de logs de combate — resumen vs efectos de objetos](#22-orden-de-logs-de-combate--resumen-vs-efectos-de-objetos)
+23. [Desglose de modificadores de daño en el log de combate](#23-desglose-de-modificadores-de-daño-en-el-log-de-combate)
+24. [Penalización de experiencia por diferencia de nivel](#24-penalización-de-experiencia-por-diferencia-de-nivel)
 
 ---
 
@@ -901,24 +903,34 @@ Cada pokemon puede llevar **como mucho un objeto equipado**:
 },
 ```
 
-### Dos tipos de trigger
+### Tres tipos de trigger
 
 - **`PASSIVE`** — se ejecuta **una vez** al equipar (`fn`) y al quitar (`revert`).
   Útil para modificadores permanentes mientras se lleve el objeto, como
-  `combatMods.spe` del Pañuelo Eleccion.
+  `combatMods.spe` del Pañuelo Eleccion o `combatMods.spd` del Chaleco Asalto.
 - **`ON_TURN_START`** — se evalúa tras cada golpe recibido en combate, con el
   HP ya actualizado (`applyHeldItemTurnStart`, llamado desde `_animateAttack`
   justo después de aplicar el daño al defensor). Si declara `onceFlag`, solo
   se ejecuta una vez por ruta — el flag se resetea junto a `combatMods` en
   `adventure()`.
+- **`ON_TURN_END`** — se evalúa al **final del turno**, en
+  `_applyEndOfTurnStatus`, después del daño por estado (veneno/quemadura/
+  congelación). Si ambos combatientes llevan un objeto con este trigger, se
+  resuelven en **orden de velocidad** (`effectiveSpeed`, mayor primero), pero
+  siempre como **última acción del turno** — después de todo lo demás. Útil
+  para curación pasiva como Restos (`applyHeldItemTurnEnd`).
 
 ### Objetos disponibles
 
 | ID | Nombre | Efecto |
 |---|---|---|
 | `sitrus-berry` | Baya Zidra | Si HP < 50% (y > 0%), cura 25% del HP máximo. Una vez por ruta. |
-| `choice-scarf` | Pañuelo Eleccion | `combatMods.spe += 1.0` (+100% VEL, afecta orden de turno vía `effectiveSpeed`). Bloquea cambio de `autoMove`. |
-| `carbon` | Carbón | +50% de daño a movimientos de tipo **fuego** y clase **especial** (ver `dmgBoost` abajo). |
+| `choice-scarf` | Pañuelo Elección | `combatMods.spe += 1.0` (+100% VEL, afecta orden de turno vía `effectiveSpeed`). Bloquea cambio de `autoMove`. |
+| `assault-vest` | Chaleco asalto | `combatMods.spd += 0.5` (+50% defensa especial). Bloquea cambio de `autoMove`. |
+| `carbon` | Carbón | +25% de daño a movimientos de tipo **fuego** (ver `dmgBoost` abajo). |
+| `mystic-water` | Agua Mística | +25% de daño a movimientos de tipo **agua** (ver `dmgBoost` abajo). |
+| `miracle-seed` | Semilla Milagro | +25% de daño a movimientos de tipo **planta** (ver `dmgBoost` abajo). |
+| `leftovers` | Restos | Cura 10% del HP máximo al final de cada turno (`ON_TURN_END`, ver abajo). No cura si está a tope o debilitado. |
 
 ### dmgBoost — boost de daño condicional por tipo/clase de movimiento
 
@@ -932,11 +944,11 @@ de aplicar STAB/efectividad/aleatoriedad, comprobando en tiempo real
 ```js
 'carbon': {
   name: 'Carbón',
-  desc: 'Aumenta el daño de los movimientos de tipo FUEGO y clase ESPECIAL un 50%.',
+  desc: 'Aumenta el daño de los movimientos de tipo FUEGO un 25%.',
   img:  'assets/sprites/items/carbon.png',
   fallbackIcon: '🔥',
   trigger: HELD_ITEM_TRIGGERS.PASSIVE,
-  dmgBoost: { mult: 0.5, type: 'fire', class: 'special' },
+  dmgBoost: { mult: 0.25, type: 'fire' },
   fn(ctx) {},      // no-op — el boost se evalúa en calcDamage, no aquí
   revert(ctx) {},  // no-op — al desequipar, calcDamage deja de verlo
 },
@@ -944,25 +956,26 @@ de aplicar STAB/efectividad/aleatoriedad, comprobando en tiempo real
 
 Campos de `dmgBoost`:
 
-- **`mult`** — multiplicador adicional de daño. `0.5` = ×1.5 (+50%).
+- **`mult`** — multiplicador adicional de daño. `0.25` = ×1.25 (+25%).
   `dmg = Math.floor(dmg * (1 + mult))`.
 - **`type`** — si está informado (p.ej. `'fire'`), solo aplica cuando
   `move.type === type`. Si es `null`/se omite, aplica a **todos los tipos**.
-- **`class`** — si está informado (`'physical'` o `'special'`), solo aplica
-  cuando `move.damageClass === class`. Si es `null`/se omite, aplica a
-  **ambas clases**.
+- **`class`** — opcional. Si está informado (`'physical'` o `'special'`), solo
+  aplica cuando `move.damageClass === class`. Si es `null`/se omite (como en
+  `carbon`, `mystic-water` y `miracle-seed`), aplica a **ambas clases**.
 
 **Por qué `fn`/`revert` están vacíos**: a diferencia de `combatMods` (que se
 escriben una vez al equipar y deben revertirse al quitar), `dmgBoost` se lee
 directamente de `HELD_ITEMS[attacker.heldItem]` en cada cálculo de daño. Si el
-pokemon ya no lleva el objeto (`heldItem !== 'carbon'`), el boost
-simplemente no se evalúa — no hace falta revertir ningún estado.
+pokemon ya no lleva el objeto, el boost simplemente no se evalúa — no hace
+falta revertir ningún estado.
 
 **Ejemplo**: Ascuas (Ember, fuego/especial, poder 40) con Carbón equipado en
-un Charmander Nv.10 pasa de hacer ~9 dmg a ~13 dmg contra un objetivo neutral
-(+50%, redondeado hacia abajo). Un movimiento físico de fuego (p.ej. Rueda
-Fuego) o un movimiento especial de otro tipo (p.ej. Pistola Agua) **no**
-reciben el boost — solo la combinación type+class declarada en `dmgBoost`.
+un Charmander Nv.10 pasa de hacer ~9 dmg a ~11 dmg contra un objetivo neutral
+(+25%, redondeado hacia abajo). Como `carbon` no declara `class`, también
+afecta a movimientos físicos de fuego (p.ej. Rueda Fuego). Un movimiento
+especial de otro tipo (p.ej. Pistola Agua) no recibe el boost — solo
+movimientos cuyo `move.type` coincida con el `type` declarado en `dmgBoost`.
 
 ### API
 
@@ -970,6 +983,7 @@ reciben el boost — solo la combinación type+class declarada en `dmgBoost`.
 equipHeldItem(pokemon, itemId)   // equipa (revierte el anterior si lo había)
 unequipHeldItem(pokemon)         // quita y "destruye" — revierte efecto pasivo
 applyHeldItemTurnStart(pokemon, ctx) // ON_TURN_START — llamado desde combate
+applyHeldItemTurnEnd(pokemon, ctx)   // ON_TURN_END — llamado al final del turno, en orden de velocidad
 resetHeldItemFlags(team)         // resetea _heldItemFlags de todo el equipo
 heldItemBlocksMoveChange(pokemon) // true si el objeto bloquea cambiar autoMove
 ```
@@ -1017,10 +1031,12 @@ el jugador elige ese premio y selecciona a qué pokemon equiparlo.
 
 ### Sprites pendientes
 
-`assets/sprites/items/sitrus-berry.png`, `assets/sprites/items/choice-scarf.png`
-y `assets/sprites/items/carbon.png` no existen todavía — el icono cae a
-`fallbackIcon` (🍒 / 🧣 / 🔥) vía `onerror`. Añade los PNG a esa carpeta
-cuando los tengas; no se necesita ningún cambio de código adicional.
+`assets/sprites/items/sitrus-berry.png`, `assets/sprites/items/choice-scarf.png`,
+`assets/sprites/items/carbon.png`, `assets/sprites/items/mystic-water.png`,
+`assets/sprites/items/miracle-seed.png`, `assets/sprites/items/assault-vest.png`
+y `assets/sprites/items/leftovers.png` no existen todavía — el icono cae a
+`fallbackIcon` (🍒 / 🧣 / 🔥 / 💧 / 🌱 / 🦺 / 🍞) vía `onerror`. Añade los PNG a
+esa carpeta cuando los tengas; no se necesita ningún cambio de código adicional.
 
 ---
 
@@ -1629,4 +1645,99 @@ actualizado — esto no ha cambiado. Solo se reordenó el `console.log` de
 resumen para que el orden de la consola sea más intuitivo durante depuración;
 no afecta a la lógica de combate ni al log visible en pantalla
 (`[COMBAT LOG]`, vía `_updateCombatLog`).
+
+---
+
+## 23. Desglose de modificadores de daño en el log de combate
+
+`calcDamage` (`battle.js`) ahora devuelve, además de `dmg`/`isCrit`/`eff`, un
+array **`modifiers`** con los modificadores que afectaron al daño de ese
+golpe concreto — tanto subidas/bajadas de estadística (`combatMods`, sección
+9) como boosts de objetos equipados (`dmgBoost`, sección 9.5). Cada entrada
+es `{ label, mult }`.
+
+### Qué se incluye
+
+- **Modificador de ataque del atacante** — `combatMods.atk` (movimientos
+  físicos) o `combatMods.spa` (especiales), si es distinto de 0.
+  Label: `"ATK <nombre> +20%"` / `"SPA <nombre> -10%"`.
+- **Modificador de defensa del defensor** — `combatMods.def` (físicos) o
+  `combatMods.spd` (especiales), si es distinto de 0.
+  Label: `"DEF <nombre> -20%"` / `"SPD <nombre> +50%"`.
+- **Boost de objeto equipado** — si `HELD_ITEMS[attacker.heldItem].dmgBoost`
+  aplica a este movimiento (type/class coinciden, sección 9.5).
+  Label: `"<nombre objeto> (<atacante>) +25%"`.
+
+Solo se listan los modificadores **relevantes para este golpe concreto** —
+p.ej. si el movimiento es físico, no se muestra `combatMods.spa` aunque el
+atacante tenga ese modificador activo (no afecta a este cálculo).
+
+### Dónde se muestra
+
+- **Consola** — una línea adicional justo después del resumen `[COMBAT] ...
+  -> X dmg`:
+  ```
+  [COMBAT] Charmander uso Ascuas -> 11 dmg
+  [COMBAT] Modificadores aplicados: Carbón (Charmander) +25% (×1.25)
+  ```
+- **Log de combate visible** (`_updateCombatLog`) — una línea por
+  modificador, mostrada tras los mensajes de "Es muy eficaz!"/"Un golpe
+  crítico!" y antes de evaluar el objeto equipado del defensor:
+  ```
+  [COMBAT LOG] Charmander uso Ascuas!
+  [COMBAT LOG] Es muy eficaz!
+  [COMBAT LOG] SPA Charmander +20%
+  [COMBAT LOG] Carbón (Charmander) +25%
+  ```
+
+Si no hay ningún modificador activo para ese golpe, `modifiers` es un array
+vacío y no se añade ninguna línea extra al log.
+
+---
+
+## 24. Penalización de experiencia por diferencia de nivel
+
+Configurable en `EXP_TABLE.EXP_PENALTY` (`exp-table.js`):
+
+```js
+EXP_PENALTY: {
+  levelDiff: 2,    // diferencia de nivel a partir de la cual se aplica la penalización
+  multiplier: 0.5, // multiplicador de exp aplicado si se supera levelDiff
+},
+```
+
+**Regla**: si el pokemon **activo** del jugador (el que está combatiendo en
+ese momento, `ctx.activePlayer`) tiene más de `levelDiff` niveles por encima
+del pokemon rival derrotado, **todo el equipo** recibe
+`gained = Math.round(gained * multiplier)` — es decir, con los valores por
+defecto, la mitad de la experiencia que ganarían normalmente. Aplica por
+igual a combates salvajes, de entrenador y de gimnasio.
+
+### Implementación
+
+`gainExp(pokemon, foeName, battleType, foeLevel, activeLevel)` (`pokemon.js`)
+acepta un quinto parámetro `activeLevel` — el nivel del pokemon activo del
+jugador en ese combate. Tras calcular `gained` con los multiplicadores
+habituales (`MULTIPLIERS`, `levelMult`), si
+`activeLevel - foeLevel > EXP_TABLE.EXP_PENALTY.levelDiff`, se aplica
+`gained = Math.round(gained * EXP_TABLE.EXP_PENALTY.multiplier)` **antes** de
+sumarlo a `pokemon.exp` — afecta tanto al pokemon activo como al resto del
+equipo, ya que la comparación de nivel siempre usa el activo, no cada
+miembro individualmente.
+
+Ambos puntos donde se reparte experiencia pasan `activeLevel`:
+
+- `screens.js` (`_combatEnd`) → `(ctx.activePlayer ?? player).level`
+- `battle.js` (simulador, `runBattleSim`) → `activePlayer.level`
+
+Si `activeLevel` se omite, por defecto vale `foeLevel` (diferencia 0 → sin
+penalización), por lo que llamadas antiguas a `gainExp` sin este parámetro
+siguen funcionando sin cambios de comportamiento.
+
+### Ejemplo
+
+Con los valores por defecto (`levelDiff: 2`, `multiplier: 0.5`):
+- Activo Nv.12 vs rival Nv.10 → diferencia 2 → **sin penalización**, exp normal.
+- Activo Nv.13 vs rival Nv.10 → diferencia 3 → **penalización**, exp ÷ 2 para
+  todo el equipo (redondeado).
 

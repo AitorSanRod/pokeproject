@@ -2,16 +2,21 @@
 // que la UI consume para animar y mostrar mensajes
 
 function calcDamage(attacker, defender, move) {
-  if (!move || !move.power) return { dmg: 0, isCrit: false };
+  if (!move || !move.power) return { dmg: 0, isCrit: false, modifiers: [] };
 
   const isSpecial = move.damageClass === 'special';
 
   // Modificadores aditivos sobre la base: mod=0 → ×1.0, mod=0.4 → ×1.4, mod=-0.4 → ×0.6
   // Mínimo multiplicador: 0.1 (no puede llegar a 0 ni negativo)
-  const atkMult = Math.max(0.1, 1 + (attacker.combatMods?.atk ?? 0));
-  const spaMult = Math.max(0.1, 1 + (attacker.combatMods?.spa ?? 0));
-  const defMult = Math.max(0.1, 1 + (defender.combatMods?.def ?? 0));
-  const spdMult = Math.max(0.1, 1 + (defender.combatMods?.spd ?? 0));
+  const atkMod  = attacker.combatMods?.atk ?? 0;
+  const spaMod  = attacker.combatMods?.spa ?? 0;
+  const defMod  = defender.combatMods?.def ?? 0;
+  const spdMod  = defender.combatMods?.spd ?? 0;
+
+  const atkMult = Math.max(0.1, 1 + atkMod);
+  const spaMult = Math.max(0.1, 1 + spaMod);
+  const defMult = Math.max(0.1, 1 + defMod);
+  const spdMult = Math.max(0.1, 1 + spdMod);
 
   const atk = isSpecial
     ? Math.floor(attacker.stats.spa * spaMult)
@@ -28,8 +33,30 @@ function calcDamage(attacker, defender, move) {
 
   dmg = Math.floor(dmg * stab * eff * rnd);
 
+  // ── Desglose de modificadores activos — para el log de combate (UI).
+  // Solo se incluyen modificadores de combatMods relevantes para esta
+  // clase de movimiento (atk/spa del atacante, def/spd del defensor) y
+  // distintos de 0, más cualquier boost de objeto equipado.
+  const modifiers = [];
+  const atkLabel = isSpecial ? 'SPA' : 'ATK';
+  const defLabel = isSpecial ? 'SPD' : 'DEF';
+  const atkModVal = isSpecial ? spaMod : atkMod;
+  const defModVal = isSpecial ? spdMod : defMod;
+  if (atkModVal !== 0) {
+    modifiers.push({
+      label: `${atkLabel} ${attacker.displayName} ${atkModVal > 0 ? '+' : ''}${Math.round(atkModVal * 100)}%`,
+      mult: Math.max(0.1, 1 + atkModVal),
+    });
+  }
+  if (defModVal !== 0) {
+    modifiers.push({
+      label: `${defLabel} ${defender.displayName} ${defModVal > 0 ? '+' : ''}${Math.round(defModVal * 100)}%`,
+      mult: Math.max(0.1, 1 + defModVal),
+    });
+  }
+
   // ── Objeto equipado del ATACANTE — boost de daño condicional por tipo/clase
-  // (p.ej. Carbón: +50% a movimientos de tipo fuego y clase especial).
+  // (p.ej. Carbón: +25% a movimientos de tipo fuego).
   // Se evalúa en tiempo real desde HELD_ITEMS — si el objeto se quita, el
   // boost deja de aplicarse automáticamente sin necesidad de revertir nada.
   const heldItem = HELD_ITEMS?.[attacker.heldItem];
@@ -39,13 +66,17 @@ function calcDamage(attacker, defender, move) {
     const classMatches = !cls  || move.damageClass === cls;
     if (typeMatches && classMatches) {
       dmg = Math.floor(dmg * (1 + mult));
+      modifiers.push({
+        label: `${heldItem.name} (${attacker.displayName}) +${Math.round(mult * 100)}%`,
+        mult: 1 + mult,
+      });
     }
   }
 
   const isCrit = Math.random() < COMBAT_CONFIG.CRIT_CHANCE;
   if (isCrit) dmg = Math.floor(dmg * COMBAT_CONFIG.CRIT_MULTIPLIER);
 
-  return { dmg: Math.max(1, dmg), isCrit, eff };
+  return { dmg: Math.max(1, dmg), isCrit, eff, modifiers };
 }
 
 function enemyChooseMove(enemy, player) {
@@ -169,7 +200,7 @@ async function runBattleSim(playerPokemon, foePokemon, options = {}) {
 
     for (const member of fullTeam) {
       if (member.currentHp <= 0) continue;
-      const { gained, levelsGained } = gainExp(member, foePokemon.name, battleType, foePokemon.level);
+      const { gained, levelsGained } = gainExp(member, foePokemon.name, battleType, foePokemon.level, activePlayer.level);
       events.push({ type: 'exp', pokemon: member.displayName, gained });
       if (levelsGained > 0) events.push({ type: 'level-up', pokemon: member.displayName, level: member.level });
     }

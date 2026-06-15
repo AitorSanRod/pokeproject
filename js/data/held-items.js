@@ -13,6 +13,12 @@
 //   ON_TURN_START  → se evalúa al principio de cada turno de combate, con el
 //                     HP ya actualizado tras el daño recibido. Útil para
 //                     objetos de curación condicional (Baya Zidra).
+//   ON_TURN_END    → se evalúa al FINAL del turno, después del daño por
+//                     estado (veneno/quemadura/etc). Si varios pokemon tienen
+//                     un objeto ON_TURN_END, se resuelven en orden de
+//                     velocidad (effectiveSpeed, mayor primero) — pero
+//                     siempre como última acción del turno, después de todo
+//                     lo demás. Útil para curación pasiva (Restos).
 //
 // onceFlag: si se declara, el efecto solo puede activarse UNA VEZ por
 // ese identificador — el flag se guarda en pokemon._heldItemFlags[onceFlag]
@@ -33,6 +39,7 @@
 var HELD_ITEM_TRIGGERS = Object.freeze({
   PASSIVE: 'passive',          // al equipar (fn) / al quitar (revert)
   ON_TURN_START: 'on-turn-start',    // al inicio de cada turno de combate
+  ON_TURN_END: 'on-turn-end',        // al final de cada turno de combate
 });
 
 var HELD_ITEMS = {
@@ -91,12 +98,12 @@ var HELD_ITEMS = {
     fn(ctx) {
       const { user } = ctx;
       if (!user.combatMods) user.combatMods = {};
-      user.combatMods.spa = (user.combatMods.spd ?? 0) + 0.5;
+      user.combatMods.spd = (user.combatMods.spd ?? 0) + 0.5;
     },
     revert(ctx) {
       const { user } = ctx;
       if (!user.combatMods) return;
-      user.combatMods.spa = (user.combatMods.spd ?? 0) - 0.5;
+      user.combatMods.spd = (user.combatMods.spd ?? 0) - 0.5;
     },
   },
 
@@ -138,6 +145,31 @@ var HELD_ITEMS = {
     dmgBoost: { mult: 0.25, type: 'grass' },
     fn(ctx) { },
     revert(ctx) { },
+  },
+
+  'leftovers': {
+    name: 'Restos',
+    desc: 'Cura el 10% del HP máximo del pokemon equipado al final de cada turno.',
+    img: 'assets/sprites/items/leftovers.png',
+    fallbackIcon: '🍞',
+    trigger: HELD_ITEM_TRIGGERS.ON_TURN_END,
+    fn(ctx) {
+      const { user, log, updateHud } = ctx;
+      // No curar a un pokemon debilitado
+      if (user.currentHp <= 0) return false;
+      // No curar si ya está al máximo
+      if (user.currentHp >= user.stats.hp) return false;
+
+      const heal = Math.max(1, Math.floor(user.stats.hp * 0.10));
+      const before = user.currentHp;
+      user.currentHp = Math.min(user.stats.hp, user.currentHp + heal);
+      const actual = user.currentHp - before;
+      if (actual > 0) {
+        log(`${user.displayName} ha recuperado ${actual} HP con restos.`);
+        if (updateHud) updateHud();
+      }
+      return actual > 0;
+    },
   },
 
 };
@@ -188,6 +220,34 @@ function applyHeldItemTurnStart(pokemon, ctx) {
   if (!itemId) return false;
   const item = HELD_ITEMS[itemId];
   if (!item || item.trigger !== HELD_ITEM_TRIGGERS.ON_TURN_START) return false;
+
+  pokemon._heldItemFlags = pokemon._heldItemFlags ?? {};
+  if (item.onceFlag && pokemon._heldItemFlags[item.onceFlag]) return false;
+
+  let executed = false;
+  try {
+    executed = !!item.fn({ ...ctx, user: pokemon });
+  } catch (e) {
+    console.error(`[ITEM] Error en "${itemId}":`, e.message);
+  }
+
+  if (executed && item.onceFlag) {
+    pokemon._heldItemFlags[item.onceFlag] = true;
+  }
+  return executed;
+}
+
+// Evalúa el efecto ON_TURN_END del objeto equipado de un pokemon, si lo tiene.
+// ctx: { user, log, updateHud }
+// Devuelve true si el efecto se ejecutó (y por tanto se consumió, si tenía onceFlag).
+// Llamar al FINAL del turno (tras el daño por estado), en orden de
+// effectiveSpeed (mayor primero) entre los pokemon que tengan un objeto
+// ON_TURN_END — ver _applyEndOfTurnStatus en screens.js.
+function applyHeldItemTurnEnd(pokemon, ctx) {
+  const itemId = pokemon?.heldItem;
+  if (!itemId) return false;
+  const item = HELD_ITEMS[itemId];
+  if (!item || item.trigger !== HELD_ITEM_TRIGGERS.ON_TURN_END) return false;
 
   pokemon._heldItemFlags = pokemon._heldItemFlags ?? {};
   if (item.onceFlag && pokemon._heldItemFlags[item.onceFlag]) return false;

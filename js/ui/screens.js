@@ -1524,6 +1524,30 @@ const Screens = {
 
     // Refrescar badges de estado en HUDs
     Screens._updateStatusBadges(player, foe);
+
+    // ── Objetos ON_TURN_END (p.ej. Restos) — última acción del turno ────────
+    // Si ambos combatientes llevan un objeto con este trigger, se resuelven
+    // en orden de velocidad (effectiveSpeed, mayor primero), pero siempre
+    // después de todo lo demás (daño por estado ya aplicado arriba).
+    const updatePlayerHud = () => {
+      Render.updateHpBar(document.getElementById('hud-player'), player.currentHp, player.stats.hp);
+      const nums = document.getElementById('hp-nums-player');
+      if (nums) nums.textContent = `${player.currentHp}/${player.stats.hp}`;
+      Screens._updateCombatTeamBar();
+    };
+    const updateFoeHud = () => {
+      Render.updateHpBar(document.getElementById('hud-foe'), foe.currentHp, foe.stats.hp);
+    };
+
+    const order = effectiveSpeed(player) >= effectiveSpeed(foe)
+      ? [{ poke: player, updateHud: updatePlayerHud }, { poke: foe, updateHud: updateFoeHud }]
+      : [{ poke: foe, updateHud: updateFoeHud }, { poke: player, updateHud: updatePlayerHud }];
+
+    for (const { poke, updateHud } of order) {
+      if (!isAlive(poke)) continue;
+      const triggered = applyHeldItemTurnEnd(poke, { log: logFn, updateHud });
+      if (triggered) await Screens._wait(400);
+    }
   },
 
   async _animateAttack(attacker, defender, move, activePlayer) {
@@ -1541,7 +1565,7 @@ const Screens = {
 
     const calc = calcDamage(attacker, defender, move ?? attacker.moves[0]);
     let dmg = calc.dmg;
-    const { isCrit, eff } = calc;
+    const { isCrit, eff, modifiers } = calc;
     move.pp = Math.max(0, (move.pp ?? 1) - 1);
 
     // Callbacks de actualización de HUD para efectos
@@ -1578,6 +1602,9 @@ const Screens = {
 
     // Log de resumen — justo tras aplicar el daño, antes de efectos (Baya Zidra, etc.)
     console.log(`[COMBAT] ${attacker.displayName} uso ${move?.name} -> ${dmg} dmg${isCrit?' (CRIT)':''}${eff>=2?' (EFICAZ!)':eff<1&&eff>0?' (poco eficaz)':eff===0?' (inmune)':''}`);
+    if (modifiers?.length) {
+      console.log(`[COMBAT] Modificadores aplicados: ${modifiers.map(m => `${m.label} (×${m.mult.toFixed(2)})`).join(', ')}`);
+    }
 
     // ── Objeto equipado del DEFENSOR (ON_TURN_START, p.ej. Baya Zidra) ──────
     // Se evalúa justo tras recibir el golpe, con el HP ya actualizado.
@@ -1600,6 +1627,13 @@ const Screens = {
     if (eff >= 2)       { Screens._updateCombatLog('Es muy eficaz!');      await Screens._wait(300); }
     else if (eff === 0) { Screens._updateCombatLog('No afecto al rival!'); await Screens._wait(300); }
     else if (eff < 1)   { Screens._updateCombatLog('No es muy eficaz...'); await Screens._wait(300); }
+
+    // Mostrar en el log de combate los modificadores que afectaron a este golpe
+    // (subidas/bajadas de estadística vía combatMods, boosts de objetos como Carbón).
+    for (const mod of modifiers ?? []) {
+      Screens._updateCombatLog(`${mod.label}`);
+      await Screens._wait(300);
+    }
 
     if (heldItemTriggered) await Screens._wait(400);
 
@@ -1663,9 +1697,10 @@ const Screens = {
 
       // EXP
       const battleType = ctx.isGym ? 'gym' : ctx.isTrainer ? 'trainer' : 'wild';
+      const activeLevel = (ctx.activePlayer ?? player).level; // pokemon ACTIVO del jugador en este combate
       for (const member of GameState.team) {
         if (member.currentHp <= 0) continue;
-        const { gained, levelsGained } = gainExp(member, foe.name, battleType, foe.level);
+        const { gained, levelsGained } = gainExp(member, foe.name, battleType, foe.level, activeLevel);
         console.log(`[COMBAT] ${member.displayName} gano ${gained} exp`);
         if (levelsGained > 0) {
           Screens._updateCombatLog(`${member.displayName} subio al nivel ${member.level}!`);
