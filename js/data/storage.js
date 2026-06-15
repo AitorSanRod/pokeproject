@@ -1,0 +1,156 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// STORAGE — persistencia entre sesiones
+//
+// Todo lo que necesita sobrevivir al cierre del navegador pasa por aquí.
+// Usa localStorage con claves prefijadas para no colisionar con otros datos.
+//
+// Claves usadas:
+//   pkmn_pokedex   → { [name]: { caught: bool } }
+//   pkmn_evs       → { [name]: { hp, atk, def, spa, spd, spe } }
+// ─────────────────────────────────────────────────────────────────────────────
+
+var Storage = {
+
+  _PREFIX: 'pkmn_',
+
+  _key(name) { return this._PREFIX + name; },
+
+  _get(key) {
+    try {
+      const raw = localStorage.getItem(this._key(key));
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      console.warn('[Storage] Error leyendo', key, e);
+      return null;
+    }
+  },
+
+  _set(key, value) {
+    try {
+      localStorage.setItem(this._key(key), JSON.stringify(value));
+    } catch (e) {
+      console.warn('[Storage] Error guardando', key, e);
+    }
+  },
+
+  // ── Pokédex ───────────────────────────────────────────────────────────────
+
+  getPokedex() {
+    return this._get('pokedex') ?? {};
+  },
+
+  markSeen(pokemonName) {
+    const dex = this.getPokedex();
+    if (dex[pokemonName]?.caught) return; // ya capturado, no hace falta
+    if (dex[pokemonName]?.seen) return;   // ya visto
+    if (!dex[pokemonName]) dex[pokemonName] = {};
+    dex[pokemonName].seen = true;
+    this._set('pokedex', dex);
+    console.log(`[Storage] Pokedex: ${pokemonName} visto`);
+  },
+
+  isSeen(pokemonName) {
+    const entry = this.getPokedex()[pokemonName];
+    return entry?.caught === true || entry?.seen === true;
+  },
+
+  markCaught(pokemonName) {
+    const dex = this.getPokedex();
+    if (!dex[pokemonName]) dex[pokemonName] = {};
+    if (dex[pokemonName].caught) return; // ya estaba marcado
+    dex[pokemonName].caught = true;
+    this._set('pokedex', dex);
+    console.log(`[Storage] Pokedex: ${pokemonName} marcado como capturado`);
+  },
+
+  isCaught(pokemonName) {
+    return this.getPokedex()[pokemonName]?.caught === true;
+  },
+
+  EV_MAX_PER_STAT: 32,
+
+  // ── Líneas evolutivas ─────────────────────────────────────────────────────
+  // Devuelve el nombre del primer eslabón de la cadena evolutiva.
+  // Los EVs se guardan bajo esa clave, así toda la cadena comparte los mismos EVs.
+  getEvolutionRoot(pokemonName) {
+    if (typeof POKEMON_DB === 'undefined') return pokemonName;
+    var current = pokemonName;
+    var visited = {};
+    while (true) {
+      if (visited[current]) return current;
+      visited[current] = true;
+      var names = Object.keys(POKEMON_DB);
+      var found = false;
+      for (var i = 0; i < names.length; i++) {
+        if (POKEMON_DB[names[i]].evolvesInto === current) {
+          current = names[i];
+          found = true;
+          break;
+        }
+      }
+      if (!found) return current;
+    }
+  },
+
+  // ── EVs ──────────────────────────────────────────────────────────────────
+  // Los EVs se guardan bajo la raíz de la cadena evolutiva.
+  // bulbasaur/ivysaur/venusaur comparten la misma entrada.
+
+  getEvs(pokemonName) {
+    const root = this.getEvolutionRoot(pokemonName);
+    const all  = this._get('evs') ?? {};
+    return all[root] ?? { hp:0, atk:0, def:0, spa:0, spd:0, spe:0 };
+  },
+
+  addEv(pokemonName, stat, amount = 1) {
+    const root = this.getEvolutionRoot(pokemonName);
+    const all  = this._get('evs') ?? {};
+    if (!all[root]) all[root] = { hp:0, atk:0, def:0, spa:0, spd:0, spe:0 };
+    const current = all[root][stat] ?? 0;
+    if (current >= this.EV_MAX_PER_STAT) {
+      console.log(`[Storage] EVs: cadena ${root} ${stat} ya en máximo (${this.EV_MAX_PER_STAT})`);
+      return all[root];
+    }
+    all[root][stat] = Math.min(this.EV_MAX_PER_STAT, current + amount);
+    this._set('evs', all);
+    console.log(`[Storage] EVs: cadena ${root} +${amount} ${stat} → ${all[root][stat]}/${this.EV_MAX_PER_STAT}`);
+    return all[root];
+  },
+
+  getAllEvs() {
+    return this._get('evs') ?? {};
+  },
+
+  // Aplica los EVs de la cadena al pokemon recién creado
+  applyStoredEvs(pokemon) {
+    const stored = this.getEvs(pokemon.name);
+    pokemon.evs = { ...pokemon.evs, ...stored };
+    return pokemon;
+  },
+
+  // ── Medallas ─────────────────────────────────────────────────────────────
+  // Las medallas se guardan por la raíz de la cadena evolutiva, igual que los EVs:
+  // ganar una medalla con Bulbasaur también la registra para Ivysaur/Venusaur.
+
+  getBadges(pokemonName) {
+    const root = this.getEvolutionRoot(pokemonName);
+    const all  = this._get('badges') ?? {};
+    return all[root] ?? [];
+  },
+
+  addBadge(pokemonName, badgeName) {
+    const root = this.getEvolutionRoot(pokemonName);
+    const all  = this._get('badges') ?? {};
+    if (!all[root]) all[root] = [];
+    if (!all[root].includes(badgeName)) {
+      all[root].push(badgeName);
+      this._set('badges', all);
+      console.log(`[Storage] Medalla: cadena ${root} obtiene "${badgeName}"`);
+    }
+    return all[root];
+  },
+
+  getAllBadges() {
+    return this._get('badges') ?? {};
+  },
+};

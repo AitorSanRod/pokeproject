@@ -1,0 +1,336 @@
+/* ── Design tokens ─────────────────────────────────────────────────────────── */
+:root {
+  /* Palette — vibrant Game Boy Color era */
+  --red:        #E3350D;
+  --red-dark:   #9B2008;
+  --red-light:  #FF6B4A;
+  --yellow:     #F7D02C;
+  --yellow-dark:#C8A800;
+  --blue:       #1A6FBF;
+  --blue-light: #6DB4FF;
+  --green:      #38BF4B;
+  --green-dark: #1E7A2A;
+  --white:      #F8F8F8;
+  --off-white:  #EEE8D5;
+  --grey-light: #D0CBBA;
+  --grey:       #888070;
+  --grey-dark:  #44403A;
+  --black:      #1A1814;
+
+  /* HP bar colours */
+  --hp-high:    #38BF4B;
+  --hp-mid:     #F7D02C;
+  --hp-low:     #E3350D;
+
+  /* Type badge colours */
+  --type-normal:   #A8A878;
+  --type-fire:     #F08030;
+  --type-water:    #6890F0;
+  --type-grass:    #78C850;
+  --type-electric: #F8D030;
+  --type-ice:      #98D8D8;
+  --type-fighting: #C03028;
+  --type-poison:   #A040A0;
+  --type-ground:   #E0C068;
+  --type-flying:   #A890F0;
+  --type-psychic:  #F85888;
+  --type-bug:      #A8B820;
+  --type-rock:     #B8A038;
+  --type-ghost:    #705898;
+  --type-dragon:   #7038F8;
+  --type-dark:     #705848;
+  --type-steel:    #B8B8D0;
+  --type-fairy:    #EE99AC;
+
+  /* Typography */
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-body:  'Nunito', sans-serif;
+
+  /* Spacing */
+  --sp-xs:  4px;
+  --sp-sm:  8px;
+  --sp-md:  16px;
+  --sp-lg:  24px;
+  --sp-xl:  40px;
+  --sp-2xl: 64px;
+
+  /* Borders */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --border:    3px solid var(--black);
+
+  /* Shadows — hard pixel-style */
+  --shadow-sm: 3px 3px 0 var(--black);
+  --shadow-md: 5px 5px 0 var(--black);
+  --shadow-lg: 7px 7px 0 var(--black);
+
+  /* Layout */
+  --screen-max: 480px;
+  --transition: 120ms ease;
+
+  /* ── Tokens de componente ── */
+
+  /* Campo de combate */
+  --combat-field-height:   300px;  /* altura total del escenario */
+  --combat-sprite-foe-size:    128px;  /* sprite del rival */
+  --combat-sprite-player-size: 192px;  /* sprite del jugador (más grande = más cerca) */
+
+  /* HUD de combate (badge nombre/vida) */
+  --combat-hud-min-width:  180px;
+  --combat-hud-padding:    10px 16px;
+  --combat-hud-name-size:  11px;   /* tamaño del nombre del pokemon */
+  --combat-hud-level-size: 9px;    /* tamaño del texto "Nv.X" */
+  --combat-hud-label-size: 8px;    /* tamaño de la etiqueta "HP" */
+  --combat-hud-nums-size:  9px;    /* tamaño de los números HP "X/MAX" */
+  --combat-hud-bar-height: 14px;   /* grosor de la barra de HP en el HUD */
+
+  /* Barra de entrenador */
+  --trainer-bar-height:    28px;
+  --trainer-bar-bg:        rgba(0,0,0,.6);
+  --trainer-bar-name-size: 7px;
+  --trainer-ball-size:     10px;
+
+  /* Log de combate */
+  --combat-log-min-height: 48px;
+  --combat-log-font-size:  8px;
+
+  /* Botón de ataque activo */
+  --move-btn-min-height:   56px;
+  --move-btn-name-size:    10px;
+  --move-btn-bar-width:    6px;    /* grosor de la barra de color de tipo */
+
+  /* Mini-equipo bajo el ataque */
+  --team-pip-sprite-size:  28px;
+  --team-pip-font-size:    5px;
+
+  /* HP bars por contexto */
+  --hp-bar-height-default: 8px;    /* team bar de ruta, entre rutas */
+  --hp-bar-height-sm:      6px;    /* mini-pip del team bar de ruta */
+}
+
+/* ── Reset ─────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden; /* single-screen app */
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--grey-dark);
+  color: var(--black);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-body);
+  border: none;
+  background: none;
+}
+
+img { display: block; image-rendering: pixelated; }
+
+/* ── App shell ─────────────────────────────────────────────────────────────── */
+#app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(0,0,0,.04) 10px,
+      rgba(0,0,0,.04) 20px
+    ),
+    var(--grey-dark);
+}
+
+/* Game viewport — fixed phone-like frame on desktop, full screen on mobile */
+.game-viewport {
+  width: 100%;
+  max-width: var(--screen-max);
+  height: 100%;
+  max-height: 860px;
+  background: var(--off-white);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  border: var(--border);
+  box-shadow: var(--shadow-lg);
+}
+
+@media (max-width: 500px) {
+  .game-viewport {
+    border: none;
+    box-shadow: none;
+    max-height: 100%;
+  }
+}
+
+/* ── Screen transitions ────────────────────────────────────────────────────── */
+.screen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: screen-in 200ms ease both;
+}
+
+@keyframes screen-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Pixel button ──────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-sm) var(--sp-lg);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  color: var(--black);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition), box-shadow var(--transition);
+  text-transform: uppercase;
+  user-select: none;
+  min-height: 44px; /* touch target */
+}
+
+.btn:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--black); }
+.btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--black); }
+
+.btn--primary { background: var(--red); color: var(--white); }
+.btn--primary:hover { background: var(--red-light); }
+
+.btn--yellow { background: var(--yellow); color: var(--black); }
+.btn--blue   { background: var(--blue);   color: var(--white); }
+.btn--green  { background: var(--green);  color: var(--white); }
+.btn--ghost  { background: transparent; box-shadow: none; border-color: transparent; }
+.btn--ghost:hover { background: rgba(0,0,0,.06); box-shadow: none; }
+
+.btn--wide { width: 100%; }
+.btn--sm   { font-size: 7px; padding: var(--sp-xs) var(--sp-sm); min-height: 36px; }
+
+/* ── Type badge ────────────────────────────────────────────────────────────── */
+.type-badge {
+  display: inline-block;
+  font-family: var(--font-pixel);
+  font-size: 6px;
+  padding: 3px 6px;
+  border-radius: var(--radius-sm);
+  border: 2px solid rgba(0,0,0,.25);
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-shadow: 1px 1px 0 rgba(0,0,0,.4);
+}
+
+.type-badge[data-type="normal"]   { background: var(--type-normal); }
+.type-badge[data-type="fire"]     { background: var(--type-fire); }
+.type-badge[data-type="water"]    { background: var(--type-water); }
+.type-badge[data-type="grass"]    { background: var(--type-grass); color: var(--black); text-shadow: none; }
+.type-badge[data-type="electric"] { background: var(--type-electric); color: var(--black); text-shadow: none; }
+.type-badge[data-type="ice"]      { background: var(--type-ice); color: var(--black); text-shadow: none; }
+.type-badge[data-type="fighting"] { background: var(--type-fighting); }
+.type-badge[data-type="poison"]   { background: var(--type-poison); }
+.type-badge[data-type="ground"]   { background: var(--type-ground); color: var(--black); text-shadow: none; }
+.type-badge[data-type="flying"]   { background: var(--type-flying); }
+.type-badge[data-type="psychic"]  { background: var(--type-psychic); }
+.type-badge[data-type="bug"]      { background: var(--type-bug); }
+.type-badge[data-type="rock"]     { background: var(--type-rock); }
+.type-badge[data-type="ghost"]    { background: var(--type-ghost); }
+.type-badge[data-type="dragon"]   { background: var(--type-dragon); }
+.type-badge[data-type="dark"]     { background: var(--type-dark); }
+.type-badge[data-type="steel"]    { background: var(--type-steel); color: var(--black); text-shadow: none; }
+.type-badge[data-type="fairy"]    { background: var(--type-fairy); color: var(--black); text-shadow: none; }
+
+/* ── HP bar ────────────────────────────────────────────────────────────────── */
+.hp-bar-wrap {
+  width: 100%;
+  height: var(--hp-bar-height-default);
+  background: var(--grey-light);
+  border: 2px solid var(--black);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.hp-bar-fill {
+  height: 100%;
+  border-radius: 1px;
+  transition: width 400ms ease, background 400ms ease;
+}
+
+.hp-bar-fill[data-level="high"]   { background: var(--hp-high); }
+.hp-bar-fill[data-level="mid"]    { background: var(--hp-mid); }
+.hp-bar-fill[data-level="low"]    { background: var(--hp-low); }
+
+/* ── Pokemon sprite ────────────────────────────────────────────────────────── */
+.sprite {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.sprite--lg { width: 96px;  height: 96px; }
+.sprite--md { width: 64px;  height: 64px; }
+.sprite--sm { width: 48px;  height: 48px; }
+.sprite--placeholder {
+  background: var(--grey-light);
+  border: 2px dashed var(--grey);
+  border-radius: var(--radius-sm);
+}
+
+/* ── Log panel (debug/battle log) ──────────────────────────────────────────── */
+.log-panel {
+  background: var(--black);
+  color: #88FF88;
+  font-family: monospace;
+  font-size: 10px;
+  padding: var(--sp-sm);
+  overflow-y: auto;
+  flex-shrink: 0;
+  max-height: 120px;
+  line-height: 1.6;
+}
+
+.log-panel .log-line { padding: 1px 0; }
+.log-panel .log-line--dmg    { color: #FF8888; }
+.log-panel .log-line--exp    { color: #88FFFF; }
+.log-panel .log-line--level  { color: var(--yellow); font-weight: bold; }
+.log-panel .log-line--catch  { color: #FF88FF; }
+.log-panel .log-line--system { color: var(--grey-light); opacity: .6; }
+
+/* ── Utility ───────────────────────────────────────────────────────────────── */
+.pixel-title {
+  font-family: var(--font-pixel);
+  line-height: 1.6;
+  letter-spacing: 1px;
+}
+
+.divider {
+  width: 100%;
+  height: 3px;
+  background: var(--black);
+  flex-shrink: 0;
+}
+
+.nature-up   { color: var(--red);   font-weight: 800; }
+.nature-down { color: var(--blue);  font-weight: 800; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--grey-light); }
+::-webkit-scrollbar-thumb { background: var(--grey-dark); border-radius: 3px; }

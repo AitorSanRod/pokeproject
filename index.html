@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poké</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/screens.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Screens are injected here by screens.js -->
+  </div>
+
+  <!-- Data layer (ported from Node) -->
+  <script src="js/data/combat-config.js"></script>
+  <script src="js/data/types.js"></script>
+  <script src="js/data/natures.js"></script>
+  <script src="js/data/exp-table.js"></script>
+  <script src="js/data/move-pool.js"></script>
+  <script src="js/data/pokemon-db.js"></script>
+  <script src="js/data/routes.js"></script>
+  <script src="js/data/mock-data.js"></script>
+  <script src="js/data/storage.js"></script>
+  <script src="js/data/pokedex.js"></script>
+  <script src="js/data/move-effects.js"></script>
+  <script src="js/data/status-effects.js"></script>
+
+  <!-- API layer -->
+  <script src="js/api.js"></script>
+
+  <!-- Game logic -->
+  <script src="js/game/pokemon.js"></script>
+  <script src="js/game/battle.js"></script>
+  <script src="js/game/route.js"></script>
+
+  <!-- UI layer -->
+  <script src="js/ui/render.js"></script>
+  <script src="js/ui/pokedex-screen.js"></script>
+  <script src="js/ui/compendium-screen.js"></script>
+  <script src="js/ui/screens.js"></script>
+
+  <!-- Entry point -->
+  <script src="js/main.js"></script>
+</body>
+</html>
