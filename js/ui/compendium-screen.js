@@ -188,12 +188,6 @@ const CompendiumScreen = {
                 <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">
                   PP:${m.pp ?? '—'}
                 </span>
-                <!-- Efecto badge(s) -->
-                ${effects.map(e => `
-                  <span style="font-family:var(--font-pixel);font-size:4px;color:var(--blue);
-                    border:1px solid var(--blue);padding:1px 4px;border-radius:2px;flex-shrink:0">
-                    ${triggerLabels[e.trigger] ?? ''}
-                  </span>`).join('')}
                 <!-- Tooltip del efecto -->
                 ${effectDesc ? `<div class="move-effect-tooltip">✦ ${effectDesc}</div>` : ''}
               </div>`;
@@ -218,18 +212,6 @@ const CompendiumScreen = {
           style="width:28px;height:28px;image-rendering:pixelated;object-fit:contain;flex-shrink:0"
           onerror="this.outerHTML='<span style=font-size:22px>${item.fallbackIcon ?? '❓'}</span>'">
         <div style="flex:1">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
-            <span style="font-family:var(--font-pixel);font-size:7px">${item.name}</span>
-            <span style="font-family:var(--font-pixel);font-size:4px;color:var(--blue);
-              border:1px solid var(--blue);padding:1px 4px;border-radius:2px;flex-shrink:0">
-              ${triggerLabels[item.trigger] ?? ''}
-            </span>
-            ${item.blocksMoveChange ? `
-              <span style="font-family:var(--font-pixel);font-size:4px;color:var(--red);
-                border:1px solid var(--red);padding:1px 4px;border-radius:2px;flex-shrink:0">
-                BLOQUEA MOVIMIENTO
-              </span>` : ''}
-          </div>
           <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey-dark);line-height:1.8">
             ${item.desc}
           </span>
