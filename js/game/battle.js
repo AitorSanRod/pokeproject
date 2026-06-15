@@ -28,6 +28,20 @@ function calcDamage(attacker, defender, move) {
 
   dmg = Math.floor(dmg * stab * eff * rnd);
 
+  // ── Objeto equipado del ATACANTE — boost de daño condicional por tipo/clase
+  // (p.ej. Carbón: +50% a movimientos de tipo fuego y clase especial).
+  // Se evalúa en tiempo real desde HELD_ITEMS — si el objeto se quita, el
+  // boost deja de aplicarse automáticamente sin necesidad de revertir nada.
+  const heldItem = HELD_ITEMS?.[attacker.heldItem];
+  if (heldItem?.dmgBoost) {
+    const { mult, type, class: cls } = heldItem.dmgBoost;
+    const typeMatches  = !type || move.type === type;
+    const classMatches = !cls  || move.damageClass === cls;
+    if (typeMatches && classMatches) {
+      dmg = Math.floor(dmg * (1 + mult));
+    }
+  }
+
   const isCrit = Math.random() < COMBAT_CONFIG.CRIT_CHANCE;
   if (isCrit) dmg = Math.floor(dmg * COMBAT_CONFIG.CRIT_MULTIPLIER);
 

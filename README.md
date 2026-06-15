@@ -21,6 +21,7 @@ movimientos, efectos, estados, evoluciones, recompensas y pantallas.
 7. [Efectos de movimientos (MOVE_EFFECTS)](#7-efectos-de-movimientos-move_effects)
 8. [Efectos de estado (status-effects.js)](#8-efectos-de-estado-status-effectsjs)
 9. [Sistema de combatMods (modificadores de stat)](#9-sistema-de-combatmods-modificadores-de-stat)
+9.5. [Objetos equipados (held-items.js)](#95-objetos-equipados-held-itemsjs)
 10. [EVs por cadena evolutiva](#10-evs-por-cadena-evolutiva)
 11. [Recompensas de fin de ruta](#11-recompensas-de-fin-de-ruta)
 12. [Pokédex — 3 estados](#12-pokédex--3-estados)
@@ -32,6 +33,8 @@ movimientos, efectos, estados, evoluciones, recompensas y pantallas.
 18. [Progreso del camino durante combate](#18-progreso-del-camino-durante-combate)
 19. [UI — headers, botones atrás y pokéball](#19-ui--headers-botones-atrás-y-pokéball)
 20. [Validación de daño y efectividad de tipos](#20-validación-de-daño-y-efectividad-de-tipos)
+21. [Rutas tipo 'information' y pantalla final personalizable](#21-rutas-tipo-information-y-pantalla-final-personalizable)
+22. [Orden de logs de combate — resumen vs efectos de objetos](#22-orden-de-logs-de-combate--resumen-vs-efectos-de-objetos)
 
 ---
 
@@ -62,8 +65,8 @@ js/
     pokemon.js                  createPokemon, computeStats, gainExp, evolve, fullHeal
     battle.js                   calcDamage (con combatMods), enemyChooseMove
   ui/
-    render.js                    Render.hpBar, typeBadge, statsGrid, updateHpBar
-    screens.js                   Todas las pantallas (~1850 líneas)
+    render.js                    Render.hpBar, typeBadge/typeBadges, statsGrid, updateHpBar
+    screens.js                   Todas las pantallas, incl. rutas 'information' (~2100 líneas)
     pokedex-screen.js            Pokédex: 3 estados + detalle con stats/EVs/movimientos
     compendium-screen.js         Compendio: efectos de estado + lista de movimientos
 assets/
@@ -875,6 +878,152 @@ ataque vía `_updateStatusBadges`.
 
 ---
 
+## 9.5. Objetos equipados (held-items.js)
+
+Cada pokemon puede llevar **como mucho un objeto equipado**:
+`pokemon.heldItem` guarda el `id` del objeto (o `null`), y
+`pokemon._heldItemFlags` guarda flags de activación "una vez por ruta".
+
+### Estructura de un objeto en HELD_ITEMS
+
+```js
+'sitrus-berry': {
+  name: 'Baya Zidra',
+  desc: 'Si el HP baja del 50%, restaura el 25% del HP máximo. Solo una vez por ruta.',
+  img:  'assets/sprites/items/sitrus-berry.png',
+  fallbackIcon: '🍒',          // se usa si `img` no carga (onerror)
+  trigger: HELD_ITEM_TRIGGERS.ON_TURN_START,
+  onceFlag: 'sitrus-berry-used', // solo se activa una vez por ruta
+  fn(ctx) {
+    // ctx: { user, log, updateHud }
+    // devuelve true si el efecto se ejecutó (consumido)
+  },
+},
+```
+
+### Dos tipos de trigger
+
+- **`PASSIVE`** — se ejecuta **una vez** al equipar (`fn`) y al quitar (`revert`).
+  Útil para modificadores permanentes mientras se lleve el objeto, como
+  `combatMods.spe` del Pañuelo Eleccion.
+- **`ON_TURN_START`** — se evalúa tras cada golpe recibido en combate, con el
+  HP ya actualizado (`applyHeldItemTurnStart`, llamado desde `_animateAttack`
+  justo después de aplicar el daño al defensor). Si declara `onceFlag`, solo
+  se ejecuta una vez por ruta — el flag se resetea junto a `combatMods` en
+  `adventure()`.
+
+### Objetos disponibles
+
+| ID | Nombre | Efecto |
+|---|---|---|
+| `sitrus-berry` | Baya Zidra | Si HP < 50% (y > 0%), cura 25% del HP máximo. Una vez por ruta. |
+| `choice-scarf` | Pañuelo Eleccion | `combatMods.spe += 1.0` (+100% VEL, afecta orden de turno vía `effectiveSpeed`). Bloquea cambio de `autoMove`. |
+| `carbon` | Carbón | +50% de daño a movimientos de tipo **fuego** y clase **especial** (ver `dmgBoost` abajo). |
+
+### dmgBoost — boost de daño condicional por tipo/clase de movimiento
+
+Un objeto `PASSIVE` puede declarar `dmgBoost` para aumentar el daño de
+movimientos que cumplan ciertas condiciones de `type`/`damageClass`. A
+diferencia de `combatMods` (modificadores de stat genéricos, sección 9),
+`dmgBoost` se evalúa **dentro de `calcDamage`** (`battle.js`), justo después
+de aplicar STAB/efectividad/aleatoriedad, comprobando en tiempo real
+`HELD_ITEMS[attacker.heldItem]`:
+
+```js
+'carbon': {
+  name: 'Carbón',
+  desc: 'Aumenta el daño de los movimientos de tipo FUEGO y clase ESPECIAL un 50%.',
+  img:  'assets/sprites/items/carbon.png',
+  fallbackIcon: '🔥',
+  trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+  dmgBoost: { mult: 0.5, type: 'fire', class: 'special' },
+  fn(ctx) {},      // no-op — el boost se evalúa en calcDamage, no aquí
+  revert(ctx) {},  // no-op — al desequipar, calcDamage deja de verlo
+},
+```
+
+Campos de `dmgBoost`:
+
+- **`mult`** — multiplicador adicional de daño. `0.5` = ×1.5 (+50%).
+  `dmg = Math.floor(dmg * (1 + mult))`.
+- **`type`** — si está informado (p.ej. `'fire'`), solo aplica cuando
+  `move.type === type`. Si es `null`/se omite, aplica a **todos los tipos**.
+- **`class`** — si está informado (`'physical'` o `'special'`), solo aplica
+  cuando `move.damageClass === class`. Si es `null`/se omite, aplica a
+  **ambas clases**.
+
+**Por qué `fn`/`revert` están vacíos**: a diferencia de `combatMods` (que se
+escriben una vez al equipar y deben revertirse al quitar), `dmgBoost` se lee
+directamente de `HELD_ITEMS[attacker.heldItem]` en cada cálculo de daño. Si el
+pokemon ya no lleva el objeto (`heldItem !== 'carbon'`), el boost
+simplemente no se evalúa — no hace falta revertir ningún estado.
+
+**Ejemplo**: Ascuas (Ember, fuego/especial, poder 40) con Carbón equipado en
+un Charmander Nv.10 pasa de hacer ~9 dmg a ~13 dmg contra un objetivo neutral
+(+50%, redondeado hacia abajo). Un movimiento físico de fuego (p.ej. Rueda
+Fuego) o un movimiento especial de otro tipo (p.ej. Pistola Agua) **no**
+reciben el boost — solo la combinación type+class declarada en `dmgBoost`.
+
+### API
+
+```js
+equipHeldItem(pokemon, itemId)   // equipa (revierte el anterior si lo había)
+unequipHeldItem(pokemon)         // quita y "destruye" — revierte efecto pasivo
+applyHeldItemTurnStart(pokemon, ctx) // ON_TURN_START — llamado desde combate
+resetHeldItemFlags(team)         // resetea _heldItemFlags de todo el equipo
+heldItemBlocksMoveChange(pokemon) // true si el objeto bloquea cambiar autoMove
+```
+
+### ITEM — acceso por clave con guión bajo
+
+Igual que `POKEMON`/`MOVES` (ver la convención de nombres, sección 2), `ITEM`
+se genera automáticamente a partir de las claves de `HELD_ITEMS`
+reemplazando `-` por `_`:
+
+```js
+ITEM.sitrus_berry === 'sitrus-berry'
+ITEM.choice_scarf === 'choice-scarf'
+```
+
+Al añadir un objeto nuevo a `HELD_ITEMS`, su `ITEM.xxx` queda disponible
+automáticamente — no hace falta tocar nada más. Usa siempre `ITEM.xxx` en
+`routes.js` (p.ej. `rewardExtras`, sección 11) en vez del id con guión.
+
+**Importante — reset de ruta**: `adventure()` resetea `combatMods = {}` para
+todo el equipo al empezar cada ruta (sección 9). Esto borraría también el
+efecto pasivo de objetos como el Pañuelo Eleccion, así que `adventure()`
+**re-aplica** `item.fn({user: p})` para cualquier `heldItem` con trigger
+`PASSIVE` justo después del reset.
+
+### UI — pantalla de selección de camino
+
+En `_renderTeamBar`, si `p.heldItem` existe, aparece un icono (16×16px,
+`item.img` o `item.fallbackIcon` si la imagen falla) a la derecha de la barra
+de HP de ese pokemon:
+
+- **Hover** → tooltip (`.held-item-tooltip`) con nombre y descripción
+- **Click** → `_showUnequipItemConfirm(poke)`: modal de confirmación. Si se
+  confirma, `unequipHeldItem` revierte el efecto pasivo y el objeto
+  desaparece para siempre (no vuelve a ningún inventario)
+
+El click en el icono usa `e.preventDefault() + e.stopPropagation()` para no
+disparar también el modal de automovimiento de la fila completa.
+
+### Cómo se obtienen los objetos
+
+Vía recompensa de fin de ruta (`rewardExtras` en `routes.js`, sección 11) —
+`equipHeldItem(pokemon, itemId)` se llama desde `_showHeldItemSelector` cuando
+el jugador elige ese premio y selecciona a qué pokemon equiparlo.
+
+### Sprites pendientes
+
+`assets/sprites/items/sitrus-berry.png`, `assets/sprites/items/choice-scarf.png`
+y `assets/sprites/items/carbon.png` no existen todavía — el icono cae a
+`fallbackIcon` (🍒 / 🧣 / 🔥) vía `onerror`. Añade los PNG a esa carpeta
+cuando los tengas; no se necesita ningún cambio de código adicional.
+
+---
+
 ## 10. EVs por cadena evolutiva
 
 ### Comportamiento
@@ -909,7 +1058,8 @@ Verificado con test — funciona para cadenas de 2 y 3 eslabones.
 
 ## 11. Recompensas de fin de ruta
 
-Al completar un camino, `_showItemReward()` muestra **siempre 3 premios fijos**:
+Al completar un camino, `_showItemReward()` muestra **3 premios elegidos sin
+repetir** de un pool de candidatos. El pool base son siempre estos 3:
 
 ### 1. Pokemon de la ruta
 
@@ -940,14 +1090,48 @@ cadena evolutiva, ver sección 10) se aplica el EV.
 
 ### 3. Rare Candy
 
-Siempre el mismo — `+1 nivel a todo el equipo` vía `levelUpPokemon(p, 1)`.
+`+1 nivel a todo el equipo` vía `levelUpPokemon(p, 1)`.
 Sprite: `assets/sprites/items/rarecandy.png`.
 
-### Añadir rewardPokemon a una ruta nueva
+### rewardExtras — objetos equipables como candidatos extra
+
+`ROUTE_DATA[area].rewardExtras` es un array opcional de ids de
+`HELD_ITEMS` (sección 9.5), referenciados vía la constante `ITEM`:
+
+```js
+'route-1': {
+  rewardPokemon: [...],
+  rewardExtras: [ITEM.sitrus_berry, ITEM.choice_scarf],  // opcional
+  ...
+}
+```
+
+Cada entrada de `rewardExtras` se añade como **candidato adicional** de tipo
+`held-item` al pool junto a los 3 base. **De entre todos los candidatos
+disponibles se eligen 3 al azar, sin repetir**:
+
+| `rewardExtras` | Candidatos totales | Resultado |
+|---|---|---|
+| `[]` o ausente | 3 (pokemon, vitamina, candy) | Siempre los 3 base |
+| `[ITEM.sitrus_berry]` | 4 | 3 al azar de los 4 |
+| `[ITEM.sitrus_berry, ITEM.choice_scarf]` | 5 | 3 al azar de los 5 |
+
+El algoritmo (`_showItemReward`): si hay ≤3 candidatos, se muestran todos
+tal cual; si hay más, se asigna a cada uno un número aleatorio (`Math.random()`),
+se ordenan por ese número y se toman los primeros 3 — garantiza 3 elementos
+**distintos**, sin necesidad de comprobar duplicados manualmente.
+
+Al elegir un premio `type:'held-item'`, se abre `_showHeldItemSelector` —
+eliges a qué pokemon del equipo se equipa (`equipHeldItem`). Si ese pokemon
+ya llevaba otro objeto, se muestra "Sustituye: <nombre>" — el objeto anterior
+se revierte y se pierde (igual que `_showUnequipItemConfirm`, sección 9.5).
+
+### Añadir rewardPokemon/rewardExtras a una ruta nueva
 
 ```js
 'nueva-ruta': {
   rewardPokemon: [POKEMON.eevee, POKEMON.pikachu],
+  rewardExtras:  [ITEM.sitrus_berry],  // opcional
   ...
 }
 ```
@@ -986,7 +1170,7 @@ stage evolutiva** (sección 5) — solo si está capturado; si no, muestra cajas
 ## 13. Compendio
 
 Pantalla accesible desde el menú principal (`📚 COMPENDIO`), implementada en
-`compendium-screen.js`. Dos secciones:
+`compendium-screen.js`. Tres secciones:
 
 ### Efectos de estado
 
@@ -1005,6 +1189,21 @@ poder, PP, y tooltip de efecto al hover.
   movimiento nuevo a una `moveLine`, o cambias las `moveLines` de un pokemon,
   esta lista se actualiza sola, sin tocar el compendio.
 - Pokemon no capturados se muestran con sprite oscuro y nombre `???`
+
+### Objetos equipables
+
+Todos los objetos de `HELD_ITEMS` (sección 9.5), implementado en
+`_renderHeldItemList()`. Por cada objeto se muestra:
+- Sprite (`item.img`, con `fallbackIcon` como respaldo si la imagen falla)
+- Nombre y descripción completa (`item.desc`)
+- Badge de trigger: `PASIVO` (`HELD_ITEM_TRIGGERS.PASSIVE`) o
+  `INICIO DE TURNO` (`HELD_ITEM_TRIGGERS.ON_TURN_START`)
+- Badge adicional `BLOQUEA MOVIMIENTO` si `item.blocksMoveChange === true`
+  (p.ej. Pañuelo Elección)
+
+Esta lista se genera dinámicamente a partir de `HELD_ITEMS` — **al añadir un
+objeto nuevo siguiendo la guía de la sección 9.5, aparece automáticamente en
+el compendio sin tocar `compendium-screen.js`**.
 
 ---
 
@@ -1341,3 +1540,93 @@ Casos verificados en testing:
   STAB ×1.5 → rango 17-21 dmg ✓
 
 Ambos coinciden exactamente con los valores observados en combate real.
+
+---
+
+## 21. Rutas tipo 'information' y pantalla final personalizable
+
+### Rutas tipo 'information'
+
+Una entrada de `ROUTE_DATA` puede marcarse con `type: 'information'` para
+crear una pantalla intermedia **sin caminos ni combates**: solo título,
+descripción y un botón "CONTINUAR" que avanza a la siguiente ruta de
+`KANTO_ROUTES` (o a la pantalla de victoria si es la última).
+
+```js
+'info-ejemplo': {
+  type: 'information',
+  bg: 'assets/bg/espacio-raro.png',          // opcional — si se omite, usa un degradado verde
+  title: 'Enhorabuena!',                      // opcional
+  description: 'Has superado este tramo...<br>Prepárate para lo que viene.', // opcional, admite HTML
+}
+```
+
+Para que aparezca, añade su `area` a `KANTO_ROUTES` en la posición donde la
+quieras mostrar:
+
+```js
+var KANTO_ROUTES = [
+  { name: 'Ruta 1', area: 'route-1' },
+  { name: 'Información', area: 'info-ejemplo' },  // pantalla intermedia
+  { name: 'Ruta 22', area: 'route-22' },
+  ...
+];
+```
+
+`Screens.adventure()` detecta `data.type === 'information'` y llama
+directamente a `Screens._showInformation(route, data)`, saltándose por
+completo `_renderAdventureShell` y `_showPathSelection`. El botón
+"CONTINUAR" hace `GameState.routeIndex++` y reanuda el flujo normal
+(`Screens.show(Screens.adventure)` o `Screens.victory` si era la última ruta).
+
+Esta pantalla **no entrega premios** — para eso siguen existiendo
+`rewardPokemon`/`rewardExtras` en rutas normales (sección 11), gestionados por
+`_showItemReward` sin cambios.
+
+### Pantalla final "HAS GANADO!" — FINAL_SCREEN
+
+La pantalla `Screens.victory` (mostrada al completar la última ruta de
+`KANTO_ROUTES`) ahora lee su título, subtítulo, fondo y texto del botón desde
+`FINAL_SCREEN`, definido en `routes.js`:
+
+```js
+var FINAL_SCREEN = {
+  title:   'HAS GANADO!',                    // opcional, por defecto 'HAS GANADO!'
+  // subtitle: 'Medalla obtenida:<br><br>Boulder Badge', // opcional — si se omite, muestra la última medalla obtenida (GameState.badges)
+  bg:      null,                             // opcional — p.ej. 'assets/bg/espacio-raro.png'
+  btnText: 'NUEVA PARTIDA',                  // opcional
+};
+```
+
+Si se omite cualquier campo (o todo el objeto `FINAL_SCREEN`), `Screens.victory`
+mantiene su comportamiento original: título "HAS GANADO!", fondo amarillo por
+defecto (`.screen--victory` en `css/screens.css`), subtítulo con la última
+medalla y botón "NUEVA PARTIDA" que resetea el estado y vuelve a `Screens.title`.
+
+---
+
+## 22. Orden de logs de combate — resumen vs efectos de objetos
+
+El log de consola `[COMBAT] <atacante> uso <movimiento> -> X dmg` se imprime
+**inmediatamente después de aplicar el daño**, antes de evaluar efectos del
+objeto equipado del defensor (p.ej. Baya Zidra, sección 9.5). Esto asegura que
+en consola aparezca primero el resumen del golpe y después cualquier mensaje
+de efecto asociado:
+
+```
+[COMBAT] Turno: Bulbasaur usará Polvo Veneno | Nidoran-m usará Aguijon Toxico
+[COMBAT LOG] Bulbasaur uso Polvo Veneno!
+[COMBAT] Bulbasaur uso Polvo Veneno -> 8 dmg (poco eficaz)
+[COMBAT LOG] No es muy eficaz...
+[COMBAT LOG] Nidoran-m uso Aguijon Toxico!
+[COMBAT] Nidoran-m uso Aguijon Toxico -> 3 dmg
+[COMBAT LOG] Bulbasaur comio su Baya Zidra y recupero 7 HP!
+```
+
+**Nota**: la Baya Zidra (`ON_TURN_START`, sección 9.5) siempre se evalúa
+**correctamente después de aplicar el daño**, con el HP del defensor ya
+actualizado — esto no ha cambiado. Solo se reordenó el `console.log` de
+resumen para que el orden de la consola sea más intuitivo durante depuración;
+no afecta a la lógica de combate ni al log visible en pantalla
+(`[COMBAT LOG]`, vía `_updateCombatLog`).
+

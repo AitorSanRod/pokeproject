@@ -1,0 +1,229 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// OBJETOS EQUIPADOS (HELD ITEMS)
+//
+// Cada pokemon puede llevar como mucho UN objeto equipado (pokemon.heldItem,
+// guarda el id del objeto o null). Los objetos viven en HELD_ITEMS, con una
+// estructura muy similar a MOVE_EFFECTS (move-effects.js) pero en su propio
+// archivo para mantener la lógica separada.
+//
+// TRIGGERS:
+//   PASSIVE        → se aplica/revierte UNA VEZ al equipar/quitar el objeto
+//                     (p.ej. modificar combatMods de forma permanente mientras
+//                     se lleve el objeto). fn(ctx) y revert(ctx).
+//   ON_TURN_START  → se evalúa al principio de cada turno de combate, con el
+//                     HP ya actualizado tras el daño recibido. Útil para
+//                     objetos de curación condicional (Baya Zidra).
+//
+// onceFlag: si se declara, el efecto solo puede activarse UNA VEZ por
+// ese identificador — el flag se guarda en pokemon._heldItemFlags[onceFlag]
+// y se resetea junto con combatMods al empezar una ruta nueva (screens.js,
+// adventure()).
+//
+// blocksMoveChange: true → mientras el pokemon lleve este objeto, no se puede
+// cambiar su autoMove desde el selector de la pantalla de ruta (Pañuelo Elección).
+//
+// CÓMO AÑADIR UN OBJETO NUEVO:
+//   1. Añade entrada en HELD_ITEMS con id único
+//   2. trigger: HELD_ITEM_TRIGGERS.PASSIVE | ON_TURN_START
+//   3. Para PASSIVE: fn(ctx) al equipar, revert(ctx) al quitar
+//   4. Para ON_TURN_START: fn(ctx) — usa onceFlag si solo debe activarse una vez
+//   5. name/desc/img — mostrados en la UI (tooltip, tienda, etc.)
+// ─────────────────────────────────────────────────────────────────────────────
+
+var HELD_ITEM_TRIGGERS = Object.freeze({
+  PASSIVE: 'passive',          // al equipar (fn) / al quitar (revert)
+  ON_TURN_START: 'on-turn-start',    // al inicio de cada turno de combate
+});
+
+var HELD_ITEMS = {
+
+  'sitrus-berry': {
+    name: 'Baya Zidra',
+    desc: 'Si el HP baja del 50%, restaura el 25% del HP máximo. Solo una vez por ruta.',
+    img: 'assets/sprites/items/sitrus-berry.png',
+    fallbackIcon: '🍒',
+    trigger: HELD_ITEM_TRIGGERS.ON_TURN_START,
+    onceFlag: 'sitrus-berry-used',
+    fn(ctx) {
+      const { user, log, updateHud } = ctx;
+      // No saltar si el pokemon está debilitado (HP a 0)
+      if (user.currentHp <= 0) return false;
+      if (user.currentHp / user.stats.hp >= 0.5) return false;
+
+      const heal = Math.max(1, Math.floor(user.stats.hp * 0.25));
+      const before = user.currentHp;
+      user.currentHp = Math.min(user.stats.hp, user.currentHp + heal);
+      const actual = user.currentHp - before;
+      if (actual > 0) {
+        log(`${user.displayName} usó la Baya Zidra!`);
+        if (updateHud) updateHud();
+      }
+      return true; // consumida — onceFlag se marca aunque actual sea 0
+    },
+  },
+
+  'choice-scarf': {
+    name: 'Pañuelo Elección',
+    desc: 'Aumenta la VEL un 100%, pero bloquea el cambio de movimiento.',
+    img: 'assets/sprites/items/choice-scarf.png',
+    fallbackIcon: '🧣',
+    trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+    blocksMoveChange: true,
+    fn(ctx) {
+      const { user } = ctx;
+      if (!user.combatMods) user.combatMods = {};
+      user.combatMods.spe = (user.combatMods.spe ?? 0) + 1.0;
+    },
+    revert(ctx) {
+      const { user } = ctx;
+      if (!user.combatMods) return;
+      user.combatMods.spe = (user.combatMods.spe ?? 0) - 1.0;
+    },
+  },
+
+  'assault-vest': {
+    name: 'Chaleco asalto',
+    desc: 'Aumenta un 50% la defensa especial.',
+    img: 'assets/sprites/items/assault-vest.png',
+    fallbackIcon: '🦺',
+    trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+    blocksMoveChange: true,
+    fn(ctx) {
+      const { user } = ctx;
+      if (!user.combatMods) user.combatMods = {};
+      user.combatMods.spa = (user.combatMods.spd ?? 0) + 0.5;
+    },
+    revert(ctx) {
+      const { user } = ctx;
+      if (!user.combatMods) return;
+      user.combatMods.spa = (user.combatMods.spd ?? 0) - 0.5;
+    },
+  },
+
+  'carbon': {
+    name: 'Carbón',
+    desc: 'Aumenta el daño de los movimientos de tipo FUEGO un 25%.',
+    img: 'assets/sprites/items/carbon.png',
+    fallbackIcon: '🔥',
+    trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+    // dmgBoost — leído en tiempo real por calcDamage (battle.js):
+    //   mult  → multiplicador adicional de daño (0.5 = +50%)
+    //   type  → solo aplica a movimientos de este MOVE_POOL type. null/ausente = todos los tipos
+    //   class → solo aplica a movimientos de este damageClass ('physical'|'special'). null/ausente = ambas clases
+    dmgBoost: { mult: 0.25, type: 'fire' },
+    // Sin combatMods que aplicar/revertir — el efecto se evalúa directamente
+    // en calcDamage comprobando heldItem del atacante, así que desequiparlo
+    // hace que el boost deje de aplicarse automáticamente.
+    fn(ctx) { },
+    revert(ctx) { },
+  },
+
+  'mystic-water': {
+    name: 'Agua Mística',
+    desc: 'Aumenta el daño de los movimientos de tipo AGUA un 25%.',
+    img: 'assets/sprites/items/mystic-water.png',
+    fallbackIcon: '💧',
+    trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+    dmgBoost: { mult: 0.25, type: 'water' },
+    fn(ctx) { },
+    revert(ctx) { },
+  },
+
+  'miracle-seed': {
+    name: 'Semilla Milagro',
+    desc: 'Aumenta el daño de los movimientos de tipo PLANTA un 25%.',
+    img: 'assets/sprites/items/miracle-seed.png',
+    fallbackIcon: '🌱',
+    trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+    dmgBoost: { mult: 0.25, type: 'grass' },
+    fn(ctx) { },
+    revert(ctx) { },
+  },
+
+};
+
+// ── API ──────────────────────────────────────────────────────────────────────
+
+// Equipa un objeto a un pokemon. Si ya llevaba otro, primero se revierte su
+// efecto pasivo (no se "destruye" el anterior aquí — solo se reemplaza).
+function equipHeldItem(pokemon, itemId) {
+  if (!HELD_ITEMS[itemId]) {
+    console.warn(`[ITEM] Objeto desconocido: ${itemId}`);
+    return false;
+  }
+  if (pokemon.heldItem) unequipHeldItem(pokemon);
+
+  pokemon.heldItem = itemId;
+  pokemon._heldItemFlags = pokemon._heldItemFlags ?? {};
+
+  const item = HELD_ITEMS[itemId];
+  if (item.trigger === HELD_ITEM_TRIGGERS.PASSIVE && item.fn) {
+    item.fn({ user: pokemon });
+  }
+  console.log(`[ITEM] ${pokemon.displayName} equipa ${item.name}`);
+  return true;
+}
+
+// Quita el objeto equipado — revierte su efecto pasivo si lo tenía y "destruye"
+// el objeto (no vuelve al inventario). Devuelve el id del objeto quitado, o null.
+function unequipHeldItem(pokemon) {
+  const itemId = pokemon.heldItem;
+  if (!itemId) return null;
+  const item = HELD_ITEMS[itemId];
+
+  if (item?.trigger === HELD_ITEM_TRIGGERS.PASSIVE && item.revert) {
+    item.revert({ user: pokemon });
+  }
+
+  pokemon.heldItem = null;
+  console.log(`[ITEM] ${pokemon.displayName} pierde ${item?.name ?? itemId} (destruido)`);
+  return itemId;
+}
+
+// Evalúa el efecto ON_TURN_START del objeto equipado de un pokemon, si lo tiene.
+// ctx: { user, log, updateHud }
+// Devuelve true si el efecto se ejecutó (y por tanto se consumió, si tenía onceFlag).
+function applyHeldItemTurnStart(pokemon, ctx) {
+  const itemId = pokemon?.heldItem;
+  if (!itemId) return false;
+  const item = HELD_ITEMS[itemId];
+  if (!item || item.trigger !== HELD_ITEM_TRIGGERS.ON_TURN_START) return false;
+
+  pokemon._heldItemFlags = pokemon._heldItemFlags ?? {};
+  if (item.onceFlag && pokemon._heldItemFlags[item.onceFlag]) return false;
+
+  let executed = false;
+  try {
+    executed = !!item.fn({ ...ctx, user: pokemon });
+  } catch (e) {
+    console.error(`[ITEM] Error en "${itemId}":`, e.message);
+  }
+
+  if (executed && item.onceFlag) {
+    pokemon._heldItemFlags[item.onceFlag] = true;
+  }
+  return executed;
+}
+
+// Resetea los flags "una vez por ruta" de todo el equipo — llamar en
+// adventure() junto al reset de combatMods.
+function resetHeldItemFlags(team) {
+  for (const p of team) p._heldItemFlags = {};
+}
+
+// true si el pokemon lleva un objeto que bloquea el cambio de autoMove
+// (p.ej. Pañuelo Eleccion)
+function heldItemBlocksMoveChange(pokemon) {
+  const item = HELD_ITEMS[pokemon?.heldItem];
+  return !!item?.blocksMoveChange;
+}
+
+// ── ITEM — acceso por clave con guión bajo, igual que POKEMON/MOVES ──────────
+// Permite escribir ITEM.sitrus_berry / ITEM.choice_scarf en routes.js en vez
+// del id real con guión ('sitrus-berry' / 'choice-scarf'). Se genera
+// automáticamente a partir de las claves de HELD_ITEMS — al añadir un objeto
+// nuevo a HELD_ITEMS, su acceso ITEM.xxx queda disponible sin tocar nada más.
+var ITEM = {};
+for (const id of Object.keys(HELD_ITEMS)) {
+  ITEM[id.replace(/-/g, '_')] = id;
+}

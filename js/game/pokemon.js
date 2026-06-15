@@ -86,6 +86,8 @@ async function createPokemon(nameOrId, level, isPlayer = false, moveId = null, o
   pokemon.stats     = computeStats(pokemon);
   pokemon.currentHp = pokemon.stats.hp;
   pokemon.combatMods = {};  // modificadores de combate: { atk, def, spa, spd, spe } como multiplicadores
+  pokemon.heldItem   = null; // id de HELD_ITEMS, o null — ver held-items.js
+  pokemon._heldItemFlags = {}; // flags "una vez por ruta" de objetos equipados
   return pokemon;
 }
 
@@ -163,6 +165,14 @@ function healPokemon(pokemon) {
 }
 
 function isAlive(pokemon) { return pokemon.currentHp > 0; }
+
+// Velocidad efectiva para determinar el orden de turno — aplica combatMods.spe
+// (p.ej. Pañuelo Eleccion: +100% vía held-items.js) sobre stats.spe.
+// Mismo patrón aditivo que calcDamage: mod=0 → ×1.0, mod=1.0 → ×2.0.
+function effectiveSpeed(pokemon) {
+  const mult = Math.max(0.1, 1 + (pokemon?.combatMods?.spe ?? 0));
+  return Math.floor((pokemon?.stats?.spe ?? 0) * mult);
+}
 
 // Comprueba si el pokemon tiene en su moveset algún movimiento con
 // effectId:'clear' — efecto pasivo de inmunidad (ver move-effects.js).

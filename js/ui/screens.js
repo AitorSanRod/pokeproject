@@ -190,6 +190,16 @@ const Screens = {
 
     // Resetear modificadores de combate al empezar ruta nueva
     for (const p of GameState.team) p.combatMods = {};
+    // Resetear flags "una vez por ruta" de objetos equipados (p.ej. Baya Zidra)
+    resetHeldItemFlags(GameState.team);
+    // Re-aplicar efectos pasivos de objetos equipados (p.ej. Pañuelo Eleccion +VEL)
+    // ya que combatMods se acaba de resetear por completo
+    for (const p of GameState.team) {
+      if (p.heldItem) {
+        const item = HELD_ITEMS[p.heldItem];
+        if (item?.trigger === HELD_ITEM_TRIGGERS.PASSIVE && item.fn) item.fn({ user: p });
+      }
+    }
 
     // Pantalla de bienvenida — solo una vez por ruta (p.ej. "Llegas a Ciudad Plateada")
     if (data?.welcome && !GameState.welcomeShown?.[route.area]) {
@@ -199,8 +209,43 @@ const Screens = {
       return;
     }
 
+    // Ruta de tipo 'information' — sin caminos ni combates, solo
+    // título + descripción + botón "CONTINUAR" hacia la siguiente ruta.
+    if (data?.type === 'information') {
+      Screens._showInformation(route, data);
+      return;
+    }
+
     Screens._renderAdventureShell(route);
     Screens._showPathSelection(route);
+  },
+
+  // Pantalla informativa — usa data.title / data.description / data.bg de
+  // routes.js (ROUTE_DATA[area] con type:'information'). No tiene caminos
+  // ni combates: solo un texto y un botón "CONTINUAR" que avanza a la
+  // siguiente ruta (o a la pantalla de victoria si es la última).
+  _showInformation(route, data) {
+    const bg = data.bg
+      ? `background-image:url('${data.bg}');background-size:cover;background-position:center;`
+      : `background:linear-gradient(160deg,var(--green-dark) 0%,var(--green) 100%);`;
+
+    document.getElementById('viewport').innerHTML = `
+      <div class="screen" style="${bg}
+        align-items:center;justify-content:center;gap:18px;padding:32px 24px;text-align:center;display:flex;flex-direction:column;">
+        ${data.title ? `<span style="font-family:var(--font-pixel);font-size:18px;color:var(--white);text-shadow:3px 3px 0 rgba(0,0,0,.3);line-height:1.6">${data.title.toUpperCase()}</span>` : ''}
+        ${data.description ? `<p style="text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">${data.description}</p>` : ''}
+        <button class="btn btn--primary btn--wide" id="btn-info-continue" style="max-width:240px">CONTINUAR</button>
+      </div>`;
+
+    document.getElementById('btn-info-continue').addEventListener('click', () => {
+      GameState.routeIndex++;
+      if (GameState.routeIndex >= KANTO_ROUTES.length) {
+        const lastBadge = GameState.badges[GameState.badges.length - 1];
+        Screens.show(Screens.victory, lastBadge);
+      } else {
+        Screens.show(Screens.adventure);
+      }
+    });
   },
 
   // Pantalla de "llegada" — usa data.welcome (title/subtitle/img) de routes.js.
@@ -531,7 +576,17 @@ const Screens = {
               <span class="route-team-row__name">${p.displayName}</span>
               <span class="route-team-row__level">Nv.${p.level}</span>
             </div>
-            <div style="margin-top:4px;max-width:160px">${Render.hpBar(p.currentHp, p.stats.hp)}</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+              <div style="max-width:160px;flex:1">${Render.hpBar(p.currentHp, p.stats.hp)}</div>
+              ${p.heldItem ? (() => {
+                const item = HELD_ITEMS[p.heldItem];
+                return `
+                  <div class="held-item-icon" data-idx="${i}" data-item-name="${item.name}" data-item-desc="${item.desc}">
+                    <img src="${item.img}" alt="${item.name}"
+                      onerror="this.outerHTML='<span class=\\'held-item-icon__fallback\\'>${item.fallbackIcon ?? '❓'}</span>'">
+                  </div>`;
+              })() : ''}
+            </div>
           </div>
           ${autoMove ? `<span class="type-badge" data-type="${autoMove.type}"
             style="font-size:7px;padding:3px 7px;flex-shrink:0">${autoMove.name}</span>` : ''}
@@ -545,6 +600,44 @@ const Screens = {
         if (e.defaultPrevented) return;
         const poke = GameState.team[+row.dataset.idx];
         Screens._showPipMoveModal(poke);
+      });
+    });
+
+    // Click en el icono de objeto equipado → confirmar si se quiere quitar
+    bar.querySelectorAll('.held-item-icon').forEach(icon => {
+      icon.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        const poke = GameState.team[+icon.dataset.idx];
+        Screens._showUnequipItemConfirm(poke);
+      });
+    });
+
+    // Tooltip de objeto equipado — se añade a document.body con position:fixed
+    // para evitar que lo recorte el overflow:hidden de .screen--adventure.
+    bar.querySelectorAll('.held-item-icon').forEach(icon => {
+      let tooltipEl = null;
+      icon.addEventListener('mouseenter', () => {
+        tooltipEl = document.createElement('div');
+        tooltipEl.className = 'held-item-tooltip held-item-tooltip--floating';
+        tooltipEl.innerHTML = `<strong>${icon.dataset.itemName}</strong><br>${icon.dataset.itemDesc}`;
+        document.body.appendChild(tooltipEl);
+
+        const rect = icon.getBoundingClientRect();
+        tooltipEl.style.left = `${rect.right}px`;
+        tooltipEl.style.top  = `${rect.top - 6}px`;
+
+        // Si se saldría por la derecha de la pantalla, alinear a la derecha del icono
+        const tooltipRect = tooltipEl.getBoundingClientRect();
+        if (tooltipRect.right > window.innerWidth) {
+          tooltipEl.style.left = `${rect.right - tooltipRect.width}px`;
+        }
+        // Posicionar verticalmente encima del icono
+        tooltipEl.style.top = `${rect.top - tooltipEl.offsetHeight - 6}px`;
+      });
+      icon.addEventListener('mouseleave', () => {
+        tooltipEl?.remove();
+        tooltipEl = null;
       });
     });
 
@@ -583,16 +676,34 @@ const Screens = {
     const overlay = document.createElement('div');
     overlay.id = 'pip-modal';
     overlay.className = 'modal-overlay';
+    const labels = { atk:'ATK', def:'DEF', spa:'SPA', spd:'SPD', spe:'VEL' };
+    const nature = poke.nature;
+    const natureLine = nature && (nature.boost || nature.lower)
+      ? `<span class="nature-up">+${labels[nature.boost]}</span> / <span class="nature-down">-${labels[nature.lower]}</span>`
+      : `<span style="color:var(--grey)">${nature?.name ?? ''}</span>`;
+
+    const moveChangeBlocked = heldItemBlocksMoveChange(poke);
+    const blockedItem = moveChangeBlocked ? HELD_ITEMS[poke.heldItem] : null;
+
     overlay.innerHTML = `
       <div class="modal-sheet">
         <div class="modal-title">${poke.displayName} — Automovimiento</div>
+        <div style="text-align:center;font-family:var(--font-pixel);font-size:7px;margin-bottom:8px">${natureLine}</div>
+        ${moveChangeBlocked ? `
+          <div style="background:var(--off-white);border-radius:var(--radius-sm);padding:8px 10px;
+            border-left:3px solid var(--red);margin-bottom:8px;text-align:center">
+            <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey-dark);line-height:1.8">
+              ${blockedItem.fallbackIcon ?? ''} ${blockedItem.name} bloquea el cambio de movimiento
+            </span>
+          </div>` : ''}
         <div style="display:flex;flex-direction:column;gap:6px">
           ${poke.moves.map(m => {
             const effectDesc = getEffectDescriptions(m);
             return `
               <div style="position:relative">
                 <button class="btn ${poke.autoMove === m.id ? 'btn--primary' : ''} btn--wide"
-                  data-moveid="${m.id}" style="justify-content:space-between">
+                  data-moveid="${m.id}" style="justify-content:space-between"
+                  ${moveChangeBlocked ? 'disabled' : ''}>
                   <span>${m.name}</span>
                   <span style="opacity:.6;font-size:6px">${m.type.toUpperCase()} · POD:${m.power ?? '—'}</span>
                 </button>
@@ -607,6 +718,7 @@ const Screens = {
 
     overlay.querySelectorAll('[data-moveid]').forEach(btn => {
       btn.addEventListener('click', () => {
+        if (moveChangeBlocked) return;
         poke.autoMove = btn.dataset.moveid;
         console.log(`[UI] Automovimiento de ${poke.displayName}: ${poke.autoMove}`);
         overlay.remove();
@@ -615,6 +727,44 @@ const Screens = {
     });
 
     document.getElementById('pip-modal-close').addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  },
+
+  // Confirmación al pulsar el icono de objeto equipado — si confirma, el
+  // objeto se "destruye" (revierte su efecto pasivo y desaparece para siempre).
+  _showUnequipItemConfirm(poke) {
+    const item = HELD_ITEMS[poke.heldItem];
+    if (!item) return;
+
+    document.getElementById('unequip-modal')?.remove();
+    const overlay = document.createElement('div');
+    overlay.id = 'unequip-modal';
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-sheet">
+        <div class="modal-title">${item.fallbackIcon ?? ''} ${item.name}</div>
+        <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);text-align:center;line-height:1.8">
+          ${item.desc}
+        </p>
+        <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);text-align:center;line-height:1.8">
+          ¿Quitar este objeto a ${poke.displayName}?<br>
+          <span style="color:var(--red)">El objeto se destruira</span> y se perderan
+          todos los cambios que provoca.
+        </p>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn--ghost" id="unequip-cancel" style="flex:1">No quitar</button>
+          <button class="btn btn--primary" id="unequip-confirm" style="flex:1;background:var(--red)">Quitar</button>
+        </div>
+      </div>`;
+
+    document.getElementById('viewport').appendChild(overlay);
+
+    document.getElementById('unequip-confirm').addEventListener('click', () => {
+      unequipHeldItem(poke);
+      overlay.remove();
+      Screens._renderTeamBar();
+    });
+    document.getElementById('unequip-cancel').addEventListener('click', () => overlay.remove());
     overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
   },
 
@@ -643,7 +793,8 @@ const Screens = {
     // Premio 3: rare candy (siempre)
     const candyIcon = '<img src="assets/sprites/items/rarecandy.png" style="width:40px;height:40px;image-rendering:pixelated;object-fit:contain">';
 
-    const prizes = [
+    // Pool base — siempre presentes como candidatos
+    const basePrizes = [
       {
         id: 'pokemon',
         icon: `<img src="${rewardPoke.spriteUrl ?? ''}" style="width:52px;height:52px;image-rendering:pixelated;object-fit:contain" onerror="this.style.opacity=0">`,
@@ -667,6 +818,33 @@ const Screens = {
         type: 'candy',
       },
     ];
+
+    // Objetos equipables extra de la ruta (sección 9.5) — opcional.
+    // ROUTE_DATA[area].rewardExtras: [ITEM.sitrus_berry, ITEM.choice_scarf, ...]
+    const extraItemPrizes = (data.rewardExtras ?? []).map(itemId => {
+      const item = HELD_ITEMS[itemId];
+      if (!item) { console.warn(`[REWARD] Objeto desconocido en rewardExtras: ${itemId}`); return null; }
+      return {
+        id: `held-${itemId}`,
+        icon: `<img src="${item.img}" style="width:40px;height:40px;image-rendering:pixelated;object-fit:contain"
+          onerror="this.outerHTML='<span style=font-size:32px>${item.fallbackIcon ?? '❓'}</span>'">`,
+        name: item.name,
+        desc: item.desc,
+        type: 'held-item',
+        itemId,
+      };
+    }).filter(Boolean);
+
+    // Elegir 3 premios SIN REPETIR entre basePrizes + extraItemPrizes.
+    // Si hay <=3 candidatos en total, se muestran todos.
+    const allCandidates = [...basePrizes, ...extraItemPrizes];
+    const prizes = allCandidates.length <= 3
+      ? allCandidates
+      : allCandidates
+          .map(p => ({ p, sort: Math.random() }))
+          .sort((a, b) => a.sort - b.sort)
+          .slice(0, 3)
+          .map(({ p }) => p);
 
     const advance = () => {
       GameState.routeIndex++;
@@ -714,6 +892,8 @@ const Screens = {
         } else if (chosen.type === 'candy') {
           for (const p of GameState.team) levelUpPokemon(p, 1);
           advance();
+        } else if (chosen.type === 'held-item') {
+          Screens._showHeldItemSelector(chosen, advance);
         }
       });
     });
@@ -809,6 +989,59 @@ const Screens = {
     });
   },
 
+  // Selector de pokemon para equipar un objeto (premio de fin de ruta, sección 9.5).
+  // Si el pokemon elegido ya lleva un objeto, este se sustituye (el anterior
+  // se "pierde" — equipHeldItem revierte su efecto pasivo automáticamente).
+  _showHeldItemSelector(item, onDone) {
+    const heldItem = HELD_ITEMS[item.itemId];
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-sheet">
+        <div class="modal-title">${item.icon} ${item.name}</div>
+        <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
+          ${item.desc}
+        </p>
+        <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
+          Elige un pokemon para equipar este objeto
+        </p>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          ${GameState.team.map((p, i) => {
+            const current = p.heldItem ? HELD_ITEMS[p.heldItem] : null;
+            return `
+              <button class="btn btn--wide" data-idx="${i}"
+                style="display:flex;align-items:center;gap:10px;justify-content:flex-start;padding:8px 12px">
+                <img src="${p.spriteUrl ?? ''}" style="width:28px;height:28px;image-rendering:pixelated"
+                  onerror="this.style.opacity=0">
+                <span style="flex:1;text-align:left;font-family:var(--font-pixel);font-size:7px">${p.displayName}</span>
+                ${current ? `
+                  <span style="font-family:var(--font-pixel);font-size:6px;color:var(--red)">
+                    Sustituye: ${current.name}
+                  </span>` : ''}
+              </button>`;
+          }).join('')}
+        </div>
+        <button class="btn btn--ghost btn--wide" id="held-item-cancel">Cancelar</button>
+      </div>`;
+
+    document.getElementById('viewport').appendChild(overlay);
+
+    overlay.querySelectorAll('[data-idx]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = GameState.team[+btn.dataset.idx];
+        equipHeldItem(p, item.itemId);
+        console.log(`[ITEM] ${heldItem.name} → ${p.displayName}`);
+        overlay.remove();
+        onDone();
+      });
+    });
+
+    document.getElementById('held-item-cancel').addEventListener('click', () => {
+      overlay.remove();
+      onDone(); // continua aunque no use el objeto
+    });
+  },
+
   // Selector de pokemon para un punto de curación del camino (type:'heal').
   // Cura el HP al 100% y elimina el estado alterado del elegido.
   _showHealSelector(onDone) {
@@ -860,21 +1093,6 @@ const Screens = {
       overlay.remove();
       onDone(); // continua sin curar a nadie
     });
-  },
-
-  _applyItem(item) {
-    if (item.type === 'combat') {
-      const p = GameState.team[0];
-      p.currentHp = Math.min(p.stats.hp, p.currentHp + item.value);
-    }
-    if (item.type === 'ball') GameState.balls += 1;
-    if (item.type === 'candy') {
-      for (const p of GameState.team) {
-        levelUpPokemon(p, 1);
-        console.log(`[ITEM] Rare Candy: ${p.displayName} ahora es Nv.${p.level}`);
-      }
-    }
-    if (item.type === 'stone') GameState.items.push(item);
   },
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -1023,6 +1241,10 @@ const Screens = {
                     style="width:${Math.max(0,Math.round(p.currentHp/p.stats.hp*100))}%"></div>
                 </div>
                 <div class="combat-team-pip__hp-nums">${p.currentHp}/${p.stats.hp}</div>
+                <div class="combat-team-pip__exp-bar">
+                  <div class="combat-team-pip__exp-fill"
+                    style="width:${Math.max(0, Math.min(100, Math.round((p.exp / p.expToNext) * 100)))}%"></div>
+                </div>
               </div>
             </div>`).join('')}
         </div>
@@ -1164,32 +1386,6 @@ const Screens = {
     setTimeout(() => Screens._executeCombatTurn(active, foe), 900);
   },
 
-  _showMoveSelection(player) {
-    const ctx = GameState.combat;
-    const area = document.getElementById('combat-actions-area');
-    area.innerHTML = `
-      <div class="combat-actions">
-        ${player.moves.map(m => `
-          <button class="move-btn" data-move="${m.id}" data-type="${m.type}">
-            <span class="move-btn__name">${m.name}</span>
-            <span class="move-btn__meta">
-              <span class="type-badge" data-type="${m.type}" style="font-size:5px;padding:2px 4px">${m.type}</span>
-              <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey-dark)">POD: ${m.power ?? '—'}</span>
-            </span>
-          </button>`).join('')}
-      </div>`;
-
-    area.querySelectorAll('.move-btn:not([disabled])').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const move = player.moves.find(m => m.id === btn.dataset.move);
-        ctx.chosenMove = move;
-        console.log(`[COMBAT] Movimiento elegido: ${move.name}`);
-        area.innerHTML = '';
-        Screens._executeCombatTurn(player, ctx.foeTeam[ctx.foeIndex]);
-      });
-    });
-  },
-
   async _executeCombatTurn(player, foe) {
     const ctx = GameState.combat;
 
@@ -1253,7 +1449,7 @@ const Screens = {
     } else if (foe._priority && !player._priority) {
       playerGoesFirst = false;
     } else {
-      playerGoesFirst = player.stats.spe >= foe.stats.spe;
+      playerGoesFirst = effectiveSpeed(player) >= effectiveSpeed(foe);
     }
     const [first, second] = playerGoesFirst ? [player, foe] : [foe, player];
 
@@ -1380,6 +1576,14 @@ const Screens = {
     // Aplicar el daño (ya ajustado por shield-25 si corresponde)
     defender.currentHp = Math.max(0, defender.currentHp - dmg);
 
+    // Log de resumen — justo tras aplicar el daño, antes de efectos (Baya Zidra, etc.)
+    console.log(`[COMBAT] ${attacker.displayName} uso ${move?.name} -> ${dmg} dmg${isCrit?' (CRIT)':''}${eff>=2?' (EFICAZ!)':eff<1&&eff>0?' (poco eficaz)':eff===0?' (inmune)':''}`);
+
+    // ── Objeto equipado del DEFENSOR (ON_TURN_START, p.ej. Baya Zidra) ──────
+    // Se evalúa justo tras recibir el golpe, con el HP ya actualizado.
+    const heldItemUpdateHud = defender === activePlayer ? updatePlayerHud : updateFoeHud;
+    const heldItemTriggered = applyHeldItemTurnStart(defender, { log: logFn, updateHud: heldItemUpdateHud });
+
     // Floater de daño sobre el sprite del defensor
     const defTarget = isPlayerAtk ? 'foe' : 'player';
     Screens._showFloater(defTarget, isCrit ? `-${dmg}!` : `-${dmg}`, isCrit ? 'crit' : 'dmg');
@@ -1396,6 +1600,8 @@ const Screens = {
     if (eff >= 2)       { Screens._updateCombatLog('Es muy eficaz!');      await Screens._wait(300); }
     else if (eff === 0) { Screens._updateCombatLog('No afecto al rival!'); await Screens._wait(300); }
     else if (eff < 1)   { Screens._updateCombatLog('No es muy eficaz...'); await Screens._wait(300); }
+
+    if (heldItemTriggered) await Screens._wait(400);
 
     // Recoil/heal-on-hit pueden haber cambiado el HP de defender/attacker — refrescar HUDs
     if (onHittedHadEffect) {
@@ -1433,7 +1639,6 @@ const Screens = {
     // Actualizar badges de estado y modificadores de stat
     Screens._updateStatusBadges(activePlayer, foe);
 
-    console.log(`[COMBAT] ${attacker.displayName} uso ${move?.name} -> ${dmg} dmg${isCrit?' (CRIT)':''}${eff>=2?' (EFICAZ!)':eff<1&&eff>0?' (poco eficaz)':eff===0?' (inmune)':''}`);
     await Screens._wait(400);
   },
 
@@ -1642,6 +1847,10 @@ const Screens = {
               style="width:${Math.max(0,Math.round(p.currentHp/p.stats.hp*100))}%"></div>
           </div>
           <div class="combat-team-pip__hp-nums">${p.currentHp}/${p.stats.hp}</div>
+          <div class="combat-team-pip__exp-bar">
+            <div class="combat-team-pip__exp-fill"
+              style="width:${Math.max(0, Math.min(100, Math.round((p.exp / p.expToNext) * 100)))}%"></div>
+          </div>
         </div>
       </div>`).join('');
   },
@@ -1901,14 +2110,20 @@ const Screens = {
   // VICTORY
   // ═══════════════════════════════════════════════════════════════════════
   victory(badge) {
+    // Personalizable vía FINAL_SCREEN en routes.js — title/subtitle/bg/btnText.
+    // Si no está definido, se usan los valores por defecto de siempre.
+    const cfg = (typeof FINAL_SCREEN !== 'undefined' && FINAL_SCREEN) ? FINAL_SCREEN : {};
+    const title   = cfg.title   ?? 'HAS GANADO!';
+    const btnText = cfg.btnText ?? 'NUEVA PARTIDA';
+    const bg = cfg.bg
+      ? `background-image:url('${cfg.bg}');background-size:cover;background-position:center;`
+      : '';
+
     document.getElementById('viewport').innerHTML = `
-      <div class="screen screen--victory">
-        <div class="victory-title">HAS GANADO!</div>
-        <div class="victory-badge">
-          Medalla obtenida:<br><br>${badge ?? 'Boulder Badge'}
-        </div>
+      <div class="screen screen--victory" style="${bg}">
+        <div class="victory-title">${title}</div>
         <button class="btn btn--primary" id="btn-restart" style="max-width:220px;width:100%">
-          NUEVA PARTIDA
+          ${btnText}
         </button>
       </div>`;
     document.getElementById('btn-restart').addEventListener('click', () => {

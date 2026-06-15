@@ -161,10 +161,10 @@ var MOVE_POOL = {
       { id: 'photo-geyser', name: 'Fotogeyser', power: 100, pp: 10, type: 'psychic', damageClass: 'physical' },
     ],
     special: [
-      { id: 'confusion', name: 'Confusion', power: 50, pp: 25, type: 'psychic', damageClass: 'special' },
-      { id: 'psychic', name: 'Psiquico', power: 90, pp: 10, type: 'psychic', damageClass: 'special'},
+      { id: 'confusion', name: 'Confusion', power: 25, pp: 25, type: 'psychic', damageClass: 'special', effectId: 'double-hit' },
+      { id: 'psychic', name: 'Psiquico', power: 90, pp: 10, type: 'psychic', damageClass: 'special' },
       { id: 'psystrike', name: 'Golpe Psi', power: 100, pp: 10, type: 'psychic', damageClass: 'special' },
-      { id: 'trick', name: 'Truco', power: 10, pp: 99, type: 'psychic', damageClass: 'special', boss: true, effectId: ['clear', 'sleep', 'lower-spd-20'] },
+      { id: 'trick', name: 'Truco', power: 30, pp: 99, type: 'psychic', damageClass: 'special', boss: true, effectId: ['clear', 'sleep', 'lower-spd-20'] },
     ],
   },
   bug: {

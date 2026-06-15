@@ -178,7 +178,7 @@ const PokedexScreen = {
                 ${badges.map(b => `
                   <span style="font-family:var(--font-pixel);font-size:6px;color:var(--white);
                     background:var(--yellow);border:2px solid var(--black);border-radius:var(--radius-sm);
-                    padding:3px 7px;text-shadow:1px 1px 0 rgba(0,0,0,.25)">🏆 ${b}</span>
+                    padding:3px 7px;text-shadow:1px 1px 0 rgba(0,0,0,.25)">${b}</span>
                 `).join('')}
               </div>
             ` : `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">Sin medallas aun</span>`}

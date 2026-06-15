@@ -31,20 +31,6 @@ const Render = {
     return types.map(t => this.typeBadge(t)).join('');
   },
 
-  // Sprite img element
-  sprite(url, alt, cls = '') {
-    if (!url) return `<div class="loading-sprite ${cls}"></div>`;
-    return `<img src="${url}" alt="${alt}" class="sprite ${cls}" onerror="this.style.opacity=0.3">`;
-  },
-
-  // Nature display with colored arrows
-  natureDisplay(nature) {
-    if (!nature.boost && !nature.lower) {
-      return `<span style="color:var(--grey)">${nature.name}</span>`;
-    }
-    const labels = { atk:'ATK', def:'DEF', spa:'SPA', spd:'SPD', spe:'VEL' };
-    return `${nature.name} <span class="nature-up">${labels[nature.boost]}↑</span> <span class="nature-down">${labels[nature.lower]}↓</span>`;
-  },
 
   // Mini stat grid for pokemon card — acepta evs opcionales para mostrar +N
   statsGrid(stats, nature, evs = null) {
@@ -68,12 +54,6 @@ const Render = {
         : '';
       return `<div class="starter-stat"><span class="${cls}">${stats[key]}</span>${evHtml} ${label}</div>`;
     }).join('');
-  },
-
-  // Log line with type
-  logLine(text, type = '') {
-    console.log(`[BATTLE] ${text}`);
-    return `<div class="log-line log-line--${type}">${text}</div>`;
   },
 };
 

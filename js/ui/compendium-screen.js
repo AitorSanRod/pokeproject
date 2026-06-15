@@ -40,6 +40,14 @@ const CompendiumScreen = {
             ${CompendiumScreen._renderMoveList()}
           </div>
 
+          <!-- Objetos equipables -->
+          <div style="background:var(--white);border:var(--border);border-radius:var(--radius-md);
+            padding:var(--sp-md);box-shadow:var(--shadow-sm)">
+            <div style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-dark);
+              margin-bottom:var(--sp-md);letter-spacing:1px">OBJETOS EQUIPABLES</div>
+            ${CompendiumScreen._renderHeldItemList()}
+          </div>
+
         </div>
       </div>`;
 
@@ -190,6 +198,41 @@ const CompendiumScreen = {
                 ${effectDesc ? `<div class="move-effect-tooltip">✦ ${effectDesc}</div>` : ''}
               </div>`;
           }).join('')}
+        </div>
+      </div>`).join('');
+  },
+
+  // ── Lista de objetos equipables (held-items.js) ────────────────────────────
+  _renderHeldItemList() {
+    if (typeof HELD_ITEMS === 'undefined') return '<p>HELD_ITEMS no disponible</p>';
+
+    const triggerLabels = {
+      'passive':        'PASIVO',
+      'on-turn-start':  'INICIO DE TURNO',
+    };
+
+    return Object.values(HELD_ITEMS).map(item => `
+      <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 10px;margin-bottom:6px;
+        background:var(--off-white);border:1px solid var(--grey-light);border-radius:var(--radius-sm)">
+        <img src="${item.img}" alt="${item.name}"
+          style="width:28px;height:28px;image-rendering:pixelated;object-fit:contain;flex-shrink:0"
+          onerror="this.outerHTML='<span style=font-size:22px>${item.fallbackIcon ?? '❓'}</span>'">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+            <span style="font-family:var(--font-pixel);font-size:7px">${item.name}</span>
+            <span style="font-family:var(--font-pixel);font-size:4px;color:var(--blue);
+              border:1px solid var(--blue);padding:1px 4px;border-radius:2px;flex-shrink:0">
+              ${triggerLabels[item.trigger] ?? ''}
+            </span>
+            ${item.blocksMoveChange ? `
+              <span style="font-family:var(--font-pixel);font-size:4px;color:var(--red);
+                border:1px solid var(--red);padding:1px 4px;border-radius:2px;flex-shrink:0">
+                BLOQUEA MOVIMIENTO
+              </span>` : ''}
+          </div>
+          <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey-dark);line-height:1.8">
+            ${item.desc}
+          </span>
         </div>
       </div>`).join('');
   },

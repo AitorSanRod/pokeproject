@@ -755,17 +755,6 @@
   color: var(--grey-dark);
   text-align: right;
 }
-  background: var(--yellow);
-  color: var(--black);
-  font-family: var(--font-pixel);
-  font-size: 6px;
-  padding: 3px 8px;
-  border: 2px solid var(--black);
-  border-radius: var(--radius-sm);
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
 
 /* ── BETWEEN-ROUTE MENU ────────────────────────────────────────────────────── */
 .screen--between {
@@ -887,8 +876,8 @@
 .victory-title {
   font-family: var(--font-pixel);
   font-size: 18px;
-  color: var(--red);
-  text-shadow: 3px 3px 0 var(--red-dark), 6px 6px 0 rgba(0,0,0,.2);
+  color: var(--white);
+  text-shadow: 3px 3px 0 var(--grey), 6px 6px 0 rgba(0,0,0,.2);
   line-height: 1.6;
   animation: victory-pop 400ms cubic-bezier(.36,2,.4,1) both;
 }
@@ -1440,3 +1429,67 @@ div:hover > .move-effect-tooltip { display: block; }
   border: 2px solid var(--black);
   flex-shrink: 0;
 }
+
+/* ── EXP BAR — barra de experiencia bajo la barra de HP en el team bar ──────── */
+.combat-team-pip__exp-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--grey-light);
+  border: 1px solid var(--black);
+  border-radius: 1px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+.combat-team-pip__exp-fill {
+  height: 100%;
+  background: var(--blue);
+  /* sin transición: se actualiza al instante, sin animación */
+}
+
+/* ── HELD ITEM ICON — objeto equipado junto a la barra de HP ────────────────── */
+.held-item-icon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid var(--grey-light);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+}
+.held-item-icon img {
+  width: 16px;
+  height: 16px;
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+.held-item-icon__fallback {
+  font-size: 12px;
+  line-height: 1;
+}
+.held-item-tooltip {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-pixel);
+  font-size: 6px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  white-space: normal;
+  width: 160px;
+  z-index: 1000;
+  pointer-events: none;
+  line-height: 1.8;
+  text-align: left;
+}
+.held-item-tooltip strong { color: var(--yellow); }
+
+/* Variante usada por _renderTeamBar — se añade a document.body en
+   posición fija calculada en JS, para evitar el recorte de
+   overflow:hidden de .screen--adventure (sección 22.1 del README) */
+.held-item-tooltip--floating {
+  position: fixed;
+}
+
