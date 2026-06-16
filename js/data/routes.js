@@ -553,7 +553,7 @@ var ROUTE_DATA = {
           name: POKEMON.pikachu, minLv: 24, maxLv: 26, moveId: MOVES.electric.special.thunder_shock
         },
         {
-          name: POKEMON.Voltorb, minLv: 22, maxLv: 25, moveId: MOVES.electric.special.tri_attack
+          name: POKEMON.voltorb, minLv: 22, maxLv: 25, moveId: MOVES.electric.special.tri_attack
         },
         {
           name: POKEMON.raichu, minLv: 26, maxLv: 32, moveId: MOVES.electric.special.thunder
