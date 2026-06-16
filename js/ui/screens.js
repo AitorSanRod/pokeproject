@@ -5,6 +5,7 @@ const Screens = {
 
   // ── Navega a una pantalla ────────────────────────────────────────────────
   show(screenFn, ...args) {
+    document.getElementById('btn-notes-global')?.style.setProperty('display', 'none');
     const viewport = document.getElementById('app');
     viewport.innerHTML = `<div class="game-viewport" id="viewport"></div>`;
     screenFn(...args);
@@ -19,7 +20,6 @@ const Screens = {
         <div class="title-logo">
           <span class="title-logo__main">POKEMON</span>
           <span class="title-logo__sub">v0.0.2</span>
-          <span class="title-logo__sub">Nuevos objetos añadidos</span>
         </div>
         <div class="title-pokeball">
           <div class="title-pokeball__top"></div>
@@ -46,6 +46,7 @@ const Screens = {
       .addEventListener('click', () => PokedexScreen.show(() => Screens.show(Screens.title)));
     document.getElementById('btn-compendium-title')
       .addEventListener('click', () => CompendiumScreen.show(() => Screens.show(Screens.title)));
+    document.getElementById('btn-notes-global')?.style.removeProperty('display');
     console.log('[UI] Pantalla: Titulo');
   },
 
@@ -669,6 +670,13 @@ const Screens = {
         Screens._renderTeamBar();
       });
     });
+    Screens._initTouchSort(bar, '.route-team-row', (from, to) => {
+      const tmp = GameState.team[from];
+      GameState.team[from] = GameState.team[to];
+      GameState.team[to]   = tmp;
+      console.log(`[UI] Equipo reordenado (touch): pos ${from} <-> pos ${to}`);
+      Screens._renderTeamBar();
+    });
   },
 
   _showPipMoveModal(poke) {
@@ -1275,19 +1283,25 @@ const Screens = {
   // Helper separado para el botón de pausa (evita duplicar código)
   _setupCombatPauseBtn() {
 
-    // Botones flotantes: pokédex + pausa
-    document.getElementById('app').querySelectorAll('.global-pause-btn').forEach(e => e.remove());
+    // Botones flotantes: pokédex + pausa — se añaden al contenedor global
+    document.querySelectorAll('.global-pause-btn').forEach(e => e.remove());
+    const globalControls = document.getElementById('global-controls');
+    const btnStyle = 'font-size:14px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);padding:6px 8px;border-radius:6px;cursor:pointer;line-height:1';
     const pauseWrap = document.createElement('div');
     pauseWrap.className = 'global-pause-btn';
-    pauseWrap.style.cssText = 'position:fixed;top:12px;right:12px;z-index:1000;display:flex;gap:6px';
+    pauseWrap.style.cssText = 'display:flex;gap:6px';
     pauseWrap.innerHTML = `
-      <button class="btn btn--sm" id="btn-dex-combat"
-        style="min-height:32px;padding:4px 10px;font-size:10px;background:rgba(255,255,255,.92);border-color:var(--black);box-shadow:var(--shadow-sm)"
-        title="Pokédex">📖</button>
-      <button class="btn btn--sm" id="btn-pause-combat"
-        style="min-height:32px;padding:4px 12px;font-size:10px;background:rgba(255,255,255,.92);border-color:var(--black);box-shadow:var(--shadow-sm)"
-        title="Pausar/Reanudar">⏸</button>`;
-    document.getElementById('app').appendChild(pauseWrap);
+      <button id="btn-dex-combat" style="${btnStyle}" title="Pokédex">📖</button>
+      <button id="btn-pause-combat" style="${btnStyle}" title="Pausar/Reanudar">⏸</button>`;
+    (globalControls || document.body).appendChild(pauseWrap);
+
+    pauseWrap.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('mouseenter', () => btn.style.background = 'rgba(0,0,0,.6)');
+      btn.addEventListener('mouseleave', () => {
+        if (btn.id === 'btn-pause-combat' && GameState.paused) return;
+        btn.style.background = 'rgba(0,0,0,.35)';
+      });
+    });
 
     document.getElementById('btn-dex-combat').addEventListener('click', () => {
       GameState.paused = true;
@@ -1304,7 +1318,8 @@ const Screens = {
       pauseBtn.addEventListener('click', () => {
         GameState.paused = !GameState.paused;
         pauseBtn.textContent = GameState.paused ? '▶' : '⏸';
-        pauseBtn.style.background = GameState.paused ? 'var(--yellow)' : 'rgba(255,255,255,.92)';
+        pauseBtn.style.background = GameState.paused ? 'rgba(200,160,0,.7)' : 'rgba(0,0,0,.35)';
+        pauseBtn.style.color = GameState.paused ? 'rgba(255,255,255,.9)' : 'rgba(255,255,255,.6)';
         console.log(`[UI] Combate ${GameState.paused ? 'pausado' : 'reanudado'}`);
       });
     }
@@ -2097,6 +2112,65 @@ const Screens = {
         GameState.team[toIdx]   = tmp;
         Screens.betweenRoutes();
         console.log(`[UI] Equipo reordenado: pos ${fromIdx} <-> pos ${toIdx}`);
+      });
+    });
+    Screens._initTouchSort(document.body, '.team-card', (from, to) => {
+      const tmp = GameState.team[from];
+      GameState.team[from] = GameState.team[to];
+      GameState.team[to]   = tmp;
+      Screens.betweenRoutes();
+      console.log(`[UI] Equipo reordenado (touch): pos ${from} <-> pos ${to}`);
+    });
+  },
+
+  // Touch drag-and-drop reorder para móvil.
+  // container: elemento raíz donde buscar los items (o document.body)
+  // selector:  CSS selector de cada fila arrastrable
+  // onSwap(fromIdx, toIdx): callback que ejecuta el intercambio y re-renderiza
+  _initTouchSort(container, selector, onSwap) {
+    let dragEl = null;
+    let clone  = null;
+    let offX = 0, offY = 0;
+
+    container.querySelectorAll(selector).forEach(el => {
+      el.addEventListener('touchstart', e => {
+        const touch = e.touches[0];
+        const rect  = el.getBoundingClientRect();
+        offX = touch.clientX - rect.left;
+        offY = touch.clientY - rect.top;
+        dragEl = el;
+        dragEl.style.opacity = '.3';
+
+        clone = el.cloneNode(true);
+        clone.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;z-index:9999;pointer-events:none;opacity:.85;box-shadow:0 6px 20px rgba(0,0,0,.35);`;
+        document.body.appendChild(clone);
+        e.preventDefault();
+      }, { passive: false });
+
+      el.addEventListener('touchmove', e => {
+        if (!clone) return;
+        const touch = e.touches[0];
+        clone.style.left = `${touch.clientX - offX}px`;
+        clone.style.top  = `${touch.clientY - offY}px`;
+
+        clone.style.visibility = 'hidden';
+        const under = document.elementFromPoint(touch.clientX, touch.clientY);
+        clone.style.visibility = '';
+        const targetEl = under?.closest(selector);
+        container.querySelectorAll(selector).forEach(r => r.style.outline = '');
+        if (targetEl && targetEl !== dragEl) targetEl.style.outline = '2px solid var(--yellow)';
+        e.preventDefault();
+      }, { passive: false });
+
+      el.addEventListener('touchend', e => {
+        if (!dragEl) return;
+        const touch = e.changedTouches[0];
+        clone?.remove(); clone = null;
+        container.querySelectorAll(selector).forEach(r => { r.style.opacity = ''; r.style.outline = ''; });
+        const under = document.elementFromPoint(touch.clientX, touch.clientY);
+        const targetEl = under?.closest(selector);
+        if (targetEl && targetEl !== dragEl) onSwap(+dragEl.dataset.idx, +targetEl.dataset.idx);
+        dragEl = null;
       });
     });
   },

@@ -89,7 +89,7 @@ var HELD_ITEMS = {
   },
 
   'assault-vest': {
-    name: 'Chaleco asalto',
+    name: 'Chaleco Asalto',
     desc: 'Aumenta un 50% la defensa especial.',
     img: 'assets/sprites/items/assault-vest.png',
     fallbackIcon: '🦺',

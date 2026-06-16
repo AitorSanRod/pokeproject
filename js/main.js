@@ -57,16 +57,18 @@ window.addEventListener('DOMContentLoaded', () => {
   console.log('[GAME] Pokemon Adventure — version web');
   console.log('[GAME] Abre las DevTools (F12) para ver el log de combate');
 
+  // Contenedor compartido para todos los botones globales flotantes
+  const globalControls = document.createElement('div');
+  globalControls.id = 'global-controls';
+  globalControls.style.cssText = 'position:fixed;bottom:12px;left:12px;z-index:9999;display:flex;gap:6px;align-items:center';
+  document.body.appendChild(globalControls);
+
   // Botón de reset — fijo en la pantalla global, fuera del viewport del juego
   const resetBtn = document.createElement('button');
   resetBtn.id = 'btn-reset-global';
   resetBtn.textContent = '🗑';
   resetBtn.title = 'Borrar datos guardados (pokédex y EVs)';
   resetBtn.style.cssText = [
-    'position:fixed',
-    'bottom:12px',
-    'left:12px',
-    'z-index:9999',
     'font-size:14px',
     'background:rgba(0,0,0,.35)',
     'border:1px solid rgba(255,255,255,.2)',
@@ -94,6 +96,28 @@ window.addEventListener('DOMContentLoaded', () => {
     }, 1500);
   });
 
-  document.body.appendChild(resetBtn);
+  globalControls.appendChild(resetBtn);
+
+  // Botón de notas — mismo estilo que el reset, abre popup con docs/notes.json
+  const notesBtn = document.createElement('button');
+  notesBtn.id = 'btn-notes-global';
+  notesBtn.title = 'Notas';
+  notesBtn.textContent = '📋';
+  notesBtn.style.cssText = [
+    'display:none',
+    'font-size:14px',
+    'background:rgba(0,0,0,.35)',
+    'border:1px solid rgba(255,255,255,.2)',
+    'color:rgba(255,255,255,.6)',
+    'padding:6px 8px',
+    'border-radius:6px',
+    'cursor:pointer',
+    'line-height:1',
+  ].join(';');
+  notesBtn.addEventListener('mouseenter', () => notesBtn.style.background = 'rgba(0,0,0,.6)');
+  notesBtn.addEventListener('mouseleave', () => notesBtn.style.background = 'rgba(0,0,0,.35)');
+  notesBtn.addEventListener('click', () => NotesPopup.open());
+  globalControls.appendChild(notesBtn);
+
   Screens.show(Screens.title);
 });

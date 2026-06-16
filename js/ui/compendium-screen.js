@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// COMPENDIUM — referencia de efectos de estado y movimientos
+// COMPENDIUM — referencia de efectos de estado, tipos y movimientos
 // ─────────────────────────────────────────────────────────────────────────────
 
 const CompendiumScreen = {
@@ -11,55 +11,57 @@ const CompendiumScreen = {
     CompendiumScreen._renderMain();
   },
 
-  // ── Pantalla principal: dos secciones ─────────────────────────────────────
+  // ── Pantalla principal: secciones colapsables ─────────────────────────────
   _renderMain() {
     const vp = document.getElementById('viewport');
+
+    const sec = (id, title, content) => `
+      <div style="background:var(--white);border:var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-sm)">
+        <button data-sec="${id}" style="width:100%;display:flex;align-items:center;justify-content:space-between;
+          padding:var(--sp-md);background:none;border:none;cursor:pointer;text-align:left;gap:var(--sp-sm);
+          border-radius:var(--radius-md)">
+          <span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-dark);letter-spacing:1px">${title}</span>
+          <span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey);flex-shrink:0">▶</span>
+        </button>
+        <div data-sec-body="${id}" style="display:none;padding:var(--sp-sm) var(--sp-md) var(--sp-md)">${content}</div>
+      </div>`;
+
     vp.innerHTML = `
-      <div class="screen" style="background:var(--off-white);display:flex;flex-direction:column;">
+      <div class="screen" style="background:var(--off-white);display:flex;flex-direction:column;overflow:hidden">
 
         <div class="screen-header" style="background:var(--blue)">
           <button class="btn btn--ghost screen-header__back" id="comp-back">${BACK_ARROW_SVG}</button>
           <span class="screen-header__title">COMPENDIO</span>
         </div>
 
-        <div style="overflow-y:auto;flex:1;padding:var(--sp-md);display:flex;flex-direction:column;gap:var(--sp-md)">
-
-          <!-- Efectos de estado -->
-          <div style="background:var(--white);border:var(--border);border-radius:var(--radius-md);
-            padding:var(--sp-md);box-shadow:var(--shadow-sm)">
-            <div style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-dark);
-              margin-bottom:var(--sp-md);letter-spacing:1px">EFECTOS DE ESTADO</div>
-            ${CompendiumScreen._renderStatusList()}
+        <!-- scroll container: block (no flex) para que overflow-y:auto funcione -->
+        <div style="overflow-y:auto;flex:1;min-height:0">
+          <!-- layout container: flex separado del scroll -->
+          <div style="display:flex;flex-direction:column;gap:var(--sp-md);padding:var(--sp-md)">
+            ${sec('status', 'EFECTOS DE ESTADO', CompendiumScreen._renderStatusList())}
+            ${sec('types',  'TIPOS',             CompendiumScreen._renderTypeChart())}
+            ${sec('moves',  'MOVIMIENTOS',        CompendiumScreen._renderMoveList())}
+            ${sec('items',  'OBJETOS EQUIPABLES', CompendiumScreen._renderHeldItemList())}
           </div>
-
-          <!-- Movimientos -->
-          <div style="background:var(--white);border:var(--border);border-radius:var(--radius-md);
-            padding:var(--sp-md);box-shadow:var(--shadow-sm)">
-            <div style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-dark);
-              margin-bottom:var(--sp-md);letter-spacing:1px">MOVIMIENTOS</div>
-            ${CompendiumScreen._renderMoveList()}
-          </div>
-
-          <!-- Objetos equipables -->
-          <div style="background:var(--white);border:var(--border);border-radius:var(--radius-md);
-            padding:var(--sp-md);box-shadow:var(--shadow-sm)">
-            <div style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-dark);
-              margin-bottom:var(--sp-md);letter-spacing:1px">OBJETOS EQUIPABLES</div>
-            ${CompendiumScreen._renderHeldItemList()}
-          </div>
-
         </div>
       </div>`;
 
     document.getElementById('comp-back')
       .addEventListener('click', () => CompendiumScreen._returnFn?.());
 
-    // Clicks en movimientos → detalle con pokemon que lo usan
-    vp.querySelectorAll('[data-move-id]').forEach(el => {
-      el.addEventListener('click', () => {
-        const moveId = el.dataset.moveId;
-        CompendiumScreen._renderMoveDetail(moveId);
+    vp.querySelectorAll('[data-sec]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id   = btn.dataset.sec;
+        const body = vp.querySelector(`[data-sec-body="${id}"]`);
+        const arrow = btn.querySelector('span:last-child');
+        const open  = body.style.display !== 'none';
+        body.style.display = open ? 'none' : 'block';
+        arrow.textContent  = open ? '▶' : '▼';
       });
+    });
+
+    vp.querySelectorAll('[data-move-id]').forEach(el => {
+      el.addEventListener('click', () => CompendiumScreen._renderMoveDetail(el.dataset.moveId));
     });
   },
 
@@ -125,6 +127,79 @@ const CompendiumScreen = {
       </div>`).join('');
   },
 
+  // ── Tabla defensiva de tipos ──────────────────────────────────────────────
+  _renderTypeChart() {
+    const allTypes = [
+      'normal','fire','water','electric','grass','ice','fighting','poison',
+      'ground','flying','psychic','bug','rock','ghost','dragon','dark','steel','fairy',
+    ];
+
+    // Matchup defensivo: { tipo defensor → { tipo atacante: multiplicador } }
+    // Solo entradas distintas de x1 (el neutro se omite)
+    const chart = {
+      normal:   { ghost:0, fighting:2 },
+      fire:     { fire:.5, grass:.5, ice:.5, bug:.5, steel:.5, fairy:.5, water:2, ground:2, rock:2 },
+      water:    { fire:.5, water:.5, ice:.5, steel:.5, electric:2, grass:2 },
+      electric: { electric:.5, flying:.5, steel:.5, ground:2 },
+      grass:    { water:.5, electric:.5, grass:.5, ground:.5, fire:2, ice:2, poison:2, flying:2, bug:2 },
+      ice:      { ice:.5, fire:2, fighting:2, rock:2, steel:2 },
+      fighting: { rock:.5, bug:.5, dark:.5, flying:2, psychic:2, fairy:2 },
+      poison:   { grass:.5, fighting:.5, poison:.5, bug:.5, fairy:.5, ground:2, psychic:2 },
+      ground:   { poison:.5, rock:.5, electric:0, water:2, grass:2, ice:2 },
+      flying:   { grass:.5, fighting:.5, bug:.5, ground:0, electric:2, ice:2, rock:2 },
+      psychic:  { fighting:.5, psychic:.5, bug:2, ghost:2, dark:2 },
+      bug:      { grass:.5, fighting:.5, ground:.5, fire:2, flying:2, rock:2 },
+      rock:     { normal:.5, fire:.5, poison:.5, flying:.5, water:2, grass:2, fighting:2, ground:2, steel:2 },
+      ghost:    { normal:0, fighting:0, poison:.5, bug:.5, ghost:2, dark:2 },
+      dragon:   { fire:.5, water:.5, electric:.5, grass:.5, ice:2, dragon:2, fairy:2 },
+      dark:     { psychic:0, ghost:.5, dark:.5, fighting:2, bug:2, fairy:2 },
+      steel:    { normal:.5, grass:.5, ice:.5, flying:.5, psychic:.5, bug:.5, rock:.5, dragon:.5, steel:.5, fairy:.5, poison:0, fire:2, fighting:2, ground:2 },
+      fairy:    { dragon:0, fighting:.5, bug:.5, dark:.5, poison:2, steel:2 },
+    };
+
+    const mulLabel = { 4:'x4', 2:'x2', 0.5:'x½', 0.25:'x¼', 0:'x0' };
+    const mulColor = {
+      4:    '#880000',
+      2:    '#c62828',
+      0.5:  '#2e7d32',
+      0.25: '#1565c0',
+      0:    '#555',
+    };
+    const mulOrder = [4, 2, 0.5, 0.25, 0];
+
+    return allTypes.map(type => {
+      const entries = chart[type] ?? {};
+      const groups  = {};
+      for (const [atk, mul] of Object.entries(entries)) {
+        (groups[mul] ??= []).push(atk);
+      }
+
+      const rows = mulOrder
+        .filter(m => groups[m]?.length)
+        .map(m => `
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-family:var(--font-pixel);font-size:9px;color:${mulColor[m]};
+              flex-shrink:0;min-width:28px;font-weight:bold">
+              ${mulLabel[m]}
+            </span>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">
+              ${groups[m].map(t =>
+                `<span class="type-badge" data-type="${t}" style="font-size:8px;padding:3px 10px">${t.toUpperCase()}</span>`
+              ).join('')}
+            </div>
+          </div>`).join('');
+
+      return `
+        <div style="border-radius:var(--radius-sm);border:1px solid var(--grey-light);
+          background:var(--off-white);padding:10px 12px;margin-bottom:8px">
+          <div style="display: flex;justify-content: center;margin-bottom:1em">
+            <span class="type-badge" data-type="${type}" style="font-size:14px;padding:4px 16px">${type.toUpperCase()}</span>
+          </div>
+          ${rows || `<span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey)">Sin debilidades ni resistencias especiales</span>`}
+        </div>`;
+    }).join('');
+  },
+
   // ── Lista de movimientos agrupados por tipo ────────────────────────────────
   _renderMoveList() {
     if (typeof MOVE_POOL === 'undefined') return '<p>MOVE_POOL no disponible</p>';
@@ -161,34 +236,24 @@ const CompendiumScreen = {
             const effects   = typeof MOVE_EFFECTS !== 'undefined'
               ? effectIds.map(id => MOVE_EFFECTS[id]).filter(Boolean)
               : [];
-            const triggerLabels = {
-              'before-attack': 'ANTES',
-              'after-attack':  'TRAS',
-              'on-hitted':     'AL RECIBIR',
-            };
             const effectDesc = effects.map(e => e.desc).filter(Boolean).join(' · ');
             return `
               <div class="comp-move-row" data-move-id="${m.id}"
                 style="display:flex;align-items:center;gap:8px;padding:6px 10px;
                   background:var(--off-white);border:1px solid var(--grey-light);
                   border-radius:var(--radius-sm);cursor:pointer;position:relative">
-                <!-- Clase de daño -->
                 <span style="font-family:var(--font-pixel);font-size:4px;
                   color:${m.damageClass === 'special' ? 'var(--blue)' : 'var(--red)'};
                   border:1px solid currentColor;padding:1px 4px;border-radius:2px;flex-shrink:0">
                   ${m.damageClass === 'special' ? 'ESP' : 'FIS'}
                 </span>
-                <!-- Nombre -->
                 <span style="font-family:var(--font-pixel);font-size:7px;flex:1">${m.name}</span>
-                <!-- Poder -->
                 <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">
                   POD:${m.power ?? '—'}
                 </span>
-                <!-- PP -->
                 <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">
                   PP:${m.pp ?? '—'}
                 </span>
-                <!-- Tooltip del efecto -->
                 ${effectDesc ? `<div class="move-effect-tooltip">✦ ${effectDesc}</div>` : ''}
               </div>`;
           }).join('')}
@@ -200,18 +265,17 @@ const CompendiumScreen = {
   _renderHeldItemList() {
     if (typeof HELD_ITEMS === 'undefined') return '<p>HELD_ITEMS no disponible</p>';
 
-    const triggerLabels = {
-      'passive':        'PASIVO',
-      'on-turn-start':  'INICIO DE TURNO',
-    };
-
     return Object.values(HELD_ITEMS).map(item => `
-      <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 10px;margin-bottom:6px;
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;margin-bottom:6px;
         background:var(--off-white);border:1px solid var(--grey-light);border-radius:var(--radius-sm)">
         <img src="${item.img}" alt="${item.name}"
           style="width:28px;height:28px;image-rendering:pixelated;object-fit:contain;flex-shrink:0"
           onerror="this.outerHTML='<span style=font-size:22px>${item.fallbackIcon ?? '❓'}</span>'">
         <div style="flex:1">
+        <span style="font-family:var(--font-pixel);font-size:12px;color:var(--grey-dark);line-height:1.8">
+            ${item.name}
+          </span>
+          <br>
           <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey-dark);line-height:1.8">
             ${item.desc}
           </span>
@@ -257,14 +321,15 @@ const CompendiumScreen = {
     const vp     = document.getElementById('viewport');
 
     vp.innerHTML = `
-      <div class="screen" style="background:var(--off-white);display:flex;flex-direction:column;">
+      <div class="screen" style="background:var(--off-white);display:flex;flex-direction:column;overflow:hidden">
 
         <div class="screen-header" style="background:var(--blue)">
           <button class="btn btn--ghost screen-header__back" id="move-detail-back">${BACK_ARROW_SVG}</button>
           <span class="screen-header__title">${move.name.toUpperCase()}</span>
         </div>
 
-        <div style="overflow-y:auto;flex:1;padding:var(--sp-md);display:flex;flex-direction:column;gap:var(--sp-md)">
+        <div style="overflow-y:auto;flex:1;min-height:0">
+        <div style="padding:var(--sp-md);display:flex;flex-direction:column;gap:var(--sp-md)">
 
           <!-- Info del movimiento -->
           <div style="background:var(--white);border:var(--border);border-radius:var(--radius-md);
@@ -331,6 +396,7 @@ const CompendiumScreen = {
                   }).join('')}
                 </div>`}
           </div>
+        </div>
         </div>
       </div>`;
 

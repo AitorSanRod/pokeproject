@@ -41,7 +41,7 @@ var ROUTE_DATA = {
     ],
     trainer: [
       {
-        name: 'Youngster Joey', img: 'assets/sprites/trainers/entrenadorjoven.png', rate: 60, pokemon: [
+        name: 'Youngster Joey', img: 'assets/sprites/trainers/entrenadorjoven.png', rate: 30, pokemon: [
           { name: POKEMON.rattata, minLv: 2, maxLv: 3, moveId: MOVES.normal.physical.tackle },
           { name: POKEMON.rattata, minLv: 3, maxLv: 3, moveId: MOVES.normal.physical.tackle },
         ]
@@ -49,7 +49,12 @@ var ROUTE_DATA = {
       {
         name: 'Youngster Joey', img: 'assets/sprites/trainers/entrenadorjoven.png', rate: 40, pokemon: [
           { name: POKEMON.rattata, minLv: 2, maxLv: 2, moveId: MOVES.normal.physical.tackle },
-          { name: POKEMON.pidgey, minLv: 4, maxLv: 5, moveId: MOVES.flying.physical.peck },
+          { name: POKEMON.pidgey, minLv: 2, maxLv: 3, moveId: MOVES.flying.physical.peck },
+        ]
+      },
+      {
+        name: 'Youngster Joey', img: 'assets/sprites/trainers/entrenadorjoven.png', rate: 30, pokemon: [
+          { name: POKEMON.rattata, minLv: 2, maxLv: 2, moveId: MOVES.normal.physical.tackle },
         ]
       },
     ]
