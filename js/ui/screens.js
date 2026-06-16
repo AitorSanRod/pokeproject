@@ -19,7 +19,7 @@ const Screens = {
       <div class="screen screen--title">
         <div class="title-logo">
           <span class="title-logo__main">POKEMON</span>
-          <span class="title-logo__sub">v0.0.2</span>
+          <span class="title-logo__sub">v0.0.3</span>
         </div>
         <div class="title-pokeball">
           <div class="title-pokeball__top"></div>
