@@ -105,6 +105,7 @@ var ROUTE_DATA = {
     bg: 'assets/bg/route-22.png',
     combatBg: 'assets/bg/combate.png',
     rewardPokemon: [POKEMON.mankey, POKEMON.nidoran_f, POKEMON.nidoran_m],
+    rewardExtras: [ITEM.leftovers],
     wild: [
       { name: POKEMON.nidoran_m, rate: 35, minLv: 5, maxLv: 6, moveId: MOVES.poison.physical.poison_sting },
       { name: POKEMON.nidoran_f, rate: 35, minLv: 5, maxLv: 6, moveId: MOVES.poison.physical.poison_sting },
@@ -126,7 +127,6 @@ var ROUTE_DATA = {
     bg: 'assets/bg/route-2.png',
     combatBg: 'assets/bg/combate.png',
     rewardPokemon: [POKEMON.caterpie, POKEMON.weedle, POKEMON.pidgey, POKEMON.rattata],
-    rewardExtras: [ITEM.leftovers],
     wild: [
       { name: POKEMON.rattata, rate: 35, minLv: 3, maxLv: 5, moveId: MOVES.normal.physical.tackle },
       { name: POKEMON.pidgey, rate: 30, minLv: 3, maxLv: 5, moveId: MOVES.flying.physical.peck },
@@ -210,7 +210,7 @@ var ROUTE_DATA = {
     gymType: 'rock',
     badge: 'Medalla Roca',
     gymLeaderImg: 'assets/sprites/trainers/brock.png',
-    rewardExtras: [ITEM.assault_vest, ITEM.choice_scarf, ITEM.sitrus_berry],
+    rewardExtras: [ITEM.sitrus_berry],
     trainer: [
       {
         name: 'Hiker Rocko', img: 'assets/sprites/trainers/campista.png', rate: 100,
@@ -336,7 +336,7 @@ var ROUTE_DATA = {
     gymType: 'water',
     badge: 'Medalla Agua',
     gymLeaderImg: 'assets/sprites/trainers/misty.png',
-    rewardExtras: [ITEM.assault_vest, ITEM.choice_scarf, ITEM.sitrus_berry],
+    rewardExtras: [ITEM.choice_scarf],
     trainer: [
       {
         name: 'Nadador', img: 'assets/sprites/trainers/nadador.png', rate: 50, pokemon: [
@@ -452,6 +452,7 @@ var ROUTE_DATA = {
     bg: 'assets/bg/ruta-25.png',
     combatBg: 'assets/bg/combate.png',
     rewardPokemon: [POKEMON.pinsir, POKEMON.porygon],
+    rewardExtras: [ITEM.choice_specs],
     wild: [],
     trainer: [
       {
@@ -532,8 +533,8 @@ var ROUTE_DATA = {
     gymType: 'electric',
     badge: 'Medalla Trueno',
     gymLeaderImg: 'assets/sprites/trainers/surge.png',
-    rewardPokemon: [POKEMON.Voltorb, POKEMON.pikachu, POKEMON.raichu, , POKEMON.porygon],
-    rewardExtras: [ITEM.sitrus_berry],
+    rewardPokemon: [POKEMON.voltorb, POKEMON.pikachu, POKEMON.raichu, , POKEMON.porygon],
+    rewardExtras: [ITEM.choice_band],
     trainer: [
       {
         name: ENTRENADORES.Caballero.name, img: ENTRENADORES.Caballero.img, rate: 50, pokemon: [

@@ -79,7 +79,7 @@ var MOVE_EFFECTS = {
   'lower-atk-10': {
     trigger: TRIGGERS.AFTER_ATTACK,
     statusChance: 0.10,
-    desc: 'Baja el ATK del rival un 10% (acumulable)',
+    desc: 'Baja el ATK del rival un 10%',
     fn(ctx) {
       if (hasClearEffect(ctx.target)) {
         ctx.log(`${ctx.target.displayName} esta protegido y no puede ser debilitado!`);
@@ -94,7 +94,7 @@ var MOVE_EFFECTS = {
 
   'lower-atk-20': {
     trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Baja el ATK del rival un 20% (acumulable)',
+    desc: 'Baja el ATK del rival un 20%',
     fn(ctx) {
       if (hasClearEffect(ctx.target)) {
         ctx.log(`${ctx.target.displayName} esta protegido y no puede ser debilitado!`);
@@ -109,7 +109,7 @@ var MOVE_EFFECTS = {
 
   'lower-def-20': {
     trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Baja la DEF del rival un 20% (acumulable)',
+    desc: 'Baja la DEF del rival un 20%',
     fn(ctx) {
       if (hasClearEffect(ctx.target)) {
         ctx.log(`${ctx.target.displayName} esta protegido y no puede ser debilitado!`);
@@ -157,7 +157,7 @@ var MOVE_EFFECTS = {
   'raise-spa-10': {
     trigger: TRIGGERS.AFTER_ATTACK,
     statusChance: 0.10,
-    desc: 'Sube el SPA propio un 10% del base (acumulable)',
+    desc: 'Sube el SPA propio un 10% del base',
     fn(ctx) {
       if (!ctx.user.combatMods) ctx.user.combatMods = {};
       ctx.user.combatMods.spa = (ctx.user.combatMods.spa ?? 0) + 0.10;
@@ -169,7 +169,7 @@ var MOVE_EFFECTS = {
 
   'raise-atk-20': {
     trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Sube el ATK propio un 20% del base (acumulable)',
+    desc: 'Sube el ATK propio un 20% del base',
     fn(ctx) {
       if (!ctx.user.combatMods) ctx.user.combatMods = {};
       ctx.user.combatMods.atk = (ctx.user.combatMods.atk ?? 0) + 0.20;
@@ -272,7 +272,7 @@ var MOVE_EFFECTS = {
   'flinch-20': {
     trigger: TRIGGERS.AFTER_ATTACK,
     statusChance: 0.20,
-    desc: '20% de probabilidad de hacer retroceder al rival (pierde su ataque si aun no ha actuado este turno)',
+    desc: '20% de probabilidad de hacer retroceder al rival',
     fn(ctx) {
       ctx.target._flinched = true;
     },
@@ -281,7 +281,7 @@ var MOVE_EFFECTS = {
   'flinch-30': {
     trigger: TRIGGERS.AFTER_ATTACK,
     statusChance: 0.30,
-    desc: '30% de probabilidad de hacer retroceder al rival (pierde su ataque si aun no ha actuado este turno)',
+    desc: '30% de probabilidad de hacer retroceder al rival',
     fn(ctx) {
       ctx.target._flinched = true;
     },
@@ -323,7 +323,7 @@ var MOVE_EFFECTS = {
   // directamente, vía hasClearEffect(pokemon) (ver pokemon.js).
   'clear': {
     trigger: TRIGGERS.BEFORE_ATTACK,
-    desc: 'Inmune a estados alterados y a bajadas de estadísticas mientras tenga este movimiento',
+    desc: 'Inmune a effectos de estado y cambios de estadisticas',
     fn(ctx) {
       // No-op: el efecto es pasivo, ver comentario arriba.
     },

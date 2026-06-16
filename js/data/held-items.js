@@ -88,6 +88,44 @@ var HELD_ITEMS = {
     },
   },
 
+  'choice-specs': {
+    name: 'Gafas  Elección',
+    desc: 'Aumenta la SPA un 100%, pero bloquea el cambio de movimiento.',
+    img: 'assets/sprites/items/gafas-eleccion.png',
+    fallbackIcon: '👓',
+    trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+    blocksMoveChange: true,
+    fn(ctx) {
+      const { user } = ctx;
+      if (!user.combatMods) user.combatMods = {};
+      user.combatMods.spa = (user.combatMods.spa ?? 0) + 1.0;
+    },
+    revert(ctx) {
+      const { user } = ctx;
+      if (!user.combatMods) return;
+      user.combatMods.spa = (user.combatMods.spa ?? 0) - 1.0;
+    },
+  },
+
+  'choice-band': {
+    name: 'Cinta  Elección',
+    desc: 'Aumenta la ATK un 100%, pero bloquea el cambio de movimiento.',
+    img: 'assets/sprites/items/cinta-eleccion.png',
+    fallbackIcon: '👓',
+    trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+    blocksMoveChange: true,
+    fn(ctx) {
+      const { user } = ctx;
+      if (!user.combatMods) user.combatMods = {};
+      user.combatMods.atk = (user.combatMods.atk ?? 0) + 1.0;
+    },
+    revert(ctx) {
+      const { user } = ctx;
+      if (!user.combatMods) return;
+      user.combatMods.atk = (user.combatMods.atk ?? 0) - 1.0;
+    },
+  },
+
   'assault-vest': {
     name: 'Chaleco Asalto',
     desc: 'Aumenta un 50% la defensa especial.',

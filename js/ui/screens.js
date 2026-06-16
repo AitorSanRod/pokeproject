@@ -18,6 +18,7 @@ const Screens = {
   // ── Navega a una pantalla ────────────────────────────────────────────────
   show(screenFn, ...args) {
     document.getElementById('btn-notes-global')?.style.setProperty('display', 'none');
+    document.querySelectorAll('.held-item-tooltip--floating').forEach(el => el.remove());
     const viewport = document.getElementById('app');
     viewport.innerHTML = `<div class="game-viewport" id="viewport"></div>`;
     screenFn(...args);
