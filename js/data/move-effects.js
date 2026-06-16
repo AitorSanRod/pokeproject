@@ -122,6 +122,38 @@ var MOVE_EFFECTS = {
     },
   },
 
+  'lower-spd-20-10': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Puede bajar la SPD del rival un 20%',
+    statusChance: 0.10,
+    fn(ctx) {
+      if (hasClearEffect(ctx.target)) {
+        ctx.log(`${ctx.target.displayName} esta protegido y no puede ser debilitado!`);
+        return;
+      }
+      if (!ctx.target.combatMods) ctx.target.combatMods = {};
+      ctx.target.combatMods.spd = (ctx.target.combatMods.spd ?? 0) - 0.20;
+      ctx.log(`La SPD de ${ctx.target.displayName} bajo!`);
+      if (ctx.showStatChange) ctx.showStatChange(ctx.target, 'SPD', 'down', 20);
+    },
+  },
+
+  'lower-spd-20-20': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Puede bajar la SPD del rival un 20%',
+    statusChance: 0.20,
+    fn(ctx) {
+      if (hasClearEffect(ctx.target)) {
+        ctx.log(`${ctx.target.displayName} esta protegido y no puede ser debilitado!`);
+        return;
+      }
+      if (!ctx.target.combatMods) ctx.target.combatMods = {};
+      ctx.target.combatMods.spd = (ctx.target.combatMods.spd ?? 0) - 0.20;
+      ctx.log(`La SPD de ${ctx.target.displayName} bajo!`);
+      if (ctx.showStatChange) ctx.showStatChange(ctx.target, 'SPD', 'down', 20);
+    },
+  },
+
   'raise-spa-10': {
     trigger: TRIGGERS.AFTER_ATTACK,
     statusChance: 0.10,
@@ -183,6 +215,15 @@ var MOVE_EFFECTS = {
     },
   },
 
+  'poison-50': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Tiene un 50% de probabilidad de envenenar al rival',
+    statusChance: 0.50,
+    fn(ctx) {
+      StatusEffects.apply(ctx.target, 'poison', ctx.log);
+    },
+  },
+
   'sleep-10': {
     trigger: TRIGGERS.AFTER_ATTACK,
     desc: 'Tiene un 10% de probabilidad de hacer dormir al rival',
@@ -192,12 +233,12 @@ var MOVE_EFFECTS = {
     },
   },
 
-  'sleep': {
-    trigger: TRIGGERS.BEFORE_ATTACK,
-    desc: 'Duerme al rival.',
-    statusChance: 1.00,
+  'paralize-10': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Tiene un 10% de probabilidad de paralizar al rival',
+    statusChance: 0.10,
     fn(ctx) {
-      StatusEffects.apply(ctx.target, 'sleep', ctx.log);
+      StatusEffects.apply(ctx.target, 'paralysis', ctx.log);
     },
   },
 
@@ -210,7 +251,52 @@ var MOVE_EFFECTS = {
     },
   },
 
+  'freeze-10': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Tiene un 10% de probabilidad de congelar al rival',
+    statusChance: 0.10,
+    fn(ctx) {
+      StatusEffects.apply(ctx.target, 'freeze', ctx.log);
+    },
+  },
+
+  'sleep-15': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Tiene un 15% de probabilidad de hacer dormir al rival',
+    statusChance: 0.15,
+    fn(ctx) {
+      StatusEffects.apply(ctx.target, 'sleep', ctx.log);
+    },
+  },
+
+  'flinch-20': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    statusChance: 0.20,
+    desc: '20% de probabilidad de hacer retroceder al rival (pierde su ataque si aun no ha actuado este turno)',
+    fn(ctx) {
+      ctx.target._flinched = true;
+    },
+  },
+
+  'flinch-30': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    statusChance: 0.30,
+    desc: '30% de probabilidad de hacer retroceder al rival (pierde su ataque si aun no ha actuado este turno)',
+    fn(ctx) {
+      ctx.target._flinched = true;
+    },
+  },
+
   // ── BEFORE_ATTACK ─────────────────────────────────────────────────────────
+
+  'sleep': {
+    trigger: TRIGGERS.BEFORE_ATTACK,
+    desc: 'Duerme al rival.',
+    statusChance: 1.00,
+    fn(ctx) {
+      StatusEffects.apply(ctx.target, 'sleep', ctx.log);
+    },
+  },
 
   'double-hit': {
     trigger: TRIGGERS.BEFORE_ATTACK,
@@ -245,6 +331,16 @@ var MOVE_EFFECTS = {
 
   // ── ON_HITTED ─────────────────────────────────────────────────────────────
 
+  'recoil-10': {
+    trigger: TRIGGERS.ON_HITTED,
+    desc: 'Devuelve el 10% del daño recibido al atacante',
+    fn(ctx) {
+      const recoil = Math.max(1, Math.floor(ctx.dmg * 0.10));
+      ctx.attacker.currentHp = Math.max(0, ctx.attacker.currentHp - recoil);
+      ctx.log(`${ctx.attacker.displayName} recibio ${recoil} de rebote!`);
+    },
+  },
+
   'recoil-30': {
     trigger: TRIGGERS.ON_HITTED,
     desc: 'Devuelve el 30% del daño recibido al atacante',
@@ -271,6 +367,17 @@ var MOVE_EFFECTS = {
     desc: 'Reduce el daño recibido un 25%',
     fn(ctx) {
       const reduction = Math.floor(ctx.dmg * 0.25);
+      ctx.dmg = Math.max(1, ctx.dmg - reduction);
+      ctx.user.currentHp = Math.max(0, ctx.user.currentHp + reduction);
+      ctx.log(`${ctx.user.displayName} redujo el daño del golpe!`);
+    },
+  },
+
+  'shield-50': {
+    trigger: TRIGGERS.ON_HITTED,
+    desc: 'Reduce el daño recibido un 50%',
+    fn(ctx) {
+      const reduction = Math.floor(ctx.dmg * 0.50);
       ctx.dmg = Math.max(1, ctx.dmg - reduction);
       ctx.user.currentHp = Math.max(0, ctx.user.currentHp + reduction);
       ctx.log(`${ctx.user.displayName} redujo el daño del golpe!`);

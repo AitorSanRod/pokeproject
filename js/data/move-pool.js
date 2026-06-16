@@ -36,14 +36,15 @@ var DAMAGE_CLASS = Object.freeze({
 var MOVE_POOL = {
   normal: {
     physical: [
-      { id: 'tackle', name: 'Placaje', power: 40, pp: 35, type: 'normal', damageClass: 'physical', effectId: 'priority' },
-      { id: 'body-slam', name: 'Golpe Cuerpo', power: 85, pp: 15, type: 'normal', damageClass: 'physical' },
-      { id: 'hyper-fang', name: 'Hiper Colmillo', power: 80, pp: 15, type: 'normal', damageClass: 'physical' },
+      { id: 'tackle', name: 'Placaje', power: 40, pp: 35, type: 'normal', damageClass: 'physical' },
+      { id: 'extreme-speed', name: 'Velocidad Extrema', power: 70, pp: 15, type: 'normal', damageClass: 'physical', effectId: 'priority' },
+      { id: 'hyper-fang', name: 'Hiper Colmillo', power: 90, pp: 15, type: 'normal', damageClass: 'physical', effectId: 'shield-10' },
     ],
     special: [
       { id: 'swift', name: 'Velocidad', power: 60, pp: 20, type: 'normal', damageClass: 'special', effectId: 'shield-10' },
-      { id: 'hyper-voice', name: 'Vozarrón', power: 90, pp: 10, type: 'normal', damageClass: 'special' },
-      { id: 'boomburst', name: 'Estruendo', power: 140, pp: 10, type: 'normal', damageClass: 'special' },
+      { id: 'hyper-voice', name: 'Vozarrón', power: 90, pp: 10, type: 'normal', damageClass: 'special', effectId: 'shield-25' },
+      { id: 'boomburst', name: 'Estruendo', power: 140, pp: 10, type: 'normal', damageClass: 'special', effectId: 'shield-50' },
+      { id: 'tri-attack', name: 'Triataque ', power: 80, pp: 10, type: 'normal', damageClass: 'special', effectId: ['burn-10', 'paralize-10', 'freeze-10', 'drain-10'], boss: true },
     ],
   },
   fire: {
@@ -78,8 +79,8 @@ var MOVE_POOL = {
     ],
     special: [
       { id: 'absorb', name: 'Absorber', power: 40, pp: 25, type: 'grass', damageClass: 'special', effectId: 'drain-10' },
-      { id: 'magical-leaf', name: 'Hoja Magica', power: 60, pp: 20, type: 'grass', damageClass: 'special', effectId: 'drain-25' },
-      { id: 'solar-beam', name: 'Rayo Solar', power: 120, pp: 10, type: 'grass', damageClass: 'special', effectId: 'drain-50' },
+      { id: 'magical-leaf', name: 'Hoja Magica', power: 60, pp: 20, type: 'grass', damageClass: 'special', effectId: 'sleep-15' },
+      { id: 'solar-beam', name: 'Rayo Solar', power: 120, pp: 10, type: 'grass', damageClass: 'special' },
     ],
   },
   electric: {
@@ -121,7 +122,7 @@ var MOVE_POOL = {
   poison: {
     physical: [
       { id: 'poison-sting', name: 'Aguijon Toxico', power: 35, pp: 35, type: 'poison', damageClass: 'physical', effectId: 'poison-25' },
-      { id: 'poison-jab', name: 'Puya Nociva', power: 80, pp: 20, type: 'poison', damageClass: 'physical' },
+      { id: 'poison-jab', name: 'Puya Nociva', power: 75, pp: 20, type: 'poison', damageClass: 'physical', effectId: 'poison-50' },
       { id: 'gunk-shot', name: 'Lanza Mugre', power: 120, pp: 5, type: 'poison', damageClass: 'physical' },
     ],
     special: [
@@ -162,16 +163,17 @@ var MOVE_POOL = {
     ],
     special: [
       { id: 'confusion', name: 'Confusion', power: 25, pp: 25, type: 'psychic', damageClass: 'special', effectId: 'double-hit' },
-      { id: 'psychic', name: 'Psiquico', power: 90, pp: 10, type: 'psychic', damageClass: 'special' },
+      { id: 'psychic', name: 'Psiquico', power: 70, pp: 10, type: 'psychic', damageClass: 'special', effectId: 'clear' },
       { id: 'psystrike', name: 'Golpe Psi', power: 100, pp: 10, type: 'psychic', damageClass: 'special' },
+      { id: 'teleport', name: 'Teletransporte', power: 0, pp: 99, type: 'psychic', damageClass: 'special', boss: true },
       { id: 'trick', name: 'Truco', power: 30, pp: 99, type: 'psychic', damageClass: 'special', boss: true, effectId: ['clear', 'sleep', 'lower-spd-20'] },
     ],
   },
   bug: {
     physical: [
-      { id: 'bug-bite', name: 'Picadura', power: 35, pp: 20, type: 'bug', damageClass: 'physical' },
-      { id: 'x-scissor', name: 'Tijera X', power: 65, pp: 15, type: 'bug', damageClass: 'physical' },
-      { id: 'megahorn', name: 'Megacuerno', power: 100, pp: 10, type: 'bug', damageClass: 'physical' },
+      { id: 'bug-bite', name: 'Picadura', power: 35, pp: 20, type: 'bug', damageClass: 'physical', effectId: 'recoil-10' },
+      { id: 'x-scissor', name: 'Tijera X', power: 65, pp: 15, type: 'bug', damageClass: 'physical', effectId: 'recoil-10' },
+      { id: 'megahorn', name: 'Megacuerno', power: 100, pp: 10, type: 'bug', damageClass: 'physical', effectId: 'recoil-10' },
     ],
     special: [
       { id: 'infestation', name: 'Infestacion', power: 20, pp: 20, type: 'bug', damageClass: 'special' },
@@ -181,9 +183,9 @@ var MOVE_POOL = {
   },
   rock: {
     physical: [
-      { id: 'rock-throw', name: 'Lanzarrocas', power: 50, pp: 15, type: 'rock', damageClass: 'physical' },
-      { id: 'rock-slide', name: 'Avalancha', power: 75, pp: 10, type: 'rock', damageClass: 'physical' },
-      { id: 'stone-edge', name: 'Roca Afilada', power: 100, pp: 5, type: 'rock', damageClass: 'physical' },
+      { id: 'rock-throw', name: 'Lanzarrocas', power: 50, pp: 15, type: 'rock', damageClass: 'physical', effectId: 'flinch-20' },
+      { id: 'rock-slide', name: 'Avalancha', power: 75, pp: 10, type: 'rock', damageClass: 'physical', effectId: 'flinch-20' },
+      { id: 'stone-edge', name: 'Roca Afilada', power: 100, pp: 5, type: 'rock', damageClass: 'physical', effectId: 'flinch-30' },
     ],
     special: [
       { id: 'power-gem', name: 'Joya de Luz', power: 80, pp: 20, type: 'rock', damageClass: 'special' },
@@ -193,13 +195,13 @@ var MOVE_POOL = {
   },
   ghost: {
     physical: [
-      { id: 'shadow-sneak', name: 'Sombra Ninja', power: 40, pp: 30, type: 'ghost', damageClass: 'physical', effectId: 'priority' },
+      { id: 'shadow-sneak', name: 'Sombra Ninja', power: 40, pp: 30, type: 'ghost', damageClass: 'physical' },
       { id: 'shadow-claw', name: 'Garra Umbria', power: 70, pp: 15, type: 'ghost', damageClass: 'physical' },
       { id: 'phantom-force', name: 'Fuerza Fantasma', power: 90, pp: 10, type: 'ghost', damageClass: 'physical' },
     ],
     special: [
       { id: 'hex', name: 'Maldicion', power: 65, pp: 10, type: 'ghost', damageClass: 'special' },
-      { id: 'shadow-ball', name: 'Bola Sombra', power: 80, pp: 15, type: 'ghost', damageClass: 'special', effectId: 'lower-def-20' },
+      { id: 'shadow-ball', name: 'Bola Sombra', power: 80, pp: 15, type: 'ghost', damageClass: 'special' },
       { id: 'astral-barrage', name: 'Bombardeo Astral', power: 120, pp: 5, type: 'ghost', damageClass: 'special' },
     ],
   },
@@ -247,7 +249,7 @@ var MOVE_POOL = {
     ],
     special: [
       { id: 'disarming-voice', name: 'Voz Cautivadora', power: 40, pp: 15, type: 'fairy', damageClass: 'special', effectId: 'sleep-10' },
-      { id: 'moonblast', name: 'Fuerza Lunar', power: 95, pp: 15, type: 'fairy', damageClass: 'special' },
+      { id: 'moonblast', name: 'Fuerza Lunar', power: 95, pp: 15, type: 'fairy', damageClass: 'special', efectId: 'lower-spd-20-20' },
       { id: 'sparkling-aria', name: 'Aria Luminosa', power: 90, pp: 10, type: 'fairy', damageClass: 'special' },
     ],
   },

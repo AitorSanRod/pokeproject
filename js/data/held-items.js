@@ -94,7 +94,6 @@ var HELD_ITEMS = {
     img: 'assets/sprites/items/assault-vest.png',
     fallbackIcon: '🦺',
     trigger: HELD_ITEM_TRIGGERS.PASSIVE,
-    blocksMoveChange: true,
     fn(ctx) {
       const { user } = ctx;
       if (!user.combatMods) user.combatMods = {};

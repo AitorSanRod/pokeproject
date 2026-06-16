@@ -382,6 +382,8 @@
   transition: transform var(--transition), box-shadow var(--transition);
   text-align: left;
   width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 .encounter-btn:hover  { transform: translate(-2px,-2px); box-shadow: var(--shadow-md); }
 .encounter-btn:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--black); }
@@ -716,23 +718,24 @@
 .combat-team-pip--active  { border-color: var(--blue); background: #e8f4ff; }
 .combat-team-pip--fainted { opacity: .35; filter: grayscale(1); }
 
-/* Sprite más grande, legible */
 .combat-team-pip__sprite {
-  width: 40px;
-  height: 40px;
+  width: 52px;
+  height: 52px;
   image-rendering: pixelated;
   flex-shrink: 0;
 }
 
-/* Nivel debajo del sprite */
 .combat-team-pip__level {
   font-family: var(--font-pixel);
-  font-size: 5px;
+  font-size: 8px;
   color: var(--grey);
-  text-align: center;
-  flex-shrink: 0;
-  width: 40px;
-  margin-top: -6px;
+}
+
+/* Fila nivel (izq) + HP nums (der) bajo la barra */
+.combat-team-pip__hp-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
 }
 
 /* HP section: barra + números, ancho fijo igual para todos */
@@ -751,7 +754,7 @@
 
 .combat-team-pip__hp-nums {
   font-family: var(--font-pixel);
-  font-size: 6px;
+  font-size: 8px;
   color: var(--grey-dark);
   text-align: right;
 }
@@ -1114,6 +1117,47 @@
 .route-team-row__info .hp-bar-wrap { max-width: 160px; }
 .route-team-row__name   { font-family: var(--font-pixel); font-size: 10px; color: var(--black); }
 .route-team-row__level  { font-family: var(--font-pixel); font-size: 8px;  color: var(--grey); }
+
+/* ── PATH NODES ROW ─────────────────────────────────────────────────────────── */
+.path-nodes-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.path-node-img {
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+  object-fit: contain;
+  display: block;
+}
+
+.path-node-sep {
+  color: var(--grey-light);
+  font-size: 12px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+@media (max-width: 480px) {
+  .combat-player { left: -10px; }
+  .combat-foe { right: -12px; }
+
+  .path-node-img {
+    max-width: 24px;
+    width: 100%;
+    height: auto;
+  }
+  .path-nodes-row {
+    gap: 2px;
+  }
+  .path-node-sep {
+    font-size: 9px;
+  }
+}
 
 /* ── PATH ENCOUNTER TOOLTIP ─────────────────────────────────────────────────── */
 .path-encounter-cell { cursor: default; }

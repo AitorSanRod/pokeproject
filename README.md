@@ -37,6 +37,7 @@ movimientos, efectos, estados, evoluciones, recompensas y pantallas.
 22. [Orden de logs de combate — resumen vs efectos de objetos](#22-orden-de-logs-de-combate--resumen-vs-efectos-de-objetos)
 23. [Desglose de modificadores de daño en el log de combate](#23-desglose-de-modificadores-de-daño-en-el-log-de-combate)
 24. [Penalización de experiencia por diferencia de nivel](#24-penalización-de-experiencia-por-diferencia-de-nivel)
+25. [Pokémon Shiny](#25-pokémon-shiny)
 
 ---
 
@@ -58,7 +59,7 @@ js/
     status-effects.js           StatusEffects: poison/paralysis/burn/sleep/freeze
     natures.js                  25 naturalezas
     pokemon-db.js               POKEMON_DB (151 Gen1, tipos, moveLines, evoluciones) + POKEMON_LIST
-    routes.js                   ROUTE_DATA + KANTO_ROUTES + generatePaths()
+    routes.js                   ROUTE_DATA + KANTO_ROUTES + SHINY_RATE + generatePaths()
     storage.js                  Storage: pokédex, EVs por cadena evolutiva
     pokedex.js                  KANTO_DEX (151) + getDexEntry()
     types.js                    Tabla de efectividad
@@ -107,7 +108,8 @@ const POKEMON = POKEMON_LIST; // POKEMON.rattata → 'rattata'
   wild: [
     { name: POKEMON.rattata, rate: 45, minLv: 2, maxLv: 4, moveId: MOVES.normal.physical.tackle },
     { name: POKEMON.pidgey,  rate: 45, minLv: 2, maxLv: 4, moveId: MOVES.flying.physical.peck   },
-    { name: POKEMON.pikachu, rate: 10, minLv: 3, maxLv: 7, moveId: MOVES.electric.special.thunder_shock },
+    // shiny: true → este Pokémon SIEMPRE aparece como shiny (ver sección 25)
+    { name: POKEMON.pikachu, rate: 10, minLv: 3, maxLv: 7, moveId: MOVES.electric.special.thunder_shock, shiny: true },
   ],
 
   // Entrenadores normales — rate debe sumar 100
@@ -299,6 +301,41 @@ evolutiva completa.
 **Importante**: `RIVAL_STARTER` solo funciona dentro de `specialTrainer.pokemon`,
 resuelto la primera vez que `enc.type === 'special'` aparece en el camino
 (antes de que `GameState.specialTrainerUsed` se ponga a `true`).
+
+### RIVAL_STARTER_2 — segunda forma del contra-tipo
+
+Para un encuentro posterior donde el rival ya ha evolucionado su starter a la
+forma intermedia, usa el marcador `'RIVAL_STARTER_2'`:
+
+```js
+specialTrainer: {
+  name: 'Azul',
+  img:  'assets/sprites/trainers/rival_kanto.png',
+  pokemon: [
+    { name: 'RIVAL_STARTER_2', minLv: 18, maxLv: 22 },
+  ],
+},
+```
+
+`_runNextInPath` lo resuelve con `pickRivalSecondForm(GameState.starter.name)`
+(definida en `routes.js`):
+
+```js
+function pickRivalSecondForm(playerPokemon) {
+  if (playerPokemon === POKEMON.bulbasaur)  return POKEMON.charmeleon;  // jugador Bulbasaur → rival Charmeleon
+  if (playerPokemon === POKEMON.charmander) return POKEMON.wartortle;   // jugador Charmander → rival Wartortle
+  if (playerPokemon === POKEMON.squirtle)   return POKEMON.ivysaur;     // jugador Squirtle → rival Ivysaur
+  return POKEMON.vaporeon; // fallback
+}
+```
+
+El nivel, `moveId` y `overrides` del entry se respetan tal cual — solo se
+sustituye `name`. Si no se especifica `moveId`, `buildMoves` usará el movimiento
+de mayor poder para esa stage evolutiva (stage 1 = forma intermedia).
+
+Ambos marcadores (`RIVAL_STARTER` y `RIVAL_STARTER_2`) pueden coexistir en el
+mismo `pokemon[]` del `specialTrainer` — cada uno se resuelve de forma
+independiente.
 
 ---
 
@@ -502,8 +539,12 @@ las stats que difieran del default.
 ### Firma de createPokemon
 
 ```js
-createPokemon(nameOrId, level, isPlayer = false, moveId = null, overrides = null)
+createPokemon(nameOrId, level, isPlayer = false, moveId = null, overrides = null, shiny = false)
 ```
+
+El parámetro `shiny` se usa internamente — no hace falta pasarlo manualmente
+desde `routes.js`. El sistema lo gestiona a través de `SHINY_RATE` y del campo
+`shiny: true` en los encuentros salvajes (ver sección 25).
 
 ---
 
@@ -1740,4 +1781,128 @@ Con los valores por defecto (`levelDiff: 2`, `multiplier: 0.5`):
 - Activo Nv.12 vs rival Nv.10 → diferencia 2 → **sin penalización**, exp normal.
 - Activo Nv.13 vs rival Nv.10 → diferencia 3 → **penalización**, exp ÷ 2 para
   todo el equipo (redondeado).
+
+---
+
+## 25. Pokémon Shiny
+
+### Cómo funciona
+
+Los Pokémon shiny tienen sprites alternativos de color diferente. El sistema
+tiene dos modos de aparición:
+
+1. **Encuentro aleatorio** — cualquier Pokémon salvaje puede aparecer shiny
+   con una probabilidad configurable globalmente.
+2. **Shiny forzado** — una entrada concreta del array `wild` puede marcarse
+   con `shiny: true` para que ese Pokémon sea **siempre** shiny.
+
+### SHINY_RATE — probabilidad global
+
+Definida en `routes.js`, antes de `ROUTE_DATA`:
+
+```js
+// Probabilidad (0–1) de que un Pokémon salvaje aparezca como shiny.
+// 0.001 = 1 de cada 1000 (similar a los juegos principales).
+// Ponlo a 1 para que todos sean shiny (útil para testear).
+var SHINY_RATE = 0.001;
+```
+
+Esta constante es la única que hay que tocar para cambiar la tasa global.
+Aplica a **todos** los encuentros salvajes de **todas** las rutas.
+
+### Cómo añadir un shiny forzado en una ruta
+
+Añade `shiny: true` a cualquier entrada del array `wild` en `routes.js`:
+
+```js
+wild: [
+  { name: POKEMON.rattata, rate: 45, minLv: 2, maxLv: 4, moveId: MOVES.normal.physical.tackle },
+  { name: POKEMON.pidgey,  rate: 45, minLv: 2, maxLv: 4, moveId: MOVES.flying.physical.peck   },
+  // Este Pikachu SIEMPRE aparecerá shiny, independientemente de SHINY_RATE
+  { name: POKEMON.pikachu, rate: 10, minLv: 3, maxLv: 7, moveId: MOVES.electric.special.thunder_shock, shiny: true },
+],
+```
+
+Cuando el sistema elige ese Pikachu por su `rate`, el flag `shiny: true`
+garantiza que será shiny sin ninguna tirada de dados. Las demás entradas
+sin `shiny: true` siguen sujetas a `SHINY_RATE`.
+
+### Lógica en screens.js
+
+En `_runNextInPath`, justo antes de crear el Pokémon salvaje:
+
+```js
+const entry   = pickWildEncounter(data.wild);
+const isShiny = entry.shiny === true || Math.random() < SHINY_RATE;
+const foePoke = await createPokemon(entry.name, rollLevel(entry), false, entry.moveId ?? null, entry.overrides ?? null, isShiny);
+```
+
+`entry.shiny === true` tiene prioridad sobre la tirada aleatoria.
+
+### Sprites shiny
+
+Los sprites se obtienen de los mismos repositorios que los normales, pero con
+rutas diferentes:
+
+| Sprite | URL |
+|---|---|
+| Normal (frente) | `sprites/pokemon/{id}.png` |
+| Normal (espalda) | `sprites/pokemon/back/{id}.png` |
+| **Shiny (frente)** | `sprites/pokemon/shiny/{id}.png` |
+| **Shiny (espalda)** | `sprites/pokemon/back/shiny/{id}.png` |
+
+Cuando PokeAPI está disponible, `api.js` extrae `data.sprites.front_shiny` y
+`data.sprites.back_shiny` directamente de la respuesta. En modo fallback
+(sin red), `mock-data.js` construye las URLs con el `id` local.
+
+`createPokemon` asigna los sprites correctos automáticamente:
+
+```js
+spriteUrl:    shiny ? (apiData.sprites.front_shiny ?? apiData.sprites.front_default) : apiData.sprites.front_default,
+backSpriteUrl: shiny ? (apiData.sprites.back_shiny  ?? apiData.sprites.back_default)  : apiData.sprites.back_default,
+```
+
+Si el sprite shiny no existe (fallo de red o Pokémon sin shiny en la API),
+cae al sprite normal como respaldo.
+
+### El objeto Pokémon tiene el campo `shiny`
+
+Cualquier Pokémon creado con `createPokemon` tiene `pokemon.shiny: boolean`.
+Esto permite consultarlo en cualquier parte del código:
+
+```js
+if (foePoke.shiny) { /* mostrar efecto especial */ }
+```
+
+### Indicador visual ★
+
+Los Pokémon shiny del equipo muestran un indicador dorado `★` en dos sitios:
+
+- **Barra de equipo** (pantalla de ruta) — junto al nombre del Pokémon
+- **Pips de combate** (barra inferior durante el combate) — junto al nivel (`Nv.5 ★`)
+
+El indicador se renderiza directamente en el HTML de `_renderTeamBar` y
+`_updateCombatTeamBar` leyendo `p.shiny`.
+
+### Captura y evolución
+
+Al capturar un shiny, el objeto Pokémon ya tiene `shiny: true` y los sprites
+correctos — no hace falta ningún paso adicional. Al capturarlo se añade
+al equipo con `team.push(foe)` igual que cualquier otro.
+
+Si un shiny evoluciona, `evolve()` pasa `pokemon.shiny` a `createPokemon`
+para que la forma evolucionada conserve el color shiny y sus sprites
+correspondientes:
+
+```js
+async function evolve(pokemon, intoName) {
+  const newPoke = await createPokemon(intoName, pokemon.level, pokemon.isPlayer, null, null, pokemon.shiny ?? false);
+  ...
+}
+```
+
+### Testear shinies rápidamente
+
+Pon `SHINY_RATE = 1` en `routes.js` para que **todos** los Pokémon salvajes
+sean shiny. Recuerda volver a `0.001` (o el valor que quieras) para producción.
 

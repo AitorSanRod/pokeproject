@@ -27,7 +27,7 @@ function computeStats(pokemon) {
 // Si no se especifica, IVs por defecto = 31 (perfectos) y EVs = 0 para CUALQUIER pokemon
 // (jugador o rival). Para encuentros hardcodeados (gym leaders, rivales especiales)
 // se puede pasar overrides desde routes.js para personalizar IVs/EVs de ese pokemon.
-async function createPokemon(nameOrId, level, isPlayer = false, moveId = null, overrides = null) {
+async function createPokemon(nameOrId, level, isPlayer = false, moveId = null, overrides = null, shiny = false) {
   const apiData = await PokeAPI.getPokemon(String(nameOrId));
   const nature  = randomNature();
 
@@ -79,8 +79,9 @@ async function createPokemon(nameOrId, level, isPlayer = false, moveId = null, o
                      ? moveId
                      : moves.reduce((best, m) => (m.power ?? 0) > (best?.power ?? 0) ? m : best, moves[0])?.id ?? null,
     isPlayer,
-    spriteUrl:    apiData.sprites.front_default,
-    backSpriteUrl: apiData.sprites.back_default,
+    shiny,
+    spriteUrl:    shiny ? (apiData.sprites.front_shiny ?? apiData.sprites.front_default) : apiData.sprites.front_default,
+    backSpriteUrl: shiny ? (apiData.sprites.back_shiny  ?? apiData.sprites.back_default)  : apiData.sprites.back_default,
   };
 
   pokemon.stats     = computeStats(pokemon);
@@ -208,7 +209,7 @@ function checkEvolution(pokemon) {
 // Evoluciona un pokemon conservando IVs, EVs, naturaleza, EXP y autoMove.
 // Devuelve el nuevo pokemon evolucionado (async porque necesita datos de la API).
 async function evolve(pokemon, intoName) {
-  const newPoke = await createPokemon(intoName, pokemon.level, pokemon.isPlayer);
+  const newPoke = await createPokemon(intoName, pokemon.level, pokemon.isPlayer, null, null, pokemon.shiny ?? false);
 
   // Preservar progreso del entrenador
   newPoke.ivs      = { ...pokemon.ivs };
@@ -227,6 +228,10 @@ async function evolve(pokemon, intoName) {
   // Mantener HP proporcional al que tenía
   const hpRatio     = pokemon.currentHp / pokemon.stats.hp;
   newPoke.currentHp = Math.max(1, Math.floor(newPoke.stats.hp * hpRatio));
+
+  // Preservar objeto equipado y sus flags
+  newPoke.heldItem       = pokemon.heldItem ?? null;
+  newPoke._heldItemFlags = { ...(pokemon._heldItemFlags ?? {}) };
 
   console.log(`[EVOLUCION] ${pokemon.displayName} → ${newPoke.displayName} Nv.${newPoke.level}`);
   return newPoke;

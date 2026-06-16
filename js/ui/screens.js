@@ -3,6 +3,18 @@
 
 const Screens = {
 
+  // ── Guarda la run actual en localStorage ────────────────────────────────
+  _saveRun() {
+    Storage.saveRun({
+      version:     GameState.version,
+      routeIndex:  GameState.routeIndex,
+      starterName: GameState.starter?.name ?? null,
+      team:        GameState.team,
+      badges:      GameState.badges,
+      items:       GameState.items,
+    });
+  },
+
   // ── Navega a una pantalla ────────────────────────────────────────────────
   show(screenFn, ...args) {
     document.getElementById('btn-notes-global')?.style.setProperty('display', 'none');
@@ -15,11 +27,19 @@ const Screens = {
   // TITLE
   // ═══════════════════════════════════════════════════════════════════════
   title() {
+    // Si hay un guardado de versión incompatible, eliminarlo automáticamente
+    const rawSave = Storage.loadRun();
+    if (rawSave && rawSave.version !== GameState.version) {
+      Storage.clearRun();
+      console.log('[Storage] Run antigua descartada (versión incompatible)');
+    }
+    const hasSave = Storage.hasRun(GameState.version);
+
     document.getElementById('viewport').innerHTML = `
       <div class="screen screen--title">
         <div class="title-logo">
           <span class="title-logo__main">POKEMON</span>
-          <span class="title-logo__sub">v0.0.3</span>
+          <span class="title-logo__sub">${GameState.version}</span>
         </div>
         <div class="title-pokeball">
           <div class="title-pokeball__top"></div>
@@ -28,8 +48,9 @@ const Screens = {
           <div class="title-pokeball__center"></div>
         </div>
         <div class="title-actions">
-          <button class="btn btn--primary btn--wide" id="btn-adventure">
-            AVENTURA
+          ${hasSave ? `<button class="btn btn--primary btn--wide" id="btn-continue">CONTINUAR</button>` : ''}
+          <button class="btn ${hasSave ? 'btn--wide' : 'btn--primary btn--wide'}" id="btn-adventure">
+            ${hasSave ? 'NUEVA PARTIDA' : 'AVENTURA'}
           </button>
           <button class="btn btn--wide" id="btn-dex-title">
             POKÉDEX
@@ -40,8 +61,30 @@ const Screens = {
         </div>
       </div>`;
 
+    if (hasSave) {
+      document.getElementById('btn-continue').addEventListener('click', () => {
+        const save = Storage.loadRun();
+        if (!save) return;
+        GameState.reset();
+        GameState.routeIndex       = save.routeIndex ?? 0;
+        GameState.badges           = save.badges     ?? [];
+        GameState.items            = save.items      ?? [];
+        GameState.team             = save.team       ?? [];
+        GameState.starter          = save.starterName ? { name: save.starterName } : null;
+        GameState.autoMode         = true;
+        console.log(`[Storage] Run cargada — ruta ${GameState.routeIndex}, equipo: ${GameState.team.map(p => p.displayName).join(', ')}`);
+        Screens.show(Screens.adventure);
+      });
+    }
     document.getElementById('btn-adventure')
-      .addEventListener('click', () => Screens.show(Screens.regionSelect));
+      .addEventListener('click', () => {
+        if (hasSave) {
+          const ok = confirm('¿Iniciar una nueva partida?\n\nSe perderá el progreso guardado.');
+          if (!ok) return;
+          Storage.clearRun();
+        }
+        Screens.show(Screens.regionSelect);
+      });
     document.getElementById('btn-dex-title')
       .addEventListener('click', () => PokedexScreen.show(() => Screens.show(Screens.title)));
     document.getElementById('btn-compendium-title')
@@ -166,6 +209,7 @@ const Screens = {
             console.log(`[UI] Starter elegido: ${s.name}`);
             GameState.init(p);
             GameState.autoMode = true;
+            Screens._saveRun();
             Screens.show(Screens.adventure);
           });
 
@@ -245,6 +289,7 @@ const Screens = {
         const lastBadge = GameState.badges[GameState.badges.length - 1];
         Screens.show(Screens.victory, lastBadge);
       } else {
+        Screens._saveRun();
         Screens.show(Screens.adventure);
       }
     });
@@ -377,23 +422,19 @@ const Screens = {
 
     const iconFor = (enc) => {
       if (enc.type === 'heal') {
-        return `<img src="assets/sprites/items/potion.png"
-          style="width:32px;height:32px;image-rendering:pixelated;object-fit:contain" alt="curacion">`;
+        return `<img src="assets/sprites/items/potion.png" class="path-node-img" alt="curacion">`;
       }
       if (enc.type === 'leader') {
-        if (enc.img) return `<img src="${enc.img}"
-          style="width:32px;height:32px;image-rendering:pixelated;object-fit:contain"
+        if (enc.img) return `<img src="${enc.img}" class="path-node-img"
           onerror="this.outerHTML='<span style=font-size:22px>🏆</span>'">`;
         return `<span style="font-size:22px">🏆</span>`;
       }
       if (enc.type === 'trainer' || enc.type === 'special') {
-        if (enc.img) return `<img src="${enc.img}"
-          style="width:32px;height:32px;image-rendering:pixelated;object-fit:contain"
+        if (enc.img) return `<img src="${enc.img}" class="path-node-img"
           onerror="this.outerHTML='<span style=font-size:22px>❓</span>'">`;
         return `<span style="font-size:22px">❓</span>`;
       }
-      return `<img src="assets/sprites/others/grass.png"
-        style="width:32px;height:32px;image-rendering:pixelated" alt="salvaje">`;
+      return `<img src="assets/sprites/others/grass.png" class="path-node-img" alt="salvaje">`;
     };
 
     area.innerHTML = `
@@ -410,14 +451,13 @@ const Screens = {
         <div style="display:flex;flex-direction:column;gap:6px;width:100%">
           ${resolvedPaths.map((path, pi) => `
             <button class="encounter-btn" id="path-${pi}" data-path="${pi}">
-              <div style="display:flex;gap:6px;align-items:center;flex:1">
+              <div class="path-nodes-row">
                 ${path.map((enc, ei) => `
                   <div class="path-encounter-cell" data-tooltip="${enc.name}"
-                    style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;position:relative">
+                    style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;min-width:0;position:relative">
                     ${iconFor(enc)}
-                    <!-- Tooltip -->
                     <div class="path-tooltip">${enc.name}</div>
-                  </div>`).join('<span style="color:var(--grey-light);font-size:12px">›</span>')}
+                  </div>`).join('<span class="path-node-sep">›</span>')}
               </div>
             </button>`).join('')}
         </div>
@@ -494,7 +534,7 @@ const Screens = {
       }
       const foeTeam = [];
       for (const p of gym.leader) {
-        foeTeam.push(await createPokemon(p.name, p.level, false, p.moveId ?? null, p.overrides ?? null));
+        foeTeam.push(await createPokemon(p.name, p.level, false, p.moveId ?? null, p.overrides ?? null, p.shiny ?? false));
       }
       Screens.show(Screens.combat, {
         foeTeam,
@@ -525,11 +565,15 @@ const Screens = {
           // se sustituye por el contra-tipo del starter del jugador
           trainer = {
             ...data.specialTrainer,
-            pokemon: data.specialTrainer.pokemon.map(p =>
-              p.name === 'RIVAL_STARTER'
-                ? { ...p, name: pickInitialPokemonRival(GameState.starter.name) }
-                : p
-            ),
+            pokemon: data.specialTrainer.pokemon.map(p => {
+              if (p.name === 'RIVAL_STARTER')
+                return { ...p, name: pickInitialPokemonRival(GameState.starter.name) };
+              if (p.name === 'RIVAL_STARTER_2')
+                return { ...p, name: pickRivalSecondForm(GameState.starter.name) };
+              if (p.name === 'RIVAL_STARTER_3')
+                return { ...p, name: pickRivalThirdForm(GameState.starter.name) };
+              return p;
+            }),
           };
           GameState.specialTrainerUsed = true;
           console.log(`[ADVENTURE] Encuentro especial: ${trainer.name}`);
@@ -540,7 +584,7 @@ const Screens = {
       if (!trainer) { GameState._pathRunning = false; Screens._runNextInPath(); return; }
       const foeTeam = [];
       for (const p of trainer.pokemon) {
-        foeTeam.push(await createPokemon(p.name, rollLevel(p), false, p.moveId ?? null, p.overrides ?? null));
+        foeTeam.push(await createPokemon(p.name, rollLevel(p), false, p.moveId ?? null, p.overrides ?? null, p.shiny ?? false));
       }
       Screens.show(Screens.combat, {
         foeTeam,
@@ -552,7 +596,8 @@ const Screens = {
     } else {
       // Salvaje — combate automático + captura automática
       const entry   = pickWildEncounter(data.wild);
-      const foePoke = await createPokemon(entry.name, rollLevel(entry), false, entry.moveId ?? null, entry.overrides ?? null);
+      const isShiny = entry.shiny === true || Math.random() < (typeof SHINY_RATE !== 'undefined' ? SHINY_RATE : 0);
+      const foePoke = await createPokemon(entry.name, rollLevel(entry), false, entry.moveId ?? null, entry.overrides ?? null, isShiny);
       Screens.show(Screens.combat, {
         foeTeam:    [foePoke],
         isWild:     true,
@@ -564,6 +609,7 @@ const Screens = {
   },
 
   _renderTeamBar() {
+    document.querySelectorAll('.held-item-tooltip--floating').forEach(el => el.remove());
     const bar = document.getElementById('team-bar');
     if (!bar) return;
     bar.innerHTML = GameState.team.map((p, i) => {
@@ -575,7 +621,7 @@ const Screens = {
             onerror="this.style.opacity=0">
           <div class="route-team-row__info">
             <div style="display:flex;align-items:baseline;gap:6px">
-              <span class="route-team-row__name">${p.displayName}</span>
+              <span class="route-team-row__name">${p.displayName}${p.shiny ? ' <span style="color:#FFD700;font-size:9px">★</span>' : ''}</span>
               <span class="route-team-row__level">Nv.${p.level}</span>
             </div>
             <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
@@ -780,6 +826,7 @@ const Screens = {
   async _showItemReward() {
     const route = KANTO_ROUTES[GameState.routeIndex];
     const data  = ROUTE_DATA[route.area];
+    const REWARD_BG = "url('assets/bg/price.png') center/cover no-repeat";
 
     // Premio 1: pokemon aleatorio de la ruta
     const rewardPool   = data.rewardPokemon ?? [POKEMON.rattata];
@@ -822,7 +869,7 @@ const Screens = {
       {
         id: 'rare-candy',
         icon: candyIcon,
-        name: 'Rare Candy',
+        name: 'Carameloraro',
         desc: '+1 nivel a todo el equipo',
         type: 'candy',
       },
@@ -861,28 +908,46 @@ const Screens = {
         const lastBadge = GameState.badges[GameState.badges.length - 1];
         Screens.show(Screens.victory, lastBadge);
       } else {
+        Screens._saveRun();
         Screens.show(Screens.adventure);
       }
     };
 
     document.getElementById('viewport').innerHTML = `
-      <div class="screen" style="background:linear-gradient(160deg,var(--green-dark) 0%,var(--green) 100%);
+      <div class="screen" style="background:${REWARD_BG};
         align-items:center;justify-content:center;gap:20px;padding:32px 24px;text-align:center;display:flex;flex-direction:column;">
         <span style="font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.7);letter-spacing:2px">COMPLETADA</span>
         <span style="font-family:var(--font-pixel);font-size:16px;color:var(--white);text-shadow:3px 3px 0 rgba(0,0,0,.3);line-height:1.6">${route.name.toUpperCase()}</span>
         <span style="font-family:var(--font-pixel);font-size:8px;color:var(--yellow)">Elige una recompensa:</span>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:340px">
           ${prizes.map(p => `
-            <div class="item-card" data-prize="${p.id}"
-              style="background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.4);color:white;cursor:pointer">
+            <div class="item-card" data-prize="${p.id}" data-desc="${p.desc}">
               <div class="item-card__icon">${p.icon}</div>
-              <div class="item-card__name" style="color:white">${p.name}</div>
-              <div class="item-card__desc" style="color:rgba(255,255,255,.6);font-size:7px;margin-top:2px">${p.desc}</div>
+              <div class="item-card__name">${p.name}</div>
             </div>`).join('')}
         </div>
+        <button id="reward-skip" class="btn btn--wide"
+          style="max-width:340px;width:100%;background:var(--white);border:var(--border);box-shadow:var(--shadow-sm)">
+          CONTINUAR
+        </button>
       </div>`;
 
+    document.getElementById('reward-skip').addEventListener('click', advance);
+
     document.querySelectorAll('.item-card').forEach(el => {
+      let tipEl = null;
+      el.addEventListener('mouseenter', () => {
+        tipEl = document.createElement('div');
+        tipEl.className = 'held-item-tooltip held-item-tooltip--floating';
+        tipEl.textContent = el.dataset.desc;
+        document.body.appendChild(tipEl);
+        const rect = el.getBoundingClientRect();
+        tipEl.style.left = `${rect.left}px`;
+        tipEl.style.top  = `${rect.top - tipEl.offsetHeight - 6}px`;
+        if (parseFloat(tipEl.style.top) < 4) tipEl.style.top = `${rect.bottom + 6}px`;
+      });
+      el.addEventListener('mouseleave', () => { tipEl?.remove(); tipEl = null; });
+
       el.addEventListener('click', async () => {
         const prizeId = el.dataset.prize;
         const chosen  = prizes.find(p => p.id === prizeId);
@@ -945,7 +1010,6 @@ const Screens = {
 
     document.getElementById('swap-cancel').addEventListener('click', () => {
       overlay.remove();
-      onDone(); // avanza sin añadir el pokemon
     });
   },
 
@@ -994,7 +1058,6 @@ const Screens = {
 
     document.getElementById('ev-cancel').addEventListener('click', () => {
       overlay.remove();
-      onDone(); // continua aunque no use el objeto
     });
   },
 
@@ -1047,7 +1110,6 @@ const Screens = {
 
     document.getElementById('held-item-cancel').addEventListener('click', () => {
       overlay.remove();
-      onDone(); // continua aunque no use el objeto
     });
   },
 
@@ -1108,12 +1170,12 @@ const Screens = {
   // COMBAT
   // ═══════════════════════════════════════════════════════════════════════
   combat(options) {
-    const { foeTeam, isWild = false, isTrainer = false, isGym = false, gymLeaderName, onWin, onLoss } = options;
+    const { foeTeam, isWild = false, isTrainer = false, isGym = false, gymLeaderName, trainerName, onWin, onLoss } = options;
 
     GameState.combat = {
       foeTeam,
       foeIndex:    0,
-      isWild, isTrainer, isGym, gymLeaderName,
+      isWild, isTrainer, isGym, gymLeaderName, trainerName,
       onWin, onLoss,
       chosenMove:  null,
       lastFoeObj:  null,
@@ -1132,7 +1194,7 @@ const Screens = {
     const introText = ctx.isGym
       ? `El lider ${ctx.gymLeaderName}\nquiere combatir!`
       : ctx.isTrainer
-      ? `!Un entrenador\nquiere combatir!`
+      ? `!${ctx.trainerName ?? 'Entrenador'}\nquiere combatir!`
       : `Un ${foe.displayName}\nsalvaje aparecio!`;
 
     console.log(`[COMBAT] ${introText.replace('\n',' ')}`);
@@ -1240,16 +1302,16 @@ const Screens = {
         <div class="combat-team-bar" id="combat-team-bar">
           ${GameState.team.map(p => `
             <div class="combat-team-pip ${p === player ? 'combat-team-pip--active' : ''} ${!isAlive(p) ? 'combat-team-pip--fainted' : ''}">
-              <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
-                <img src="${p.spriteUrl ?? ''}" class="combat-team-pip__sprite" alt="${p.displayName}" onerror="this.style.opacity=0">
-                <div class="combat-team-pip__level">Nv.${p.level}</div>
-              </div>
+              <img src="${p.spriteUrl ?? ''}" class="combat-team-pip__sprite" alt="${p.displayName}" onerror="this.style.opacity=0">
               <div class="combat-team-pip__hp-section">
                 <div class="hp-bar-wrap combat-team-pip__hp-bar">
                   <div class="hp-bar-fill" data-level="${p.currentHp/p.stats.hp > 0.5 ? 'high' : p.currentHp/p.stats.hp > 0.25 ? 'mid' : 'low'}"
                     style="width:${Math.max(0,Math.round(p.currentHp/p.stats.hp*100))}%"></div>
                 </div>
-                <div class="combat-team-pip__hp-nums">${p.currentHp}/${p.stats.hp}</div>
+                <div class="combat-team-pip__hp-row">
+                  <div class="combat-team-pip__level">Nv.${p.level}${p.shiny ? ' <span style="color:#FFD700">★</span>' : ''}</div>
+                  <div class="combat-team-pip__hp-nums">${p.currentHp}/${p.stats.hp}</div>
+                </div>
                 <div class="combat-team-pip__exp-bar">
                   <div class="combat-team-pip__exp-fill"
                     style="width:${Math.max(0, Math.min(100, Math.round((p.exp / p.expToNext) * 100)))}%"></div>
@@ -1440,8 +1502,10 @@ const Screens = {
     // Limpiar flags temporales del turno anterior — tanto jugador como rival
     player._priority  = false;
     player._doubleHit = false;
+    player._flinched  = false;
     foe._priority     = false;
     foe._doubleHit    = false;
+    foe._flinched     = false;
 
     // before-attack: se evalúa para AMBOS movimientos antes de decidir el orden
     // de turno, ya que efectos como 'priority' (ataca primero) deben poder
@@ -1499,14 +1563,20 @@ const Screens = {
     }
 
     // ── Segundo atacante ───────────────────────────────────────────────────
-    const secondCheck = StatusEffects.checkBeforeAttack(second);
-    if (secondCheck.message) { logFn(secondCheck.message); await Screens._wait(500); }
-    if (secondCheck.canAttack) {
-      await Screens._animateAttack(second, first, moveOf(second), player);
-      if (!isAlive(first)) {
-        ctx._turnRunning = false;
-        await Screens._applyEndOfTurnStatus(player, foe);
-        Screens._combatEnd(); return;
+    if (second._flinched) {
+      second._flinched = false;
+      logFn(`${second.displayName} retrocedio y no pudo atacar!`);
+      await Screens._wait(700);
+    } else {
+      const secondCheck = StatusEffects.checkBeforeAttack(second);
+      if (secondCheck.message) { logFn(secondCheck.message); await Screens._wait(500); }
+      if (secondCheck.canAttack) {
+        await Screens._animateAttack(second, first, moveOf(second), player);
+        if (!isAlive(first)) {
+          ctx._turnRunning = false;
+          await Screens._applyEndOfTurnStatus(player, foe);
+          Screens._combatEnd(); return;
+        }
       }
     }
 
@@ -1640,9 +1710,9 @@ const Screens = {
     }
 
     if (isCrit) { Screens._updateCombatLog('Un golpe critico!'); await Screens._wait(300); }
-    if (eff >= 2)       { Screens._updateCombatLog('Es muy eficaz!');      await Screens._wait(300); }
-    else if (eff === 0) { Screens._updateCombatLog('No afecto al rival!'); await Screens._wait(300); }
-    else if (eff < 1)   { Screens._updateCombatLog('No es muy eficaz...'); await Screens._wait(300); }
+    if (eff >= 2)       { Screens._updateCombatLog(`Es eficaz contra ${defender.displayName}!`); await Screens._wait(300); }
+    else if (eff === 0) { Screens._updateCombatLog(`No afecto a ${defender.displayName}!`);      await Screens._wait(300); }
+    else if (eff < 1)   { Screens._updateCombatLog(`No es muy eficaz contra ${defender.displayName}...`); await Screens._wait(300); }
 
     // Mostrar en el log de combate los modificadores que afectaron a este golpe
     // (subidas/bajadas de estadística vía combatMods, boosts de objetos como Carbón).
@@ -1888,16 +1958,16 @@ const Screens = {
     const active = ctx?.activePlayer ?? GameState.team[0];
     bar.innerHTML = GameState.team.map(p => `
       <div class="combat-team-pip ${p === active ? 'combat-team-pip--active' : ''} ${!isAlive(p) ? 'combat-team-pip--fainted' : ''}">
-        <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
-          <img src="${p.spriteUrl ?? ''}" class="combat-team-pip__sprite" alt="${p.displayName}" onerror="this.style.opacity=0">
-          <div class="combat-team-pip__level">Nv.${p.level}</div>
-        </div>
+        <img src="${p.spriteUrl ?? ''}" class="combat-team-pip__sprite" alt="${p.displayName}" onerror="this.style.opacity=0">
         <div class="combat-team-pip__hp-section">
           <div class="hp-bar-wrap combat-team-pip__hp-bar">
             <div class="hp-bar-fill" data-level="${p.currentHp/p.stats.hp > 0.5 ? 'high' : p.currentHp/p.stats.hp > 0.25 ? 'mid' : 'low'}"
               style="width:${Math.max(0,Math.round(p.currentHp/p.stats.hp*100))}%"></div>
           </div>
-          <div class="combat-team-pip__hp-nums">${p.currentHp}/${p.stats.hp}</div>
+          <div class="combat-team-pip__hp-row">
+            <div class="combat-team-pip__level">Nv.${p.level}${p.shiny ? ' <span style="color:#FFD700">★</span>' : ''}</div>
+            <div class="combat-team-pip__hp-nums">${p.currentHp}/${p.stats.hp}</div>
+          </div>
           <div class="combat-team-pip__exp-bar">
             <div class="combat-team-pip__exp-fill"
               style="width:${Math.max(0, Math.min(100, Math.round((p.exp / p.expToNext) * 100)))}%"></div>
@@ -2128,28 +2198,40 @@ const Screens = {
   // selector:  CSS selector de cada fila arrastrable
   // onSwap(fromIdx, toIdx): callback que ejecuta el intercambio y re-renderiza
   _initTouchSort(container, selector, onSwap) {
-    let dragEl = null;
-    let clone  = null;
+    const DRAG_THRESHOLD = 8;
+    let dragEl    = null;
+    let clone     = null;
     let offX = 0, offY = 0;
+    let startX = 0, startY = 0;
+    let isDragging = false;
 
     container.querySelectorAll(selector).forEach(el => {
       el.addEventListener('touchstart', e => {
         const touch = e.touches[0];
-        const rect  = el.getBoundingClientRect();
+        startX = touch.clientX;
+        startY = touch.clientY;
+        const rect = el.getBoundingClientRect();
         offX = touch.clientX - rect.left;
         offY = touch.clientY - rect.top;
         dragEl = el;
-        dragEl.style.opacity = '.3';
-
-        clone = el.cloneNode(true);
-        clone.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;z-index:9999;pointer-events:none;opacity:.85;box-shadow:0 6px 20px rgba(0,0,0,.35);`;
-        document.body.appendChild(clone);
-        e.preventDefault();
-      }, { passive: false });
+        isDragging = false;
+      }, { passive: true });
 
       el.addEventListener('touchmove', e => {
-        if (!clone) return;
+        if (!dragEl) return;
         const touch = e.touches[0];
+
+        if (!isDragging) {
+          if (Math.hypot(touch.clientX - startX, touch.clientY - startY) < DRAG_THRESHOLD) return;
+          isDragging = true;
+          document.querySelectorAll('.held-item-tooltip--floating').forEach(el => el.remove());
+          const rect = dragEl.getBoundingClientRect();
+          dragEl.style.opacity = '.3';
+          clone = dragEl.cloneNode(true);
+          clone.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;z-index:9999;pointer-events:none;opacity:.85;box-shadow:0 6px 20px rgba(0,0,0,.35);`;
+          document.body.appendChild(clone);
+        }
+
         clone.style.left = `${touch.clientX - offX}px`;
         clone.style.top  = `${touch.clientY - offY}px`;
 
@@ -2164,13 +2246,18 @@ const Screens = {
 
       el.addEventListener('touchend', e => {
         if (!dragEl) return;
-        const touch = e.changedTouches[0];
         clone?.remove(); clone = null;
         container.querySelectorAll(selector).forEach(r => { r.style.opacity = ''; r.style.outline = ''; });
-        const under = document.elementFromPoint(touch.clientX, touch.clientY);
-        const targetEl = under?.closest(selector);
-        if (targetEl && targetEl !== dragEl) onSwap(+dragEl.dataset.idx, +targetEl.dataset.idx);
+
+        if (isDragging) {
+          const touch = e.changedTouches[0];
+          const under = document.elementFromPoint(touch.clientX, touch.clientY);
+          const targetEl = under?.closest(selector);
+          if (targetEl && targetEl !== dragEl) onSwap(+dragEl.dataset.idx, +targetEl.dataset.idx);
+        }
+
         dragEl = null;
+        isDragging = false;
       });
     });
   },
@@ -2220,6 +2307,7 @@ const Screens = {
   // VICTORY
   // ═══════════════════════════════════════════════════════════════════════
   victory(badge) {
+    Storage.clearRun();
     // Personalizable vía FINAL_SCREEN en routes.js — title/subtitle/bg/btnText.
     // Si no está definido, se usan los valores por defecto de siempre.
     const cfg = (typeof FINAL_SCREEN !== 'undefined' && FINAL_SCREEN) ? FINAL_SCREEN : {};
@@ -2247,6 +2335,7 @@ const Screens = {
   // DEFEAT
   // ═══════════════════════════════════════════════════════════════════════
   defeat() {
+    Storage.clearRun();
     document.getElementById('viewport').innerHTML = `
       <div class="screen screen--defeat">
         <div class="defeat-title">HAS SIDO<br>DERROTADO</div>

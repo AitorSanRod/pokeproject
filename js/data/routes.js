@@ -19,6 +19,47 @@
 
 const MOVES = MOVE_LIST;
 const POKEMON = POKEMON_LIST;
+const ENTRENADORES = {
+  Rival: {
+    name: 'Azul',
+    img: 'assets/sprites/trainers/rival_kanto.png',
+  },
+  Cazabichos: {
+    name: 'Cazabichos',
+    img: 'assets/sprites/trainers/cazabichos.png',
+  },
+  EntrenadorJoven: {
+    name: 'Entrenador joven',
+    img: 'assets/sprites/trainers/entrenadorjoven.png',
+  },
+  Campista: {
+    name: 'Campista',
+    img: 'assets/sprites/trainers/campista.png',
+  },
+  Montanero: {
+    name: 'Montañero',
+    img: 'assets/sprites/trainers/montanero.png',
+  },
+  Dominguera: {
+    name: 'Dominguera',
+    img: 'assets/sprites/trainers/dominguera.png',
+  },
+  Nadador: {
+    name: 'Nadador',
+    img: 'assets/sprites/trainers/nadador.png',
+  },
+  Caballero: {
+    name: 'Caballero',
+    img: 'assets/sprites/trainers/caballero.png',
+  },
+  Mecanico: {
+    name: 'Mecanico',
+    img: 'assets/sprites/trainers/mecanico.png',
+  }
+}
+var SHINY_RATE = 0.001;
+// Probabilidad (0–1) de que un Pokémon salvaje aparezca como shiny.
+// 0.001 = 1 de cada 1000 (equivale a 1/1024, similar a los juegos principales).
 
 var ROUTE_DATA = {
 
@@ -284,7 +325,7 @@ var ROUTE_DATA = {
 
   'ciudad-celeste': {
     bg: 'assets/bg/ciudad-celeste.png',
-    combatBg: 'assets/bg/combate.png',
+    combatBg: 'assets/bg/combate-agua.png',
     wild: [],
     welcome: {
       title: 'Ciudad Celeste',
@@ -331,44 +372,198 @@ var ROUTE_DATA = {
     ],
   },
 
-  'ruta-24': {
+  'ruta-24-1': {
     bg: 'assets/bg/ruta-24.png',
     combatBg: 'assets/bg/combate.png',
-    rewardPokemon: [POKEMON.pidgey],
+    rewardPokemon: [POKEMON.abra],
+    wild: [],
+    specialTrainer: {
+      name: 'Azul', img: 'assets/sprites/trainers/rival_kanto.png', pokemon: [
+        { name: POKEMON.abra, minLv: 16, maxLv: 16, moveId: MOVES.psychic.special.teleport },
+        { name: POKEMON.pidgeotto, minLv: 16, maxLv: 18, moveId: MOVES.flying.physical.wing_attack },
+        { name: 'RIVAL_STARTER_2', minLv: 18, maxLv: 22 },
+      ]
+    },
+    trainer: [],
+    paths: [
+      [{ type: 'special' }]
+    ],
+  },
+
+  'ruta-24-2': {
+    bg: 'assets/bg/ruta-24.png',
+    combatBg: 'assets/bg/combate.png',
+    rewardPokemon: [POKEMON.odish, POKEMON.onix, POKEMON.ivysaur, POKEMON.charmeleon, POKEMON.wartortle],
     wild: [
       { name: POKEMON.pidgey, rate: 40, minLv: 10, maxLv: 14, moveId: MOVES.flying.physical.peck },
     ],
     specialTrainer: {
-      name: 'Azul', img: 'assets/sprites/trainers/rival_kanto.png', pokemon: [
-        { name: POKEMON.wartortle, minLv: 18, maxLv: 22, moveId: MOVES.water.special.surf },
+      name: 'Soldado Rocket', img: 'assets/sprites/trainers/soldado-rocket.png', pokemon: [
+        { name: POKEMON.golbat, minLv: 16, maxLv: 16, moveId: MOVES.poison.physical.poison_jab },
+        { name: POKEMON.porygon, minLv: 20, maxLv: 25, moveId: MOVES.normal.special.tri_attack },
       ]
     },
     trainer: [
       {
-        name: 'Cazabichos', img: 'assets/sprites/trainers/cazabichos.png', rate: 100, pokemon: [
+        name: 'Cazabichos', img: 'assets/sprites/trainers/cazabichos.png', rate: 20, pokemon: [
           { name: POKEMON.metapod, minLv: 18, maxLv: 20, moveId: MOVES.bug.physical.bug_bite }
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Campista.name} aburrido`, img: ENTRENADORES.Campista.img, rate: 20, pokemon: [
+          { name: POKEMON.metapod, minLv: 13, maxLv: 20, moveId: MOVES.bug.physical.bug_bite },
+          { name: POKEMON.caterpie, minLv: 13, maxLv: 20, moveId: MOVES.bug.physical.bug_bite }
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Dominguera.name}`, img: ENTRENADORES.Dominguera.img, rate: 15, pokemon: [
+          { name: POKEMON.odish, minLv: 14, maxLv: 21, moveId: MOVES.grass.special.absorb },
+          { name: POKEMON.butterfree, minLv: 13, maxLv: 20, moveId: MOVES.bug.special.infestation }
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Montanero.name}`, img: ENTRENADORES.Montanero.img, rate: 15, pokemon: [
+          { name: POKEMON.onix, minLv: 16, maxLv: 22, moveId: MOVES.rock.physical.rock_throw },
+          { name: POKEMON.onix, minLv: 14, maxLv: 25, moveId: MOVES.ground.physical.bulldoze }
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Campista.name} fumao`, img: ENTRENADORES.Campista.img, rate: 10, pokemon: [
+          { name: POKEMON.ivysaur, minLv: 16, maxLv: 21, moveId: MOVES.grass.special.magical_leaf }
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Campista.name} fogoso`, img: ENTRENADORES.Campista.img, rate: 10, pokemon: [
+          { name: POKEMON.charmeleon, minLv: 16, maxLv: 21, moveId: MOVES.fire.special.flamethrower }
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Campista.name} mojado`, img: ENTRENADORES.Campista.img, rate: 10, pokemon: [
+          { name: POKEMON.wartortle, minLv: 16, maxLv: 21, moveId: MOVES.water.special.surf }
         ]
       },
     ],
     paths: [
-      [{ type: 'special' }, { type: 'heal' }, { type: 'trainer' }, { type: 'trainer' }, { type: 'trainer' }, { type: 'heal' }, { type: 'trainer' }, { type: 'trainer' }]
+      [{ type: 'trainer' }, { type: 'trainer' }, { type: 'trainer' }, { type: 'heal' }, { type: 'trainer' }, { type: 'trainer' }, { type: 'special' }]
     ],
   },
 
   'ruta-25': {
     bg: 'assets/bg/ruta-25.png',
     combatBg: 'assets/bg/combate.png',
-    rewardPokemon: [POKEMON.pinsir],
+    rewardPokemon: [POKEMON.pinsir, POKEMON.porygon],
     wild: [],
     trainer: [
       {
         name: 'Adrián el dominguero', img: 'assets/sprites/trainers/campista.png', rate: 100, pokemon: [
-          { name: POKEMON.pinsir, minLv: 30, maxLv: 36, moveId: MOVES.water.physical.megahorn },
+          { name: POKEMON.mr_mime, minLv: 30, maxLv: 32, moveId: MOVES.psychic.special.psychic },
+          { name: POKEMON.pinsir, minLv: 31, maxLv: 36, moveId: MOVES.water.physical.megahorn, shiny: true },
         ]
       },
     ],
     paths: [
       [{ type: 'trainer' }],
+    ],
+  },
+
+  'info-bill': {
+    type: 'information',
+    bg: 'assets/bg/ruta-25.png',
+    title: 'Laboratorio de Bill',
+    description: '<div style="display: flex; justify-content: center;"><img src="assets/sprites/others/bill.gif"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">Tienes una charla con Bill y vuelves al camino</p>',
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Gimasio de Lt. Surge (Ciudad Carmín)
+  // ═══════════════════════════════════════════════════════════════════════
+
+  'ruta-5': {
+    bg: 'assets/bg/ruta-5.png',
+    combatBg: 'assets/bg/combate.png',
+    rewardPokemon: [POKEMON.bellsprout, POKEMON.meowth],
+    wild: [
+      { name: POKEMON.bellsprout, rate: 45, minLv: 18, maxLv: 24, moveId: MOVES.grass.special.absorb },
+      { name: POKEMON.meowth, rate: 45, minLv: 18, maxLv: 25, moveId: MOVES.normal.physical.extreme_speed },
+      { name: POKEMON.growlithe, rate: 10, minLv: 18, maxLv: 22, moveId: MOVES.normal.physical.extreme_speed },
+    ],
+    trainer: [],
+    paths: [
+      [{ type: 'wild' }, { type: 'wild' }, { type: 'wild' }],
+      [{ type: 'wild' }, { type: 'wild' }, { type: 'wild' }],
+      [{ type: 'wild' }, { type: 'wild' }, { type: 'wild' }]
+    ],
+  },
+
+  'ruta-6': {
+    bg: 'assets/bg/ruta-6.png',
+    combatBg: 'assets/bg/combate.png',
+    rewardPokemon: [POKEMON.magikarp, POKEMON.meowth],
+    wild: [
+      { name: POKEMON.magikarp, rate: 65, minLv: 18, maxLv: 24, moveId: MOVES.water.special.water_gun },
+      { name: POKEMON.gyarados, rate: 5, minLv: 18, maxLv: 25, moveId: MOVES.water.physical.crabhammer },
+      { name: POKEMON.psyduck, rate: 30, minLv: 18, maxLv: 22, moveId: MOVES.water.special.water_gun },
+    ],
+    trainer: [
+      {
+        name: `${ENTRENADORES.Campista.name}`, img: ENTRENADORES.Campista.img, rate: 50, pokemon: [
+          { name: POKEMON.rattata, minLv: 22, maxLv: 25, moveId: MOVES.normal.physical.tackle },
+          { name: POKEMON.pikachu, minLv: 24, maxLv: 27, moveId: MOVES.electric.special.thunderbolt }
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Campista.name}`, img: ENTRENADORES.Campista.img, rate: 50, pokemon: [
+          { name: POKEMON.squirtle, minLv: 22, maxLv: 25, moveId: MOVES.water.special.water_gun },
+          { name: POKEMON.butterfree, minLv: 24, maxLv: 27, moveId: MOVES.psychic.special.confusion }
+        ]
+      },
+    ],
+  },
+
+  'ciudad-carmin': {
+    bg: 'assets/bg/ciudad-carmin.png',
+    combatBg: 'assets/bg/combate-electrico.png',
+    wild: [],
+    welcome: {
+      title: 'Ciudad Carmin',
+      subtitle: 'Gimnasio Pokemon de tipo Eléctrico',
+      img: 'assets/bg/ciudad-carmin.png',
+    },
+    gymLeader: 'Lt. Surge',
+    gymType: 'electric',
+    badge: 'Medalla Trueno',
+    gymLeaderImg: 'assets/sprites/trainers/surge.png',
+    rewardPokemon: [POKEMON.Voltorb, POKEMON.pikachu, POKEMON.raichu, , POKEMON.porygon],
+    rewardExtras: [ITEM.sitrus_berry],
+    trainer: [
+      {
+        name: ENTRENADORES.Caballero.name, img: ENTRENADORES.Caballero.img, rate: 50, pokemon: [
+          { name: POKEMON.pikachu, minLv: 24, maxLv: 26, moveId: MOVES.electric.special.thunder_shock },
+          { name: POKEMON.pikachu, minLv: 24, maxLv: 26, moveId: MOVES.electric.special.thunderbolt }
+        ]
+      },
+      {
+        name: ENTRENADORES.Mecanico.name, img: ENTRENADORES.Mecanico.img, rate: 50, pokemon: [
+          { name: POKEMON.raichu, minLv: 22, maxLv: 23, moveId: MOVES.electric.special.thunder },
+        ]
+      },
+    ],
+    gym: {
+      leader: [
+        {
+          name: POKEMON.pikachu, minLv: 24, maxLv: 26, moveId: MOVES.electric.special.thunder_shock
+        },
+        {
+          name: POKEMON.Voltorb, minLv: 22, maxLv: 25, moveId: MOVES.electric.special.tri_attack
+        },
+        {
+          name: POKEMON.raichu, minLv: 26, maxLv: 32, moveId: MOVES.electric.special.thunder
+        }
+      ]
+    },
+    paths: [
+      [{ type: 'trainer' }, { type: 'trainer' }, { type: 'trainer' }, { type: 'leader' }],
+      [{ type: 'trainer' }, { type: 'trainer' }, { type: 'leader' }],
+      [{ type: 'trainer' }, { type: 'leader' }]
     ],
   },
 
@@ -423,8 +618,13 @@ var KANTO_ROUTES = [
   { name: 'Mt. Moon', area: 'mt-moon' },
   { name: 'Ruta 4', area: 'ruta-4' },
   { name: 'Ciudad Celeste', area: 'ciudad-celeste' },
-  { name: 'Ruta 24', area: 'ruta-24' },
+  { name: 'Ruta 24 (Entrada)', area: 'ruta-24-1' },
+  { name: 'Ruta 24 (Puente)', area: 'ruta-24-2' },
   { name: 'Ruta 25', area: 'ruta-25' },
+  { name: 'Laboratorio de Bill', area: 'info-bill' },
+  { name: 'Ruta 5', area: 'ruta-5' },
+  { name: 'Ruta 6', area: 'ruta-6' },
+  { name: 'Ciudad Carmín', area: 'ciudad-carmin' },
   { name: '???', area: 'espacio-raro' },
   { name: 'Final', area: 'info-final' }
 ];
@@ -473,6 +673,24 @@ function pickInitialPokemonRival(playerPokemon) { //Debe elegirse el pokemon ini
   return POKEMON.eevee; // Default fallback
 }
 
+// Segunda forma del contra-tipo del starter del jugador.
+// Usar con el marcador 'RIVAL_STARTER_2' en specialTrainer.pokemon (ver README sección 2).
+function pickRivalSecondForm(playerPokemon) {
+  if (playerPokemon === POKEMON.bulbasaur) return POKEMON.charmeleon;
+  if (playerPokemon === POKEMON.charmander) return POKEMON.wartortle;
+  if (playerPokemon === POKEMON.squirtle) return POKEMON.ivysaur;
+  return POKEMON.eevee; // fallback
+}
+
+// Tercera forma (evolución final) del contra-tipo del starter del jugador.
+// Usar con el marcador 'RIVAL_STARTER_3' en specialTrainer.pokemon.
+function pickRivalThirdForm(playerPokemon) {
+  if (playerPokemon === POKEMON.bulbasaur) return POKEMON.charizard;
+  if (playerPokemon === POKEMON.charmander) return POKEMON.blastoise;
+  if (playerPokemon === POKEMON.squirtle) return POKEMON.venusaur;
+  return POKEMON.eevee; // fallback
+}
+
 function generatePaths(area) {
   const data = ROUTE_DATA[area];
   if (!data) return [];
@@ -495,11 +713,13 @@ function generatePaths(area) {
     ];
   } else if (len === 3) {
     templates = [
+      ['wild', 'wild', 'wild'],
       ['trainer', 'wild', 'wild'],
       ['wild', 'trainer', 'wild'],
       ['wild', 'wild', 'trainer'],
       ['trainer', 'trainer', 'wild'],
       ['wild', 'trainer', 'trainer'],
+      ['trainer', 'trainer', 'trainer'],
       ['trainer', 'heal', 'trainer'],
     ];
   } else {

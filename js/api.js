@@ -44,6 +44,8 @@ const PokeAPI = {
       sprites: {
         front_default: getSpriteUrl(key),
         back_default:  getBackSpriteUrl(key),
+        front_shiny:   getShinySpriteUrl(key),
+        back_shiny:    getBackShinySpriteUrl(key),
       },
     };
     this._cache[key] = normalized;
@@ -60,6 +62,8 @@ const PokeAPI = {
       sprites: {
         front_default: data.sprites.front_default,
         back_default:  data.sprites.back_default,
+        front_shiny:   data.sprites.front_shiny,
+        back_shiny:    data.sprites.back_shiny,
       },
     };
   },

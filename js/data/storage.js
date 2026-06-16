@@ -153,4 +153,33 @@ var Storage = {
   getAllBadges() {
     return this._get('badges') ?? {};
   },
+
+  // ── Run State ────────────────────────────────────────────────────────────
+  // Guarda/carga/elimina el estado de la partida en curso para poder continuar
+  // tras recargar el navegador. Independiente de pokédex y EVs.
+  // Formato: { version, routeIndex, starterName, team, badges, items }
+
+  saveRun(state) {
+    this._set('run', state);
+    console.log(`[Storage] Run guardada — ruta ${state.routeIndex}, equipo: ${(state.team ?? []).map(p => p.displayName).join(', ')}`);
+  },
+
+  loadRun() {
+    return this._get('run');
+  },
+
+  hasRun(currentVersion) {
+    const save = this._get('run');
+    if (!save) return false;
+    return save.version === currentVersion;
+  },
+
+  clearRun() {
+    try {
+      localStorage.removeItem(this._key('run'));
+      console.log('[Storage] Run eliminada');
+    } catch (e) {
+      console.warn('[Storage] Error eliminando run', e);
+    }
+  },
 };

@@ -31,10 +31,10 @@ var POKEMON_STATS = {
   raichu:       { id:26,  hp:60,  atk:90,  def:55,  spa:90,  spd:80,  spe:110 },
   sandshrew:    { id:27,  hp:50,  atk:75,  def:85,  spa:20,  spd:30,  spe:40  },
   sandslash:    { id:28,  hp:75,  atk:100, def:110, spa:45,  spd:55,  spe:65  },
-  'nidoran-f':  { id:29,  hp:55,  atk:47,  def:52,  spa:40,  spd:40,  spe:41  },
+  'nidoran_f':  { id:29,  hp:55,  atk:47,  def:52,  spa:40,  spd:40,  spe:41  },
   nidorina:     { id:30,  hp:70,  atk:62,  def:67,  spa:55,  spd:55,  spe:56  },
   nidoqueen:    { id:31,  hp:90,  atk:92,  def:87,  spa:75,  spd:85,  spe:76  },
-  'nidoran-m':  { id:32,  hp:46,  atk:57,  def:40,  spa:40,  spd:40,  spe:50  },
+  'nidoran_m':  { id:32,  hp:46,  atk:57,  def:40,  spa:40,  spd:40,  spe:50  },
   nidorino:     { id:33,  hp:61,  atk:72,  def:57,  spa:55,  spd:55,  spe:65  },
   nidoking:     { id:34,  hp:81,  atk:102, def:77,  spa:85,  spd:75,  spe:85  },
   clefairy:     { id:35,  hp:70,  atk:45,  def:48,  spa:60,  spd:65,  spe:35  },
@@ -85,7 +85,7 @@ var POKEMON_STATS = {
   slowbro:      { id:80,  hp:95,  atk:75,  def:110, spa:100, spd:80,  spe:30  },
   magnemite:    { id:81,  hp:25,  atk:35,  def:70,  spa:95,  spd:55,  spe:45  },
   magneton:     { id:82,  hp:50,  atk:60,  def:95,  spa:120, spd:70,  spe:70  },
-  "farfetch'd": { id:83,  hp:52,  atk:90,  def:55,  spa:58,  spd:62,  spe:60  },
+  "farfetchd": { id:83,  hp:52,  atk:90,  def:55,  spa:58,  spd:62,  spe:60  },
   doduo:        { id:84,  hp:35,  atk:85,  def:45,  spa:35,  spd:35,  spe:75  },
   dodrio:       { id:85,  hp:60,  atk:110, def:70,  spa:60,  spd:60,  spe:110 },
   seel:         { id:86,  hp:65,  atk:45,  def:55,  spa:45,  spd:70,  spe:45  },
@@ -124,7 +124,7 @@ var POKEMON_STATS = {
   seaking:      { id:119, hp:80,  atk:92,  def:65,  spa:65,  spd:80,  spe:68  },
   staryu:       { id:120, hp:30,  atk:45,  def:55,  spa:70,  spd:55,  spe:85  },
   starmie:      { id:121, hp:60,  atk:75,  def:85,  spa:100, spd:85,  spe:115 },
-  'mr-mime':    { id:122, hp:40,  atk:45,  def:65,  spa:100, spd:120, spe:90  },
+  'mr_mime':    { id:122, hp:40,  atk:45,  def:65,  spa:100, spd:120, spe:90  },
   scyther:      { id:123, hp:70,  atk:110, def:80,  spa:55,  spd:80,  spe:105 },
   jynx:         { id:124, hp:65,  atk:50,  def:35,  spa:115, spd:95,  spe:95  },
   electabuzz:   { id:125, hp:65,  atk:83,  def:57,  spa:95,  spd:85,  spe:105 },
@@ -166,4 +166,16 @@ function getBackSpriteUrl(name) {
   var data = POKEMON_STATS[name.toLowerCase()];
   if (!data) return null;
   return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/' + data.id + '.png';
+}
+
+function getShinySpriteUrl(name) {
+  var data = POKEMON_STATS[name.toLowerCase()];
+  if (!data) return null;
+  return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/' + data.id + '.png';
+}
+
+function getBackShinySpriteUrl(name) {
+  var data = POKEMON_STATS[name.toLowerCase()];
+  if (!data) return null;
+  return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/' + data.id + '.png';
 }
