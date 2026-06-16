@@ -414,14 +414,14 @@ var FINAL_SCREEN = {
 };
 
 var KANTO_ROUTES = [
-  // { name: 'Ruta 1', area: 'route-1' },
-  // { name: 'Ruta 22', area: 'route-22' },
-  // { name: 'Ruta 2', area: 'route-2' },
-  // { name: 'Bosque Verde', area: 'bosque-verde' },
-  // { name: 'Ciudad Plateada', area: 'ciudad-plateada' },
-  // { name: 'Ruta 3', area: 'ruta-3' },
-  // { name: 'Mt. Moon', area: 'mt-moon' },
-  // { name: 'Ruta 4', area: 'ruta-4' },
+  { name: 'Ruta 1', area: 'route-1' },
+  { name: 'Ruta 22', area: 'route-22' },
+  { name: 'Ruta 2', area: 'route-2' },
+  { name: 'Bosque Verde', area: 'bosque-verde' },
+  { name: 'Ciudad Plateada', area: 'ciudad-plateada' },
+  { name: 'Ruta 3', area: 'ruta-3' },
+  { name: 'Mt. Moon', area: 'mt-moon' },
+  { name: 'Ruta 4', area: 'ruta-4' },
   { name: 'Ciudad Celeste', area: 'ciudad-celeste' },
   { name: 'Ruta 24', area: 'ruta-24' },
   { name: 'Ruta 25', area: 'ruta-25' },
