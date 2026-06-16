@@ -185,14 +185,12 @@ function effectiveSpeed(pokemon) {
 
 // Comprueba si el pokemon tiene en su moveset algún movimiento con
 // effectId:'clear' — efecto pasivo de inmunidad (ver move-effects.js).
-// Mientras lo tenga (sea o no su autoMove actual), el pokemon no puede:
-//   - recibir ningún estado alterado (StatusEffects.apply)
-//   - sufrir bajadas de estadísticas (lower-atk-X, lower-def-X, etc.)
+// Solo activo si el movimiento con 'clear' es el autoMove actualmente seleccionado.
 function hasClearEffect(pokemon) {
-  return !!pokemon?.moves?.some(m => {
-    if (Array.isArray(m.effectId)) return m.effectId.includes('clear');
-    return m.effectId === 'clear';
-  });
+  const active = pokemon?.moves?.find(m => m.id === pokemon?.autoMove) ?? pokemon?.moves?.[0];
+  if (!active) return false;
+  if (Array.isArray(active.effectId)) return active.effectId.includes('clear');
+  return active.effectId === 'clear';
 }
 
 // ── Evoluciones ───────────────────────────────────────────────────────────────

@@ -534,7 +534,7 @@ const Screens = {
       }
       const foeTeam = [];
       for (const p of gym.leader) {
-        foeTeam.push(await createPokemon(p.name, p.level, false, p.moveId ?? null, p.overrides ?? null, p.shiny ?? false));
+        foeTeam.push(await createPokemon(p.name, rollLevel(p), false, p.moveId ?? null, p.overrides ?? null, p.shiny ?? false));
       }
       Screens.show(Screens.combat, {
         foeTeam,
@@ -959,7 +959,7 @@ const Screens = {
             advance();
           } else {
             // Equipo lleno — elegir cual sustituir
-            Screens._showPokemonSwapSelector(rewardPoke, advance);
+            Screens._showPokemonSwapSelector(rewardPoke, advance, null);
           }
         } else if (chosen.type === 'ev-stat') {
           Screens._showEvItemSelector(chosen, advance);
@@ -974,7 +974,7 @@ const Screens = {
   },
 
   // Selector para sustituir un pokemon cuando el equipo está lleno
-  _showPokemonSwapSelector(newPoke, onDone) {
+  _showPokemonSwapSelector(newPoke, onDone, onCancel = onDone) {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
@@ -1010,6 +1010,7 @@ const Screens = {
 
     document.getElementById('swap-cancel').addEventListener('click', () => {
       overlay.remove();
+      onCancel?.();
     });
   },
 
