@@ -393,7 +393,7 @@ var ROUTE_DATA = {
   'ruta-24-2': {
     bg: 'assets/bg/ruta-24.png',
     combatBg: 'assets/bg/combate.png',
-    rewardPokemon: [POKEMON.odish, POKEMON.onix, POKEMON.ivysaur, POKEMON.charmeleon, POKEMON.wartortle],
+    rewardPokemon: [POKEMON.oddish, POKEMON.onix, POKEMON.ivysaur, POKEMON.charmeleon, POKEMON.wartortle],
     wild: [
       { name: POKEMON.pidgey, rate: 40, minLv: 10, maxLv: 14, moveId: MOVES.flying.physical.peck },
     ],
@@ -417,7 +417,7 @@ var ROUTE_DATA = {
       },
       {
         name: `${ENTRENADORES.Dominguera.name}`, img: ENTRENADORES.Dominguera.img, rate: 15, pokemon: [
-          { name: POKEMON.odish, minLv: 14, maxLv: 21, moveId: MOVES.grass.special.absorb },
+          { name: POKEMON.oddish, minLv: 14, maxLv: 21, moveId: MOVES.grass.special.absorb },
           { name: POKEMON.butterfree, minLv: 13, maxLv: 20, moveId: MOVES.bug.special.infestation }
         ]
       },
