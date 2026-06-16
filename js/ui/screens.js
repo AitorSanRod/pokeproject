@@ -8,7 +8,7 @@ const Screens = {
     Storage.saveRun({
       version:     GameState.version,
       routeIndex:  GameState.routeIndex,
-      starterName: GameState.starter?.name ?? null,
+      starterName: GameState.starterName ?? GameState.starter?.name ?? null,
       team:        GameState.team,
       badges:      GameState.badges,
       items:       GameState.items,
@@ -71,6 +71,7 @@ const Screens = {
         GameState.items            = save.items      ?? [];
         GameState.team             = save.team       ?? [];
         GameState.starter          = save.starterName ? { name: save.starterName } : null;
+        GameState.starterName      = save.starterName ?? null;
         GameState.autoMode         = true;
         console.log(`[Storage] Run cargada — ruta ${GameState.routeIndex}, equipo: ${GameState.team.map(p => p.displayName).join(', ')}`);
         Screens.show(Screens.adventure);
@@ -567,11 +568,11 @@ const Screens = {
             ...data.specialTrainer,
             pokemon: data.specialTrainer.pokemon.map(p => {
               if (p.name === 'RIVAL_STARTER')
-                return { ...p, name: pickInitialPokemonRival(GameState.starter.name) };
+                return { ...p, name: pickInitialPokemonRival(GameState.starterName) };
               if (p.name === 'RIVAL_STARTER_2')
-                return { ...p, name: pickRivalSecondForm(GameState.starter.name) };
+                return { ...p, name: pickRivalSecondForm(GameState.starterName) };
               if (p.name === 'RIVAL_STARTER_3')
-                return { ...p, name: pickRivalThirdForm(GameState.starter.name) };
+                return { ...p, name: pickRivalThirdForm(GameState.starterName) };
               return p;
             }),
           };
