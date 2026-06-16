@@ -296,25 +296,79 @@ var ROUTE_DATA = {
     badge: 'Medalla Agua',
     gymLeaderImg: 'assets/sprites/trainers/misty.png',
     rewardExtras: [ITEM.assault_vest, ITEM.choice_scarf, ITEM.sitrus_berry],
-    trainer: [],
+    trainer: [
+      {
+        name: 'Nadador', img: 'assets/sprites/trainers/nadador.png', rate: 50, pokemon: [
+          { name: POKEMON.horsea, minLv: 18, maxLv: 22, moveId: MOVES.water.special.water_gun },
+          { name: POKEMON.shellder, minLv: 18, maxLv: 23, moveId: MOVES.ice.special.ice_beam },
+        ]
+      },
+      {
+        name: 'Dominguera', img: 'assets/sprites/trainers/dominguera.png', rate: 50, pokemon: [
+          { name: POKEMON.doldeen, minLv: 22, maxLv: 23, moveId: MOVES.water.physical.crabhammer },
+        ]
+      },
+    ],
     gym: {
       leader: [
         {
-          name: POKEMON.staryu, level: 22, moveId: MOVES.water.special.surf,
+          name: POKEMON.staryu, level: 23, moveId: MOVES.water.special.surf,
           overrides: {
             evs: { hp: 32, def: 32, spd: 32, spa: 32 },
           },
         },
         {
-          name: POKEMON.starmie, level: 25, moveId: MOVES.psychic.special.confusion,
+          name: POKEMON.starmie, level: 26, moveId: MOVES.psychic.special.confusion,
           overrides: {
-            evs: { hp: 32, def: 32, spd: 32, spa: 32},
+            evs: { hp: 32, def: 32, spd: 32, spa: 32 },
           },
         },
       ]
     },
     paths: [
-      [{ type: 'leader' }],
+      [{ type: 'trainer' }, { type: 'trainer' }, { type: 'leader' }],
+      [{ type: 'trainer' }, { type: 'leader' }],
+    ],
+  },
+
+  'ruta-24': {
+    bg: 'assets/bg/ruta-24.png',
+    combatBg: 'assets/bg/combate.png',
+    rewardPokemon: [POKEMON.pidgey],
+    wild: [
+      { name: POKEMON.pidgey, rate: 40, minLv: 10, maxLv: 14, moveId: MOVES.flying.physical.peck },
+    ],
+    specialTrainer: {
+      name: 'Azul', img: 'assets/sprites/trainers/rival_kanto.png', pokemon: [
+        { name: POKEMON.wartortle, minLv: 18, maxLv: 22, moveId: MOVES.water.special.surf },
+      ]
+    },
+    trainer: [
+      {
+        name: 'Cazabichos', img: 'assets/sprites/trainers/cazabichos.png', rate: 100, pokemon: [
+          { name: POKEMON.metapod, minLv: 18, maxLv: 20, moveId: MOVES.bug.physical.bug_bite }
+        ]
+      },
+    ],
+    paths: [
+      [{ type: 'special' }, { type: 'heal' }, { type: 'trainer' }, { type: 'trainer' }, { type: 'trainer' }, { type: 'heal' }, { type: 'trainer' }, { type: 'trainer' }]
+    ],
+  },
+
+  'ruta-25': {
+    bg: 'assets/bg/ruta-25.png',
+    combatBg: 'assets/bg/combate.png',
+    rewardPokemon: [POKEMON.pinsir],
+    wild: [],
+    trainer: [
+      {
+        name: 'Adrián el dominguero', img: 'assets/sprites/trainers/campista.png', rate: 100, pokemon: [
+          { name: POKEMON.pinsir, minLv: 30, maxLv: 36, moveId: MOVES.water.physical.megahorn },
+        ]
+      },
+    ],
+    paths: [
+      [{ type: 'trainer' }],
     ],
   },
 
@@ -369,6 +423,8 @@ var KANTO_ROUTES = [
   { name: 'Mt. Moon', area: 'mt-moon' },
   { name: 'Ruta 4', area: 'ruta-4' },
   { name: 'Ciudad Celeste', area: 'ciudad-celeste' },
+  { name: 'Ruta 24', area: 'ruta-24' },
+  { name: 'Ruta 25', area: 'ruta-25' },
   { name: '???', area: 'espacio-raro' },
   { name: 'Final', area: 'info-final' }
 ];

@@ -400,7 +400,7 @@ const Screens = {
       <div style="display:flex;flex-direction:column;align-items:center;width:100%;
         padding:var(--sp-md) var(--sp-md) 0;gap:var(--sp-xs)">
 
-        <h1 style="font-family:var(--font-pixel);color:white;letter-spacing:1px;margin-bottom:1em;
+        <h1 style="font-family:var(--font-pixel);color:white;letter-spacing:1px;margin-bottom:1em;text-align:center;
           text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 2px 2px 0 #000">${route.name.toUpperCase()}</h1>
         <div style="font-family:var(--font-pixel);font-size:48px;line-height:1;color:white;
           text-shadow:4px 4px 0 var(--grey-light);user-select:none">?</div>
@@ -696,7 +696,7 @@ const Screens = {
 
     overlay.innerHTML = `
       <div class="modal-sheet">
-        <div class="modal-title">${poke.displayName} — Automovimiento</div>
+        <div class="modal-title">${poke.displayName}</div>
         <div style="text-align:center;font-family:var(--font-pixel);font-size:7px;margin-bottom:8px">${natureLine}</div>
         ${moveChangeBlocked ? `
           <div style="background:var(--off-white);border-radius:var(--radius-sm);padding:8px 10px;
