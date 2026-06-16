@@ -139,7 +139,7 @@ var ROUTE_DATA = {
           { name: POKEMON.caterpie, minLv: 6, maxLv: 12, moveId: MOVES.bug.physical.bug_bite },
           { name: POKEMON.caterpie, minLv: 6, maxLv: 12, moveId: MOVES.bug.physical.bug_bite },
           { name: POKEMON.caterpie, minLv: 6, maxLv: 12, moveId: MOVES.bug.physical.bug_bite },
-          { name: POKEMON.mecaterpietapod, minLv: 6, maxLv: 12, moveId: MOVES.bug.physical.bug_bite },
+          { name: POKEMON.caterpie, minLv: 6, maxLv: 12, moveId: MOVES.bug.physical.bug_bite },
         ]
       },
     ],
