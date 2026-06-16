@@ -291,18 +291,18 @@ var ROUTE_DATA = {
     rewardPokemon: [POKEMON.zubat, POKEMON.clefairy, POKEMON.geodude],
     rewardExtras: [ITEM.sitrus_berry, ITEM.leftovers],
     wild: [
-      { name: POKEMON.zubat, rate: 30, minLv: 14, maxLv: 21, moveId: MOVES.flying.physical.peck },
-      { name: POKEMON.zubat, rate: 30, minLv: 14, maxLv: 21, moveId: MOVES.poison.physical.poison_jab },
-      { name: POKEMON.geodude, rate: 25, minLv: 14, maxLv: 22, moveId: MOVES.rock.physical.rock_throw },
-      { name: POKEMON.paras, rate: 5, minLv: 14, maxLv: 22, moveId: MOVES.poison.physical.poison_sting },
+      { name: POKEMON.zubat, rate: 30, minLv: 10, maxLv: 14, moveId: MOVES.flying.physical.peck },
+      { name: POKEMON.zubat, rate: 30, minLv: 11, maxLv: 14, moveId: MOVES.poison.physical.poison_jab },
+      { name: POKEMON.geodude, rate: 25, minLv: 11, maxLv: 13, moveId: MOVES.rock.physical.rock_throw },
+      { name: POKEMON.paras, rate: 5, minLv: 14, maxLv: 17, moveId: MOVES.poison.physical.poison_sting },
       { name: POKEMON.clefairy, minLv: 16, maxLv: 20, moveId: MOVES.fairy.special.disarming_voice },
     ],
     trainer: [
       {
         name: 'Montañero', img: 'assets/sprites/trainers/montanero.png', rate: 100, pokemon: [
-          { name: POKEMON.geodude, minLv: 14, maxLv: 18, moveId: MOVES.rock.physical.rock_throw },
-          { name: POKEMON.geodude, minLv: 14, maxLv: 18, moveId: MOVES.rock.physical.rock_throw },
-          { name: POKEMON.onix, minLv: 12, maxLv: 16, moveId: MOVES.ground.physical.bulldoze },
+          { name: POKEMON.geodude, minLv: 14, maxLv: 16, moveId: MOVES.rock.physical.rock_throw },
+          { name: POKEMON.geodude, minLv: 12, maxLv: 16, moveId: MOVES.rock.physical.rock_throw },
+          { name: POKEMON.onix, minLv: 12, maxLv: 17, moveId: MOVES.ground.physical.bulldoze },
         ]
       },
     ]
@@ -340,8 +340,8 @@ var ROUTE_DATA = {
     trainer: [
       {
         name: 'Nadador', img: 'assets/sprites/trainers/nadador.png', rate: 50, pokemon: [
-          { name: POKEMON.horsea, minLv: 18, maxLv: 22, moveId: MOVES.water.special.water_gun },
-          { name: POKEMON.shellder, minLv: 18, maxLv: 23, moveId: MOVES.ice.special.ice_beam },
+          { name: POKEMON.horsea, minLv: 18, maxLv: 20, moveId: MOVES.water.special.water_gun },
+          { name: POKEMON.shellder, minLv: 18, maxLv: 21, moveId: MOVES.ice.special.ice_beam },
         ]
       },
       {
@@ -361,7 +361,7 @@ var ROUTE_DATA = {
         {
           name: POKEMON.starmie, level: 24, moveId: MOVES.psychic.special.confusion,
           overrides: {
-            evs: { hp: 0, def: 32, spd: 32, spa: 0 },
+            evs: { hp: 32, def: 32, spd: 32, spa: 32 },
           },
         },
       ]
@@ -379,9 +379,9 @@ var ROUTE_DATA = {
     wild: [],
     specialTrainer: {
       name: 'Azul', img: 'assets/sprites/trainers/rival_kanto.png', pokemon: [
-        { name: POKEMON.abra, minLv: 16, maxLv: 16, moveId: MOVES.psychic.special.teleport },
-        { name: POKEMON.pidgeotto, minLv: 16, maxLv: 18, moveId: MOVES.flying.physical.wing_attack },
-        { name: 'RIVAL_STARTER_2', minLv: 18, maxLv: 22 },
+        { name: POKEMON.abra, minLv: 14, maxLv: 14, moveId: MOVES.psychic.special.teleport },
+        { name: POKEMON.pidgeotto, minLv: 16, maxLv: 20, moveId: MOVES.flying.physical.wing_attack },
+        { name: 'RIVAL_STARTER_2', minLv: 18, maxLv: 24 },
       ]
     },
     trainer: [],
@@ -457,8 +457,8 @@ var ROUTE_DATA = {
     trainer: [
       {
         name: 'Adrián el dominguero', img: 'assets/sprites/trainers/campista.png', rate: 100, pokemon: [
-          { name: POKEMON.mr_mime, minLv: 30, maxLv: 32, moveId: MOVES.psychic.special.psychic },
-          { name: POKEMON.pinsir, minLv: 31, maxLv: 36, moveId: MOVES.water.physical.megahorn, shiny: true },
+          { name: POKEMON.mr_mime, minLv: 25, maxLv: 28, moveId: MOVES.psychic.special.psychic },
+          { name: POKEMON.pinsir, minLv: 27, maxLv: 32, moveId: MOVES.water.physical.megahorn, shiny: true },
         ]
       },
     ],
@@ -554,7 +554,7 @@ var ROUTE_DATA = {
           name: POKEMON.pikachu, minLv: 24, maxLv: 26, moveId: MOVES.electric.special.thunder_shock
         },
         {
-          name: POKEMON.voltorb, minLv: 22, maxLv: 25, moveId: MOVES.electric.special.tri_attack
+          name: POKEMON.voltorb, minLv: 24, maxLv: 27, moveId: MOVES.electric.special.tri_attack
         },
         {
           name: POKEMON.raichu, minLv: 26, maxLv: 32, moveId: MOVES.electric.special.thunder

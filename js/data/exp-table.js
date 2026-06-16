@@ -1,5 +1,5 @@
 var EXP_TABLE = {
-  BASE_EXP_REQUIRED: 10,
+  BASE_EXP_REQUIRED: 12.5,
 
   MULTIPLIERS: { wild: 0.8, trainer: 1.1, gym: 1.5 },
 
