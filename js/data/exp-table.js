@@ -1,7 +1,7 @@
 var EXP_TABLE = {
-  BASE_EXP_REQUIRED: 12.5,
+  BASE_EXP_REQUIRED: 12.2,
 
-  MULTIPLIERS: { wild: 0.8, trainer: 1.1, gym: 1.5 },
+  MULTIPLIERS: { wild: 0.9, trainer: 1.2, gym: 1.5 },
 
   // Penalización de experiencia por diferencia de nivel.
   // Si el pokemon ACTIVO del jugador tiene más de `levelDiff` niveles que el

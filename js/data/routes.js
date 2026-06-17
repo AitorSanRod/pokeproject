@@ -110,7 +110,7 @@ var ROUTE_DATA = {
     wild: [
       { name: POKEMON.rattata, rate: 45, minLv: 2, maxLv: 4, moveId: MOVES.normal.physical.tackle },
       { name: POKEMON.pidgey, rate: 45, minLv: 2, maxLv: 3, moveId: MOVES.flying.physical.peck },
-      { name: POKEMON.pikachu, rate: 10, minLv: 3, maxLv: 6, moveId: MOVES.electric.special.thunder_shock },
+      { name: POKEMON.pikachu, rate: 10, minLv: 2, maxLv: 4, moveId: MOVES.electric.special.thunder_shock },
     ],
     trainer: [
       {
