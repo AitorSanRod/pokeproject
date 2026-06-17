@@ -2,6 +2,26 @@
 // types:    tipos de pokemon que pueden aprenderla
 // pokemons: pokemon específicos que pueden aprenderla (independientemente del tipo)
 // moveId:   id del movimiento en MOVE_POOL (debe tener mt:true)
+const MT_SPRITES = {
+  normal: 'assets/sprites/mts/tm-water.png',
+  fire: 'assets/sprites/mts/tm-water.png',
+  water: 'assets/sprites/mts/tm-water.png',
+  grass: 'assets/sprites/mts/tm-water.png',
+  electric: 'assets/sprites/mts/tm-water.png',
+  ice: 'assets/sprites/mts/tm-water.png',
+  fighting: 'assets/sprites/mts/tm-water.png',
+  poison: 'assets/sprites/mts/tm-water.png',
+  ground: 'assets/sprites/mts/tm-water.png',
+  fliying: 'assets/sprites/mts/tm-water.png',
+  pyschic: 'assets/sprites/mts/tm-water.png',
+  bug: 'assets/sprites/mts/tm-water.png',
+  rock: 'assets/sprites/mts/tm-water.png',
+  ghost: 'assets/sprites/mts/tm-water.png',
+  dragon: 'assets/sprites/mts/tm-water.png',
+  dark: 'assets/sprites/mts/tm-water.png',
+  steel: 'assets/sprites/mts/tm-water.png',
+  fairy: 'assets/sprites/mts/tm-water.png',
+}
 
 var TM_LIST = {
   'tm-surf': {

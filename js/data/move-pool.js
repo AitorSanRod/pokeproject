@@ -173,12 +173,12 @@ var MOVE_POOL = {
     physical: [
       { stage: 1, id: 'bug-bite', name: 'Picadura', power: 35, pp: 20, type: 'bug', damageClass: 'physical', effectId: 'recoil-10' },
       { stage: 2, id: 'x-scissor', name: 'Tijera X', power: 65, pp: 15, type: 'bug', damageClass: 'physical', effectId: 'recoil-10' },
-      { stage: 3, id: 'megahorn', name: 'Megacuerno', power: 100, pp: 10, type: 'bug', damageClass: 'physical', effectId: 'recoil-10' },
+      { stage: 3, id: 'megahorn', name: 'Megacuerno', power: 90, pp: 10, type: 'bug', damageClass: 'physical', },
     ],
     special: [
       { stage: 1, id: 'infestation', name: 'Infestacion', power: 20, pp: 20, type: 'bug', damageClass: 'special' },
       { stage: 2, id: 'signal-beam', name: 'Rayo Señal', power: 75, pp: 15, type: 'bug', damageClass: 'special' },
-      { stage: 3, id: 'bug-buzz', name: 'Zumbido', power: 90, pp: 10, type: 'bug', damageClass: 'special' },
+      { stage: 3, id: 'bug-buzz', name: 'Zumbido', power: 100, pp: 10, type: 'bug', damageClass: 'special' },
     ],
   },
   rock: {

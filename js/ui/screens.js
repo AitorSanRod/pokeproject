@@ -456,7 +456,7 @@ const Screens = {
         <div style="font-family:var(--font-pixel);font-size:48px;line-height:1;color:white;
           text-shadow:4px 4px 0 var(--grey-light);user-select:none">?</div>
         <p class="encounter-prompt" style="margin-bottom:4px;color:white;
-          text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000">Elige tu camino</p>
+          text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000">Elige un camino</p>
 
         <div style="display:flex;flex-direction:column;gap:6px;width:100%">
           ${resolvedPaths.map((path, pi) => `

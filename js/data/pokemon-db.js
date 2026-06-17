@@ -274,16 +274,217 @@ var POKEMON_DB = {
 };
 
 // ── POKEMON_LIST ──────────────────────────────────────────────────────────────
-function _buildPokemonList() {
-  const list = {};
-  const names = Object.keys(POKEMON_DB);
-  for (let i = 0; i < names.length; i++) {
-    const name = names[i];
-    list[name.replace(/-/g, '_')] = name;
-  }
-  list.nidoran_m = 'nidoran-m';
-  list.nidoran_f = 'nidoran-f';
-  list.mr_mime = 'mr-mime';
-  return list;
-}
-var POKEMON_LIST = _buildPokemonList();
+// Catálogo completo de Gen 1. Usar como POKEMON.nombre en routes.js.
+// El valor es el nombre exacto de la PokeAPI (string que recibe createPokemon).
+var POKEMON_LIST = {
+  // Starters
+  bulbasaur:   'bulbasaur',
+  ivysaur:     'ivysaur',
+  venusaur:    'venusaur',
+  charmander:  'charmander',
+  charmeleon:  'charmeleon',
+  charizard:   'charizard',
+  squirtle:    'squirtle',
+  wartortle:   'wartortle',
+  blastoise:   'blastoise',
+  // Bug
+  caterpie:    'caterpie',
+  metapod:     'metapod',
+  butterfree:  'butterfree',
+  weedle:      'weedle',
+  kakuna:      'kakuna',
+  beedrill:    'beedrill',
+  // Flying / Normal
+  pidgey:      'pidgey',
+  pidgeotto:   'pidgeotto',
+  pidgeot:     'pidgeot',
+  rattata:     'rattata',
+  raticate:    'raticate',
+  spearow:     'spearow',
+  fearow:      'fearow',
+  // Poison
+  ekans:       'ekans',
+  arbok:       'arbok',
+  // Electric
+  pikachu:     'pikachu',
+  raichu:      'raichu',
+  // Ground
+  sandshrew:   'sandshrew',
+  sandslash:   'sandslash',
+  // Nidoran (guión requerido por la PokeAPI)
+  nidoran_f:   'nidoran-f',
+  nidorina:    'nidorina',
+  nidoqueen:   'nidoqueen',
+  nidoran_m:   'nidoran-m',
+  nidorino:    'nidorino',
+  nidoking:    'nidoking',
+  // Fairy / Normal
+  clefairy:    'clefairy',
+  clefable:    'clefable',
+  jigglypuff:  'jigglypuff',
+  wigglytuff:  'wigglytuff',
+  // Fire
+  vulpix:      'vulpix',
+  ninetales:   'ninetales',
+  // Poison / Flying
+  zubat:       'zubat',
+  golbat:      'golbat',
+  // Grass / Poison
+  oddish:      'oddish',
+  gloom:       'gloom',
+  vileplume:   'vileplume',
+  paras:       'paras',
+  parasect:    'parasect',
+  // Bug / Poison
+  venonat:     'venonat',
+  venomoth:    'venomoth',
+  // Ground
+  diglett:     'diglett',
+  dugtrio:     'dugtrio',
+  // Normal
+  meowth:      'meowth',
+  persian:     'persian',
+  // Water
+  psyduck:     'psyduck',
+  golduck:     'golduck',
+  // Fighting
+  mankey:      'mankey',
+  primeape:    'primeape',
+  // Fire
+  growlithe:   'growlithe',
+  arcanine:    'arcanine',
+  // Water
+  poliwag:     'poliwag',
+  poliwhirl:   'poliwhirl',
+  poliwrath:   'poliwrath',
+  // Psychic
+  abra:        'abra',
+  kadabra:     'kadabra',
+  alakazam:    'alakazam',
+  // Fighting
+  machop:      'machop',
+  machoke:     'machoke',
+  machamp:     'machamp',
+  // Grass / Poison
+  bellsprout:  'bellsprout',
+  weepinbell:  'weepinbell',
+  victreebel:  'victreebel',
+  // Water / Poison
+  tentacool:   'tentacool',
+  tentacruel:  'tentacruel',
+  // Rock / Ground
+  geodude:     'geodude',
+  graveler:    'graveler',
+  golem:       'golem',
+  // Fire
+  ponyta:      'ponyta',
+  rapidash:    'rapidash',
+  // Water / Psychic
+  slowpoke:    'slowpoke',
+  slowbro:     'slowbro',
+  // Electric / Steel
+  magnemite:   'magnemite',
+  magneton:    'magneton',
+  // Normal / Flying
+  farfetch_d:  'farfetch-d',
+  doduo:       'doduo',
+  dodrio:      'dodrio',
+  // Water / Ice
+  seel:        'seel',
+  dewgong:     'dewgong',
+  // Poison
+  grimer:      'grimer',
+  muk:         'muk',
+  // Water / Ice
+  shellder:    'shellder',
+  cloyster:    'cloyster',
+  // Ghost / Poison
+  gastly:      'gastly',
+  haunter:     'haunter',
+  gengar:      'gengar',
+  // Rock / Ground
+  onix:        'onix',
+  // Psychic
+  drowzee:     'drowzee',
+  hypno:       'hypno',
+  // Water
+  krabby:      'krabby',
+  kingler:     'kingler',
+  // Electric
+  voltorb:     'voltorb',
+  electrode:   'electrode',
+  // Grass / Psychic
+  exeggcute:   'exeggcute',
+  exeggutor:   'exeggutor',
+  // Ground
+  cubone:      'cubone',
+  marowak:     'marowak',
+  // Fighting
+  hitmonlee:   'hitmonlee',
+  hitmonchan:  'hitmonchan',
+  // Normal
+  lickitung:   'lickitung',
+  // Poison
+  koffing:     'koffing',
+  weezing:     'weezing',
+  // Ground / Rock
+  rhyhorn:     'rhyhorn',
+  rhydon:      'rhydon',
+  // Normal
+  chansey:     'chansey',
+  tangela:     'tangela',
+  kangaskhan:  'kangaskhan',
+  // Water
+  horsea:      'horsea',
+  seadra:      'seadra',
+  goldeen:     'goldeen',
+  seaking:     'seaking',
+  staryu:      'staryu',
+  starmie:     'starmie',
+  // Psychic / Fairy
+  mr_mime:     'mr-mime',
+  // Bug / Flying
+  scyther:     'scyther',
+  // Ice / Psychic
+  jynx:        'jynx',
+  // Electric / Fire
+  electabuzz:  'electabuzz',
+  magmar:      'magmar',
+  // Bug
+  pinsir:      'pinsir',
+  // Normal
+  tauros:      'tauros',
+  // Water
+  magikarp:    'magikarp',
+  gyarados:    'gyarados',
+  lapras:      'lapras',
+  // Normal
+  ditto:       'ditto',
+  // Eevee
+  eevee:       'eevee',
+  vaporeon:    'vaporeon',
+  jolteon:     'jolteon',
+  flareon:     'flareon',
+  // Normal
+  porygon:     'porygon',
+  // Rock / Water (fósiles)
+  omanyte:     'omanyte',
+  omastar:     'omastar',
+  kabuto:      'kabuto',
+  kabutops:    'kabutops',
+  // Rock / Flying
+  aerodactyl:  'aerodactyl',
+  // Normal
+  snorlax:     'snorlax',
+  // Legendarios
+  articuno:    'articuno',
+  zapdos:      'zapdos',
+  moltres:     'moltres',
+  // Dragon
+  dratini:     'dratini',
+  dragonair:   'dragonair',
+  dragonite:   'dragonite',
+  // Psychic
+  mewtwo:      'mewtwo',
+  mew:         'mew',
+};

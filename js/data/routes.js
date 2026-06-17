@@ -482,7 +482,7 @@ var ROUTE_DATA = {
       {
         name: 'Adrián el dominguero', img: 'assets/sprites/trainers/campista.png', rate: 100, pokemon: [
           { name: POKEMON.mr_mime, minLv: 25, maxLv: 28, moveId: MOVES.psychic.special.psychic },
-          { name: POKEMON.pinsir, minLv: 27, maxLv: 30, moveId: MOVES.water.physical.megahorn, shiny: true },
+          { name: POKEMON.pinsir, minLv: 26, maxLv: 28, moveId: MOVES.water.physical.megahorn, shiny: true },
         ]
       },
     ],
@@ -582,7 +582,7 @@ var ROUTE_DATA = {
     gymType: 'electric',
     badge: 'Medalla Trueno',
     gymLeaderImg: 'assets/sprites/trainers/surge.png',
-    rewardPokemon: [POKEMON.voltorb, POKEMON.pikachu, POKEMON.raichu, , POKEMON.porygon],
+    rewardPokemon: [POKEMON.voltorb, POKEMON.pikachu, POKEMON.raichu, POKEMON.porygon],
     rewardExtras: [ITEM.choice_band],
     trainer: [
       {
