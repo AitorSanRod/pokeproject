@@ -77,7 +77,7 @@ var TM_LIST = {
   'tm-metal-claw': {
     id: 'metal-claw',
     name: 'MT Garra Metal',
-    moveId: 'giga-drain',
+    moveId: 'metal-claw',
     types: ['charmander', 'charmeleon', 'charizard'],
     pokemons: [],
     desc: 'Enseña Garra Metal',
