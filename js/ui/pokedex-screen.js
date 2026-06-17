@@ -98,28 +98,30 @@ const PokedexScreen = {
     const badges = Storage.getBadges(name);
     const STAT_LABEL = { hp:'HP', atk:'ATK', def:'DEF', spa:'SPA', spd:'SPD', spe:'VEL' };
 
-    // Movimientos disponibles filtrados por stage evolutiva
-    const dbEntry   = typeof POKEMON_DB !== 'undefined' ? POKEMON_DB[name] : null;
-    const moveLines = dbEntry?.moveLines ?? [];
-    const stage     = typeof getEvolutionStage !== 'undefined' ? getEvolutionStage(name) : 2;
-    const maxIdx    = Math.min(stage, 2);
+    // Movimientos disponibles filtrados por stage del pokemon (misma lógica que buildMoves)
+    const dbEntry      = typeof POKEMON_DB !== 'undefined' ? POKEMON_DB[name] : null;
+    const moveLines    = dbEntry?.moveLines ?? [];
+    const pokemonStage = dbEntry?.stage ?? 3;
     const pokeMovesById = new Set();
     const pokeMovesList = [];
-    if (typeof MOVE_POOL !== 'undefined') {
+    if (typeof getMoveProgression !== 'undefined') {
       for (const line of moveLines) {
-        const progression = typeof getMoveProgression !== 'undefined'
-          ? getMoveProgression(line.type, line.damageClass)
-          : Object.values(MOVE_POOL[line.type]?.[line.damageClass] ?? {});
-        for (let i = 0; i <= maxIdx; i++) {
-          const move = progression[i];
-          if (move && !pokeMovesById.has(move.id)) {
+        const progression = getMoveProgression(line.type, line.damageClass);
+        for (const move of progression) {
+          if (move && !move.boss && !move.mt && (move.stage ?? 1) <= pokemonStage && !pokeMovesById.has(move.id)) {
             pokeMovesById.add(move.id);
             pokeMovesList.push(move);
           }
         }
       }
-
     }
+
+    // MTs aprendidas por la cadena evolutiva — compartidas entre todas las formas
+    // (Storage.getLearnedMTs resuelve por raíz: Ivysaur ve las MTs de Bulbasaur)
+    const learnedMtIds = typeof Storage !== 'undefined' ? Storage.getLearnedMTs(name) : [];
+    const mtMovesList  = learnedMtIds
+      .map(id => (typeof MOVE_BY_ID !== 'undefined' ? MOVE_BY_ID[id] : null))
+      .filter(Boolean);
 
     vp.innerHTML = `
       <div class="screen" style="background:var(--off-white);display:flex;flex-direction:column;">
@@ -190,13 +192,19 @@ const PokedexScreen = {
             <div style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);margin-bottom:var(--sp-sm)">
               MOVIMIENTOS
             </div>
-            ${isCaught && pokeMovesList.length > 0 ? `
+            ${isCaught && (pokeMovesList.length > 0 || mtMovesList.length > 0) ? `
               <div style="display:flex;flex-direction:column;gap:5px">
-                ${pokeMovesList.map(m => {
+                ${[
+                  ...pokeMovesList.map(m => ({ m, isMT: false })),
+                  ...mtMovesList.map(m => ({ m, isMT: true })),
+                ].map(({ m, isMT }) => {
                   const effectDesc = getEffectDescriptions(m);
                   return `
-                    <div style="display:flex;align-items:center;gap:8px;padding:5px 8px;
-                      background:var(--off-white);border-radius:var(--radius-sm);position:relative">
+                    <div style="display:flex;align-items:center;gap:6px;padding:5px 8px;
+                      background:${isMT ? '#eef4ff' : 'var(--off-white)'};
+                      border-radius:var(--radius-sm);position:relative">
+                      ${isMT ? `<span style="font-family:var(--font-pixel);font-size:5px;color:var(--white);
+                        background:#4a7fc1;border-radius:2px;padding:1px 4px;flex-shrink:0">MT</span>` : ''}
                       <span class="type-badge" data-type="${m.type}" style="font-size:5px;padding:2px 5px;flex-shrink:0">${m.type}</span>
                       <span style="font-family:var(--font-pixel);font-size:7px;flex:1">${m.name}</span>
                       <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">POD:${m.power ?? '—'}</span>

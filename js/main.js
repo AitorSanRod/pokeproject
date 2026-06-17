@@ -87,11 +87,13 @@ window.addEventListener('DOMContentLoaded', () => {
   resetBtn.addEventListener('mouseleave', () => resetBtn.style.background = 'rgba(0,0,0,.35)');
 
   resetBtn.addEventListener('click', () => {
-    const ok = confirm('¿Borrar todos los datos guardados?\n\nSe eliminará el progreso de la Pokédex y los EVs de todos los pokemon.\n\nEsta acción no se puede deshacer.');
+    const ok = confirm('¿Borrar todos los datos guardados?\n\nSe eliminará el progreso de la Pokédex, los EVs, las medallas y los movimientos aprendidos por MT.\n\nEsta acción no se puede deshacer.');
     if (!ok) return;
     Storage._set('pokedex', {});
     Storage._set('evs', {});
-    console.log('[Storage] Datos reseteados: pokédex y EVs eliminados');
+    Storage._set('mts', {});
+    Storage._set('badges', {});
+    console.log('[Storage] Datos reseteados: pokédex, EVs, MTs y medallas eliminados');
     resetBtn.textContent = '✓';
     resetBtn.style.color = '#4caf50';
     setTimeout(() => {

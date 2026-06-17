@@ -50,18 +50,24 @@ async function createPokemon(nameOrId, level, isPlayer = false, moveId = null, o
 
   const name = apiData.name;
 
-  // Movimientos: SIEMPRE se construye el set completo según la stage evolutiva
-  // (sección 5). moveId (definido en routes.js para rivales) NO reemplaza el
-  // moveset — solo fija qué movimiento usa ese rival por defecto (autoMove).
-  // Así, si el pokemon es capturado, ya tiene todos sus movimientos disponibles.
+  // Stage: definida en POKEMON_DB[name].stage (1=1 ataque, 2=2, 3=3).
+  const moveLevel = POKEMON_DB[name]?.stage ?? 3;
   const moves = buildMoves(name);
 
-  // Si moveId apunta a un movimiento que no está en el moveset por stage
-  // (p.ej. un movimiento más fuerte que su stage normalmente no tendría),
-  // se añade igualmente para que el rival lo pueda usar.
+  // Movimiento hardcodeado vía moveId (rivales/gym leaders con ataque específico)
   if (moveId && MOVE_BY_ID[moveId] && !moves.find(m => m.id === moveId)) {
     const m = MOVE_BY_ID[moveId];
     moves.push({ ...m, maxPp: m.pp });
+  }
+
+  // MTs aprendidas: solo para pokemon del jugador — cargadas desde Storage
+  // (se reinician cuando el jugador borra los datos de pokédex)
+  const learnedMTs = (isPlayer && typeof Storage !== 'undefined')
+    ? Storage.getLearnedMTs(name)
+    : [];
+  for (const mtId of learnedMTs) {
+    const m = MOVE_BY_ID[mtId];
+    if (m && !moves.find(mv => mv.id === mtId)) moves.push({ ...m, maxPp: m.pp });
   }
 
   const pokemon = {
@@ -71,7 +77,7 @@ async function createPokemon(nameOrId, level, isPlayer = false, moveId = null, o
     types:        apiData.types.map(t => t.type.name),
     baseStats,
     ivs, evs, nature, level,
-    moveLevel:    0,
+    moveLevel,
     exp:          0,
     expToNext:    EXP_TABLE.expToNext(level),
     moves,
@@ -89,6 +95,7 @@ async function createPokemon(nameOrId, level, isPlayer = false, moveId = null, o
   pokemon.combatMods = {};  // modificadores de combate: { atk, def, spa, spd, spe } como multiplicadores
   pokemon.heldItem   = null; // id de HELD_ITEMS, o null — ver held-items.js
   pokemon._heldItemFlags = {}; // flags "una vez por ruta" de objetos equipados
+  pokemon.learnedMTs = learnedMTs; // cache de MTs aprendidas (fuente: Storage)
   return pokemon;
 }
 
@@ -216,10 +223,8 @@ async function evolve(pokemon, intoName) {
   newPoke.exp      = pokemon.exp;
   newPoke.expToNext = EXP_TABLE.expToNext(pokemon.level);
 
-  // Subir línea de movimientos (moveLevel +1, hasta máximo 2)
-  newPoke.moveLevel = Math.min(2, (pokemon.moveLevel ?? 0) + 1);
-  newPoke.moves     = buildMoves(intoName);
-  newPoke.autoMove  = pokemon.autoMove ?? newPoke.moves[0]?.id ?? null;
+  // moves y learnedMTs ya vienen correctos de createPokemon (stage + Storage MTs)
+  newPoke.autoMove = pokemon.autoMove ?? newPoke.moves[0]?.id ?? null;
 
   // Recalcular stats con los nuevos IVs/EVs/naturaleza
   newPoke.stats     = computeStats(newPoke);

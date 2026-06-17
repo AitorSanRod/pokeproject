@@ -1,17 +1,13 @@
 const NOTES_DATA = {
-  "title": "Actualización 0.0.5 (Víctor pierde la cabeza)",
+  "title": "Actualización 0.0.6 (Sonríe Misty)",
   "lines": [
-    "Añadidas nuevas habilidades a los ataques (Añadido flinch, perdon por el retraso).",
-    "Guardado entre sesiones.",
-    "Nuevas rutas añadidas.",
-    "Arreglado texto de combate.",
-    "Los nombres de los entrenadores se muestran correctamente durante el combate.",
-    "Balance para que Victor pueda pasarse a Misty.",
-    "Completado gimnasio de Ciudad Celeste.",
-    "Corregido un bug con los titulos de los gimnasios, no aparecian centrados.",
-    "Añadidos nuevos combates finales y rutas.",
-    "Más cambios que no recuerdo...",
-    "Bulbasaurs regados.",
-    "¡Un dominguero salvaje apareció! (Y tiene un pokemon guapísimo)."
+    "Durante el combate, en moviles y pantallas grandes, se ha añadido escroll para ver la lista de pokemon.",
+    "Balance de experiencia",
+    "MTs añadidas, se guardan entre sesiones y lineas evolutivas: Un pokemon de tipo tierra puede aprender todas las MTs de tierra. Hay pokémon que pueden aprender MTs especificas.",
+    "Actualización de stages de pokemon (Lo siento, Mr. mime al pozo)",
+    "El Starmie de Misty ha aumentado sus caracteristicas",
+    "¿Eso es un barco?",
+    "El orden de los entrenadores ya no se modifica al elegir rutas.",
+    "Descripciones de movimientos mejorados."
   ]
 };

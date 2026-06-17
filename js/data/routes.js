@@ -361,7 +361,8 @@ var ROUTE_DATA = {
         {
           name: POKEMON.starmie, level: 24, moveId: MOVES.psychic.special.confusion,
           overrides: {
-            evs: { hp: 32, def: 32, spd: 32, spa: 32 },
+            evs: { hp: 0, def: 0, spd: 0, spa: 32 },
+            ivs: { hp: 0, def: 0, spd: 0, spa: 31 },
           },
         },
       ]
@@ -554,7 +555,7 @@ var ROUTE_DATA = {
           name: POKEMON.pikachu, minLv: 24, maxLv: 26, moveId: MOVES.electric.special.thunder_shock
         },
         {
-          name: POKEMON.voltorb, minLv: 24, maxLv: 27, moveId: MOVES.electric.special.tri_attack
+          name: POKEMON.voltorb, minLv: 24, maxLv: 27, moveId: MOVES.normal.special.hyper_voice
         },
         {
           name: POKEMON.raichu, minLv: 26, maxLv: 32, moveId: MOVES.electric.special.thunder

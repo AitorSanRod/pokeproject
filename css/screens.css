@@ -1480,10 +1480,9 @@ div:hover > .move-effect-tooltip { display: block; }
 /* ── EXP BAR — barra de experiencia bajo la barra de HP en el team bar ──────── */
 .combat-team-pip__exp-bar {
   width: 100%;
-  height: 4px;
+  height: 3px;
   background: var(--grey-light);
-  border: 1px solid var(--black);
-  border-radius: 1px;
+  border-radius: 2px;
   overflow: hidden;
   margin-top: 2px;
 }

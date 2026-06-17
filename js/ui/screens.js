@@ -73,6 +73,13 @@ const Screens = {
         GameState.team             = save.team       ?? [];
         GameState.starter          = save.starterName ? { name: save.starterName } : null;
         GameState.starterName      = save.starterName ?? null;
+        // Re-sincronizar MTs desde Storage: si el jugador borró los datos de pokédex
+        // (que también limpia Storage.mts), los movimientos de MT se eliminan del equipo.
+        GameState.team.forEach(p => {
+          const validMTs = Storage.getLearnedMTs(p.name);
+          p.moves     = (p.moves ?? []).filter(m => !MOVE_BY_ID[m.id]?.mt || validMTs.includes(m.id));
+          p.learnedMTs = validMTs;
+        });
         GameState.autoMode         = true;
         console.log(`[Storage] Run cargada — ruta ${GameState.routeIndex}, equipo: ${GameState.team.map(p => p.displayName).join(', ')}`);
         Screens.show(Screens.adventure);
@@ -840,14 +847,71 @@ const Screens = {
     const data  = ROUTE_DATA[route.area];
     const REWARD_BG = "url('assets/bg/price.png') center/cover no-repeat";
 
-    // Premio 1: pokemon aleatorio de la ruta
-    const rewardPool   = data.rewardPokemon ?? [POKEMON.rattata];
-    const rewardName   = rewardPool[Math.floor(Math.random() * rewardPool.length)];
-    const maxLevel     = Math.max(...GameState.team.map(p => p.level));
-    const rewardPoke   = await createPokemon(rewardName, maxLevel, true);
-    Storage.markCaught(rewardPoke.name);
+    const maxLevel = Math.max(...GameState.team.map(p => p.level));
 
-    // Premio 2: vitamina aleatoria
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    const tmEligible = (tmId) => {
+      const tm = TM_LIST[tmId];
+      if (!tm) return false;
+      return GameState.team.some(p => canLearnTM(p, tmId) && !(p.learnedMTs ?? []).includes(tm.moveId));
+    };
+    const makeTmPrize = (tmId) => {
+      const tm = TM_LIST[tmId];
+      const move = MOVE_BY_ID[tm.moveId];
+      return {
+        id: tmId,
+        icon: `<img src="${tm.sprite}" style="width:40px;height:40px;image-rendering:pixelated;object-fit:contain"
+                 onerror="this.outerHTML='<span style=font-size:32px>${tm.fallbackIcon}</span>'">`,
+        name: tm.name,
+        desc: `${tm.desc}${move ? ` · ${move.name} (Poder: ${move.power})` : ''}`,
+        type: 'tm',
+        tmId,
+      };
+    };
+
+    // ── Slot fijo: Pokemon ────────────────────────────────────────────────────
+    let rewardPoke = null;
+    let pokemonPrize = null;
+    if (data.rewardPokemon?.length) {
+      const rewardName = data.rewardPokemon[Math.floor(Math.random() * data.rewardPokemon.length)];
+      rewardPoke = await createPokemon(rewardName, maxLevel, true);
+      Storage.markCaught(rewardPoke.name);
+      pokemonPrize = {
+        id: 'pokemon',
+        icon: `<img src="${rewardPoke.spriteUrl ?? ''}" style="width:52px;height:52px;image-rendering:pixelated;object-fit:contain" onerror="this.style.opacity=0">`,
+        name: rewardPoke.displayName,
+        desc: `Nv.${rewardPoke.level} · ${rewardPoke.types.join('/')}`,
+        type: 'pokemon',
+      };
+    }
+
+    // ── Slot fijo: Objeto equipable (1 elegido al azar de rewardExtras) ───────
+    let itemPrize = null;
+    if (data.rewardExtras?.length) {
+      const itemId = data.rewardExtras[Math.floor(Math.random() * data.rewardExtras.length)];
+      const item = HELD_ITEMS[itemId];
+      if (item) {
+        itemPrize = {
+          id: `held-${itemId}`,
+          icon: `<img src="${item.img}" style="width:40px;height:40px;image-rendering:pixelated;object-fit:contain"
+            onerror="this.outerHTML='<span style=font-size:32px>${item.fallbackIcon ?? '❓'}</span>'">`,
+          name: item.name,
+          desc: item.desc,
+          type: 'held-item',
+          itemId,
+        };
+      }
+    }
+
+    // ── Slot fijo: MT de la ruta (1 elegida al azar de rewardTMs) ────────────
+    let routeTmPrize = null;
+    if (data.rewardTMs?.length) {
+      const eligible = data.rewardTMs.filter(tmEligible).map(makeTmPrize);
+      if (eligible.length > 0)
+        routeTmPrize = eligible[Math.floor(Math.random() * eligible.length)];
+    }
+
+    // ── Pool aleatorio: vitaminas + candy + 1 MT del pool global ─────────────
     const vitaminas = [
       { id:'mas-ps',        icon:'<img src="assets/sprites/items/ps.png"       style="width:40px;height:40px;image-rendering:pixelated;object-fit:contain">', name:'Más PS',        stat:'hp'  },
       { id:'proteina',      icon:'<img src="assets/sprites/items/proteina.png" style="width:40px;height:40px;image-rendering:pixelated;object-fit:contain">', name:'Proteína',      stat:'atk' },
@@ -857,19 +921,9 @@ const Screens = {
       { id:'carbohidratos', icon:'<img src="assets/sprites/items/carbo.png"    style="width:40px;height:40px;image-rendering:pixelated;object-fit:contain">', name:'Carbohidratos', stat:'spe' },
     ];
     const vitaminaChoice = vitaminas[Math.floor(Math.random() * vitaminas.length)];
-
-    // Premio 3: rare candy (siempre)
     const candyIcon = '<img src="assets/sprites/items/rarecandy.png" style="width:40px;height:40px;image-rendering:pixelated;object-fit:contain">';
 
-    // Pool base — siempre presentes como candidatos
-    const basePrizes = [
-      {
-        id: 'pokemon',
-        icon: `<img src="${rewardPoke.spriteUrl ?? ''}" style="width:52px;height:52px;image-rendering:pixelated;object-fit:contain" onerror="this.style.opacity=0">`,
-        name: rewardPoke.displayName,
-        desc: `Nv.${rewardPoke.level} · ${rewardPoke.types.join('/')}`,
-        type: 'pokemon',
-      },
+    const randomPool = [
       {
         id: vitaminaChoice.id,
         icon: vitaminaChoice.icon,
@@ -887,32 +941,30 @@ const Screens = {
       },
     ];
 
-    // Objetos equipables extra de la ruta (sección 9.5) — opcional.
-    // ROUTE_DATA[area].rewardExtras: [ITEM.sitrus_berry, ITEM.choice_scarf, ...]
-    const extraItemPrizes = (data.rewardExtras ?? []).map(itemId => {
-      const item = HELD_ITEMS[itemId];
-      if (!item) { console.warn(`[REWARD] Objeto desconocido en rewardExtras: ${itemId}`); return null; }
-      return {
-        id: `held-${itemId}`,
-        icon: `<img src="${item.img}" style="width:40px;height:40px;image-rendering:pixelated;object-fit:contain"
-          onerror="this.outerHTML='<span style=font-size:32px>${item.fallbackIcon ?? '❓'}</span>'">`,
-        name: item.name,
-        desc: item.desc,
-        type: 'held-item',
-        itemId,
-      };
-    }).filter(Boolean);
+    // Añadir 1 MT del pool global (excluyendo la MT fija de ruta si ya hay una)
+    const usedTmId = routeTmPrize?.tmId;
+    const globalEligible = Object.keys(TM_LIST)
+      .filter(id => id !== usedTmId && tmEligible(id))
+      .map(makeTmPrize);
+    if (globalEligible.length > 0)
+      randomPool.push(globalEligible[Math.floor(Math.random() * globalEligible.length)]);
 
-    // Elegir 3 premios SIN REPETIR entre basePrizes + extraItemPrizes.
-    // Si hay <=3 candidatos en total, se muestran todos.
-    const allCandidates = [...basePrizes, ...extraItemPrizes];
-    const prizes = allCandidates.length <= 3
-      ? allCandidates
-      : allCandidates
-          .map(p => ({ p, sort: Math.random() }))
-          .sort((a, b) => a.sort - b.sort)
-          .slice(0, 3)
-          .map(({ p }) => p);
+    // ── Construir los 3 premios finales ───────────────────────────────────────
+    // Si las 3 listas fijas están definidas → 1 de cada, sin pool aleatorio.
+    // Si falta alguna → los slots restantes se rellenan del pool aleatorio.
+    const fixedPrizes = [pokemonPrize, itemPrize, routeTmPrize].filter(Boolean);
+    const slotsNeeded = 3 - fixedPrizes.length;
+    let prizes;
+    if (slotsNeeded <= 0) {
+      prizes = fixedPrizes;
+    } else {
+      const shuffled = randomPool
+        .map(p => ({ p, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .slice(0, slotsNeeded)
+        .map(({ p }) => p);
+      prizes = [...fixedPrizes, ...shuffled];
+    }
 
     const advance = () => {
       GameState.routeIndex++;
@@ -980,6 +1032,8 @@ const Screens = {
           advance();
         } else if (chosen.type === 'held-item') {
           Screens._showHeldItemSelector(chosen, advance);
+        } else if (chosen.type === 'tm') {
+          Screens._showTMSelector(chosen, advance);
         }
       });
     });
@@ -1122,6 +1176,54 @@ const Screens = {
     });
 
     document.getElementById('held-item-cancel').addEventListener('click', () => {
+      overlay.remove();
+    });
+  },
+
+  // Selector de pokemon para enseñar una MT. Cancelar devuelve a la pantalla de premios.
+  _showTMSelector(item, onDone) {
+    const tm   = TM_LIST[item.tmId];
+    const move = MOVE_BY_ID[tm.moveId];
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-sheet">
+        <div class="modal-title">${item.icon} ${item.name}</div>
+        <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
+          Elige un pokemon para enseñar <strong>${move?.name ?? tm.moveId}</strong>
+        </p>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          ${GameState.team.map((p, i) => {
+            const compatible  = canLearnTM(p, item.tmId);
+            const alreadyKnows = (p.learnedMTs ?? []).includes(tm.moveId);
+            const disabled = !compatible || alreadyKnows;
+            return `
+              <button class="btn btn--wide" data-idx="${i}" ${disabled ? 'disabled' : ''}
+                style="display:flex;align-items:center;gap:10px;justify-content:flex-start;padding:8px 12px;opacity:${disabled ? '0.4' : '1'}">
+                <img src="${p.spriteUrl ?? ''}" style="width:28px;height:28px;image-rendering:pixelated"
+                  onerror="this.style.opacity=0">
+                <span style="flex:1;text-align:left;font-family:var(--font-pixel);font-size:7px">${p.displayName}</span>
+                <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">
+                  ${alreadyKnows ? 'Ya conoce' : (!compatible ? 'No compatible' : '')}
+                </span>
+              </button>`;
+          }).join('')}
+        </div>
+        <button class="btn btn--ghost btn--wide" id="tm-cancel">Cancelar</button>
+      </div>`;
+
+    document.getElementById('viewport').appendChild(overlay);
+
+    overlay.querySelectorAll('[data-idx]:not([disabled])').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = GameState.team[+btn.dataset.idx];
+        teachTM(p, item.tmId);
+        overlay.remove();
+        onDone();
+      });
+    });
+
+    document.getElementById('tm-cancel').addEventListener('click', () => {
       overlay.remove();
     });
   },

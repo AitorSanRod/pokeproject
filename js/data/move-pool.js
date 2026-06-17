@@ -36,221 +36,221 @@ var DAMAGE_CLASS = Object.freeze({
 var MOVE_POOL = {
   normal: {
     physical: [
-      { id: 'tackle', name: 'Placaje', power: 40, pp: 35, type: 'normal', damageClass: 'physical' },
-      { id: 'extreme-speed', name: 'Velocidad Extrema', power: 70, pp: 15, type: 'normal', damageClass: 'physical', effectId: 'priority' },
-      { id: 'hyper-fang', name: 'Hiper Colmillo', power: 90, pp: 15, type: 'normal', damageClass: 'physical', effectId: 'shield-10' },
+      { stage: 1, id: 'tackle', name: 'Placaje', power: 40, pp: 35, type: 'normal', damageClass: 'physical' },
+      { stage: 2, id: 'extreme-speed', name: 'Velocidad Extrema', power: 70, pp: 15, type: 'normal', damageClass: 'physical', effectId: 'priority' },
+      { stage: 3, id: 'hyper-fang', name: 'Hiper Colmillo', power: 90, pp: 15, type: 'normal', damageClass: 'physical', effectId: 'shield-10' },
     ],
     special: [
-      { id: 'swift', name: 'Velocidad', power: 60, pp: 20, type: 'normal', damageClass: 'special', effectId: 'shield-10' },
-      { id: 'hyper-voice', name: 'Vozarrón', power: 90, pp: 10, type: 'normal', damageClass: 'special', effectId: 'shield-25' },
-      { id: 'boomburst', name: 'Estruendo', power: 140, pp: 10, type: 'normal', damageClass: 'special', effectId: 'shield-50' },
+      { stage: 1, id: 'swift', name: 'Velocidad', power: 60, pp: 20, type: 'normal', damageClass: 'special', effectId: 'shield-10' },
+      { stage: 2, id: 'hyper-voice', name: 'Vozarrón', power: 90, pp: 10, type: 'normal', damageClass: 'special', effectId: 'shield-25' },
+      { stage: 3, id: 'boomburst', name: 'Estruendo', power: 140, pp: 10, type: 'normal', damageClass: 'special', effectId: 'shield-50' },
       { id: 'tri-attack', name: 'Triataque ', power: 80, pp: 10, type: 'normal', damageClass: 'special', effectId: ['burn-10', 'paralize-10', 'freeze-10', 'drain-10'], boss: true },
     ],
   },
   fire: {
     physical: [
-      { id: 'flame-wheel', name: 'Rueda Fuego', power: 60, pp: 25, type: 'fire', damageClass: 'physical' },
-      { id: 'fire-fang', name: 'Colmillo Igneo', power: 65, pp: 15, type: 'fire', damageClass: 'physical' },
-      { id: 'flare-blitz', name: 'Llamarada', power: 120, pp: 15, type: 'fire', damageClass: 'physical' },
+      { stage: 1, id: 'flame-wheel', name: 'Rueda Fuego', power: 60, pp: 25, type: 'fire', damageClass: 'physical' },
+      { stage: 2, id: 'fire-fang', name: 'Colmillo Igneo', power: 65, pp: 15, type: 'fire', damageClass: 'physical' },
+      { stage: 3, id: 'flare-blitz', name: 'Llamarada', power: 120, pp: 15, type: 'fire', damageClass: 'physical' },
     ],
     special: [
-      { id: 'ember', name: 'Ascuas', power: 40, pp: 25, type: 'fire', damageClass: 'special', effectId: 'burn-10' },
-      { id: 'flamethrower', name: 'Lanzallamas', power: 90, pp: 15, type: 'fire', damageClass: 'special', effectId: 'burn-20' },
-      { id: 'fire-blast', name: 'Sofoco', power: 110, pp: 5, type: 'fire', damageClass: 'special', effectId: 'burn-25' },
+      { stage: 1, id: 'ember', name: 'Ascuas', power: 40, pp: 25, type: 'fire', damageClass: 'special', effectId: 'burn-10' },
+      { stage: 2, id: 'flamethrower', name: 'Lanzallamas', power: 90, pp: 15, type: 'fire', damageClass: 'special', effectId: 'burn-20' },
+      { stage: 3, id: 'fire-blast', name: 'Sofoco', power: 110, pp: 5, type: 'fire', damageClass: 'special', effectId: 'burn-25' },
     ],
   },
   water: {
     physical: [
-      { id: 'waterfall', name: 'Cascada', power: 50, pp: 15, type: 'water', damageClass: 'physical', effectId: 'raise-atk-20' },
-      { id: 'crabhammer', name: 'Martillazo', power: 70, pp: 10, type: 'water', damageClass: 'physical' },
-      { id: 'wave-crash', name: 'Envite acuatico', power: 110, pp: 10, type: 'water', damageClass: 'physical' },
+      { stage: 1, id: 'waterfall', name: 'Cascada', power: 50, pp: 15, type: 'water', damageClass: 'physical', effectId: 'raise-atk-20' },
+      { stage: 2, id: 'crabhammer', name: 'Martillazo', power: 70, pp: 10, type: 'water', damageClass: 'physical' },
+      { stage: 3, id: 'wave-crash', name: 'Envite acuatico', power: 110, pp: 10, type: 'water', damageClass: 'physical' },
     ],
     special: [
-      { id: 'water-gun', name: 'Pistola Agua', power: 40, pp: 25, type: 'water', damageClass: 'special', effectId: 'raise-spa-10' },
-      { id: 'surf', name: 'Surf', power: 90, pp: 15, type: 'water', damageClass: 'special' },
-      { id: 'hydro-pump', name: 'Hidrobomba', power: 110, pp: 5, type: 'water', damageClass: 'special' },
+      { stage: 1, id: 'water-gun', name: 'Pistola Agua', power: 40, pp: 25, type: 'water', damageClass: 'special', effectId: 'raise-spa-10' },
+      { stage: 2, mt: true, id: 'surf', name: 'Surf', power: 90, pp: 15, type: 'water', damageClass: 'special' },
+      { stage: 3, id: 'hydro-pump', name: 'Hidrobomba', power: 110, pp: 5, type: 'water', damageClass: 'special' },
     ],
   },
   grass: {
     physical: [
-      { id: 'vine-whip', name: 'Latigo Cepa', power: 45, pp: 25, type: 'grass', damageClass: 'physical' },
-      { id: 'razor-leaf', name: 'Hoja afilada', power: 55, pp: 25, type: 'grass', damageClass: 'physical' },
-      { id: 'wood-hammer', name: 'Mazazo', power: 120, pp: 15, type: 'grass', damageClass: 'physical' },
+      { stage: 1, id: 'vine-whip', name: 'Latigo Cepa', power: 45, pp: 25, type: 'grass', damageClass: 'physical' },
+      { stage: 2, id: 'razor-leaf', name: 'Hoja afilada', power: 55, pp: 25, type: 'grass', damageClass: 'physical' },
+      { stage: 3, id: 'wood-hammer', name: 'Mazazo', power: 120, pp: 15, type: 'grass', damageClass: 'physical' },
     ],
     special: [
-      { id: 'absorb', name: 'Absorber', power: 40, pp: 25, type: 'grass', damageClass: 'special', effectId: 'drain-10' },
-      { id: 'magical-leaf', name: 'Hoja Magica', power: 60, pp: 20, type: 'grass', damageClass: 'special', effectId: 'sleep-15' },
-      { id: 'solar-beam', name: 'Rayo Solar', power: 120, pp: 10, type: 'grass', damageClass: 'special' },
+      { stage: 1, id: 'absorb', name: 'Absorber', power: 40, pp: 25, type: 'grass', damageClass: 'special', effectId: 'drain-10' },
+      { stage: 2, id: 'magical-leaf', name: 'Hoja Magica', power: 60, pp: 20, type: 'grass', damageClass: 'special', effectId: 'sleep-15' },
+      { stage: 3, mt: true, id: 'solar-beam', name: 'Rayo Solar', power: 120, pp: 10, type: 'grass', damageClass: 'special' },
     ],
   },
   electric: {
     physical: [
-      { id: 'thunder-punch', name: 'Puño Trueno', power: 75, pp: 15, type: 'electric', damageClass: 'physical', effectId: 'paralize-25' },
-      { id: 'wild-charge', name: 'Voltiocruel', power: 90, pp: 15, type: 'electric', damageClass: 'physical' },
-      { id: 'volt-tackle', name: 'Placaje Eléctrico', power: 120, pp: 15, type: 'electric', damageClass: 'physical' },
+      { stage: 1, id: 'thunder-punch', name: 'Puño Trueno', power: 75, pp: 15, type: 'electric', damageClass: 'physical', effectId: 'paralize-25' },
+      { stage: 2, id: 'wild-charge', name: 'Voltiocruel', power: 90, pp: 15, type: 'electric', damageClass: 'physical' },
+      { stage: 3, id: 'volt-tackle', name: 'Placaje Eléctrico', power: 120, pp: 15, type: 'electric', damageClass: 'physical' },
     ],
     special: [
-      { id: 'thunder-shock', name: 'Impactrueno', power: 40, pp: 30, type: 'electric', damageClass: 'special', effectId: 'paralize-25' },
-      { id: 'thunderbolt', name: 'Rayo', power: 90, pp: 15, type: 'electric', damageClass: 'special' },
-      { id: 'thunder', name: 'Trueno', power: 110, pp: 10, type: 'electric', damageClass: 'special' },
+      { stage: 1, id: 'thunder-shock', name: 'Impactrueno', power: 40, pp: 30, type: 'electric', damageClass: 'special', effectId: 'paralize-25' },
+      { stage: 2, mt: true, id: 'thunderbolt', name: 'Rayo', power: 90, pp: 15, type: 'electric', damageClass: 'special' },
+      { stage: 3, id: 'thunder', name: 'Trueno', power: 110, pp: 10, type: 'electric', damageClass: 'special' },
     ],
   },
   ice: {
     physical: [
-      { id: 'ice-punch', name: 'Puño Hielo', power: 75, pp: 15, type: 'ice', damageClass: 'physical' },
-      { id: 'ice-fang', name: 'Colmillo Hielo', power: 65, pp: 15, type: 'ice', damageClass: 'physical' },
-      { id: 'icicle-crash', name: 'Alud', power: 85, pp: 10, type: 'ice', damageClass: 'physical' },
+      { stage: 1, id: 'ice-punch', name: 'Puño Hielo', power: 75, pp: 15, type: 'ice', damageClass: 'physical' },
+      { stage: 2, id: 'ice-fang', name: 'Colmillo Hielo', power: 65, pp: 15, type: 'ice', damageClass: 'physical' },
+      { stage: 3, id: 'icicle-crash', name: 'Alud', power: 85, pp: 10, type: 'ice', damageClass: 'physical' },
     ],
     special: [
-      { id: 'powder-snow', name: 'Polvo de Nieve', power: 40, pp: 25, type: 'ice', damageClass: 'special' },
-      { id: 'ice-beam', name: 'Rayo Hielo', power: 90, pp: 10, type: 'ice', damageClass: 'special' },
-      { id: 'blizzard', name: 'Ventisca', power: 110, pp: 5, type: 'ice', damageClass: 'special' },
+      { stage: 1, id: 'powder-snow', name: 'Polvo de Nieve', power: 40, pp: 25, type: 'ice', damageClass: 'special' },
+      { stage: 2, mt: true, id: 'ice-beam', name: 'Rayo Hielo', power: 90, pp: 10, type: 'ice', damageClass: 'special' },
+      { stage: 3, id: 'blizzard', name: 'Ventisca', power: 110, pp: 5, type: 'ice', damageClass: 'special' },
     ],
   },
   fighting: {
     physical: [
-      { id: 'karate-chop', name: 'Golpe Karate', power: 50, pp: 25, type: 'fighting', damageClass: 'physical', effectId: 'raise-atk-20' },
-      { id: 'brick-break', name: 'Romperrocas', power: 75, pp: 15, type: 'fighting', damageClass: 'physical' },
-      { id: 'close-combat', name: 'A Bocajarro', power: 120, pp: 5, type: 'fighting', damageClass: 'physical' },
+      { stage: 1, id: 'karate-chop', name: 'Golpe Karate', power: 50, pp: 25, type: 'fighting', damageClass: 'physical', effectId: 'raise-atk-20' },
+      { stage: 2, id: 'brick-break', name: 'Romperrocas', power: 75, pp: 15, type: 'fighting', damageClass: 'physical' },
+      { stage: 3, id: 'close-combat', name: 'A Bocajarro', power: 120, pp: 5, type: 'fighting', damageClass: 'physical' },
     ],
     special: [
-      { id: 'vacuum-wave', name: 'Onda Vacio', power: 40, pp: 30, type: 'fighting', damageClass: 'special' },
-      { id: 'aura-sphere', name: 'Esfera Aural', power: 80, pp: 20, type: 'fighting', damageClass: 'special' },
-      { id: 'focus-blast', name: 'Onda Certera', power: 120, pp: 5, type: 'fighting', damageClass: 'special' },
+      { stage: 1, id: 'vacuum-wave', name: 'Onda Vacio', power: 40, pp: 30, type: 'fighting', damageClass: 'special' },
+      { stage: 2, id: 'aura-sphere', name: 'Esfera Aural', power: 80, pp: 20, type: 'fighting', damageClass: 'special' },
+      { stage: 3, id: 'focus-blast', name: 'Onda Certera', power: 120, pp: 5, type: 'fighting', damageClass: 'special' },
     ],
   },
   poison: {
     physical: [
-      { id: 'poison-sting', name: 'Aguijon Toxico', power: 35, pp: 35, type: 'poison', damageClass: 'physical', effectId: 'poison-25' },
-      { id: 'poison-jab', name: 'Puya Nociva', power: 75, pp: 20, type: 'poison', damageClass: 'physical', effectId: 'poison-50' },
-      { id: 'gunk-shot', name: 'Lanza Mugre', power: 120, pp: 5, type: 'poison', damageClass: 'physical' },
+      { stage: 1, id: 'poison-sting', name: 'Aguijon Toxico', power: 35, pp: 35, type: 'poison', damageClass: 'physical', effectId: 'poison-25' },
+      { stage: 2, id: 'poison-jab', name: 'Puya Nociva', power: 75, pp: 20, type: 'poison', damageClass: 'physical', effectId: 'poison-50' },
+      { stage: 3, id: 'gunk-shot', name: 'Lanza Mugre', power: 120, pp: 5, type: 'poison', damageClass: 'physical' },
     ],
     special: [
-      { id: 'poison-powder', name: 'Polvo Veneno', power: 50, pp: 35, type: 'poison', damageClass: 'special', effectId: 'poison-25' },
-      { id: 'sludge-bomb', name: 'Bomba Lodo', power: 90, pp: 10, type: 'poison', damageClass: 'special' },
-      { id: 'sludge-wave', name: 'Onda Toxica', power: 95, pp: 10, type: 'poison', damageClass: 'special' },
+      { stage: 1, id: 'poison-powder', name: 'Polvo Veneno', power: 50, pp: 35, type: 'poison', damageClass: 'special', effectId: 'poison-25' },
+      { stage: 2, id: 'sludge-bomb', name: 'Bomba Lodo', power: 90, pp: 10, type: 'poison', damageClass: 'special' },
+      { stage: 3, id: 'sludge-wave', name: 'Onda Toxica', power: 95, pp: 10, type: 'poison', damageClass: 'special' },
     ],
   },
   ground: {
     physical: [
-      { id: 'bulldoze', name: 'Terratemblor', power: 60, pp: 20, type: 'ground', damageClass: 'physical' },
-      { id: 'stomping-tantrum', name: 'Pataleta', power: 85, pp: 10, type: 'ground', damageClass: 'physical' },
-      { id: 'earthquake', name: 'Terremoto', power: 100, pp: 10, type: 'ground', damageClass: 'physical' },
+      { stage: 1, id: 'bulldoze', name: 'Terratemblor', power: 60, pp: 20, type: 'ground', damageClass: 'physical' },
+      { stage: 2, id: 'stomping-tantrum', name: 'Pataleta', power: 85, pp: 10, type: 'ground', damageClass: 'physical' },
+      { stage: 3, mt: true, id: 'earthquake', name: 'Terremoto', power: 100, pp: 10, type: 'ground', damageClass: 'physical' },
     ],
     special: [
-      { id: 'mud-shot', name: 'Disparo Lodo', power: 55, pp: 15, type: 'ground', damageClass: 'special' },
-      { id: 'earth-power', name: 'Tierra Viva', power: 90, pp: 10, type: 'ground', damageClass: 'special' },
-      { id: 'sandsear-storm', name: 'Simún de Arena', power: 100, pp: 5, type: 'ground', damageClass: 'special' },
+      { stage: 1, id: 'mud-shot', name: 'Disparo Lodo', power: 55, pp: 15, type: 'ground', damageClass: 'special' },
+      { stage: 2, id: 'earth-power', name: 'Tierra Viva', power: 90, pp: 10, type: 'ground', damageClass: 'special' },
+      { stage: 3, id: 'sandsear-storm', name: 'Simún de Arena', power: 100, pp: 5, type: 'ground', damageClass: 'special' },
     ],
   },
   flying: {
     physical: [
-      { id: 'peck', name: 'Picotazo', power: 35, pp: 35, type: 'flying', damageClass: 'physical', effectId: 'lower-atk-10' },
-      { id: 'wing-attack', name: 'Ataque Ala', power: 60, pp: 35, type: 'flying', damageClass: 'physical' },
-      { id: 'brave-bird', name: 'Pajaro Osado', power: 120, pp: 15, type: 'flying', damageClass: 'physical' },
+      { stage: 1, id: 'peck', name: 'Picotazo', power: 35, pp: 35, type: 'flying', damageClass: 'physical', effectId: 'lower-atk-10' },
+      { stage: 2, id: 'wing-attack', name: 'Ataque Ala', power: 60, pp: 35, type: 'flying', damageClass: 'physical' },
+      { stage: 3, id: 'brave-bird', name: 'Pajaro Osado', power: 120, pp: 15, type: 'flying', damageClass: 'physical' },
     ],
     special: [
-      { id: 'gust', name: 'Tornado', power: 40, pp: 35, type: 'flying', damageClass: 'special', effectId: 'lower-atk-10' },
-      { id: 'air-slash', name: 'Tajo Aereo', power: 75, pp: 20, type: 'flying', damageClass: 'special' },
-      { id: 'hurricane', name: 'Huracan', power: 110, pp: 10, type: 'flying', damageClass: 'special' },
+      { stage: 1, id: 'gust', name: 'Tornado', power: 40, pp: 35, type: 'flying', damageClass: 'special', effectId: 'lower-atk-10' },
+      { stage: 2, id: 'air-slash', name: 'Tajo Aereo', power: 75, pp: 20, type: 'flying', damageClass: 'special' },
+      { stage: 3, id: 'hurricane', name: 'Huracan', power: 110, pp: 10, type: 'flying', damageClass: 'special' },
     ],
   },
   psychic: {
     physical: [
-      { id: 'zen-headbutt', name: 'Cabezazo Zen', power: 80, pp: 15, type: 'psychic', damageClass: 'physical' },
-      { id: 'psycho-cut', name: 'Psicucuchilla', power: 70, pp: 20, type: 'psychic', damageClass: 'physical' },
-      { id: 'photo-geyser', name: 'Fotogeyser', power: 100, pp: 10, type: 'psychic', damageClass: 'physical' },
+      { stage: 1, id: 'zen-headbutt', name: 'Cabezazo Zen', power: 80, pp: 15, type: 'psychic', damageClass: 'physical' },
+      { stage: 2, id: 'psycho-cut', name: 'Psicucuchilla', power: 70, pp: 20, type: 'psychic', damageClass: 'physical' },
+      { stage: 3, id: 'photo-geyser', name: 'Fotogeyser', power: 100, pp: 10, type: 'psychic', damageClass: 'physical' },
     ],
     special: [
-      { id: 'confusion', name: 'Confusion', power: 25, pp: 25, type: 'psychic', damageClass: 'special', effectId: 'double-hit' },
-      { id: 'psychic', name: 'Psiquico', power: 70, pp: 10, type: 'psychic', damageClass: 'special', effectId: 'clear' },
-      { id: 'psystrike', name: 'Golpe Psi', power: 100, pp: 10, type: 'psychic', damageClass: 'special' },
+      { stage: 1, id: 'confusion', name: 'Confusion', power: 25, pp: 25, type: 'psychic', damageClass: 'special', effectId: 'double-hit' },
+      { stage: 2, id: 'psychic', name: 'Psiquico', power: 70, pp: 10, type: 'psychic', damageClass: 'special', effectId: 'clear' },
+      { stage: 3, id: 'psystrike', name: 'Golpe Psi', power: 100, pp: 10, type: 'psychic', damageClass: 'special' },
       { id: 'teleport', name: 'Teletransporte', power: 0, pp: 99, type: 'psychic', damageClass: 'special', boss: true },
       { id: 'trick', name: 'Truco', power: 30, pp: 99, type: 'psychic', damageClass: 'special', boss: true, effectId: ['clear', 'sleep', 'lower-spd-20'] },
     ],
   },
   bug: {
     physical: [
-      { id: 'bug-bite', name: 'Picadura', power: 35, pp: 20, type: 'bug', damageClass: 'physical', effectId: 'recoil-10' },
-      { id: 'x-scissor', name: 'Tijera X', power: 65, pp: 15, type: 'bug', damageClass: 'physical', effectId: 'recoil-10' },
-      { id: 'megahorn', name: 'Megacuerno', power: 100, pp: 10, type: 'bug', damageClass: 'physical', effectId: 'recoil-10' },
+      { stage: 1, id: 'bug-bite', name: 'Picadura', power: 35, pp: 20, type: 'bug', damageClass: 'physical', effectId: 'recoil-10' },
+      { stage: 2, id: 'x-scissor', name: 'Tijera X', power: 65, pp: 15, type: 'bug', damageClass: 'physical', effectId: 'recoil-10' },
+      { stage: 3, id: 'megahorn', name: 'Megacuerno', power: 100, pp: 10, type: 'bug', damageClass: 'physical', effectId: 'recoil-10' },
     ],
     special: [
-      { id: 'infestation', name: 'Infestacion', power: 20, pp: 20, type: 'bug', damageClass: 'special' },
-      { id: 'signal-beam', name: 'Rayo Señal', power: 75, pp: 15, type: 'bug', damageClass: 'special' },
-      { id: 'bug-buzz', name: 'Zumbido', power: 90, pp: 10, type: 'bug', damageClass: 'special' },
+      { stage: 1, id: 'infestation', name: 'Infestacion', power: 20, pp: 20, type: 'bug', damageClass: 'special' },
+      { stage: 2, id: 'signal-beam', name: 'Rayo Señal', power: 75, pp: 15, type: 'bug', damageClass: 'special' },
+      { stage: 3, id: 'bug-buzz', name: 'Zumbido', power: 90, pp: 10, type: 'bug', damageClass: 'special' },
     ],
   },
   rock: {
     physical: [
-      { id: 'rock-throw', name: 'Lanzarrocas', power: 50, pp: 15, type: 'rock', damageClass: 'physical', effectId: 'flinch-20' },
-      { id: 'rock-slide', name: 'Avalancha', power: 75, pp: 10, type: 'rock', damageClass: 'physical', effectId: 'flinch-20' },
-      { id: 'stone-edge', name: 'Roca Afilada', power: 100, pp: 5, type: 'rock', damageClass: 'physical', effectId: 'flinch-30' },
+      { stage: 1, id: 'rock-throw', name: 'Lanzarrocas', power: 50, pp: 15, type: 'rock', damageClass: 'physical', effectId: 'flinch-20' },
+      { stage: 2, id: 'rock-slide', name: 'Avalancha', power: 75, pp: 10, type: 'rock', damageClass: 'physical', effectId: 'flinch-20' },
+      { stage: 3, id: 'stone-edge', name: 'Roca Afilada', power: 100, pp: 5, type: 'rock', damageClass: 'physical', effectId: 'flinch-30' },
     ],
     special: [
-      { id: 'power-gem', name: 'Joya de Luz', power: 80, pp: 20, type: 'rock', damageClass: 'special' },
-      { id: 'tar-shot', name: 'Alquitranazo', power: 60, pp: 15, type: 'rock', damageClass: 'special' },
-      { id: 'meteor-beam', name: 'Rayo Meteoro', power: 120, pp: 10, type: 'rock', damageClass: 'special' },
+      { stage: 1, id: 'power-gem', name: 'Joya de Luz', power: 80, pp: 20, type: 'rock', damageClass: 'special' },
+      { stage: 2, id: 'tar-shot', name: 'Alquitranazo', power: 60, pp: 15, type: 'rock', damageClass: 'special' },
+      { stage: 3, id: 'meteor-beam', name: 'Rayo Meteoro', power: 120, pp: 10, type: 'rock', damageClass: 'special' },
     ],
   },
   ghost: {
     physical: [
-      { id: 'shadow-sneak', name: 'Sombra Ninja', power: 40, pp: 30, type: 'ghost', damageClass: 'physical' },
-      { id: 'shadow-claw', name: 'Garra Umbria', power: 70, pp: 15, type: 'ghost', damageClass: 'physical' },
-      { id: 'phantom-force', name: 'Fuerza Fantasma', power: 90, pp: 10, type: 'ghost', damageClass: 'physical' },
+      { stage: 1, id: 'shadow-sneak', name: 'Sombra Ninja', power: 40, pp: 30, type: 'ghost', damageClass: 'physical' },
+      { stage: 2, id: 'shadow-claw', name: 'Garra Umbria', power: 70, pp: 15, type: 'ghost', damageClass: 'physical' },
+      { stage: 3, id: 'phantom-force', name: 'Fuerza Fantasma', power: 90, pp: 10, type: 'ghost', damageClass: 'physical' },
     ],
     special: [
-      { id: 'hex', name: 'Maldicion', power: 65, pp: 10, type: 'ghost', damageClass: 'special' },
-      { id: 'shadow-ball', name: 'Bola Sombra', power: 80, pp: 15, type: 'ghost', damageClass: 'special' },
-      { id: 'astral-barrage', name: 'Bombardeo Astral', power: 120, pp: 5, type: 'ghost', damageClass: 'special' },
+      { stage: 1, id: 'hex', name: 'Maldicion', power: 65, pp: 10, type: 'ghost', damageClass: 'special' },
+      { stage: 2, id: 'shadow-ball', name: 'Bola Sombra', power: 80, pp: 15, type: 'ghost', damageClass: 'special' },
+      { stage: 3, id: 'astral-barrage', name: 'Bombardeo Astral', power: 120, pp: 5, type: 'ghost', damageClass: 'special' },
     ],
   },
   dragon: {
     physical: [
-      { id: 'dragon-tail', name: 'Cola Dragon', power: 60, pp: 10, type: 'dragon', damageClass: 'physical' },
-      { id: 'dragon-claw', name: 'Garra Dragon', power: 80, pp: 15, type: 'dragon', damageClass: 'physical' },
-      { id: 'outrage', name: 'Furia Dragon', power: 120, pp: 10, type: 'dragon', damageClass: 'physical' },
+      { stage: 1, id: 'dragon-tail', name: 'Cola Dragon', power: 60, pp: 10, type: 'dragon', damageClass: 'physical' },
+      { stage: 2, id: 'dragon-claw', name: 'Garra Dragon', power: 80, pp: 15, type: 'dragon', damageClass: 'physical' },
+      { stage: 3, id: 'outrage', name: 'Furia Dragon', power: 120, pp: 10, type: 'dragon', damageClass: 'physical' },
     ],
     special: [
-      { id: 'dragon-rage', name: 'Ira Dragon', power: 40, pp: 10, type: 'dragon', damageClass: 'special' },
-      { id: 'dragon-pulse', name: 'Pulso Dragon', power: 85, pp: 10, type: 'dragon', damageClass: 'special' },
-      { id: 'draco-meteor', name: 'Dracometeoro', power: 130, pp: 5, type: 'dragon', damageClass: 'special' },
+      { stage: 1, id: 'dragon-rage', name: 'Ira Dragon', power: 40, pp: 10, type: 'dragon', damageClass: 'special' },
+      { stage: 2, id: 'dragon-pulse', name: 'Pulso Dragon', power: 85, pp: 10, type: 'dragon', damageClass: 'special' },
+      { stage: 3, id: 'draco-meteor', name: 'Dracometeoro', power: 130, pp: 5, type: 'dragon', damageClass: 'special' },
     ],
   },
   dark: {
     physical: [
-      { id: 'bite', name: 'Mordisco', power: 60, pp: 25, type: 'dark', damageClass: 'physical' },
-      { id: 'crunch', name: 'Triturar', power: 80, pp: 15, type: 'dark', damageClass: 'physical' },
-      { id: 'wicked-blow', name: 'Golpe Perverso', power: 80, pp: 5, type: 'dark', damageClass: 'physical' },
+      { stage: 1, id: 'bite', name: 'Mordisco', power: 60, pp: 25, type: 'dark', damageClass: 'physical' },
+      { stage: 2, id: 'crunch', name: 'Triturar', power: 80, pp: 15, type: 'dark', damageClass: 'physical' },
+      { stage: 3, id: 'wicked-blow', name: 'Golpe Perverso', power: 80, pp: 5, type: 'dark', damageClass: 'physical' },
     ],
     special: [
-      { id: 'feint-attack', name: 'Ataque Furtivo', power: 60, pp: 20, type: 'dark', damageClass: 'special' },
-      { id: 'dark-pulse', name: 'Pulso Umbrio', power: 80, pp: 15, type: 'dark', damageClass: 'special' },
-      { id: 'fiery-wrath', name: 'Ira Oscura', power: 90, pp: 10, type: 'dark', damageClass: 'special' },
+      { stage: 1, id: 'feint-attack', name: 'Ataque Furtivo', power: 60, pp: 20, type: 'dark', damageClass: 'special' },
+      { stage: 2, id: 'dark-pulse', name: 'Pulso Umbrio', power: 80, pp: 15, type: 'dark', damageClass: 'special' },
+      { stage: 3, id: 'fiery-wrath', name: 'Ira Oscura', power: 90, pp: 10, type: 'dark', damageClass: 'special' },
     ],
   },
   steel: {
     physical: [
-      { id: 'metal-claw', name: 'Garra Metal', power: 50, pp: 35, type: 'steel', damageClass: 'physical' },
-      { id: 'iron-head', name: 'Cabeza de Hierro', power: 80, pp: 15, type: 'steel', damageClass: 'physical' },
-      { id: 'behemoth-blade', name: 'Hoja Behemoth', power: 100, pp: 5, type: 'steel', damageClass: 'physical' },
+      { stage: 1, id: 'metal-claw', name: 'Garra Metal', power: 50, pp: 35, type: 'steel', damageClass: 'physical' },
+      { stage: 2, id: 'iron-head', name: 'Cabeza de Hierro', power: 80, pp: 15, type: 'steel', damageClass: 'physical' },
+      { stage: 3, id: 'behemoth-blade', name: 'Hoja Behemoth', power: 100, pp: 5, type: 'steel', damageClass: 'physical' },
     ],
     special: [
-      { id: 'mirror-shot', name: 'Destello', power: 65, pp: 10, type: 'steel', damageClass: 'special' },
-      { id: 'flash-cannon', name: 'Canon Destello', power: 80, pp: 10, type: 'steel', damageClass: 'special' },
-      { id: 'steel-beam', name: 'Rayo Acero', power: 140, pp: 5, type: 'steel', damageClass: 'special' },
+      { stage: 1, id: 'mirror-shot', name: 'Destello', power: 65, pp: 10, type: 'steel', damageClass: 'special' },
+      { stage: 2, id: 'flash-cannon', name: 'Canon Destello', power: 80, pp: 10, type: 'steel', damageClass: 'special' },
+      { stage: 3, id: 'steel-beam', name: 'Rayo Acero', power: 140, pp: 5, type: 'steel', damageClass: 'special' },
     ],
   },
   fairy: {
     physical: [
-      { id: 'fairy-wind', name: 'Viento Feerico', power: 40, pp: 30, type: 'fairy', damageClass: 'physical' },
-      { id: 'play-rough', name: 'Carantoña', power: 90, pp: 10, type: 'fairy', damageClass: 'physical' },
-      { id: 'tectonic-rage', name: 'Furia Telurica', power: 100, pp: 10, type: 'fairy', damageClass: 'physical' },
+      { stage: 1, id: 'fairy-wind', name: 'Viento Feerico', power: 40, pp: 30, type: 'fairy', damageClass: 'physical' },
+      { stage: 2, id: 'play-rough', name: 'Carantoña', power: 90, pp: 10, type: 'fairy', damageClass: 'physical' },
+      { stage: 3, id: 'tectonic-rage', name: 'Furia Telurica', power: 100, pp: 10, type: 'fairy', damageClass: 'physical' },
     ],
     special: [
-      { id: 'disarming-voice', name: 'Voz Cautivadora', power: 40, pp: 15, type: 'fairy', damageClass: 'special', effectId: 'sleep-10' },
-      { id: 'moonblast', name: 'Fuerza Lunar', power: 95, pp: 15, type: 'fairy', damageClass: 'special', efectId: 'lower-spd-20-20' },
-      { id: 'sparkling-aria', name: 'Aria Luminosa', power: 90, pp: 10, type: 'fairy', damageClass: 'special' },
+      { stage: 1, id: 'disarming-voice', name: 'Voz Cautivadora', power: 40, pp: 15, type: 'fairy', damageClass: 'special', effectId: 'sleep-10' },
+      { stage: 2, id: 'moonblast', name: 'Fuerza Lunar', power: 95, pp: 15, type: 'fairy', damageClass: 'special', efectId: 'lower-spd-20-20' },
+      { stage: 3, id: 'sparkling-aria', name: 'Aria Luminosa', power: 90, pp: 10, type: 'fairy', damageClass: 'special' },
     ],
   },
 };
@@ -282,30 +282,22 @@ function getEvolutionStage(pokemonName) {
   return hasPrev ? 1 : 0;
 }
 
-// buildMoves: devuelve todos los movimientos disponibles hasta la stage del pokemon
-// Stage 0 (base)   → solo el 1er movimiento de cada tipo (moveLevel 0)
-// Stage 1 (media)  → los 2 primeros de cada tipo (moveLevel 0 y 1)
-// Stage 2+ (final) → los 3 de cada tipo (moveLevel 0, 1 y 2)
-function buildMoves(pokemonName, _unused) {
+// buildMoves: incluye los movimientos cuyo move.stage <= POKEMON_DB[name].stage.
+// Boss:true nunca se incluye — solo accesibles vía moveId explícito en routes.js.
+function buildMoves(pokemonName) {
   const dbEntry = POKEMON_DB[pokemonName.toLowerCase()];
   if (!dbEntry) {
     return [{ id: 'tackle', name: 'Placaje', power: 40, type: 'normal', damageClass: 'physical', pp: 35, maxPp: 35 }];
   }
 
-  const stage = getEvolutionStage(pokemonName);
-  const maxIdx = Math.min(stage, 2); // 0, 1 o 2
+  const pokemonStage = dbEntry.stage ?? 3;
   const moves = [];
   const seenIds = new Set();
 
   for (const line of dbEntry.moveLines) {
     const progression = getMoveProgression(line.type, line.damageClass);
-    // Añadir todos los movimientos hasta maxIdx
-    for (let i = 0; i <= maxIdx; i++) {
-      const move = progression[i];
-      // Los movimientos marcados boss:true NUNCA forman parte del moveset
-      // normal — solo son accesibles si se hardcodean explícitamente vía
-      // moveId en routes.js (ver createPokemon en pokemon.js)
-      if (move && !move.boss && !seenIds.has(move.id)) {
+    for (const move of progression) {
+      if (move && !move.boss && !move.mt && (move.stage ?? 1) <= pokemonStage && !seenIds.has(move.id)) {
         seenIds.add(move.id);
         moves.push({ ...move, maxPp: move.pp });
       }

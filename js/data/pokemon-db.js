@@ -1,275 +1,276 @@
-// pokemon-db.js — tipos, clase de daño, moveLines y cadenas de evolución
+// pokemon-db.js — tipos, clase de daño, moveLines, cadenas de evolución y stage
+// stage: 1=1er mov por línea | 2=2 primeros | 3=los 3
 // evolvesAt: nivel de evolución | evolvesInto: nombre PokeAPI de la forma siguiente
 
 var POKEMON_DB = {
   // ── Starters ──────────────────────────────────────────────────────────────
-  bulbasaur: { types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 16, evolvesInto: 'ivysaur' },
-  ivysaur: { types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 32, evolvesInto: 'venusaur' },
-  venusaur: { types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }] },
-  charmander: { types: ['fire'], damageClass: 'special', moveLines: [{ type: 'fire', damageClass: 'special' }], evolvesAt: 16, evolvesInto: 'charmeleon' },
-  charmeleon: { types: ['fire'], damageClass: 'special', moveLines: [{ type: 'fire', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'charizard' },
-  charizard: { types: ['fire', 'flying'], damageClass: 'special', moveLines: [{ type: 'fire', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }] },
-  squirtle: { types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }], evolvesAt: 16, evolvesInto: 'wartortle' },
-  wartortle: { types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'blastoise' },
-  blastoise: { types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }] },
+  bulbasaur:  { stage: 1, types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 16, evolvesInto: 'ivysaur' },
+  ivysaur:    { stage: 2, types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 32, evolvesInto: 'venusaur' },
+  venusaur:   { stage: 3, types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }] },
+  charmander: { stage: 1, types: ['fire'], damageClass: 'special', moveLines: [{ type: 'fire', damageClass: 'special' }], evolvesAt: 16, evolvesInto: 'charmeleon' },
+  charmeleon: { stage: 2, types: ['fire'], damageClass: 'special', moveLines: [{ type: 'fire', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'charizard' },
+  charizard:  { stage: 3, types: ['fire', 'flying'], damageClass: 'special', moveLines: [{ type: 'fire', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }] },
+  squirtle:   { stage: 1, types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }], evolvesAt: 16, evolvesInto: 'wartortle' },
+  wartortle:  { stage: 2, types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'blastoise' },
+  blastoise:  { stage: 3, types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }] },
 
   // ── Bug / Poison ──────────────────────────────────────────────────────────
-  caterpie: { types: ['bug'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }], evolvesAt: 7, evolvesInto: 'metapod' },
-  metapod: { types: ['bug'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }], evolvesAt: 10, evolvesInto: 'butterfree' },
-  butterfree: { types: ['bug', 'flying'], damageClass: 'special', moveLines: [{ type: 'bug', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }] },
-  weedle: { types: ['bug', 'poison'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'poison', damageClass: 'physical' }], evolvesAt: 7, evolvesInto: 'kakuna' },
-  kakuna: { types: ['bug', 'poison'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'poison', damageClass: 'physical' }], evolvesAt: 10, evolvesInto: 'beedrill' },
-  beedrill: { types: ['bug', 'poison'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'poison', damageClass: 'physical' }] },
+  caterpie:   { stage: 1, types: ['bug'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }], evolvesAt: 7, evolvesInto: 'metapod' },
+  metapod:    { stage: 2, types: ['bug'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }], evolvesAt: 10, evolvesInto: 'butterfree' },
+  butterfree: { stage: 3, types: ['bug', 'flying'], damageClass: 'special', moveLines: [{ type: 'bug', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }] },
+  weedle:     { stage: 1, types: ['bug', 'poison'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'poison', damageClass: 'physical' }], evolvesAt: 7, evolvesInto: 'kakuna' },
+  kakuna:     { stage: 2, types: ['bug', 'poison'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'poison', damageClass: 'physical' }], evolvesAt: 10, evolvesInto: 'beedrill' },
+  beedrill:   { stage: 3, types: ['bug', 'poison'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'poison', damageClass: 'physical' }] },
 
   // ── Flying / Normal ───────────────────────────────────────────────────────
-  pidgey: { types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 18, evolvesInto: 'pidgeotto' },
-  pidgeotto: { types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 36, evolvesInto: 'pidgeot' },
-  pidgeot: { types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
-  rattata: { types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }], evolvesAt: 20, evolvesInto: 'raticate' },
-  raticate: { types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }] },
-  spearow: { types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 20, evolvesInto: 'fearow' },
-  fearow: { types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
+  pidgey:     { stage: 1, types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 18, evolvesInto: 'pidgeotto' },
+  pidgeotto:  { stage: 2, types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 36, evolvesInto: 'pidgeot' },
+  pidgeot:    { stage: 3, types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
+  rattata:    { stage: 1, types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }], evolvesAt: 20, evolvesInto: 'raticate' },
+  raticate:   { stage: 2, types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }] },
+  spearow:    { stage: 1, types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 20, evolvesInto: 'fearow' },
+  fearow:     { stage: 2, types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
 
   // ── Poison / Snake ────────────────────────────────────────────────────────
-  ekans: { types: ['poison'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 22, evolvesInto: 'arbok' },
-  arbok: { types: ['poison'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
+  ekans:      { stage: 1, types: ['poison'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 22, evolvesInto: 'arbok' },
+  arbok:      { stage: 3, types: ['poison'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
 
   // ── Electric ──────────────────────────────────────────────────────────────
-  pikachu: { types: ['electric'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }], evolvesAt: 40, evolvesInto: 'raichu' },
-  raichu: { types: ['electric'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }] },
+  pikachu:    { stage: 1, types: ['electric'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }], evolvesAt: 40, evolvesInto: 'raichu' },
+  raichu:     { stage: 3, types: ['electric'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }] },
 
   // ── Ground ────────────────────────────────────────────────────────────────
-  sandshrew: { types: ['ground'], damageClass: 'physical', moveLines: [{ type: 'ground', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 22, evolvesInto: 'sandslash' },
-  sandslash: { types: ['ground'], damageClass: 'physical', moveLines: [{ type: 'ground', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
+  sandshrew:  { stage: 1, types: ['ground'], damageClass: 'physical', moveLines: [{ type: 'ground', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 22, evolvesInto: 'sandslash' },
+  sandslash:  { stage: 3, types: ['ground'], damageClass: 'physical', moveLines: [{ type: 'ground', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
 
   // ── Nidoran ───────────────────────────────────────────────────────────────
-  'nidoran-f': { types: ['poison'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 16, evolvesInto: 'nidorina' },
-  nidorina: { types: ['poison'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 36, evolvesInto: 'nidoqueen' },
-  nidoqueen: { types: ['poison', 'ground'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }] },
-  'nidoran-m': { types: ['poison'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 16, evolvesInto: 'nidorino' },
-  nidorino: { types: ['poison'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 36, evolvesInto: 'nidoking' },
-  nidoking: { types: ['poison', 'ground'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }] },
+  'nidoran-f': { stage: 1, types: ['poison'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 16, evolvesInto: 'nidorina' },
+  nidorina:    { stage: 2, types: ['poison'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 36, evolvesInto: 'nidoqueen' },
+  nidoqueen:   { stage: 3, types: ['poison', 'ground'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }] },
+  'nidoran-m': { stage: 1, types: ['poison'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 16, evolvesInto: 'nidorino' },
+  nidorino:    { stage: 2, types: ['poison'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 36, evolvesInto: 'nidoking' },
+  nidoking:    { stage: 3, types: ['poison', 'ground'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }] },
 
   // ── Fairy / Normal ────────────────────────────────────────────────────────
-  clefairy: { types: ['fairy'], damageClass: 'special', moveLines: [{ type: 'fairy', damageClass: 'special' }, { type: 'normal', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'clefable' },
-  clefable: { types: ['fairy'], damageClass: 'special', moveLines: [{ type: 'fairy', damageClass: 'special' }, { type: 'normal', damageClass: 'special' }] },
-  jigglypuff: { types: ['normal', 'fairy'], damageClass: 'special', moveLines: [{ type: 'normal', damageClass: 'special' }, { type: 'fairy', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'wigglytuff' },
-  wigglytuff: { types: ['normal', 'fairy'], damageClass: 'special', moveLines: [{ type: 'normal', damageClass: 'special' }, { type: 'fairy', damageClass: 'special' }] },
+  clefairy:   { stage: 1, types: ['fairy'], damageClass: 'special', moveLines: [{ type: 'fairy', damageClass: 'special' }, { type: 'normal', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'clefable' },
+  clefable:   { stage: 3, types: ['fairy'], damageClass: 'special', moveLines: [{ type: 'fairy', damageClass: 'special' }, { type: 'normal', damageClass: 'special' }] },
+  jigglypuff: { stage: 1, types: ['normal', 'fairy'], damageClass: 'special', moveLines: [{ type: 'normal', damageClass: 'special' }, { type: 'fairy', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'wigglytuff' },
+  wigglytuff: { stage: 3, types: ['normal', 'fairy'], damageClass: 'special', moveLines: [{ type: 'normal', damageClass: 'special' }, { type: 'fairy', damageClass: 'special' }] },
 
   // ── Fire fox ──────────────────────────────────────────────────────────────
-  vulpix: { types: ['fire'], damageClass: 'special', moveLines: [{ type: 'fire', damageClass: 'special' }], evolvesAt: 25, evolvesInto: 'ninetales' },
-  ninetales: { types: ['fire'], damageClass: 'special', moveLines: [{ type: 'fire', damageClass: 'special' }] },
+  vulpix:     { stage: 1, types: ['fire'], damageClass: 'special', moveLines: [{ type: 'fire', damageClass: 'special' }], evolvesAt: 25, evolvesInto: 'ninetales' },
+  ninetales:  { stage: 3, types: ['fire'], damageClass: 'special', moveLines: [{ type: 'fire', damageClass: 'special' }] },
 
   // ── Poison / Flying ───────────────────────────────────────────────────────
-  zubat: { types: ['poison', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'poison', damageClass: 'physical' }], evolvesAt: 22, evolvesInto: 'golbat' },
-  golbat: { types: ['poison', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'poison', damageClass: 'physical' }] },
+  zubat:      { stage: 1, types: ['poison', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'poison', damageClass: 'physical' }], evolvesAt: 22, evolvesInto: 'golbat' },
+  golbat:     { stage: 3, types: ['poison', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'poison', damageClass: 'physical' }] },
 
   // ── Grass / Poison ────────────────────────────────────────────────────────
-  oddish: { types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 21, evolvesInto: 'gloom' },
-  gloom: { types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'vileplume' },
-  vileplume: { types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }] },
-  paras: { types: ['bug', 'grass'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'grass', damageClass: 'physical' }], evolvesAt: 24, evolvesInto: 'parasect' },
-  parasect: { types: ['bug', 'grass'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'grass', damageClass: 'physical' }] },
+  oddish:     { stage: 1, types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 21, evolvesInto: 'gloom' },
+  gloom:      { stage: 2, types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'vileplume' },
+  vileplume:  { stage: 3, types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }] },
+  paras:      { stage: 1, types: ['bug', 'grass'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'grass', damageClass: 'physical' }], evolvesAt: 24, evolvesInto: 'parasect' },
+  parasect:   { stage: 2, types: ['bug', 'grass'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'grass', damageClass: 'physical' }] },
 
   // ── Bug / Poison ──────────────────────────────────────────────────────────
-  venonat: { types: ['bug', 'poison'], damageClass: 'special', moveLines: [{ type: 'bug', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 31, evolvesInto: 'venomoth' },
-  venomoth: { types: ['bug', 'poison'], damageClass: 'special', moveLines: [{ type: 'bug', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }] },
+  venonat:    { stage: 1, types: ['bug', 'poison'], damageClass: 'special', moveLines: [{ type: 'bug', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 31, evolvesInto: 'venomoth' },
+  venomoth:   { stage: 3, types: ['bug', 'poison'], damageClass: 'special', moveLines: [{ type: 'bug', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }] },
 
   // ── Ground ────────────────────────────────────────────────────────────────
-  diglett: { types: ['ground'], damageClass: 'physical', moveLines: [{ type: 'ground', damageClass: 'physical' }], evolvesAt: 26, evolvesInto: 'dugtrio' },
-  dugtrio: { types: ['ground'], damageClass: 'physical', moveLines: [{ type: 'ground', damageClass: 'physical' }] },
+  diglett:    { stage: 1, types: ['ground'], damageClass: 'physical', moveLines: [{ type: 'ground', damageClass: 'physical' }], evolvesAt: 26, evolvesInto: 'dugtrio' },
+  dugtrio:    { stage: 2, types: ['ground'], damageClass: 'physical', moveLines: [{ type: 'ground', damageClass: 'physical' }] },
 
   // ── Normal ────────────────────────────────────────────────────────────────
-  meowth: { types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }], evolvesAt: 28, evolvesInto: 'persian' },
-  persian: { types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }] },
+  meowth:     { stage: 1, types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }], evolvesAt: 28, evolvesInto: 'persian' },
+  persian:    { stage: 2, types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }] },
 
   // ── Water ─────────────────────────────────────────────────────────────────
-  psyduck: { types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }], evolvesAt: 33, evolvesInto: 'golduck' },
-  golduck: { types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }] },
+  psyduck:    { stage: 1, types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }], evolvesAt: 33, evolvesInto: 'golduck' },
+  golduck:    { stage: 2, types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }] },
 
   // ── Fighting ──────────────────────────────────────────────────────────────
-  mankey: { types: ['fighting'], damageClass: 'physical', moveLines: [{ type: 'fighting', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 28, evolvesInto: 'primeape' },
-  primeape: { types: ['fighting'], damageClass: 'physical', moveLines: [{ type: 'fighting', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
+  mankey:     { stage: 1, types: ['fighting'], damageClass: 'physical', moveLines: [{ type: 'fighting', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 28, evolvesInto: 'primeape' },
+  primeape:   { stage: 3, types: ['fighting'], damageClass: 'physical', moveLines: [{ type: 'fighting', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
 
   // ── Fire ──────────────────────────────────────────────────────────────────
-  growlithe: { types: ['fire'], damageClass: 'physical', moveLines: [{ type: 'fire', damageClass: 'physical' }], evolvesAt: 30, evolvesInto: 'arcanine' },
-  arcanine: { types: ['fire'], damageClass: 'physical', moveLines: [{ type: 'fire', damageClass: 'physical' }] },
+  growlithe:  { stage: 1, types: ['fire'], damageClass: 'physical', moveLines: [{ type: 'fire', damageClass: 'physical' }], evolvesAt: 30, evolvesInto: 'arcanine' },
+  arcanine:   { stage: 3, types: ['fire'], damageClass: 'physical', moveLines: [{ type: 'fire', damageClass: 'physical' }] },
 
   // ── Water ─────────────────────────────────────────────────────────────────
-  poliwag: { types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }], evolvesAt: 25, evolvesInto: 'poliwhirl' },
-  poliwhirl: { types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'poliwrath' },
-  poliwrath: { types: ['water', 'fighting'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'fighting', damageClass: 'physical' }] },
+  poliwag:    { stage: 1, types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }], evolvesAt: 25, evolvesInto: 'poliwhirl' },
+  poliwhirl:  { stage: 2, types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'poliwrath' },
+  poliwrath:  { stage: 3, types: ['water', 'fighting'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'fighting', damageClass: 'physical' }] },
 
   // ── Psychic ───────────────────────────────────────────────────────────────
-  abra: { types: ['psychic'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }], evolvesAt: 16, evolvesInto: 'kadabra' },
-  kadabra: { types: ['psychic'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'alakazam' },
-  alakazam: { types: ['psychic'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }] },
+  abra:       { stage: 1, types: ['psychic'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }], evolvesAt: 16, evolvesInto: 'kadabra' },
+  kadabra:    { stage: 2, types: ['psychic'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'alakazam' },
+  alakazam:   { stage: 3, types: ['psychic'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }] },
 
   // ── Fighting ──────────────────────────────────────────────────────────────
-  machop: { types: ['fighting'], damageClass: 'physical', moveLines: [{ type: 'fighting', damageClass: 'physical' }], evolvesAt: 28, evolvesInto: 'machoke' },
-  machoke: { types: ['fighting'], damageClass: 'physical', moveLines: [{ type: 'fighting', damageClass: 'physical' }], evolvesAt: 36, evolvesInto: 'machamp' },
-  machamp: { types: ['fighting'], damageClass: 'physical', moveLines: [{ type: 'fighting', damageClass: 'physical' }] },
+  machop:     { stage: 1, types: ['fighting'], damageClass: 'physical', moveLines: [{ type: 'fighting', damageClass: 'physical' }], evolvesAt: 28, evolvesInto: 'machoke' },
+  machoke:    { stage: 2, types: ['fighting'], damageClass: 'physical', moveLines: [{ type: 'fighting', damageClass: 'physical' }], evolvesAt: 36, evolvesInto: 'machamp' },
+  machamp:    { stage: 3, types: ['fighting'], damageClass: 'physical', moveLines: [{ type: 'fighting', damageClass: 'physical' }] },
 
   // ── Grass / Poison ────────────────────────────────────────────────────────
-  bellsprout: { types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 21, evolvesInto: 'weepinbell' },
-  weepinbell: { types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'victreebel' },
-  victreebel: { types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }] },
+  bellsprout: { stage: 1, types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 21, evolvesInto: 'weepinbell' },
+  weepinbell: { stage: 2, types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'victreebel' },
+  victreebel: { stage: 3, types: ['grass', 'poison'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }] },
 
   // ── Water / Poison ────────────────────────────────────────────────────────
-  tentacool: { types: ['water', 'poison'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 30, evolvesInto: 'tentacruel' },
-  tentacruel: { types: ['water', 'poison'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }] },
+  tentacool:  { stage: 1, types: ['water', 'poison'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 30, evolvesInto: 'tentacruel' },
+  tentacruel: { stage: 3, types: ['water', 'poison'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }] },
 
   // ── Rock / Ground ─────────────────────────────────────────────────────────
-  geodude: { types: ['rock', 'ground'], damageClass: 'physical', moveLines: [{ type: 'rock', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }], evolvesAt: 25, evolvesInto: 'graveler' },
-  graveler: { types: ['rock', 'ground'], damageClass: 'physical', moveLines: [{ type: 'rock', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }], evolvesAt: 36, evolvesInto: 'golem' },
-  golem: { types: ['rock', 'ground'], damageClass: 'physical', moveLines: [{ type: 'rock', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }] },
+  geodude:    { stage: 1, types: ['rock', 'ground'], damageClass: 'physical', moveLines: [{ type: 'rock', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }], evolvesAt: 25, evolvesInto: 'graveler' },
+  graveler:   { stage: 2, types: ['rock', 'ground'], damageClass: 'physical', moveLines: [{ type: 'rock', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }], evolvesAt: 36, evolvesInto: 'golem' },
+  golem:      { stage: 3, types: ['rock', 'ground'], damageClass: 'physical', moveLines: [{ type: 'rock', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }] },
 
   // ── Fire ──────────────────────────────────────────────────────────────────
-  ponyta: { types: ['fire'], damageClass: 'physical', moveLines: [{ type: 'fire', damageClass: 'physical' }], evolvesAt: 40, evolvesInto: 'rapidash' },
-  rapidash: { types: ['fire'], damageClass: 'physical', moveLines: [{ type: 'fire', damageClass: 'physical' }] },
+  ponyta:     { stage: 1, types: ['fire'], damageClass: 'physical', moveLines: [{ type: 'fire', damageClass: 'physical' }], evolvesAt: 40, evolvesInto: 'rapidash' },
+  rapidash:   { stage: 3, types: ['fire'], damageClass: 'physical', moveLines: [{ type: 'fire', damageClass: 'physical' }] },
 
   // ── Water / Psychic ───────────────────────────────────────────────────────
-  slowpoke: { types: ['water', 'psychic'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }], evolvesAt: 37, evolvesInto: 'slowbro' },
-  slowbro: { types: ['water', 'psychic'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }] },
+  slowpoke:   { stage: 1, types: ['water', 'psychic'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }], evolvesAt: 37, evolvesInto: 'slowbro' },
+  slowbro:    { stage: 3, types: ['water', 'psychic'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }] },
 
   // ── Electric / Steel ──────────────────────────────────────────────────────
-  magnemite: { types: ['electric', 'steel'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }], evolvesAt: 30, evolvesInto: 'magneton' },
-  magneton: { types: ['electric', 'steel'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }] },
+  magnemite:  { stage: 1, types: ['electric', 'steel'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }], evolvesAt: 30, evolvesInto: 'magneton' },
+  magneton:   { stage: 3, types: ['electric', 'steel'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }] },
 
   // ── Normal / Flying ───────────────────────────────────────────────────────
-  "farfetch-d": { types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
-  doduo: { types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 31, evolvesInto: 'dodrio' },
-  dodrio: { types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
+  "farfetch-d": { stage: 2, types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
+  doduo:      { stage: 1, types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 31, evolvesInto: 'dodrio' },
+  dodrio:     { stage: 3, types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
 
   // ── Water / Ice ───────────────────────────────────────────────────────────
-  seel: { types: ['water'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'ice', damageClass: 'special' }], evolvesAt: 34, evolvesInto: 'dewgong' },
-  dewgong: { types: ['water', 'ice'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'ice', damageClass: 'special' }] },
+  seel:       { stage: 1, types: ['water'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'ice', damageClass: 'special' }], evolvesAt: 34, evolvesInto: 'dewgong' },
+  dewgong:    { stage: 3, types: ['water', 'ice'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'ice', damageClass: 'special' }] },
 
   // ── Poison ────────────────────────────────────────────────────────────────
-  grimer: { types: ['poison'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }], evolvesAt: 38, evolvesInto: 'muk' },
-  muk: { types: ['poison'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }] },
+  grimer:     { stage: 1, types: ['poison'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }], evolvesAt: 38, evolvesInto: 'muk' },
+  muk:        { stage: 3, types: ['poison'], damageClass: 'physical', moveLines: [{ type: 'poison', damageClass: 'physical' }] },
 
   // ── Water / Ice ───────────────────────────────────────────────────────────
-  shellder: { types: ['water'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'ice', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'cloyster' },
-  cloyster: { types: ['water', 'ice'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'ice', damageClass: 'special' }] },
+  shellder:   { stage: 1, types: ['water'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'ice', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'cloyster' },
+  cloyster:   { stage: 3, types: ['water', 'ice'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'ice', damageClass: 'special' }] },
 
   // ── Ghost / Poison ────────────────────────────────────────────────────────
-  gastly: { types: ['ghost', 'poison'], damageClass: 'special', moveLines: [{ type: 'ghost', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 25, evolvesInto: 'haunter' },
-  haunter: { types: ['ghost', 'poison'], damageClass: 'special', moveLines: [{ type: 'ghost', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'gengar' },
-  gengar: { types: ['ghost', 'poison'], damageClass: 'special', moveLines: [{ type: 'ghost', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }] },
+  gastly:     { stage: 1, types: ['ghost', 'poison'], damageClass: 'special', moveLines: [{ type: 'ghost', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 25, evolvesInto: 'haunter' },
+  haunter:    { stage: 2, types: ['ghost', 'poison'], damageClass: 'special', moveLines: [{ type: 'ghost', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'gengar' },
+  gengar:     { stage: 3, types: ['ghost', 'poison'], damageClass: 'special', moveLines: [{ type: 'ghost', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }] },
 
   // ── Rock / Ground ─────────────────────────────────────────────────────────
-  onix: { types: ['rock', 'ground'], damageClass: 'physical', moveLines: [{ type: 'rock', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }] },
+  onix:       { stage: 2, types: ['rock', 'ground'], damageClass: 'physical', moveLines: [{ type: 'rock', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }] },
 
   // ── Psychic ───────────────────────────────────────────────────────────────
-  drowzee: { types: ['psychic'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }], evolvesAt: 26, evolvesInto: 'hypno' },
-  hypno: { types: ['psychic'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }] },
+  drowzee:    { stage: 1, types: ['psychic'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }], evolvesAt: 26, evolvesInto: 'hypno' },
+  hypno:      { stage: 2, types: ['psychic'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }] },
 
   // ── Water ─────────────────────────────────────────────────────────────────
-  krabby: { types: ['water'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 28, evolvesInto: 'kingler' },
-  kingler: { types: ['water'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
+  krabby:     { stage: 1, types: ['water'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 28, evolvesInto: 'kingler' },
+  kingler:    { stage: 3, types: ['water'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
 
   // ── Electric ──────────────────────────────────────────────────────────────
-  voltorb: { types: ['electric'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }], evolvesAt: 30, evolvesInto: 'electrode' },
-  electrode: { types: ['electric'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }] },
+  voltorb:    { stage: 1, types: ['electric'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }], evolvesAt: 30, evolvesInto: 'electrode' },
+  electrode:  { stage: 2, types: ['electric'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }] },
 
   // ── Grass / Psychic ───────────────────────────────────────────────────────
-  exeggcute: { types: ['grass', 'psychic'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'exeggutor' },
-  exeggutor: { types: ['grass', 'psychic'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }] },
+  exeggcute:  { stage: 1, types: ['grass', 'psychic'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'exeggutor' },
+  exeggutor:  { stage: 2, types: ['grass', 'psychic'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }] },
 
   // ── Ground ────────────────────────────────────────────────────────────────
-  cubone: { types: ['ground'], damageClass: 'physical', moveLines: [{ type: 'ground', damageClass: 'physical' }], evolvesAt: 28, evolvesInto: 'marowak' },
-  marowak: { types: ['ground'], damageClass: 'physical', moveLines: [{ type: 'ground', damageClass: 'physical' }] },
+  cubone:     { stage: 1, types: ['ground'], damageClass: 'physical', moveLines: [{ type: 'ground', damageClass: 'physical' }], evolvesAt: 28, evolvesInto: 'marowak' },
+  marowak:    { stage: 2, types: ['ground'], damageClass: 'physical', moveLines: [{ type: 'ground', damageClass: 'physical' }] },
 
   // ── Fighting ──────────────────────────────────────────────────────────────
-  hitmonlee: { types: ['fighting'], damageClass: 'physical', moveLines: [{ type: 'fighting', damageClass: 'physical' }] },
-  hitmonchan: { types: ['fighting'], damageClass: 'physical', moveLines: [{ type: 'fighting', damageClass: 'physical' }] },
+  hitmonlee:  { stage: 2, types: ['fighting'], damageClass: 'physical', moveLines: [{ type: 'fighting', damageClass: 'physical' }] },
+  hitmonchan: { stage: 2, types: ['fighting'], damageClass: 'physical', moveLines: [{ type: 'fighting', damageClass: 'physical' }] },
 
   // ── Normal ────────────────────────────────────────────────────────────────
-  lickitung: { types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }] },
+  lickitung:  { stage: 3, types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }] },
 
   // ── Poison ────────────────────────────────────────────────────────────────
-  koffing: { types: ['poison'], damageClass: 'special', moveLines: [{ type: 'poison', damageClass: 'special' }], evolvesAt: 35, evolvesInto: 'weezing' },
-  weezing: { types: ['poison'], damageClass: 'special', moveLines: [{ type: 'poison', damageClass: 'special' }] },
+  koffing:    { stage: 1, types: ['poison'], damageClass: 'special', moveLines: [{ type: 'poison', damageClass: 'special' }], evolvesAt: 35, evolvesInto: 'weezing' },
+  weezing:    { stage: 2, types: ['poison'], damageClass: 'special', moveLines: [{ type: 'poison', damageClass: 'special' }] },
 
   // ── Ground / Rock ─────────────────────────────────────────────────────────
-  rhyhorn: { types: ['ground', 'rock'], damageClass: 'physical', moveLines: [{ type: 'ground', damageClass: 'physical' }, { type: 'rock', damageClass: 'physical' }], evolvesAt: 42, evolvesInto: 'rhydon' },
-  rhydon: { types: ['ground', 'rock'], damageClass: 'physical', moveLines: [{ type: 'ground', damageClass: 'physical' }, { type: 'rock', damageClass: 'physical' }] },
+  rhyhorn:    { stage: 1, types: ['ground', 'rock'], damageClass: 'physical', moveLines: [{ type: 'ground', damageClass: 'physical' }, { type: 'rock', damageClass: 'physical' }], evolvesAt: 42, evolvesInto: 'rhydon' },
+  rhydon:     { stage: 3, types: ['ground', 'rock'], damageClass: 'physical', moveLines: [{ type: 'ground', damageClass: 'physical' }, { type: 'rock', damageClass: 'physical' }] },
 
   // ── Normal ────────────────────────────────────────────────────────────────
-  chansey: { types: ['normal'], damageClass: 'special', moveLines: [{ type: 'normal', damageClass: 'special' }] },
-  tangela: { types: ['grass'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }] },
-  kangaskhan: { types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }] },
+  chansey:    { stage: 2, types: ['normal'], damageClass: 'special', moveLines: [{ type: 'normal', damageClass: 'special' }] },
+  tangela:    { stage: 2, types: ['grass'], damageClass: 'special', moveLines: [{ type: 'grass', damageClass: 'special' }] },
+  kangaskhan: { stage: 3, types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }] },
 
   // ── Water ─────────────────────────────────────────────────────────────────
-  horsea: { types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }], evolvesAt: 32, evolvesInto: 'seadra' },
-  seadra: { types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }] },
-  goldeen: { types: ['water'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'physical' }], evolvesAt: 33, evolvesInto: 'seaking' },
-  seaking: { types: ['water'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'physical' }] },
-  staryu: { types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'starmie' },
-  starmie: { types: ['water', 'psychic'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }] },
+  horsea:     { stage: 1, types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }], evolvesAt: 32, evolvesInto: 'seadra' },
+  seadra:     { stage: 2, types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }] },
+  goldeen:    { stage: 1, types: ['water'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'physical' }], evolvesAt: 33, evolvesInto: 'seaking' },
+  seaking:    { stage: 2, types: ['water'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'physical' }] },
+  staryu:     { stage: 1, types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }], evolvesAt: 36, evolvesInto: 'starmie' },
+  starmie:    { stage: 3, types: ['water', 'psychic'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }] },
 
   // ── Psychic / Fairy ───────────────────────────────────────────────────────
-  'mr-mime': { types: ['psychic', 'fairy'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }, { type: 'fairy', damageClass: 'special' }] },
+  'mr-mime':  { stage: 2, types: ['psychic', 'fairy'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }, { type: 'fairy', damageClass: 'special' }] },
 
   // ── Bug / Flying ──────────────────────────────────────────────────────────
-  scyther: { types: ['bug', 'flying'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'flying', damageClass: 'physical' }] },
+  scyther:    { stage: 2, types: ['bug', 'flying'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'flying', damageClass: 'physical' }] },
 
   // ── Ice / Psychic ─────────────────────────────────────────────────────────
-  jynx: { types: ['ice', 'psychic'], damageClass: 'special', moveLines: [{ type: 'ice', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }] },
+  jynx:       { stage: 2, types: ['ice', 'psychic'], damageClass: 'special', moveLines: [{ type: 'ice', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }] },
 
   // ── Electric / Fire ───────────────────────────────────────────────────────
-  electabuzz: { types: ['electric'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }] },
-  magmar: { types: ['fire'], damageClass: 'special', moveLines: [{ type: 'fire', damageClass: 'special' }] },
+  electabuzz: { stage: 2, types: ['electric'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }] },
+  magmar:     { stage: 2, types: ['fire'], damageClass: 'special', moveLines: [{ type: 'fire', damageClass: 'special' }] },
 
   // ── Bug ───────────────────────────────────────────────────────────────────
-  pinsir: { types: ['bug'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
+  pinsir:     { stage: 3, types: ['bug'], damageClass: 'physical', moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
 
   // ── Normal ────────────────────────────────────────────────────────────────
-  tauros: { types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }] },
+  tauros:     { stage: 3, types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }] },
 
   // ── Water ─────────────────────────────────────────────────────────────────
-  magikarp: { types: ['water'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }], evolvesAt: 20, evolvesInto: 'gyarados' },
-  gyarados: { types: ['water', 'flying'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'flying', damageClass: 'physical' }] },
-  lapras: { types: ['water', 'ice'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'ice', damageClass: 'special' }] },
+  magikarp:   { stage: 1, types: ['water'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }], evolvesAt: 20, evolvesInto: 'gyarados' },
+  gyarados:   { stage: 3, types: ['water', 'flying'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'flying', damageClass: 'physical' }] },
+  lapras:     { stage: 3, types: ['water', 'ice'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'ice', damageClass: 'special' }] },
 
   // ── Normal ────────────────────────────────────────────────────────────────
-  ditto: { types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }] },
+  ditto:      { stage: 3, types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }] },
 
   // ── Eevee line ────────────────────────────────────────────────────────────
-  eevee: { types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }] },
-  vaporeon: { types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }] },
-  jolteon: { types: ['electric'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }] },
-  flareon: { types: ['fire'], damageClass: 'special', moveLines: [{ type: 'fire', damageClass: 'special' }] },
+  eevee:      { stage: 3, types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }] },
+  vaporeon:   { stage: 3, types: ['water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }] },
+  jolteon:    { stage: 3, types: ['electric'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }] },
+  flareon:    { stage: 3, types: ['fire'], damageClass: 'special', moveLines: [{ type: 'fire', damageClass: 'special' }] },
 
   // ── Normal ────────────────────────────────────────────────────────────────
-  porygon: { types: ['normal'], damageClass: 'special', moveLines: [{ type: 'normal', damageClass: 'special' }] },
+  porygon:    { stage: 2, types: ['normal'], damageClass: 'special', moveLines: [{ type: 'normal', damageClass: 'special' }] },
 
   // ── Rock / Water ──────────────────────────────────────────────────────────
-  omanyte: { types: ['rock', 'water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'rock', damageClass: 'physical' }], evolvesAt: 40, evolvesInto: 'omastar' },
-  omastar: { types: ['rock', 'water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'rock', damageClass: 'physical' }] },
-  kabuto: { types: ['rock', 'water'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'rock', damageClass: 'physical' }], evolvesAt: 40, evolvesInto: 'kabutops' },
-  kabutops: { types: ['rock', 'water'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'rock', damageClass: 'physical' }] },
+  omanyte:    { stage: 1, types: ['rock', 'water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'rock', damageClass: 'physical' }], evolvesAt: 40, evolvesInto: 'omastar' },
+  omastar:    { stage: 3, types: ['rock', 'water'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'rock', damageClass: 'physical' }] },
+  kabuto:     { stage: 1, types: ['rock', 'water'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'rock', damageClass: 'physical' }], evolvesAt: 40, evolvesInto: 'kabutops' },
+  kabutops:   { stage: 3, types: ['rock', 'water'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'rock', damageClass: 'physical' }] },
 
   // ── Rock / Flying ─────────────────────────────────────────────────────────
-  aerodactyl: { types: ['rock', 'flying'], damageClass: 'physical', moveLines: [{ type: 'rock', damageClass: 'physical' }, { type: 'flying', damageClass: 'physical' }] },
+  aerodactyl: { stage: 3, types: ['rock', 'flying'], damageClass: 'physical', moveLines: [{ type: 'rock', damageClass: 'physical' }, { type: 'flying', damageClass: 'physical' }] },
 
   // ── Normal ────────────────────────────────────────────────────────────────
-  snorlax: { types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }] },
+  snorlax:    { stage: 3, types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }] },
 
   // ── Legendarios ───────────────────────────────────────────────────────────
-  articuno: { types: ['ice', 'flying'], damageClass: 'special', moveLines: [{ type: 'ice', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }] },
-  zapdos: { types: ['electric', 'flying'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }] },
-  moltres: { types: ['fire', 'flying'], damageClass: 'special', moveLines: [{ type: 'fire', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }] },
+  articuno:   { stage: 3, types: ['ice', 'flying'], damageClass: 'special', moveLines: [{ type: 'ice', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }] },
+  zapdos:     { stage: 3, types: ['electric', 'flying'], damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }] },
+  moltres:    { stage: 3, types: ['fire', 'flying'], damageClass: 'special', moveLines: [{ type: 'fire', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }] },
 
   // ── Dragon ────────────────────────────────────────────────────────────────
-  dratini: { types: ['dragon'], damageClass: 'special', moveLines: [{ type: 'dragon', damageClass: 'special' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 30, evolvesInto: 'dragonair' },
-  dragonair: { types: ['dragon'], damageClass: 'special', moveLines: [{ type: 'dragon', damageClass: 'special' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 55, evolvesInto: 'dragonite' },
-  dragonite: { types: ['dragon', 'flying'], damageClass: 'special', moveLines: [{ type: 'dragon', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }] },
+  dratini:    { stage: 1, types: ['dragon'], damageClass: 'special', moveLines: [{ type: 'dragon', damageClass: 'special' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 30, evolvesInto: 'dragonair' },
+  dragonair:  { stage: 2, types: ['dragon'], damageClass: 'special', moveLines: [{ type: 'dragon', damageClass: 'special' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 55, evolvesInto: 'dragonite' },
+  dragonite:  { stage: 3, types: ['dragon', 'flying'], damageClass: 'special', moveLines: [{ type: 'dragon', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }] },
 
   // ── Psychic ───────────────────────────────────────────────────────────────
-  mewtwo: { types: ['psychic'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }] },
-  mew: { types: ['psychic'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }] },
+  mewtwo:     { stage: 3, types: ['psychic'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }] },
+  mew:        { stage: 3, types: ['psychic'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }] },
 };
 
 // ── POKEMON_LIST ──────────────────────────────────────────────────────────────

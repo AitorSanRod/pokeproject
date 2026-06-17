@@ -6,7 +6,8 @@
 //
 // Claves usadas:
 //   pkmn_pokedex   → { [name]: { caught: bool } }
-//   pkmn_evs       → { [name]: { hp, atk, def, spa, spd, spe } }
+//   pkmn_evs       → { [root]: { hp, atk, def, spa, spd, spe } }
+//   pkmn_mts       → { [root]: ['move-id-1', 'move-id-2'] }  ← se borra con pokédex
 // ─────────────────────────────────────────────────────────────────────────────
 
 var Storage = {
@@ -152,6 +153,28 @@ var Storage = {
 
   getAllBadges() {
     return this._get('badges') ?? {};
+  },
+
+  // ── MTs aprendidas ───────────────────────────────────────────────────────
+  // Guardadas por raíz de cadena evolutiva, igual que los EVs.
+  // { root: ['move-id-1', 'move-id-2'] }
+  // Se reinician al borrar el storage de pokédex (misma operación de reset).
+
+  getLearnedMTs(pokemonName) {
+    const root = this.getEvolutionRoot(pokemonName);
+    const all  = this._get('mts') ?? {};
+    return all[root] ?? [];
+  },
+
+  addLearnedMT(pokemonName, moveId) {
+    const root = this.getEvolutionRoot(pokemonName);
+    const all  = this._get('mts') ?? {};
+    if (!all[root]) all[root] = [];
+    if (!all[root].includes(moveId)) {
+      all[root].push(moveId);
+      this._set('mts', all);
+      console.log(`[Storage] MT: cadena ${root} aprende ${moveId}`);
+    }
   },
 
   // ── Run State ────────────────────────────────────────────────────────────
