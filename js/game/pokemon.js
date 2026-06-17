@@ -223,8 +223,11 @@ async function evolve(pokemon, intoName) {
   newPoke.exp      = pokemon.exp;
   newPoke.expToNext = EXP_TABLE.expToNext(pokemon.level);
 
-  // moves y learnedMTs ya vienen correctos de createPokemon (stage + Storage MTs)
-  newPoke.autoMove = pokemon.autoMove ?? newPoke.moves[0]?.id ?? null;
+  // moves y learnedMTs ya vienen correctos de createPokemon (stage + Storage MTs).
+  // Mantener el autoMove previo solo si existe en el nuevo moveset; si no, primer move.
+  newPoke.autoMove = (pokemon.autoMove && newPoke.moves.find(m => m.id === pokemon.autoMove))
+    ? pokemon.autoMove
+    : newPoke.moves[0]?.id ?? null;
 
   // Recalcular stats con los nuevos IVs/EVs/naturaleza
   newPoke.stats     = computeStats(newPoke);
