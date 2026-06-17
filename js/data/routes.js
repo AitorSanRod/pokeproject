@@ -137,7 +137,6 @@ var ROUTE_DATA = {
     bg: 'assets/bg/route-22.png',
     combatBg: 'assets/bg/combate.png',
     rewardPokemon: [POKEMON.mankey, POKEMON.nidoran_f, POKEMON.nidoran_m],
-    rewardExtras: [ITEM.leftovers],
     wild: [
       { name: POKEMON.nidoran_m, rate: 35, minLv: 5, maxLv: 6, moveId: MOVES.poison.physical.poison_sting },
       { name: POKEMON.nidoran_f, rate: 35, minLv: 5, maxLv: 6, moveId: MOVES.poison.physical.poison_sting },
@@ -242,7 +241,7 @@ var ROUTE_DATA = {
     gymType: 'rock',
     badge: 'Medalla Roca',
     gymLeaderImg: 'assets/sprites/trainers/brock.png',
-    rewardExtras: [ITEM.sitrus_berry],
+    rewardExtras: [ITEM.leftovers],
     trainer: [
       {
         name: 'Hiker Rocko', img: 'assets/sprites/trainers/campista.png', rate: 100,
@@ -281,7 +280,6 @@ var ROUTE_DATA = {
     bg: 'assets/bg/ruta-3.png',
     combatBg: 'assets/bg/combate.png',
     rewardPokemon: [POKEMON.sandshrew, POKEMON.jigglypuff],
-    rewardExtras: [ITEM.assault_vest],
     wild: [
       { name: POKEMON.pidgey, rate: 20, minLv: 10, maxLv: 14, moveId: MOVES.flying.physical.peck },
       { name: POKEMON.spearow, rate: 20, minLv: 11, maxLv: 15, moveId: MOVES.flying.physical.peck },
@@ -321,7 +319,7 @@ var ROUTE_DATA = {
     bg: 'assets/bg/mt-moon.png',
     combatBg: 'assets/bg/combate-cueva.png',
     rewardPokemon: [POKEMON.zubat, POKEMON.clefairy, POKEMON.geodude],
-    rewardExtras: [ITEM.sitrus_berry, ITEM.leftovers],
+    rewardExtras: [ITEM.sitrus_berry],
     wild: [
       { name: POKEMON.zubat, rate: 30, minLv: 10, maxLv: 14, moveId: MOVES.flying.physical.peck },
       { name: POKEMON.zubat, rate: 30, minLv: 11, maxLv: 14, moveId: MOVES.poison.physical.poison_jab },
