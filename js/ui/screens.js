@@ -928,7 +928,7 @@ const Screens = {
         id: vitaminaChoice.id,
         icon: vitaminaChoice.icon,
         name: vitaminaChoice.name,
-        desc: `+4 EV ${vitaminaChoice.stat.toUpperCase()} permanente`,
+        desc: `+1 EV ${vitaminaChoice.stat.toUpperCase()} permanente`,
         type: 'ev-stat',
         stat: vitaminaChoice.stat,
       },

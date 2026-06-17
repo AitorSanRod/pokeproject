@@ -138,15 +138,15 @@ var ROUTE_DATA = {
     combatBg: 'assets/bg/combate.png',
     rewardPokemon: [POKEMON.mankey, POKEMON.nidoran_f, POKEMON.nidoran_m],
     wild: [
-      { name: POKEMON.nidoran_m, rate: 35, minLv: 5, maxLv: 6, moveId: MOVES.poison.physical.poison_sting },
-      { name: POKEMON.nidoran_f, rate: 35, minLv: 5, maxLv: 6, moveId: MOVES.poison.physical.poison_sting },
-      { name: POKEMON.mankey, rate: 10, minLv: 5, maxLv: 7, moveId: MOVES.fighting.physical.karate_chop },
+      { name: POKEMON.nidoran_m, rate: 35, minLv: 3, maxLv: 5, moveId: MOVES.poison.physical.poison_sting },
+      { name: POKEMON.nidoran_f, rate: 35, minLv: 3, maxLv: 5, moveId: MOVES.poison.physical.poison_sting },
+      { name: POKEMON.mankey, rate: 10, minLv: 4, maxLv: 6, moveId: MOVES.fighting.physical.karate_chop },
       { name: POKEMON.goldeen, rate: 20, minLv: 4, maxLv: 5, moveId: MOVES.water.physical.waterfall },
     ],
     trainer: [],
     specialTrainer: {
       name: 'Azul', img: 'assets/sprites/trainers/rival_kanto.png', pokemon: [
-        { name: 'RIVAL_STARTER', minLv: 6, maxLv: 8 },
+        { name: 'RIVAL_STARTER', minLv: 5, maxLv: 7 },
       ]
     },
     paths: [
