@@ -794,19 +794,19 @@ var ROUTE_DATA = {
     specialTrainer: {
       name: 'Jefe Giovanni', img: ENTRENADORES.Giovanni.img, pokemon: [
         {
-          name: POKEMON.onix, minLv: 28, maxLv: 35, moveId: MOVES.rock.physical.rock_slide,
+          name: POKEMON.onix, minLv: 32, maxLv: 37, moveId: MOVES.rock.physical.rock_slide,
           overrides: {
             evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 },
           },
         },
         {
-          name: POKEMON.rhyhorn, minLv: 28, maxLv: 35, moveId: MOVES.ground.physical.earthquake,
+          name: POKEMON.rhyhorn, minLv: 32, maxLv: 40, moveId: MOVES.ground.physical.earthquake,
           overrides: {
             evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 },
           },
         },
         {
-          name: POKEMON.kangaskhan, minLv: 35, maxLv: 39, moveId: MOVES.normal.physical.extreme_speed,
+          name: POKEMON.kangaskhan, minLv: 40, maxLv: 45, moveId: MOVES.normal.physical.extreme_speed,
           overrides: {
             evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 },
           },

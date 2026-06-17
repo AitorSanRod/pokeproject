@@ -1038,6 +1038,22 @@ const Screens = {
           Screens._showEvItemSelector(chosen, advance);
         } else if (chosen.type === 'candy') {
           for (const p of GameState.team) levelUpPokemon(p, 1);
+          // Procesar evoluciones pendientes silenciosamente
+          for (let i = 0; i < GameState.team.length; i++) {
+            const p = GameState.team[i];
+            if (p._pendingEvolution) {
+              const intoName = p._pendingEvolution;
+              delete p._pendingEvolution;
+              try {
+                const evolved = await evolve(p, intoName);
+                GameState.team[i] = evolved;
+                if (p === GameState.starter) GameState.starter = evolved;
+                Storage.markCaught(evolved.name);
+              } catch (e) {
+                console.error('[EVOLUCION] Error en caramelo:', e.message);
+              }
+            }
+          }
           advance();
         } else if (chosen.type === 'held-item') {
           Screens._showHeldItemSelector(chosen, advance);

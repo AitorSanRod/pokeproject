@@ -344,12 +344,6 @@ var MOVE_EFFECTS = {
   },
 
   // ── PASIVO ────────────────────────────────────────────────────────────────
-  // 'clear' no se "activa" como las demás — su sola presencia en el moveset
-  // del pokemon (sea cual sea su autoMove) lo hace inmune a:
-  //   - cualquier estado alterado (veneno, quemadura, parálisis, sueño, congelado)
-  //   - cualquier bajada de estadísticas (lower-atk-X, lower-def-X, etc.)
-  // La comprobación la hacen StatusEffects.apply() y los efectos lower-*
-  // directamente, vía hasClearEffect(pokemon) (ver pokemon.js).
   'clear': {
     trigger: TRIGGERS.BEFORE_ATTACK,
     desc: 'Inmune a effectos de estado y cambios de estadisticas',

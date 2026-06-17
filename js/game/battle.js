@@ -176,13 +176,21 @@ async function runBattleSim(playerPokemon, foePokemon, options = {}) {
     round++;
     events.push({ type: 'turn-start', round, playerHp: activePlayer.currentHp, playerMaxHp: activePlayer.stats.hp, foeHp: foePokemon.currentHp, foeMaxHp: foePokemon.stats.hp });
 
-    const playerFirst = activePlayer.stats.spe >= foePokemon.stats.spe;
-    const [first, second] = playerFirst
-      ? [activePlayer, foePokemon]
-      : [foePokemon,   activePlayer];
-
-    const firstMove  = first  === activePlayer ? options.chosenMove  : enemyChooseMove(foePokemon, activePlayer);
-    const secondMove = second === activePlayer ? options.chosenMove  : enemyChooseMove(foePokemon, activePlayer);
+    const playerMove = options.chosenMove;
+    const foeMove    = enemyChooseMove(foePokemon, activePlayer);
+    const hasPriority = (move) => {
+      const ef = move?.effectId;
+      return Array.isArray(ef) ? ef.includes('priority') : ef === 'priority';
+    };
+    const playerPriority = hasPriority(playerMove);
+    const foePriority    = hasPriority(foeMove);
+    const playerFirst = playerPriority && !foePriority
+      ? true
+      : !playerPriority && foePriority
+        ? false
+        : activePlayer.stats.spe >= foePokemon.stats.spe;
+    const [first, second]         = playerFirst ? [activePlayer, foePokemon] : [foePokemon, activePlayer];
+    const [firstMove, secondMove] = playerFirst ? [playerMove, foeMove]      : [foeMove, playerMove];
 
     events.push(...executeTurn(first, second, firstMove));
     if (!isAlive(second)) break;
