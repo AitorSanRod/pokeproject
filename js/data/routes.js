@@ -19,6 +19,11 @@
 
 const MOVES = MOVE_LIST;
 const POKEMON = POKEMON_LIST;
+const PATH_TYPE = {
+  Trainer: 'trainer',
+  Wild: 'wild',
+  Special: 'special'
+};
 const ENTRENADORES = {
   Rival: {
     name: 'Azul',
@@ -55,6 +60,23 @@ const ENTRENADORES = {
   Mecanico: {
     name: 'Mecanico',
     img: 'assets/sprites/trainers/mecanico.png',
+  },
+  Pokemaniaco: {
+    name: 'Pokemaniaco',
+    img: 'assets/sprites/trainers/pokemaniaco.png'
+  },
+  Rojo: {
+    name: 'Rojo',
+    img: 'assets/sprites/trainers/rojo.png'
+  },
+  Cientifico: {
+    name: 'Cientifico',
+    img: 'assets/sprites/trainers/cientifico.png'
+  }
+  ,
+  Marinero: {
+    name: 'Marinero',
+    img: 'assets/sprites/trainers/marinero.png'
   }
 }
 var SHINY_RATE = 0.001;
@@ -521,6 +543,24 @@ var ROUTE_DATA = {
     ],
   },
 
+  'ss-anne': {
+    bg: 'assets/bg/ss-anne.png',
+    combatBg: 'assets/bg/combate-electrico.png',
+    rewardPokemon: [POKEMON.magikarp, POKEMON.meowth],
+    wild: [],
+    specialTrainer: {
+      name: `${ENTRENADORES.Pokemaniaco.name} Cgoob`, img: ENTRENADORES.Rojo.img, pokemon: [
+        { name: POKEMON.butterfree, minLv: 25, maxLv: 31, moveId: MOVES.bug.special.signal_beam },
+        { name: POKEMON.flareon, minLv: 25, maxLv: 29, moveId: MOVES.fire.special.flamethrower },
+        { name: POKEMON.gyarados, minLv: 28, maxLv: 32, moveId: MOVES.water.physical.wave_crash },
+      ]
+    },
+    trainer: [],
+    paths: [
+      [{ type: PATH_TYPE.Special }]
+    ],
+  },
+
   'ciudad-carmin': {
     bg: 'assets/bg/ciudad-carmin.png',
     combatBg: 'assets/bg/combate-electrico.png',
@@ -626,6 +666,7 @@ var KANTO_ROUTES = [
   { name: 'Laboratorio de Bill', area: 'info-bill' },
   { name: 'Ruta 5', area: 'ruta-5' },
   { name: 'Ruta 6', area: 'ruta-6' },
+  { name: 'SS Anne', area: 'ss-anne' },
   { name: 'Ciudad Carmín', area: 'ciudad-carmin' },
   { name: '???', area: 'espacio-raro' },
   { name: 'Final', area: 'info-final' }
