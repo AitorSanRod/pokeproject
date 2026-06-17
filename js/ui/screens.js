@@ -2066,6 +2066,14 @@ const Screens = {
       Screens._updateCombatLog(`Gotcha! ${foe.displayName} fue capturado!`);
       console.log(`[COMBAT] Capturado: ${foe.displayName}`);
       Storage.markCaught(foe.name);
+      foe.isPlayer = true;
+      const capturedMTs = Storage.getLearnedMTs(foe.name);
+      foe.learnedMTs = capturedMTs;
+      for (const mtId of capturedMTs) {
+        const mtMove = MOVE_BY_ID[mtId];
+        if (mtMove && !foe.moves.find(mv => mv.id === mtId))
+          foe.moves.push({ ...mtMove, maxPp: mtMove.pp });
+      }
       if (GameState.team.length < 6) {
         GameState.team.push(foe);
         await Screens._wait(1000);
