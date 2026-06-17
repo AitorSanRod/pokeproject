@@ -86,7 +86,7 @@ var MOVE_POOL = {
       { stage: 1, id: 'absorb', name: 'Absorber', power: 40, pp: 25, type: 'grass', damageClass: 'special', effectId: 'drain-10' },
       { stage: 2, id: 'magical-leaf', name: 'Hoja Magica', power: 60, pp: 99, type: 'grass', damageClass: 'special', effectId: 'sleep-15' },
       { stage: 3, id: 'solar-beam', name: 'Rayo Solar', power: 120, pp: 99, type: 'grass', damageClass: 'special' },
-      { stage: 4, mt: true, id: 'giga-drain', name: 'Gigadrenado', power: 90, pp: 99, type: 'grass', damageClass: 'special', effectId: 'drain-50'  },
+      { stage: 4, mt: true, id: 'giga-drain', name: 'Gigadrenado', power: 60, pp: 99, type: 'grass', damageClass: 'special', effectId: 'drain-50'  },
     ],
   },
   electric: {
