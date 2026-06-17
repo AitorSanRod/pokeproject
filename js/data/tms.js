@@ -74,6 +74,16 @@ var TM_LIST = {
     sprite: MT_SPRITES.grass,
     fallbackIcon: '🌿',
   },
+  'tm-metal-claw': {
+    id: 'metal-claw',
+    name: 'MT Garra Metal',
+    moveId: 'giga-drain',
+    types: ['charmander', 'charmeleon', 'charizard'],
+    pokemons: [],
+    desc: 'Enseña Garra Metal',
+    sprite: MT_SPRITES.fire,
+    fallbackIcon: '',
+  },
 };
 
 // Devuelve true si el pokemon puede aprender la MT indicada

@@ -716,6 +716,7 @@
   border-radius: var(--radius-sm);
   background: var(--off-white);
   min-width: 0;
+  overflow: hidden;
 }
 .combat-team-pip--active  { border-color: var(--blue); background: #e8f4ff; }
 .combat-team-pip--fainted { opacity: .35; filter: grayscale(1); }

@@ -179,6 +179,18 @@ var MOVE_EFFECTS = {
     },
   },
 
+  'raise-def-20': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Sube el DEF propio un 20% del base con cada ataque',
+    fn(ctx) {
+      if (!ctx.user.combatMods) ctx.user.combatMods = {};
+      ctx.user.combatMods.def = (ctx.user.combatMods.def ?? 0) + 0.20;
+      const pct = Math.round(ctx.user.combatMods.def * 100);
+      ctx.log(`El DEF de ${ctx.user.displayName} subio! (+${pct}% base)`);
+      if (ctx.showStatChange) ctx.showStatChange(ctx.user, 'DEF', 'up', 20);
+    },
+  },
+
   'burn-10': {
     trigger: TRIGGERS.AFTER_ATTACK,
     desc: 'Tiene un 10% de probabilidad de quemar al rival',

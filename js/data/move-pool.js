@@ -237,7 +237,7 @@ var MOVE_POOL = {
   },
   steel: {
     physical: [
-      { stage: 1, id: 'metal-claw', name: 'Garra Metal', power: 50, pp: 35, type: 'steel', damageClass: 'physical' },
+      { stage: 1, id: 'metal-claw', name: 'Garra Metal', power: 50, pp: 35, type: 'steel', damageClass: 'physical', effectId: 'raise-def-20' },
       { stage: 2, id: 'iron-head', name: 'Cabeza de Hierro', power: 80, pp: 15, type: 'steel', damageClass: 'physical' },
       { stage: 3, id: 'behemoth-blade', name: 'Hoja Behemoth', power: 100, pp: 5, type: 'steel', damageClass: 'physical' },
     ],
