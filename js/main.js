@@ -16,7 +16,7 @@ const GameState = {
   specialTrainerUsed:  false,
   _pathRunning:        false,
   combat:              null,
-  version:            '0.0.5',
+  version:            GAME_VERSION,
 
   init(starter) {
     this.starter          = starter;

@@ -701,7 +701,9 @@
   padding: 6px var(--sp-md);
   background: var(--white);
   border-top: 2px solid var(--grey-light);
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-height: 80px;
+  overflow-y: auto;
 }
 
 .combat-team-pip {
@@ -1145,6 +1147,7 @@
 @media (max-width: 480px) {
   .combat-player { left: -10px; }
   .combat-foe { right: -12px; }
+  #btn-pause-combat { display: none; }
 
   .path-node-img {
     max-width: 24px;

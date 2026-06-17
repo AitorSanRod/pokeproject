@@ -323,14 +323,15 @@ const Screens = {
       ? `<div class="encounter-bg-layer" style="background-image:url('${bg}')"></div>`
       : '';
 
-    // Botón pokédex flotante arriba derecha (como el pause en combate)
+    // Botones flotantes arriba-derecha (pokédex + compendio)
     document.getElementById('app').querySelectorAll('.global-dex-btn').forEach(e => e.remove());
     const dexWrap = document.createElement('div');
     dexWrap.className = 'global-dex-btn';
-    dexWrap.style.cssText = 'position:fixed;top:12px;right:12px;z-index:1000';
-    dexWrap.innerHTML = `<button class="btn btn--sm" id="btn-dex-route-float"
-      style="min-height:32px;padding:4px 10px;font-size:10px;background:rgba(255,255,255,.92);
-      border-color:var(--black);box-shadow:var(--shadow-sm)" title="Pokédex">📖</button>`;
+    dexWrap.style.cssText = 'position:fixed;top:12px;right:12px;z-index:1000;display:flex;gap:4px';
+    const floatBtnStyle = 'min-height:32px;padding:4px 10px;font-size:10px;background:rgba(255,255,255,.92);border-color:var(--black);box-shadow:var(--shadow-sm)';
+    dexWrap.innerHTML = `
+      <button class="btn btn--sm" id="btn-dex-route-float"        style="${floatBtnStyle}" title="Pokédex">📖</button>
+      <button class="btn btn--sm" id="btn-compendium-route-float" style="${floatBtnStyle}" title="Compendio">📋</button>`;
     document.getElementById('app').appendChild(dexWrap);
 
     document.getElementById('viewport').innerHTML = `
@@ -416,7 +417,7 @@ const Screens = {
         }
         if (enc.type === 'trainer') {
           const t = pickTrainer(data.trainer);
-          return { type:'trainer', name: t?.name ?? 'Entrenador', img: t?.img ?? null };
+          return { type:'trainer', name: t?.name ?? 'Entrenador', img: t?.img ?? null, _trainer: t };
         }
         return { type:'wild', name:'Pokemon Salvaje', img:'assets/sprites/others/grass.png' };
       })
@@ -484,6 +485,14 @@ const Screens = {
 
     document.getElementById('btn-dex-route-float')?.addEventListener('click', () => {
       PokedexScreen.show(() => {
+        document.getElementById('app').querySelectorAll('.global-dex-btn').forEach(e => e.remove());
+        Screens._renderAdventureShell(route);
+        Screens._showPathSelection(route);
+      });
+    });
+
+    document.getElementById('btn-compendium-route-float')?.addEventListener('click', () => {
+      CompendiumScreen.show(() => {
         document.getElementById('app').querySelectorAll('.global-dex-btn').forEach(e => e.remove());
         Screens._renderAdventureShell(route);
         Screens._showPathSelection(route);
@@ -581,7 +590,8 @@ const Screens = {
           console.log(`[ADVENTURE] Encuentro especial: ${trainer.name}`);
         }
       } else {
-        trainer = pickTrainer(data.trainer);
+        const resolvedEnc = GameState.currentResolvedPath?.[idx];
+        trainer = resolvedEnc?._trainer ?? pickTrainer(data.trainer);
       }
       if (!trainer) { GameState._pathRunning = false; Screens._runNextInPath(); return; }
       const foeTeam = [];
@@ -1356,8 +1366,9 @@ const Screens = {
     pauseWrap.className = 'global-pause-btn';
     pauseWrap.style.cssText = 'display:flex;gap:6px';
     pauseWrap.innerHTML = `
-      <button id="btn-dex-combat" style="${btnStyle}" title="Pokédex">📖</button>
-      <button id="btn-pause-combat" style="${btnStyle}" title="Pausar/Reanudar">⏸</button>`;
+      <button id="btn-dex-combat"        style="${btnStyle}" title="Pokédex">📖</button>
+      <button id="btn-compendium-combat" style="${btnStyle}" title="Compendio">📋</button>
+      <button id="btn-pause-combat"      style="${btnStyle}" title="Pausar/Reanudar">⏸</button>`;
     (globalControls || document.body).appendChild(pauseWrap);
 
     pauseWrap.querySelectorAll('button').forEach(btn => {
@@ -1371,7 +1382,15 @@ const Screens = {
     document.getElementById('btn-dex-combat').addEventListener('click', () => {
       GameState.paused = true;
       PokedexScreen.show(() => {
-        // Volver al combate: re-renderizar la pantalla (sprites, HUDs) y reanudar
+        Screens._renderCombatScreen();
+        GameState.paused = false;
+        Screens._combatStartTurn();
+      });
+    });
+
+    document.getElementById('btn-compendium-combat').addEventListener('click', () => {
+      GameState.paused = true;
+      CompendiumScreen.show(() => {
         Screens._renderCombatScreen();
         GameState.paused = false;
         Screens._combatStartTurn();

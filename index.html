@@ -9,11 +9,19 @@
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/screens.css">
   <link rel="icon" type="image/x-icon" href="./assets/sprites/others/poke.ico">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
+  </script>
 </head>
 <body>
   <div id="app">
     <!-- Screens are injected here by screens.js -->
   </div>
+
+  <!-- Versión del juego — único punto de actualización -->
+  <script src="js/version.js"></script>
 
   <!-- Data layer (ported from Node) -->
   <script src="js/data/combat-config.js"></script>
