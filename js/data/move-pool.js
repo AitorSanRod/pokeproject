@@ -162,7 +162,7 @@ var MOVE_POOL = {
       { stage: 3, id: 'photo-geyser', name: 'Fotogeyser', power: 100, pp: 10, type: 'psychic', damageClass: 'physical' },
     ],
     special: [
-      { stage: 1, id: 'confusion', name: 'Confusion', power: 25, pp: 25, type: 'psychic', damageClass: 'special', effectId: 'double-hit' },
+      { stage: 1, id: 'confusion', name: 'Confusion', power: 20, pp: 25, type: 'psychic', damageClass: 'special', effectId: 'double-hit' },
       { stage: 2, id: 'psychic', name: 'Psiquico', power: 70, pp: 10, type: 'psychic', damageClass: 'special', effectId: 'clear' },
       { stage: 3, id: 'psystrike', name: 'Golpe Psi', power: 100, pp: 10, type: 'psychic', damageClass: 'special' },
       { id: 'teleport', name: 'Teletransporte', power: 0, pp: 99, type: 'psychic', damageClass: 'special', boss: true },

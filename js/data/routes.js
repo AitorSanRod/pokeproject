@@ -79,7 +79,7 @@ const ENTRENADORES = {
     img: 'assets/sprites/trainers/marinero.png'
   }
 }
-var SHINY_RATE = 0.001;
+var SHINY_RATE = 0.005;
 // Probabilidad (0–1) de que un Pokémon salvaje aparezca como shiny.
 // 0.001 = 1 de cada 1000 (equivale a 1/1024, similar a los juegos principales).
 
@@ -481,7 +481,7 @@ var ROUTE_DATA = {
       {
         name: 'Adrián el dominguero', img: 'assets/sprites/trainers/campista.png', rate: 100, pokemon: [
           { name: POKEMON.mr_mime, minLv: 25, maxLv: 28, moveId: MOVES.psychic.special.psychic },
-          { name: POKEMON.pinsir, minLv: 27, maxLv: 32, moveId: MOVES.water.physical.megahorn, shiny: true },
+          { name: POKEMON.pinsir, minLv: 27, maxLv: 30, moveId: MOVES.water.physical.megahorn, shiny: true },
         ]
       },
     ],
@@ -618,7 +618,7 @@ var ROUTE_DATA = {
     combatBg: 'assets/bg/combate-espacio-raro.png',
     rewardPokemon: [POKEMON.mew],
     wild: [
-      { name: POKEMON.mewtwo, rate: 100, minLv: 35, maxLv: 50, moveId: MOVES.psychic.special.trick }
+      { name: POKEMON.mewtwo, rate: 100, minLv: 40, maxLv: 60, moveId: MOVES.psychic.special.trick }
     ],
     trainer: [],
     paths: [
