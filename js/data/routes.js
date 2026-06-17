@@ -138,10 +138,10 @@ var ROUTE_DATA = {
     combatBg: 'assets/bg/combate.png',
     rewardPokemon: [POKEMON.mankey, POKEMON.nidoran_f, POKEMON.nidoran_m],
     wild: [
-      { name: POKEMON.nidoran_m, rate: 35, minLv: 3, maxLv: 5, moveId: MOVES.poison.physical.poison_sting },
-      { name: POKEMON.nidoran_f, rate: 35, minLv: 3, maxLv: 5, moveId: MOVES.poison.physical.poison_sting },
-      { name: POKEMON.mankey, rate: 10, minLv: 4, maxLv: 6, moveId: MOVES.fighting.physical.karate_chop },
-      { name: POKEMON.goldeen, rate: 20, minLv: 4, maxLv: 5, moveId: MOVES.water.physical.waterfall },
+      { name: POKEMON.nidoran_m, rate: 30, minLv: 3, maxLv: 5, moveId: MOVES.poison.physical.poison_sting },
+      { name: POKEMON.nidoran_f, rate: 30, minLv: 3, maxLv: 5, moveId: MOVES.poison.physical.poison_sting },
+      { name: POKEMON.mankey, rate: 20, minLv: 4, maxLv: 5, moveId: MOVES.fighting.physical.karate_chop },
+      { name: POKEMON.goldeen, rate: 20, minLv: 3, maxLv: 4, moveId: MOVES.water.physical.waterfall },
     ],
     trainer: [],
     specialTrainer: {
