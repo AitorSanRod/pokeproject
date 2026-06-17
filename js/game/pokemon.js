@@ -105,13 +105,9 @@ function gainExp(pokemon, foeName, battleType = 'wild', foeLevel = 5, activeLeve
   const levelMult = 1.0 + (foeLevel - 5) * 0.05;
   let gained      = Math.round(baseExp * mult * Math.max(0.5, levelMult));
 
-  // Penalización por diferencia de nivel — si el pokemon ACTIVO del jugador
-  // tiene más de EXP_TABLE.EXP_PENALTY.levelDiff niveles que el rival
-  // derrotado, todo el equipo gana EXP_TABLE.EXP_PENALTY.multiplier × exp.
-  const penalty = EXP_TABLE.EXP_PENALTY;
-  if (penalty && (activeLevel - foeLevel) > penalty.levelDiff) {
-    gained = Math.round(gained * penalty.multiplier);
-  }
+  const diff = activeLevel - foeLevel;
+  const penalty = (EXP_TABLE.EXP_PENALTIES ?? []).find(p => diff > p.levelDiff);
+  if (penalty) gained = Math.round(gained * penalty.multiplier);
 
   pokemon.exp += gained;
   let levelsGained = 0;

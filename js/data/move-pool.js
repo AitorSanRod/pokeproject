@@ -43,7 +43,7 @@ var MOVE_POOL = {
       { stage: 2, id: 'extreme-speed', name: 'Velocidad Extrema', power: 70, pp: 15, type: 'normal', damageClass: 'physical', effectId: 'priority' },
       { stage: 3, id: 'hyper-fang', name: 'Hiper Colmillo', power: 90, pp: 15, type: 'normal', damageClass: 'physical', effectId: 'shield-10' },
       { id: 'self-destruct', name: 'Autodestruccion', power: 400, pp: 5, type: 'normal', damageClass: 'physical', effectId: 'self-destruct', boss: true },
-      { id: 'false-swipe', name: 'Sonambulo', power: 5, pp: 100, type: 'normal', damageClass: 'physical', effectId: ['recoil-10', 'shield-25', 'sleep-self', 'sleep-attack'], boss: true },
+      { id: 'false-swipe', name: 'Sonambulo', power: 15, pp: 100, type: 'normal', damageClass: 'physical', effectId: ['recoil-10', 'shield-25', 'sleep-self', 'sleep-attack'], boss: true },
     ],
     special: [
       { stage: 1, id: 'swift', name: 'Velocidad', power: 60, pp: 20, type: 'normal', damageClass: 'special', effectId: 'shield-10' },

@@ -853,7 +853,7 @@ const Screens = {
     const tmEligible = (tmId) => {
       const tm = TM_LIST[tmId];
       if (!tm) return false;
-      return GameState.team.some(p => canLearnTM(p, tmId) && !p.moves.some(m => m.id === tm.moveId));
+      return !GameState.team.every(p => p.moves.some(m => m.id === tm.moveId));
     };
     const makeTmPrize = (tmId) => {
       const tm = TM_LIST[tmId];
@@ -923,6 +923,7 @@ const Screens = {
     const vitaminaChoice = vitaminas[Math.floor(Math.random() * vitaminas.length)];
     const candyIcon = '<img src="assets/sprites/items/rarecandy.png" style="width:40px;height:40px;image-rendering:pixelated;object-fit:contain">';
 
+    const vitaminaChoice2 = vitaminas.filter(v => v.id !== vitaminaChoice.id)[Math.floor(Math.random() * (vitaminas.length - 1))];
     const randomPool = [
       {
         id: vitaminaChoice.id,
@@ -938,6 +939,14 @@ const Screens = {
         name: 'Carameloraro',
         desc: '+1 nivel a todo el equipo',
         type: 'candy',
+      },
+      {
+        id: vitaminaChoice2.id,
+        icon: vitaminaChoice2.icon,
+        name: vitaminaChoice2.name,
+        desc: `+1 EV ${vitaminaChoice2.stat.toUpperCase()} permanente`,
+        type: 'ev-stat',
+        stat: vitaminaChoice2.stat,
       },
     ];
 
