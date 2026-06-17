@@ -314,6 +314,23 @@ var MOVE_EFFECTS = {
     },
   },
 
+  'sleep-attack': {
+    trigger: TRIGGERS.BEFORE_ATTACK,
+    desc: 'Permite atacar aunque el usuario este dormido',
+    fn(ctx) {
+      // No-op: la lógica la aplica StatusEffects.checkBeforeAttack al detectar
+      // este effectId en el autoMove — permite atacar ignorando el estado sueño.
+    },
+  },
+
+  'sleep-self': {
+    trigger: TRIGGERS.BEFORE_ATTACK,
+    desc: 'El usuario se duerme antes de atacar cada turno',
+    fn(ctx) {
+      StatusEffects.apply(ctx.user, 'sleep', ctx.log);
+    },
+  },
+
   // ── PASIVO ────────────────────────────────────────────────────────────────
   // 'clear' no se "activa" como las demás — su sola presencia en el moveset
   // del pokemon (sea cual sea su autoMove) lo hace inmune a:
@@ -391,6 +408,16 @@ var MOVE_EFFECTS = {
       const heal = Math.max(1, Math.floor(ctx.user.stats.hp * 0.10));
       ctx.user.currentHp = Math.min(ctx.user.stats.hp, ctx.user.currentHp + heal);
       ctx.log(`${ctx.user.displayName} se recupero parcialmente!`);
+    },
+  },
+
+  'self-destruct': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'El usuario pierde toda su vida al usar este movimiento',
+    fn(ctx) {
+      ctx.user.currentHp = 0;
+      ctx.log(`${ctx.user.displayName} se autodestruyo!`);
+      ctx.updatePlayerHud?.();
     },
   },
 

@@ -107,6 +107,16 @@ const StatusEffects = {
     s.turnsActive++;
 
     if (s.id === 'sleep') {
+      // Comprobar si el autoMove tiene el efecto 'sleep-attack' (atacar dormido)
+      const activeMove = pokemon.moves?.find(m => m.id === pokemon.autoMove);
+      const hasSleepAttack = activeMove && (
+        activeMove.effectId === 'sleep-attack' ||
+        (Array.isArray(activeMove.effectId) && activeMove.effectId.includes('sleep-attack'))
+      );
+      if (hasSleepAttack) {
+        return { canAttack: true, message: `${pokemon.displayName} ataca en sueños!` };
+      }
+
       // Turno 1: nunca se despierta
       // Turno 2: 33% de despertar
       // Turno 3: 66% de despertar

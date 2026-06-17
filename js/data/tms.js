@@ -3,24 +3,24 @@
 // pokemons: pokemon específicos que pueden aprenderla (independientemente del tipo)
 // moveId:   id del movimiento en MOVE_POOL (debe tener mt:true)
 const MT_SPRITES = {
-  normal: 'assets/sprites/mts/tm-water.png',
-  fire: 'assets/sprites/mts/tm-water.png',
+  normal: 'assets/sprites/mts/tm-normal.png',
+  fire: 'assets/sprites/mts/tm-fire.png',
   water: 'assets/sprites/mts/tm-water.png',
-  grass: 'assets/sprites/mts/tm-water.png',
-  electric: 'assets/sprites/mts/tm-water.png',
-  ice: 'assets/sprites/mts/tm-water.png',
-  fighting: 'assets/sprites/mts/tm-water.png',
-  poison: 'assets/sprites/mts/tm-water.png',
-  ground: 'assets/sprites/mts/tm-water.png',
-  fliying: 'assets/sprites/mts/tm-water.png',
-  pyschic: 'assets/sprites/mts/tm-water.png',
-  bug: 'assets/sprites/mts/tm-water.png',
-  rock: 'assets/sprites/mts/tm-water.png',
-  ghost: 'assets/sprites/mts/tm-water.png',
-  dragon: 'assets/sprites/mts/tm-water.png',
-  dark: 'assets/sprites/mts/tm-water.png',
-  steel: 'assets/sprites/mts/tm-water.png',
-  fairy: 'assets/sprites/mts/tm-water.png',
+  grass: 'assets/sprites/mts/tm-grass.png',
+  electric: 'assets/sprites/mts/tm-electric.png',
+  ice: 'assets/sprites/mts/tm-ice.png',
+  fighting: 'assets/sprites/mts/tm-fighting.png',
+  poison: 'assets/sprites/mts/tm-poison.png',
+  ground: 'assets/sprites/mts/tm-ground.png',
+  fliying: 'assets/sprites/mts/tm-fly.png',
+  pyschic: 'assets/sprites/mts/tm-psi.png',
+  bug: 'assets/sprites/mts/tm-bug.png',
+  rock: 'assets/sprites/mts/tm-rock.png',
+  ghost: 'assets/sprites/mts/tm-ghost.png',
+  dragon: 'assets/sprites/mts/tm-dragon.png',
+  dark: 'assets/sprites/mts/tm-dark.png',
+  steel: 'assets/sprites/mts/tm-steel.png',
+  fairy: 'assets/sprites/mts/tm-fairy.png',
 }
 
 var TM_LIST = {
@@ -30,8 +30,8 @@ var TM_LIST = {
     moveId: 'surf',
     types: ['water'],
     pokemons: [],
-    desc: 'Enseña Surf a pokemon de tipo Agua o a Snorlax.',
-    sprite: 'assets/sprites/items/tm-water.png',
+    desc: 'Enseña Surf.',
+    sprite: MT_SPRITES.water,
     fallbackIcon: '💧',
   },
   'tm-thunderbolt': {
@@ -40,8 +40,8 @@ var TM_LIST = {
     moveId: 'thunderbolt',
     types: ['electric'],
     pokemons: [],
-    desc: 'Enseña Rayo a pokemon de tipo Eléctrico.',
-    sprite: 'assets/sprites/items/tm-electric.png',
+    desc: 'Enseña Rayo.',
+    sprite: MT_SPRITES.electric,
     fallbackIcon: '⚡',
   },
   'tm-ice-beam': {
@@ -50,28 +50,28 @@ var TM_LIST = {
     moveId: 'ice-beam',
     types: ['ice', 'water'],
     pokemons: [],
-    desc: 'Enseña Rayo Hielo a pokemon de tipo Hielo o Agua.',
-    sprite: 'assets/sprites/items/tm-ice.png',
+    desc: 'Enseña Rayo Hielo.',
+    sprite: MT_SPRITES.ice,
     fallbackIcon: '❄️',
   },
-  'tm-earthquake': {
-    id: 'tm-earthquake',
-    name: 'MT Terremoto',
-    moveId: 'earthquake',
+  'stomping-tantrum': {
+    id: 'stomping-tantrum',
+    name: 'MT Pataleta',
+    moveId: 'stomping-tantrum',
     types: ['ground', 'rock'],
-    pokemons: ['bulbasaur', 'ivysaur'],
-    desc: 'Enseña Terremoto a pokemon de tipo Tierra o Roca, Snorlax o Kangaskhan.',
-    sprite: 'assets/sprites/items/tm-ground.png',
+    pokemons: ['charmander'],
+    desc: 'Enseña Pataleta.',
+    sprite: MT_SPRITES.ground,
     fallbackIcon: '🌍',
   },
-  'tm-solar-beam': {
-    id: 'tm-solar-beam',
-    name: 'MT Rayo Solar',
-    moveId: 'solar-beam',
+  'tm-giga-drain': {
+    id: 'giga-drain',
+    name: 'MT Gigadrenado',
+    moveId: 'giga-drain',
     types: ['grass'],
     pokemons: [],
-    desc: 'Enseña Rayo Solar a pokemon de tipo Planta.',
-    sprite: 'assets/sprites/items/tm-grass.png',
+    desc: 'Enseña Gigadrenado',
+    sprite: MT_SPRITES.grass,
     fallbackIcon: '🌿',
   },
 };
@@ -90,7 +90,7 @@ function teachTM(pokemon, tmId) {
   const tm = TM_LIST[tmId];
   if (!tm || !canLearnTM(pokemon, tmId)) return false;
   if (!pokemon.learnedMTs) pokemon.learnedMTs = [];
-  if (pokemon.learnedMTs.includes(tm.moveId)) return false; // ya aprendido
+  if (pokemon.moves.some(m => m.id === tm.moveId)) return false; // ya conoce el movimiento (natural o MT)
   const m = MOVE_BY_ID[tm.moveId];
   if (!m) return false;
   Storage.addLearnedMT(pokemon.name, tm.moveId);

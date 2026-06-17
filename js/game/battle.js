@@ -196,7 +196,7 @@ async function runBattleSim(playerPokemon, foePokemon, options = {}) {
     // EXP
     const battleType  = isGym ? 'gym' : isTrainer ? 'trainer' : 'wild';
     const fullTeam    = team ?? [activePlayer];
-    gainEVs(activePlayer, foePokemon.baseStats);
+
 
     for (const member of fullTeam) {
       if (member.currentHp <= 0) continue;

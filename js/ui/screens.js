@@ -853,7 +853,7 @@ const Screens = {
     const tmEligible = (tmId) => {
       const tm = TM_LIST[tmId];
       if (!tm) return false;
-      return GameState.team.some(p => canLearnTM(p, tmId) && !(p.learnedMTs ?? []).includes(tm.moveId));
+      return GameState.team.some(p => canLearnTM(p, tmId) && !p.moves.some(m => m.id === tm.moveId));
     };
     const makeTmPrize = (tmId) => {
       const tm = TM_LIST[tmId];
@@ -928,7 +928,7 @@ const Screens = {
         id: vitaminaChoice.id,
         icon: vitaminaChoice.icon,
         name: vitaminaChoice.name,
-        desc: `+1 ${vitaminaChoice.stat.toUpperCase()} permanente`,
+        desc: `+4 EV ${vitaminaChoice.stat.toUpperCase()} permanente`,
         type: 'ev-stat',
         stat: vitaminaChoice.stat,
       },
@@ -1114,10 +1114,10 @@ const Screens = {
       btn.addEventListener('click', () => {
         const p = GameState.team[+btn.dataset.idx];
         // Guardar EV en Storage y aplicar al pokemon
-        const newEvs = Storage.addEv(p.name, item.stat, 1);
+        const newEvs = Storage.addEv(p.name, item.stat, 4);
         p.evs[item.stat] = newEvs[item.stat];
-        p.stats = computeStats(p); // recalcular con nuevo EV
-        console.log(`[ITEM] ${item.name} → ${p.displayName} +1 ${item.stat}`);
+        p.stats = computeStats(p);
+        console.log(`[ITEM] ${item.name} → ${p.displayName} +4 EV ${item.stat}`);
         overlay.remove();
         onDone();
       });
@@ -1195,7 +1195,7 @@ const Screens = {
         <div style="display:flex;flex-direction:column;gap:6px">
           ${GameState.team.map((p, i) => {
             const compatible  = canLearnTM(p, item.tmId);
-            const alreadyKnows = (p.learnedMTs ?? []).includes(tm.moveId);
+            const alreadyKnows = p.moves.some(m => m.id === tm.moveId);
             const disabled = !compatible || alreadyKnows;
             return `
               <button class="btn btn--wide" data-idx="${i}" ${disabled ? 'disabled' : ''}
@@ -1670,7 +1670,6 @@ const Screens = {
       await Screens._animateAttack(first, second, moveOf(first), player);
       if (!isAlive(second)) {
         ctx._turnRunning = false;
-        await Screens._applyEndOfTurnStatus(player, foe);
         Screens._combatEnd(); return;
       }
     }
@@ -1681,7 +1680,6 @@ const Screens = {
       await Screens._animateAttack(first, second, moveOf(first), player);
       if (!isAlive(second)) {
         ctx._turnRunning = false;
-        await Screens._applyEndOfTurnStatus(player, foe);
         Screens._combatEnd(); return;
       }
     }
@@ -1698,7 +1696,6 @@ const Screens = {
         await Screens._animateAttack(second, first, moveOf(second), player);
         if (!isAlive(first)) {
           ctx._turnRunning = false;
-          await Screens._applyEndOfTurnStatus(player, foe);
           Screens._combatEnd(); return;
         }
       }
@@ -1899,7 +1896,8 @@ const Screens = {
     const foe    = ctx.foeTeam[ctx.foeIndex];
     const area   = document.getElementById('combat-actions-area');
 
-    if (!isAlive(foe)) {
+    // La muerte del jugador tiene prioridad: si ambos mueren a la vez, es derrota
+    if (!isAlive(foe) && isAlive(ctx.activePlayer)) {
       Screens._updateCombatLog(`${foe.displayName} se debilito!`);
       // Animación de derrota del rival
       await Screens._showFaintAnimation('foe');
@@ -2011,6 +2009,31 @@ const Screens = {
         Screens._updateCombatLog(`${ctx.activePlayer.displayName} no puede mas!`);
         await Screens._wait(600);
         Screens._clearPauseBtn(); ctx.onLoss();
+      } else if (!isAlive(foe)) {
+        // Ambos murieron a la vez (ej: Autodestruccion). El rival cuenta como debilitado.
+        Screens._updateCombatLog(`${foe.displayName} se debilito!`);
+        await Screens._showFaintAnimation('foe');
+        await Screens._wait(200);
+        // EXP para los pokemon vivos del equipo
+        const battleType2 = ctx.isGym ? 'gym' : ctx.isTrainer ? 'trainer' : 'wild';
+        const activeLevel2 = ctx.activePlayer.level;
+        for (const member of GameState.team) {
+          if (member.currentHp <= 0) continue;
+          const { levelsGained } = gainExp(member, foe.name, battleType2, foe.level, activeLevel2);
+          if (levelsGained > 0) {
+            Screens._updateCombatLog(`${member.displayName} subio al nivel ${member.level}!`);
+            Screens._updateCombatTeamBar();
+            Screens._showLevelUpPip(member, levelsGained);
+            await Screens._wait(950);
+          }
+        }
+        ctx.activePlayer  = next;
+        ctx.chosenMove    = null;
+        ctx._ending       = false;
+        ctx._turnRunning  = false;
+        ctx.introPlayed   = true;
+        await Screens._wait(600);
+        Screens._advanceFoeOrEnd();
       } else {
         Screens._updateCombatLog(`${ctx.activePlayer.displayName} no puede mas! Vamos, ${next.displayName}!`);
         ctx.activePlayer  = next;

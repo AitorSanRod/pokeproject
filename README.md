@@ -38,6 +38,7 @@ movimientos, efectos, estados, evoluciones, recompensas y pantallas.
 23. [Desglose de modificadores de daño en el log de combate](#23-desglose-de-modificadores-de-daño-en-el-log-de-combate)
 24. [Penalización de experiencia por diferencia de nivel](#24-penalización-de-experiencia-por-diferencia-de-nivel)
 25. [Pokémon Shiny](#25-pokémon-shiny)
+26. [MTs — Máquinas Técnicas](#26-mts--máquinas-técnicas)
 
 ---
 
@@ -58,14 +59,14 @@ js/
     move-effects.js             TRIGGERS + MOVE_EFFECTS + applyEffect() + statusChance
     status-effects.js           StatusEffects: poison/paralysis/burn/sleep/freeze
     natures.js                  25 naturalezas
-    pokemon-db.js               POKEMON_DB (151 Gen1, tipos, moveLines, evoluciones) + POKEMON_LIST
+    pokemon-db.js               POKEMON_DB (151 Gen1, tipos, moveLines, evoluciones) + POKEMON_LIST (hardcodeado, 151 entradas, autocompletado IDE)
     routes.js                   ROUTE_DATA + KANTO_ROUTES + SHINY_RATE + generatePaths()
     storage.js                  Storage: pokédex, EVs por cadena evolutiva
     pokedex.js                  KANTO_DEX (151) + getDexEntry()
     types.js                    Tabla de efectividad
     mock-data.js                Stats base 151 Gen1 (fallback sin red)
   game/
-    pokemon.js                  createPokemon, computeStats, gainExp, evolve, fullHeal
+    pokemon.js                  createPokemon, computeStats, gainExp, evolve, fullHeal, healPokemon
     battle.js                   calcDamage (con combatMods), enemyChooseMove
   ui/
     render.js                    Render.hpBar, typeBadge/typeBadges, statsGrid, updateHpBar
@@ -346,22 +347,31 @@ de TODO el juego** sin lanzar un error de sintaxis detectable por linters.
 
 ### El problema
 
-`POKEMON_LIST` y `MOVE_LIST` (en `pokemon-db.js` y `move-pool.js`) generan claves
-reemplazando `-` por `_`:
+`POKEMON_LIST` (en `pokemon-db.js`) está **hardcodeado** con 151 entradas explícitas.
+`MOVE_LIST` (en `move-pool.js`) se genera automáticamente con `_buildMoveList()`.
+Ambos convierten guiones a guiones bajos en sus claves:
 
 ```js
-// pokemon-db.js
-list.nidoran_m = 'nidoran-m';
-list.nidoran_f = 'nidoran-f';
-list.mr_mime   = 'mr-mime';
+// pokemon-db.js — objeto hardcodeado (151 entradas explícitas con autocompletado IDE)
+var POKEMON_LIST = {
+  nidoran_m: 'nidoran-m',   // clave con _ → valor con - (PokeAPI)
+  nidoran_f: 'nidoran-f',
+  mr_mime:   'mr-mime',
+  farfetch_d: 'farfetch-d',
+  magikarp:  'magikarp',    // la mayoría: clave = valor
+  // ...151 entradas en total
+};
 
-// move-pool.js — _buildMoveList()
+// move-pool.js — _buildMoveList() auto-generado
 list[type].physical[m.id.replace(/-/g,'_')] = m.id;
 ```
 
 Así que el **id real** del pokemon/movimiento puede tener guión (`'nidoran-f'`,
 `'poison-sting'`), pero la **clave de acceso** en `POKEMON_LIST`/`MOVE_LIST`
 usa guión bajo (`POKEMON.nidoran_f`, `MOVES.poison.physical.poison_sting`).
+
+Al escribir `POKEMON.` en `routes.js`, el IDE sugiere automáticamente todos los
+nombres disponibles gracias a que el objeto es explícito (no generado en runtime).
 
 ### Por qué rompe todo el juego sin avisar
 
@@ -1083,10 +1093,28 @@ esa carpeta cuando los tengas; no se necesita ningún cambio de código adiciona
 
 ## 10. EVs por cadena evolutiva
 
+### Fuente de EVs — solo vitaminas
+
+**Los EVs solo se obtienen a través de vitaminas** (premio de fin de ruta,
+sección 11). El combate **no** otorga EVs — a diferencia de los juegos
+oficiales, aquí no existe `gainEVs` por pelea. Cada vitamina da **+4 EVs**
+a la estadística correspondiente, lo que se traduce siempre en **+1 punto
+de stat visible** inmediatamente (`Math.floor(4/4) = 1`).
+
+### Sistema de EVs (estilo Pokémon Champions)
+
+- **Máximo por stat: 32** (`Storage.EV_MAX_PER_STAT = 32`)
+- **Sin techo total**: no hay límite de EVs entre todas las stats, solo el
+  individual de 32 por cada una
+- **Fórmula**: `evBonus = Math.floor(ev / 4)` — con 32 EVs máximos, el bonus
+  máximo por stat es **+8 puntos**
+- **Vitaminas para capear**: 8 vitaminas de la misma stat para llegar a 32 EVs
+
 ### Comportamiento
 
 **Los EVs se comparten entre TODOS los miembros de una cadena evolutiva.**
 Dar una vitamina a Ivysaur también beneficia a Bulbasaur y Venusaur (y viceversa).
+Los EVs persisten entre sesiones y entre runs (storage persistente).
 
 ### Cómo funciona — Storage.getEvolutionRoot(name)
 
@@ -1095,43 +1123,102 @@ Dar una vitamina a Ivysaur también beneficia a Bulbasaur y Venusaur (y vicevers
 siempre bajo esa clave raíz:
 
 ```js
-Storage.addEv('ivysaur', 'atk', 5);
-Storage.getEvs('bulbasaur').atk  // → 5
-Storage.getEvs('ivysaur').atk    // → 5
-Storage.getEvs('venusaur').atk   // → 5
+Storage.addEv('ivysaur', 'atk', 4);   // +4 EVs → +1 ATK visible
+Storage.getEvs('bulbasaur').atk  // → 4
+Storage.getEvs('ivysaur').atk    // → 4
+Storage.getEvs('venusaur').atk   // → 4
 Storage.getEvs('rattata').atk    // → 0 (cadena distinta)
 ```
 
-Verificado con test — funciona para cadenas de 2 y 3 eslabones.
-
 ### Dónde se aplica
 
-- `Storage.getEvs(pokemon.name)` — usado en `applyStoredEvs`, pokédex (detalle
-  y badge `EV`), y selector de vitaminas
-- Límite: **32 por stat** (`Storage.EV_MAX_PER_STAT`)
-- Las vitaminas son el único modo de subir EVs (no se ganan en combate)
+- `Storage.applyStoredEvs(pokemon)` — se llama en `GameState.init()` para el
+  starter, y en `createPokemon` para todos los pokemon del jugador (`isPlayer: true`)
+- `Storage.getEvs(pokemon.name)` — usado en pokédex (detalle y badge `EV`) y
+  en el selector de vitaminas (`_showEvItemSelector`)
+- Al evolucionar, `createPokemon` carga automáticamente los EVs de la cadena
 
 ---
 
 ## 11. Recompensas de fin de ruta
 
-Al completar un camino, `_showItemReward()` muestra **3 premios elegidos sin
-repetir** de un pool de candidatos. El pool base son siempre estos 3:
+Al completar un camino, `_showItemReward()` muestra siempre **3 premios**.
+El sistema usa **slots fijos** opcionales y completa el resto con un
+**pool aleatorio**.
 
-### 1. Pokemon de la ruta
+### Los 3 slots fijos (opcionales)
 
-- Se elige aleatoriamente de `data.rewardPokemon` (array en `routes.js`)
-- Se crea con `createPokemon(name, maxLevel, true)` donde `maxLevel` es el
-  nivel más alto del equipo actual — el pokemon de recompensa nunca es
-  más débil que tu equipo
-- Se marca automáticamente como `caught` en la pokédex
-- Si el equipo tiene <6 pokemon: se añade directamente
-- Si el equipo tiene 6: se abre `_showPokemonSwapSelector` — eliges cuál
-  sustituir, o "Cancelar" para no añadirlo
+Cada slot fijo se activa si la ruta define su propiedad correspondiente:
 
-### 2. Vitamina aleatoria
+| Slot | Propiedad en routes.js | Qué elige |
+|---|---|---|
+| Pokemon | `rewardPokemon: [...]` | 1 al azar del array |
+| Objeto equipable | `rewardExtras: [...]` | 1 al azar del array |
+| MT de ruta | `rewardTMs: [...]` | 1 al azar de las MTs elegibles del array |
 
-Una de las 6 vitaminas elegida al azar:
+**Si los 3 slots están definidos** → exactamente 3 premios fijos (1 de cada),
+sin ninguna aleatoriedad del pool base.
+
+**Si faltan slots** → los slots vacíos se rellenan del pool aleatorio
+(`3 - fixedPrizes.length` slots).
+
+### Pool aleatorio (completa slots vacíos)
+
+El pool tiene siempre 3 candidatos (se toman al azar tantos como slots vacíos):
+
+1. **Vitamina aleatoria** — 1 de las 6 vitaminas al azar
+2. **Rare Candy** — +1 nivel a todo el equipo
+3. **MT del pool global** — 1 MT del catálogo completo elegida al azar,
+   excluyendo la MT de ruta si ya se eligió como slot fijo.
+   Solo aparece si algún pokemon del equipo aún puede aprenderla.
+
+Ejemplos de combinaciones:
+
+| `rewardPokemon` | `rewardExtras` | `rewardTMs` | Resultado |
+|---|---|---|---|
+| — | — | — | vitamina + candy + MT global (pool aleatorio) |
+| ✓ | — | — | pokemon fijo + 2 del pool |
+| ✓ | ✓ | — | pokemon fijo + objeto fijo + 1 del pool |
+| ✓ | ✓ | ✓ | pokemon fijo + objeto fijo + MT fija (sin pool) |
+| — | ✓ | ✓ | objeto fijo + MT fija + 1 del pool |
+
+### Slot 1 — Pokemon de recompensa
+
+```js
+rewardPokemon: [POKEMON.eevee, POKEMON.pikachu],
+```
+
+- Se elige 1 al azar del array
+- Se crea con `createPokemon(name, maxLevel, true)` — nunca más débil que
+  el equipo actual
+- Se marca como `caught` en pokédex automáticamente
+- Si equipo < 6: se añade directo; si 6/6: abre `_showPokemonSwapSelector`
+
+### Slot 2 — Objeto equipable
+
+```js
+rewardExtras: [ITEM.sitrus_berry, ITEM.choice_band],
+```
+
+- Se elige 1 al azar del array
+- Abre `_showHeldItemSelector` — eliges a qué pokemon equiparlo
+- Si el pokemon ya lleva objeto, el anterior se revierte y se pierde
+
+### Slot 3 — MT de ruta
+
+```js
+rewardTMs: ['tm-earthquake', 'tm-ice-beam'],
+```
+
+- Se filtra cuáles puede aprender algún pokemon del equipo y aún no la sabe
+- Se elige 1 al azar de las elegibles
+- Si ninguna es elegible (ya las sabe todo el equipo), el slot queda vacío
+  y se rellena del pool aleatorio
+
+### Vitaminas (pool aleatorio)
+
+Una de las 6 vitaminas elegida al azar. Cada vitamina da **+4 EVs** a la stat
+correspondiente (+1 punto de stat visible inmediatamente):
 
 | Vitamina | Stat | Sprite |
 |---|---|---|
@@ -1142,54 +1229,23 @@ Una de las 6 vitaminas elegida al azar:
 | Zinc | SPD | `assets/sprites/items/zinc.png` |
 | Carbohidratos | VEL | `assets/sprites/items/carbo.png` |
 
-Abre `_showEvItemSelector` para elegir a qué pokemon (y por tanto a qué
-cadena evolutiva, ver sección 10) se aplica el EV.
+Abre `_showEvItemSelector` para elegir a qué pokemon (y cadena evolutiva,
+sección 10) se aplica.
 
-### 3. Rare Candy
+### Rare Candy (pool aleatorio)
 
 `+1 nivel a todo el equipo` vía `levelUpPokemon(p, 1)`.
 Sprite: `assets/sprites/items/rarecandy.png`.
 
-### rewardExtras — objetos equipables como candidatos extra
-
-`ROUTE_DATA[area].rewardExtras` es un array opcional de ids de
-`HELD_ITEMS` (sección 9.5), referenciados vía la constante `ITEM`:
-
-```js
-'route-1': {
-  rewardPokemon: [...],
-  rewardExtras: [ITEM.sitrus_berry, ITEM.choice_scarf],  // opcional
-  ...
-}
-```
-
-Cada entrada de `rewardExtras` se añade como **candidato adicional** de tipo
-`held-item` al pool junto a los 3 base. **De entre todos los candidatos
-disponibles se eligen 3 al azar, sin repetir**:
-
-| `rewardExtras` | Candidatos totales | Resultado |
-|---|---|---|
-| `[]` o ausente | 3 (pokemon, vitamina, candy) | Siempre los 3 base |
-| `[ITEM.sitrus_berry]` | 4 | 3 al azar de los 4 |
-| `[ITEM.sitrus_berry, ITEM.choice_scarf]` | 5 | 3 al azar de los 5 |
-
-El algoritmo (`_showItemReward`): si hay ≤3 candidatos, se muestran todos
-tal cual; si hay más, se asigna a cada uno un número aleatorio (`Math.random()`),
-se ordenan por ese número y se toman los primeros 3 — garantiza 3 elementos
-**distintos**, sin necesidad de comprobar duplicados manualmente.
-
-Al elegir un premio `type:'held-item'`, se abre `_showHeldItemSelector` —
-eliges a qué pokemon del equipo se equipa (`equipHeldItem`). Si ese pokemon
-ya llevaba otro objeto, se muestra "Sustituye: <nombre>" — el objeto anterior
-se revierte y se pierde (igual que `_showUnequipItemConfirm`, sección 9.5).
-
-### Añadir rewardPokemon/rewardExtras a una ruta nueva
+### Añadir recompensas a una ruta
 
 ```js
 'nueva-ruta': {
   rewardPokemon: [POKEMON.eevee, POKEMON.pikachu],
-  rewardExtras:  [ITEM.sitrus_berry],  // opcional
-  ...
+  rewardExtras:  [ITEM.sitrus_berry],       // opcional
+  rewardTMs:     ['tm-earthquake'],         // opcional — ids de TM_LIST
+  wild: [...],
+  // ...
 }
 ```
 
@@ -1368,9 +1424,17 @@ añadido a `document.body` en `DOMContentLoaded` (visible en cualquier pantalla,
 no solo el título — un contenedor padre con `overflow:hidden` lo ocultaría si
 estuviera dentro de `#app`).
 
-Al pulsar pide `confirm()` y, si se acepta, limpia `pkmn_pokedex` y `pkmn_evs`
-de `localStorage` (`Storage._set('pokedex', {})` y `Storage._set('evs', {})`).
-Muestra `✓` verde como feedback durante 1.5s.
+Al pulsar pide `confirm()` y, si se acepta, borra **las 4 claves de Storage**:
+
+```js
+Storage._set('pokedex', {});   // estado caught/seen de los 151 pokemon
+Storage._set('evs', {});       // EVs acumulados por cadena evolutiva
+Storage._set('mts', {});       // MTs aprendidas por cadena evolutiva
+Storage._set('badges', {});    // medallas ganadas por cadena evolutiva
+```
+
+Muestra `✓` verde como feedback durante 1.5s. Las medallas también desaparecen
+de la pokédex ya que `Storage.getBadges(name)` devuelve `[]` tras el reset.
 
 
 ## 17. Captura — límite de 6 pokemon en el equipo
@@ -1905,4 +1969,117 @@ async function evolve(pokemon, intoName) {
 
 Pon `SHINY_RATE = 1` en `routes.js` para que **todos** los Pokémon salvajes
 sean shiny. Recuerda volver a `0.001` (o el valor que quieras) para producción.
+
+---
+
+## 26. MTs — Máquinas Técnicas
+
+### Qué son
+
+Las MTs (Máquinas Técnicas) son movimientos especiales que los pokemon pueden
+aprender fuera del moveset por stage (sección 5). A diferencia de los movimientos
+normales, las MTs se enseñan manualmente y persisten en Storage entre sesiones.
+
+### Definición — TM_LIST (tms.js)
+
+```js
+var TM_LIST = {
+  'tm-earthquake': {
+    name: 'MT Terremoto',
+    moveId: 'earthquake',       // id del movimiento en MOVE_BY_ID
+    pokemons: ['bulbasaur', 'ivysaur', 'venusaur', ...],  // quién puede aprenderla
+  },
+  'tm-ice-beam': {
+    name: 'MT Rayo Hielo',
+    moveId: 'ice-beam',
+    pokemons: [...],
+  },
+  // ...
+};
+```
+
+`canLearnTM(pokemon, tmId)` — devuelve `true` si ese pokemon puede aprender la MT
+según su entrada en `TM_LIST.pokemons`.
+
+### Persistencia — Storage.getLearnedMTs / addLearnedMT
+
+Las MTs se guardan por **raíz de cadena evolutiva**, igual que los EVs y las medallas:
+
+```js
+Storage.addLearnedMT('bulbasaur', 'earthquake');
+Storage.getLearnedMTs('ivysaur');   // → ['earthquake']  (misma cadena)
+Storage.getLearnedMTs('venusaur');  // → ['earthquake']  (misma cadena)
+Storage.getLearnedMTs('rattata');   // → []
+```
+
+Esto significa que **si Bulbasaur aprende Terremoto, Ivysaur y Venusaur también
+lo tienen disponible** al ser creados o al evolucionar.
+
+### Carga de MTs en createPokemon
+
+Solo los pokemon del jugador (`isPlayer: true`) cargan MTs desde Storage:
+
+```js
+const learnedMTs = isPlayer ? Storage.getLearnedMTs(name) : [];
+for (const mtId of learnedMTs) {
+  const m = MOVE_BY_ID[mtId];
+  if (m && !moves.find(mv => mv.id === mtId)) moves.push({ ...m, maxPp: m.pp });
+}
+```
+
+Los rivales y pokemon salvajes nunca cargan MTs.
+
+### MTs en pokemon capturados (wild)
+
+Al capturar un pokemon salvaje (`autoCapture` o captura manual), se carga
+explícitamente la cadena de MTs en ese momento:
+
+```js
+foe.isPlayer = true;
+const capturedMTs = Storage.getLearnedMTs(foe.name);
+foe.learnedMTs = capturedMTs;
+for (const mtId of capturedMTs) {
+  const m = MOVE_BY_ID[mtId];
+  if (m && !foe.moves.find(mv => mv.id === mtId))
+    foe.moves.push({ ...m, maxPp: m.pp });
+}
+```
+
+Esto asegura que un Goldeen recién capturado tenga las MTs que su cadena ya
+había aprendido en runs anteriores.
+
+### MTs en la Pokédex
+
+En el detalle de un pokemon capturado, los movimientos aprendidos por MT
+aparecen al final de la lista de movimientos con una etiqueta azul **MT**:
+
+- Fondo azul claro diferenciado de los movimientos normales
+- Badge `MT` en azul a la izquierda del nombre
+- Se cargan con `Storage.getLearnedMTs(name)` — si Bulbasaur tiene Terremoto,
+  la entrada de Ivysaur en la pokédex también lo muestra (misma cadena)
+
+### MTs como recompensa — rewardTMs
+
+Ver sección 11. Al recibir una MT como premio de fin de ruta:
+
+1. Se muestra selector de pokemon elegibles (los que pueden aprender esa MT
+   y aún no la saben)
+2. El jugador elige a qué pokemon enseñarla
+3. `Storage.addLearnedMT(pokemon.name, mtId)` persiste la MT
+4. El movimiento se añade al array `moves` del pokemon inmediatamente
+5. La MT queda disponible para toda la cadena evolutiva en futuras partidas
+
+### autoMove al evolucionar con MTs
+
+`evolve()` preserva el `autoMove` previo si el movimiento existe en el nuevo
+moveset (incluyendo MTs):
+
+```js
+newPoke.autoMove = (pokemon.autoMove && newPoke.moves.find(m => m.id === pokemon.autoMove))
+  ? pokemon.autoMove
+  : newPoke.moves[0]?.id ?? null;
+```
+
+Si el autoMove era una MT aprendida, la evolución lo conserva porque esa MT
+se vuelve a cargar desde Storage en `createPokemon`.
 

@@ -138,14 +138,6 @@ function gainExp(pokemon, foeName, battleType = 'wild', foeLevel = 5, activeLeve
   return { gained, levelsGained };
 }
 
-function gainEVs(pokemon, foeBaseStats) {
-  const highest = Object.entries(foeBaseStats).sort((a,b) => b[1]-a[1])[0][0];
-  const total   = Object.values(pokemon.evs).reduce((a,b) => a+b, 0);
-  if (total < 510 && pokemon.evs[highest] < 252) {
-    pokemon.evs[highest] = Math.min(252, pokemon.evs[highest] + 3);
-    pokemon.stats = computeStats(pokemon);
-  }
-}
 
 function levelUpPokemon(pokemon, levels) {
   let gained = 0;

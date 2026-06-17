@@ -3,6 +3,9 @@
 //
 // Usa TYPES y DAMAGE_CLASS en vez de strings para evitar errores tipográficos.
 // Uso: type: TYPES.FIRE, damageClass: DAMAGE_CLASS.SPECIAL
+// 
+// mt: true hace que el movimiento solo se pueda aprender por mt
+// 
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Lista cerrada de tipos de pokemon válidos
@@ -39,6 +42,8 @@ var MOVE_POOL = {
       { stage: 1, id: 'tackle', name: 'Placaje', power: 40, pp: 35, type: 'normal', damageClass: 'physical' },
       { stage: 2, id: 'extreme-speed', name: 'Velocidad Extrema', power: 70, pp: 15, type: 'normal', damageClass: 'physical', effectId: 'priority' },
       { stage: 3, id: 'hyper-fang', name: 'Hiper Colmillo', power: 90, pp: 15, type: 'normal', damageClass: 'physical', effectId: 'shield-10' },
+      { id: 'self-destruct', name: 'Autodestruccion', power: 400, pp: 5, type: 'normal', damageClass: 'physical', effectId: 'self-destruct', boss: true },
+      { id: 'false-swipe', name: 'Sonambulo', power: 5, pp: 100, type: 'normal', damageClass: 'physical', effectId: ['recoil-10', 'shield-25', 'sleep-self', 'sleep-attack'], boss: true },
     ],
     special: [
       { stage: 1, id: 'swift', name: 'Velocidad', power: 60, pp: 20, type: 'normal', damageClass: 'special', effectId: 'shield-10' },
@@ -67,7 +72,7 @@ var MOVE_POOL = {
     ],
     special: [
       { stage: 1, id: 'water-gun', name: 'Pistola Agua', power: 40, pp: 25, type: 'water', damageClass: 'special', effectId: 'raise-spa-10' },
-      { stage: 2, mt: true, id: 'surf', name: 'Surf', power: 90, pp: 15, type: 'water', damageClass: 'special' },
+      { stage: 2, id: 'surf', name: 'Surf', power: 90, pp: 15, type: 'water', damageClass: 'special' },
       { stage: 3, id: 'hydro-pump', name: 'Hidrobomba', power: 110, pp: 5, type: 'water', damageClass: 'special' },
     ],
   },
@@ -79,8 +84,9 @@ var MOVE_POOL = {
     ],
     special: [
       { stage: 1, id: 'absorb', name: 'Absorber', power: 40, pp: 25, type: 'grass', damageClass: 'special', effectId: 'drain-10' },
-      { stage: 2, id: 'magical-leaf', name: 'Hoja Magica', power: 60, pp: 20, type: 'grass', damageClass: 'special', effectId: 'sleep-15' },
-      { stage: 3, mt: true, id: 'solar-beam', name: 'Rayo Solar', power: 120, pp: 10, type: 'grass', damageClass: 'special' },
+      { stage: 2, id: 'magical-leaf', name: 'Hoja Magica', power: 60, pp: 99, type: 'grass', damageClass: 'special', effectId: 'sleep-15' },
+      { stage: 3, id: 'solar-beam', name: 'Rayo Solar', power: 120, pp: 99, type: 'grass', damageClass: 'special' },
+      { stage: 4, mt: true, id: 'giga-drain', name: 'Gigadrenado', power: 90, pp: 99, type: 'grass', damageClass: 'special', effectId: 'drain-50'  },
     ],
   },
   electric: {
@@ -91,7 +97,7 @@ var MOVE_POOL = {
     ],
     special: [
       { stage: 1, id: 'thunder-shock', name: 'Impactrueno', power: 40, pp: 30, type: 'electric', damageClass: 'special', effectId: 'paralize-25' },
-      { stage: 2, mt: true, id: 'thunderbolt', name: 'Rayo', power: 90, pp: 15, type: 'electric', damageClass: 'special' },
+      { stage: 2, id: 'thunderbolt', name: 'Rayo', power: 90, pp: 15, type: 'electric', damageClass: 'special' },
       { stage: 3, id: 'thunder', name: 'Trueno', power: 110, pp: 10, type: 'electric', damageClass: 'special' },
     ],
   },
@@ -103,7 +109,7 @@ var MOVE_POOL = {
     ],
     special: [
       { stage: 1, id: 'powder-snow', name: 'Polvo de Nieve', power: 40, pp: 25, type: 'ice', damageClass: 'special' },
-      { stage: 2, mt: true, id: 'ice-beam', name: 'Rayo Hielo', power: 90, pp: 10, type: 'ice', damageClass: 'special' },
+      { stage: 2, id: 'ice-beam', name: 'Rayo Hielo', power: 90, pp: 10, type: 'ice', damageClass: 'special' },
       { stage: 3, id: 'blizzard', name: 'Ventisca', power: 110, pp: 5, type: 'ice', damageClass: 'special' },
     ],
   },
@@ -135,7 +141,7 @@ var MOVE_POOL = {
     physical: [
       { stage: 1, id: 'bulldoze', name: 'Terratemblor', power: 60, pp: 20, type: 'ground', damageClass: 'physical' },
       { stage: 2, id: 'stomping-tantrum', name: 'Pataleta', power: 85, pp: 10, type: 'ground', damageClass: 'physical' },
-      { stage: 3, mt: true, id: 'earthquake', name: 'Terremoto', power: 100, pp: 10, type: 'ground', damageClass: 'physical' },
+      { stage: 3, id: 'earthquake', name: 'Terremoto', power: 100, pp: 10, type: 'ground', damageClass: 'physical' },
     ],
     special: [
       { stage: 1, id: 'mud-shot', name: 'Disparo Lodo', power: 55, pp: 15, type: 'ground', damageClass: 'special' },

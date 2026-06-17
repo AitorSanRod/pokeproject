@@ -22,7 +22,8 @@ const POKEMON = POKEMON_LIST;
 const PATH_TYPE = {
   Trainer: 'trainer',
   Wild: 'wild',
-  Special: 'special'
+  Special: 'special',
+  Heal: 'heal'
 };
 const ENTRENADORES = {
   Rival: {
@@ -77,6 +78,14 @@ const ENTRENADORES = {
   Marinero: {
     name: 'Marinero',
     img: 'assets/sprites/trainers/marinero.png'
+  },
+  Rocket: {
+    name: 'Rocket',
+    img: 'assets/sprites/trainers/soldado-rocket.png'
+  },
+  Giovanni: {
+    name: 'Giovanni',
+    img: 'assets/sprites/trainers/giovanni.png'
   }
 }
 var SHINY_RATE = 0.005;
@@ -318,7 +327,7 @@ var ROUTE_DATA = {
       { name: POKEMON.zubat, rate: 30, minLv: 11, maxLv: 14, moveId: MOVES.poison.physical.poison_jab },
       { name: POKEMON.geodude, rate: 25, minLv: 11, maxLv: 13, moveId: MOVES.rock.physical.rock_throw },
       { name: POKEMON.paras, rate: 5, minLv: 14, maxLv: 17, moveId: MOVES.poison.physical.poison_sting },
-      { name: POKEMON.clefairy, minLv: 16, maxLv: 20, moveId: MOVES.fairy.special.disarming_voice },
+      { name: POKEMON.clefairy, rate: 10, minLv: 16, maxLv: 20, moveId: MOVES.fairy.special.disarming_voice },
     ],
     trainer: [
       {
@@ -482,7 +491,7 @@ var ROUTE_DATA = {
       {
         name: 'Adrián el dominguero', img: 'assets/sprites/trainers/campista.png', rate: 100, pokemon: [
           { name: POKEMON.mr_mime, minLv: 25, maxLv: 28, moveId: MOVES.psychic.special.psychic },
-          { name: POKEMON.pinsir, minLv: 26, maxLv: 28, moveId: MOVES.water.physical.megahorn, shiny: true },
+          { name: POKEMON.pinsir, minLv: 26, maxLv: 28, moveId: MOVES.bug.physical.megahorn, shiny: true },
         ]
       },
     ],
@@ -618,6 +627,200 @@ var ROUTE_DATA = {
   },
 
   // ═══════════════════════════════════════════════════════════════════════
+  // Guarida Rocket
+  // ═══════════════════════════════════════════════════════════════════════
+
+  'ruta-9': {
+    bg: 'assets/bg/ruta-9.png',
+    combatBg: 'assets/bg/combate.png',
+    rewardPokemon: [POKEMON.rattata, POKEMON.spearow, POKEMON.ekans, POKEMON.sandshrew],
+    rewardExtras: [ITEM.miracle_seed],
+    wild: [
+      { name: POKEMON.rattata, rate: 35, minLv: 22, maxLv: 26, moveId: MOVES.normal.physical.tackle },
+      { name: POKEMON.spearow, rate: 15, minLv: 22, maxLv: 26, moveId: MOVES.normal.physical.tackle },
+      { name: POKEMON.spearow, rate: 10, minLv: 22, maxLv: 26, moveId: MOVES.flying.physical.wing_attack },
+      { name: POKEMON.ekans, rate: 20, minLv: 22, maxLv: 26, moveId: MOVES.poison.physical.poison_jab },
+      { name: POKEMON.sandshrew, rate: 20, minLv: 22, maxLv: 26, moveId: MOVES.ground.physical.stomping_tantrum },
+    ],
+    trainer: [
+      {
+        name: `${ENTRENADORES.Dominguera.name}`, img: ENTRENADORES.Dominguera.img, rate: 25, pokemon: [
+          { name: POKEMON.oddish, minLv: 22, maxLv: 25, moveId: MOVES.grass.special.magical_leaf },
+          { name: POKEMON.bellsprout, minLv: 24, maxLv: 27, moveId: MOVES.poison.special.poison_powder },
+          { name: POKEMON.oddish, minLv: 22, maxLv: 27, moveId: MOVES.grass.special.magical_leaf },
+          { name: POKEMON.bellsprout, minLv: 24, maxLv: 27, moveId: MOVES.poison.special.sludge_bomb }
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Montanero.name}`, img: ENTRENADORES.Montanero.img, rate: 25, pokemon: [
+          { name: POKEMON.machop, minLv: 22, maxLv: 27, moveId: MOVES.fighting.physical.karate_chop },
+          { name: POKEMON.onix, minLv: 24, maxLv: 27, moveId: MOVES.rock.physical.rock_slide },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Campista.name}`, img: ENTRENADORES.Campista.img, rate: 25, pokemon: [
+          { name: POKEMON.growlithe, minLv: 22, maxLv: 25, moveId: MOVES.fire.physical.fire_fang },
+          { name: POKEMON.charmeleon, minLv: 24, maxLv: 27, moveId: MOVES.fire.special.flamethrower },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Montanero.name}`, img: ENTRENADORES.Montanero.img, rate: 25, pokemon: [
+          { name: POKEMON.machop, minLv: 28, maxLv: 37, moveId: MOVES.fighting.physical.brick_break },
+        ]
+      }
+    ],
+    paths: [
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Heal }, { type: PATH_TYPE.Wild }],
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }],
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }]
+    ],
+  },
+
+  'ruta-10': {
+    bg: 'assets/bg/ruta-10.png',
+    combatBg: 'assets/bg/combate.png',
+    wild: [
+      { name: POKEMON.voltorb, rate: 40, minLv: 22, maxLv: 26, moveId: MOVES.electric.special.thunderbolt },
+      { name: POKEMON.spearow, rate: 25, minLv: 22, maxLv: 26, moveId: MOVES.normal.physical.tackle },
+      { name: POKEMON.spearow, rate: 20, minLv: 22, maxLv: 26, moveId: MOVES.flying.physical.wing_attack },
+      { name: POKEMON.ekans, rate: 25, minLv: 22, maxLv: 26, moveId: MOVES.poison.physical.poison_jab },
+    ],
+    trainer: [
+      {
+        name: `${ENTRENADORES.Dominguera.name}`, img: ENTRENADORES.Dominguera.img, rate: 35, pokemon: [
+          { name: POKEMON.pikachu, minLv: 22, maxLv: 25, moveId: MOVES.electric.special.thunderbolt },
+          { name: POKEMON.clefairy, minLv: 24, maxLv: 27, moveId: MOVES.normal.special.hyper_voice },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Montanero.name}`, img: ENTRENADORES.Montanero.img, rate: 35, pokemon: [
+          { name: POKEMON.onix, minLv: 24, maxLv: 30, moveId: MOVES.rock.physical.rock_slide },
+          { name: POKEMON.graveler, minLv: 24, maxLv: 32, moveId: MOVES.rock.physical.rock_slide },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Campista.name}`, img: ENTRENADORES.Campista.img, rate: 15, pokemon: [
+          { name: POKEMON.growlithe, minLv: 22, maxLv: 25, moveId: MOVES.fire.physical.fire_fang },
+          { name: POKEMON.charmeleon, minLv: 24, maxLv: 27, moveId: MOVES.fire.special.flamethrower },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Montanero.name}`, img: ENTRENADORES.Montanero.img, rate: 15, pokemon: [
+          { name: POKEMON.machop, minLv: 28, maxLv: 37, moveId: MOVES.fighting.physical.brick_break },
+        ]
+      }
+    ]
+  },
+
+  'entrada-tunel-roca-info': {
+    type: 'information',
+    bg: 'assets/bg/tunel-roca.png',
+    title: 'Entrada del Tunel Roca',
+    description: '<div style="display: flex; justify-content: center;"><img src="assets/sprites/others/montanero.gif"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">Un montañero bloquea la entrada al Tunel Roca</p>',
+  },
+
+  'entrada-tunel-roca': {
+    bg: 'assets/bg/tunel-roca.png',
+    combatBg: 'assets/bg/combate-cueva.png',
+    rewardPokemon: [POKEMON.snorlax],
+    wild: [],
+    trainer: [],
+    specialTrainer: {
+      name: 'Montañero Ninja David', img: ENTRENADORES.Montanero.img, pokemon: [
+        { name: POKEMON.slowpoke, minLv: 25, maxLv: 35, moveId: MOVES.water.special.surf },
+        { name: POKEMON.psyduck, minLv: 22, maxLv: 31, moveId: MOVES.psychic.special.confusion },
+        { name: POKEMON.drowzee, minLv: 25, maxLv: 35, moveId: MOVES.psychic.special.psychic },
+        { name: POKEMON.snorlax, minLv: 25, maxLv: 35, moveId: MOVES.normal.physical.false_swipe },
+        { name: POKEMON.voltorb, minLv: 35, maxLv: 40, moveId: MOVES.normal.physical.self_destruct },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Special }],
+    ],
+  },
+
+  'tunel-roca': {
+    bg: 'assets/bg/tunel-roca.png',
+    combatBg: 'assets/bg/combate-cueva.png',
+    rewardExtras: [ITEM.miracle_seed, ITEM.carbon, ITEM.assault_vest],
+    wild: [
+      { name: POKEMON.onix, rate: 40, minLv: 24, maxLv: 30, moveId: MOVES.rock.physical.rock_slide },
+      { name: POKEMON.geodude, rate: 40, minLv: 24, maxLv: 30, moveId: MOVES.ground.physical.stomping_tantrum },
+      { name: POKEMON.machoke, rate: 34, minLv: 26, maxLv: 35, moveId: MOVES.fighting.physical.close_combat },
+    ],
+    trainer: [
+      {
+        name: `${ENTRENADORES.Montanero.name}`, img: ENTRENADORES.Montanero.img, rate: 100, pokemon: [
+          { name: POKEMON.bellsprout, minLv: 24, maxLv: 27, moveId: MOVES.poison.special.poison_powder },
+          { name: POKEMON.clefairy, minLv: 24, maxLv: 27, moveId: MOVES.normal.special.hyper_voice },
+        ]
+      }
+    ],
+  },
+
+  'ciudad-azulona': {
+    bg: 'assets/bg/ciudad-azulona.png',
+    combatBg: 'assets/bg/combate.png',
+    wild: [
+      { name: POKEMON.eevee, rate: 5, minLv: 10, maxLv: 30, moveId: MOVES.normal.physical.tackle },
+      { name: POKEMON.growlithe, rate: 5, minLv: 22, maxLv: 25, moveId: MOVES.fire.physical.fire_fang },
+      { name: POKEMON.raticate, rate: 90, minLv: 28, maxLv: 32, moveId: MOVES.normal.physical.hyper_fang },
+    ],
+    trainer: [
+      {
+        name: `${ENTRENADORES.Cientifico.name}`, img: ENTRENADORES.Cientifico.img, rate: 100, pokemon: [
+          { name: POKEMON.voltorb, minLv: 32, maxLv: 35, moveId: MOVES.electric.special.thunder },
+          { name: POKEMON.electrode, minLv: 30, maxLv: 36, moveId: MOVES.normal.special.hyper_voice },
+        ]
+      }
+    ],
+    paths: [
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }],
+    ]
+  },
+
+  'guarida-rocket': {
+    bg: 'assets/bg/guarida-rocket.png',
+    combatBg: 'assets/bg/combate-electrico.png',
+    wild: [
+      { name: POKEMON.voltorb, rate: 100, minLv: 32, maxLv: 35, moveId: MOVES.electric.special.thunder },
+    ],
+    trainer: [
+      {
+        name: `${ENTRENADORES.Cientifico.name}`, img: ENTRENADORES.Cientifico.img, rate: 15, pokemon: [
+          { name: POKEMON.voltorb, minLv: 32, maxLv: 35, moveId: MOVES.electric.special.thunder },
+          { name: POKEMON.electrode, minLv: 30, maxLv: 36, moveId: MOVES.normal.special.hyper_voice },
+        ]
+      }
+    ],
+    specialTrainer: {
+      name: 'Jefe Giovanni', img: ENTRENADORES.Giovanni.img, pokemon: [
+        {
+          name: POKEMON.onix, minLv: 28, maxLv: 35, moveId: MOVES.rock.physical.rock_slide,
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 },
+          },
+        },
+        {
+          name: POKEMON.rhyhorn, minLv: 28, maxLv: 35, moveId: MOVES.ground.physical.earthquake,
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 },
+          },
+        },
+        {
+          name: POKEMON.kangaskhan, minLv: 35, maxLv: 39, moveId: MOVES.normal.physical.extreme_speed,
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 },
+          },
+        },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Special }],
+    ]
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
   // Extra
   // ═══════════════════════════════════════════════════════════════════════
 
@@ -626,11 +829,16 @@ var ROUTE_DATA = {
     combatBg: 'assets/bg/combate-espacio-raro.png',
     rewardPokemon: [POKEMON.mew],
     wild: [
-      { name: POKEMON.mewtwo, rate: 100, minLv: 40, maxLv: 60, moveId: MOVES.psychic.special.trick }
+      {
+        name: POKEMON.mewtwo, rate: 100, minLv: 50, maxLv: 70, moveId: MOVES.psychic.special.trick,
+        overrides: {
+          evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
+        },
+      }
     ],
     trainer: [],
     paths: [
-      [{ type: 'wild' }],
+      [{ type: PATH_TYPE.Wild }],
     ],
   },
 
@@ -677,6 +885,13 @@ var KANTO_ROUTES = [
   { name: 'Llega un barco', area: 'info-cgoob' },
   { name: 'SS Anne', area: 'ss-anne' },
   { name: 'Ciudad Carmín', area: 'ciudad-carmin' },
+  { name: 'Ruta 9', area: 'ruta-9' },
+  { name: 'Ruta 10', area: 'ruta-10' },
+  { name: 'Tunel Roca', area: 'entrada-tunel-roca-info' },
+  { name: 'Tunel Roca', area: 'entrada-tunel-roca' },
+  { name: 'Tunel Roca', area: 'tunel-roca' },
+  { name: 'Ciudad Azulona', area: 'ciudad-azulona' },
+  { name: 'Guarida Rocket', area: 'guarida-rocket' },
   { name: '???', area: 'espacio-raro' },
   { name: 'Final', area: 'info-final' }
 ];
