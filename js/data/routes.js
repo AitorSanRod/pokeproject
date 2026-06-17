@@ -80,6 +80,7 @@ const ENTRENADORES = {
   }
 }
 var SHINY_RATE = 0.005;
+//var SHINY_RATE = 0.05; //5%
 // Probabilidad (0–1) de que un Pokémon salvaje aparezca como shiny.
 // 0.001 = 1 de cada 1000 (equivale a 1/1024, similar a los juegos principales).
 
@@ -543,6 +544,13 @@ var ROUTE_DATA = {
     ],
   },
 
+  'info-cgoob': {
+    type: 'information',
+    bg: 'assets/bg/ss-anne.png',
+    title: 'SS Anne',
+    description: '<div style="display: flex; justify-content: center;"><img src="assets/sprites/others/rojo.gif"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">¿Quien es ese tío?</p>',
+  },
+
   'ss-anne': {
     bg: 'assets/bg/ss-anne.png',
     combatBg: 'assets/bg/combate-electrico.png',
@@ -666,6 +674,7 @@ var KANTO_ROUTES = [
   { name: 'Laboratorio de Bill', area: 'info-bill' },
   { name: 'Ruta 5', area: 'ruta-5' },
   { name: 'Ruta 6', area: 'ruta-6' },
+  { name: 'Llega un barco', area: 'info-cgoob' },
   { name: 'SS Anne', area: 'ss-anne' },
   { name: 'Ciudad Carmín', area: 'ciudad-carmin' },
   { name: '???', area: 'espacio-raro' },
