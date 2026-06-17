@@ -1,5 +1,5 @@
 const NOTES_DATA = {
-  "title": "Actualización 0.0.7",
+  "title": "Actualización 0.0.8",
   "lines": [
     "Nuevas rutas incluidas.",
     "Varios bugs corregidos.",
