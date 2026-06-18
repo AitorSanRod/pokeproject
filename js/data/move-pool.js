@@ -177,7 +177,7 @@ var MOVE_POOL = {
   },
   bug: {
     physical: [
-      { stage: 1, id: 'bug-bite', name: 'Picadura', power: 35, pp: 20, type: 'bug', damageClass: 'physical', effectId: 'recoil-10' },
+      { stage: 1, id: 'bug-bite', name: 'Picadura', power: 35, pp: 20, type: 'bug', damageClass: 'physical' },
       { stage: 2, id: 'x-scissor', name: 'Tijera X', power: 65, pp: 15, type: 'bug', damageClass: 'physical', effectId: 'recoil-10' },
       { stage: 3, id: 'megahorn', name: 'Megacuerno', power: 90, pp: 10, type: 'bug', damageClass: 'physical', },
     ],

@@ -235,8 +235,17 @@ const Screens = {
   // ADVENTURE — selección de camino + ejecución secuencial
   // ═══════════════════════════════════════════════════════════════════════
   adventure() {
-    const route = KANTO_ROUTES[GameState.routeIndex];
-    const data  = ROUTE_DATA[route.area];
+    let route, data;
+    if (GameState._optionalArea) {
+      const area = GameState._optionalArea;
+      GameState._optionalArea = null;
+      data  = ROUTE_DATA[area];
+      route = { name: data?.title ?? 'Ruta Opcional', area };
+    } else {
+      route = KANTO_ROUTES[GameState.routeIndex];
+      data  = ROUTE_DATA[route.area];
+    }
+    GameState.currentArea  = route.area;
     GameState.autoMode     = true;
     GameState.currentBg    = data?.bg ?? null;
     // Fondo de combate independiente — si la ruta no define combatBg,
@@ -280,16 +289,20 @@ const Screens = {
   // ni combates: solo un texto y un botón "CONTINUAR" que avanza a la
   // siguiente ruta (o a la pantalla de victoria si es la última).
   _showInformation(route, data) {
-    const bg = data.bg
-      ? `background-image:url('${data.bg}');background-size:cover;background-position:center;`
-      : `background:linear-gradient(160deg,var(--green-dark) 0%,var(--green) 100%);`;
+    const bgLayer = data.bg
+      ? `<div class="encounter-bg-layer" style="background-image:url('${data.bg}')"></div>`
+      : `<div style="position:absolute;inset:0;background:linear-gradient(160deg,var(--green-dark) 0%,var(--green) 100%);z-index:0"></div>`;
 
     document.getElementById('viewport').innerHTML = `
-      <div class="screen" style="${bg}
+      <div class="screen" style="position:relative;
         align-items:center;justify-content:center;gap:18px;padding:32px 24px;text-align:center;display:flex;flex-direction:column;">
-        ${data.title ? `<span style="font-family:var(--font-pixel);font-size:18px;color:var(--white);text-shadow:3px 3px 0 rgba(0,0,0,.3);line-height:1.6">${data.title.toUpperCase()}</span>` : ''}
-        ${data.description ? `<p style="text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">${data.description}</p>` : ''}
-        <button class="btn btn--primary btn--wide" id="btn-info-continue" style="max-width:240px">CONTINUAR</button>
+        ${bgLayer}
+        <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:18px;width:100%">
+          ${data.title ? `<span style="font-family:var(--font-pixel);font-size:18px;color:var(--white);text-shadow:3px 3px 0 rgba(0,0,0,.3);line-height:1.6">${data.title.toUpperCase()}</span>` : ''}
+          ${data.description ? `<p style="text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">${data.description}</p>` : ''}
+          <button class="btn btn--primary btn--wide" id="btn-info-continue" style="max-width:240px">CONTINUAR</button>
+          ${data.optional ? `<button class="btn btn--wide" id="btn-info-optional" style="max-width:240px">${data.optional.btnName.toUpperCase()}</button>` : ''}
+        </div>
       </div>`;
 
     document.getElementById('btn-info-continue').addEventListener('click', () => {
@@ -301,6 +314,12 @@ const Screens = {
         Screens._saveRun();
         Screens.show(Screens.adventure);
       }
+    });
+
+    document.getElementById('btn-info-optional')?.addEventListener('click', () => {
+      GameState._optionalArea = data.optional.area;
+      Screens._saveRun();
+      Screens.show(Screens.adventure);
     });
   },
 
@@ -529,8 +548,9 @@ const Screens = {
       return;
     }
 
-    const route = KANTO_ROUTES[GameState.routeIndex];
-    const data  = ROUTE_DATA[route.area];
+    const data  = ROUTE_DATA[GameState.currentArea];
+    const routeEntry = KANTO_ROUTES.find(r => r.area === GameState.currentArea);
+    const route = { area: GameState.currentArea, name: routeEntry?.name ?? data?.title ?? GameState.currentArea };
     const enc   = path[idx];
 
     GameState.currentEncounter++;
@@ -843,18 +863,15 @@ const Screens = {
   },
 
   async _showItemReward() {
-    const route = KANTO_ROUTES[GameState.routeIndex];
-    const data  = ROUTE_DATA[route.area];
+    const data  = ROUTE_DATA[GameState.currentArea];
+    const routeEntry = KANTO_ROUTES.find(r => r.area === GameState.currentArea);
+    const route = { area: GameState.currentArea, name: routeEntry?.name ?? data?.title ?? GameState.currentArea };
     const REWARD_BG = "url('assets/bg/price.png') center/cover no-repeat";
 
     const maxLevel = Math.max(...GameState.team.map(p => p.level));
 
     // ── Helpers ───────────────────────────────────────────────────────────────
-    const tmEligible = (tmId) => {
-      const tm = TM_LIST[tmId];
-      if (!tm) return false;
-      return !GameState.team.every(p => p.moves.some(m => m.id === tm.moveId));
-    };
+    const tmEligible = (tmId) => !!TM_LIST[tmId];
     const makeTmPrize = (tmId) => {
       const tm = TM_LIST[tmId];
       const move = MOVE_BY_ID[tm.moveId];
@@ -974,6 +991,10 @@ const Screens = {
         .map(({ p }) => p);
       prizes = [...fixedPrizes, ...shuffled];
     }
+    prizes = prizes
+      .map(p => ({ p, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ p }) => p);
 
     const advance = () => {
       GameState.routeIndex++;
@@ -1339,7 +1360,7 @@ const Screens = {
 
     console.log(`[COMBAT] ${introText.replace('\n',' ')}`);
 
-    const routeData = ROUTE_DATA[KANTO_ROUTES[GameState.routeIndex]?.area];
+    const routeData = ROUTE_DATA[GameState.currentArea];
     const bg      = GameState.currentCombatBg;
     const bgPos   = routeData?.combatBgPosition ?? 'center';
     const bgSize  = routeData?.combatBgSize ?? 'cover'; // p.ej. '130%' para zoom y poder mover

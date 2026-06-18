@@ -1,13 +1,27 @@
 var EXP_TABLE = {
-  BASE_EXP_REQUIRED: 15,
+  BASE_EXP_REQUIRED: {
+    ranges: [
+      { from:  1, to: 10, base: 10 },
+      { from: 11, to: 20, base: 12 },
+      { from: 21, to: 30, base: 14 },
+      { from: 31, to: 40, base: 17 },
+      { from: 41, to: 50, base: 20 },
+      { from: 51, to: 60, base: 21 },
+      { from: 61, to: 70, base: 22 },
+      { from: 71, to: 80, base: 22 },
+      { from: 81, to: 90, base: 23 },
+      { from: 91, to: 100, base: 25 },
+    ],
+    fallback: 15,
+  },
 
-  MULTIPLIERS: { wild: 0.9, trainer: 1.2, gym: 1.5 },
+  MULTIPLIERS: { wild: 1.0, trainer: 1.4, gym: 1.7 },
 
   // Penalización de experiencia por diferencia de nivel.
   // Tiers ordenados de mayor a menor diferencia — se aplica el primero que se cumpla.
   EXP_PENALTIES: [
-    { levelDiff: 5, multiplier: 0.05 },
-    { levelDiff: 2, multiplier: 0.2 }, // >2 niveles → 20% exp
+    { levelDiff: 10, multiplier: 0.01 },
+    { levelDiff: 6, multiplier: 0.5 }, // >2 niveles → 20% exp
   ],
 
   // EXP base al ser derrotado — fuente: PokeAPI / Gen 1 oficial
@@ -91,7 +105,10 @@ var EXP_TABLE = {
   },
 
   expToNext(level) {
-    return this.BASE_EXP_REQUIRED * level;
+    const cfg = this.BASE_EXP_REQUIRED;
+    const range = cfg.ranges.find(r => level >= r.from && level <= r.to);
+    const base  = range ? range.base : cfg.fallback;
+    return base * level;
   },
 
   getBaseExp(name) {

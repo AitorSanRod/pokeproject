@@ -33,7 +33,7 @@ movimientos, efectos, estados, evoluciones, recompensas y pantallas.
 18. [Progreso del camino durante combate](#18-progreso-del-camino-durante-combate)
 19. [UI — headers, botones atrás y pokéball](#19-ui--headers-botones-atrás-y-pokéball)
 20. [Validación de daño y efectividad de tipos](#20-validación-de-daño-y-efectividad-de-tipos)
-21. [Rutas tipo 'information' y pantalla final personalizable](#21-rutas-tipo-information-y-pantalla-final-personalizable)
+21. [Rutas tipo 'information', rutas opcionales y pantalla final](#21-rutas-tipo-information-y-pantalla-final-personalizable)
 22. [Orden de logs de combate — resumen vs efectos de objetos](#22-orden-de-logs-de-combate--resumen-vs-efectos-de-objetos)
 23. [Desglose de modificadores de daño en el log de combate](#23-desglose-de-modificadores-de-daño-en-el-log-de-combate)
 24. [Penalización de experiencia por diferencia de nivel](#24-penalización-de-experiencia-por-diferencia-de-nivel)
@@ -54,7 +54,7 @@ js/
   main.js                      GameState global + arranque + botón reset storage
   data/
     combat-config.js           Constantes de balance (STAB, crit, CATCH_RATE...)
-    exp-table.js                Tabla de EXP base + curva de nivel
+    exp-table.js                BASE_EXP_REQUIRED (tramos por nivel) + EXP_PENALTIES (array de tiers) + expToNext()
     move-pool.js                MOVE_POOL + TYPES + DAMAGE_CLASS + buildMoves() + getEvolutionStage()
     move-effects.js             TRIGGERS + MOVE_EFFECTS + applyEffect() + statusChance
     status-effects.js           StatusEffects: poison/paralysis/burn/sleep/freeze
@@ -790,7 +790,7 @@ raise-atk, etc.).
 | sleep-10 | AFTER_ATTACK | 10% de probabilidad de dormir al rival |
 | paralize-25 | AFTER_ATTACK | 25% de probabilidad de paralizar al rival |
 | double-hit | BEFORE_ATTACK | Golpea dos veces en el mismo turno |
-| priority | BEFORE_ATTACK | Ataca primero, ignora velocidad |
+| priority | BEFORE_ATTACK | Ataca primero respecto a un rival sin prioridad. Si ambos tienen prioridad, decide la velocidad. |
 | **clear** | BEFORE_ATTACK (pasivo) | Inmune a estados alterados y a bajadas de stat — ver abajo |
 | recoil-30 | ON_HITTED | Devuelve 30% del daño recibido al atacante |
 | shield-10 / shield-25 | ON_HITTED | Reduce el daño recibido un 10%/25% |
@@ -1170,7 +1170,10 @@ El pool tiene siempre 3 candidatos (se toman al azar tantos como slots vacíos):
 2. **Rare Candy** — +1 nivel a todo el equipo
 3. **MT del pool global** — 1 MT del catálogo completo elegida al azar,
    excluyendo la MT de ruta si ya se eligió como slot fijo.
-   Solo aparece si algún pokemon del equipo aún puede aprenderla.
+
+Los 3 premios finales se **barajan aleatoriamente** antes de mostrarse —
+el orden de aparición es diferente cada vez que se llega a la pantalla de
+recompensas.
 
 Ejemplos de combinaciones:
 
@@ -1210,10 +1213,12 @@ rewardExtras: [ITEM.sitrus_berry, ITEM.choice_band],
 rewardTMs: ['tm-earthquake', 'tm-ice-beam'],
 ```
 
-- Se filtra cuáles puede aprender algún pokemon del equipo y aún no la sabe
-- Se elige 1 al azar de las elegibles
-- Si ninguna es elegible (ya las sabe todo el equipo), el slot queda vacío
-  y se rellena del pool aleatorio
+- Una MT es **siempre elegible** si existe en `TM_LIST`, independientemente
+  de si el equipo actual puede aprenderla — el selector de pokemon mostrará
+  solo los elegibles en el momento de aplicarla
+- Se elige 1 al azar de las definidas en `rewardTMs`
+- Si ninguna existe en `TM_LIST` (ids incorrectos), el slot queda vacío y se
+  rellena del pool aleatorio
 
 ### Vitaminas (pool aleatorio)
 
@@ -1236,6 +1241,12 @@ sección 10) se aplica.
 
 `+1 nivel a todo el equipo` vía `levelUpPokemon(p, 1)`.
 Sprite: `assets/sprites/items/rarecandy.png`.
+
+Tras subir el nivel de cada miembro, se comprueba si alguno tiene
+`_pendingEvolution` (evolución pendiente porque el pokemon superó su nivel
+de evolución antes de que se procesara). Si lo tiene, evoluciona
+automáticamente sin ninguna animación de selección — el jugador simplemente
+verá la forma evolucionada al volver a la pantalla de ruta.
 
 ### Añadir recompensas a una ruta
 
@@ -1664,7 +1675,7 @@ Ambos coinciden exactamente con los valores observados en combate real.
 
 ---
 
-## 21. Rutas tipo 'information' y pantalla final personalizable
+## 21. Rutas tipo 'information', rutas opcionales y pantalla final personalizable
 
 ### Rutas tipo 'information'
 
@@ -1703,6 +1714,43 @@ completo `_renderAdventureShell` y `_showPathSelection`. El botón
 Esta pantalla **no entrega premios** — para eso siguen existiendo
 `rewardPokemon`/`rewardExtras` en rutas normales (sección 11), gestionados por
 `_showItemReward` sin cambios.
+
+### Rutas opcionales — campo `optional`
+
+Las rutas tipo `information` pueden ofrecer un **segundo botón** que lleva al
+jugador a una ruta opcional. Al terminar esa ruta, el flujo retoma la
+siguiente ruta de `KANTO_ROUTES` como si hubiera pulsado "CONTINUAR" en la
+pantalla de información.
+
+```js
+'info-ejemplo': {
+  type: 'information',
+  bg:   'assets/bg/espacio-raro.png',
+  title: 'Enhorabuena!',
+  description: 'Has superado este tramo...',
+  optional: {
+    btnName: 'Explorar cueva',   // texto del botón (se convierte a mayúsculas)
+    area: 'cueva-opcional',      // clave de ROUTE_DATA — puede ser cualquier ruta normal
+  },
+},
+```
+
+Comportamiento al pulsar el botón opcional:
+
+1. `GameState._optionalArea` se fija a `data.optional.area`
+2. Se llama `Screens.show(Screens.adventure)` — la pantalla de aventura
+   detecta `_optionalArea` y lo trata como si fuera la ruta activa
+3. `GameState.routeIndex` **no se incrementa** — sigue apuntando a la
+   pantalla de información
+4. Al completar la ruta opcional (recompensa → "CONTINUAR"), `advance()`
+   llama a `GameState.routeIndex++` y la partida continúa desde la siguiente
+   ruta en `KANTO_ROUTES` con normalidad
+
+`GameState.currentArea` actúa como fuente de verdad de la ruta activa durante
+toda la sesión. Las funciones internas (`_runNextInPath`, `_showItemReward`,
+render de combate) leen `GameState.currentArea` en vez de
+`KANTO_ROUTES[routeIndex].area`, lo que hace que las rutas opcionales sean
+transparentes para el resto del código.
 
 ### Pantalla final "HAS GANADO!" — FINAL_SCREEN
 
@@ -1802,49 +1850,96 @@ vacío y no se añade ninguna línea extra al log.
 
 ## 24. Penalización de experiencia por diferencia de nivel
 
-Configurable en `EXP_TABLE.EXP_PENALTY` (`exp-table.js`):
+Configurable en `EXP_TABLE.EXP_PENALTIES` (`exp-table.js`) — un array de
+tiers ordenado de **mayor a menor** diferencia de nivel. Se aplica el
+**primer tier que se cumpla**:
 
 ```js
-EXP_PENALTY: {
-  levelDiff: 2,    // diferencia de nivel a partir de la cual se aplica la penalización
-  multiplier: 0.5, // multiplicador de exp aplicado si se supera levelDiff
-},
+EXP_PENALTIES: [
+  { levelDiff: 5, multiplier: 0.05 }, // >5 niveles → 5% de la exp
+  { levelDiff: 2, multiplier: 0.2  }, // >2 niveles → 20% de la exp
+],
 ```
 
-**Regla**: si el pokemon **activo** del jugador (el que está combatiendo en
-ese momento, `ctx.activePlayer`) tiene más de `levelDiff` niveles por encima
-del pokemon rival derrotado, **todo el equipo** recibe
-`gained = Math.round(gained * multiplier)` — es decir, con los valores por
-defecto, la mitad de la experiencia que ganarían normalmente. Aplica por
-igual a combates salvajes, de entrenador y de gimnasio.
+**Regla**: si el pokemon **activo** del jugador (`ctx.activePlayer`) supera
+la diferencia de nivel de algún tier, **todo el equipo** recibe la exp
+multiplicada por ese `multiplier`. Los tiers se comprueban en orden — el
+primero que se cumpla gana (por eso se colocan de mayor a menor `levelDiff`).
+Aplica por igual a combates salvajes, de entrenador y de gimnasio.
+
+### Cómo añadir un tier nuevo
+
+Inserta una entrada nueva en el array **antes** del tier con menor `levelDiff`
+que ya exista. El array siempre debe estar ordenado de mayor a menor:
+
+```js
+EXP_PENALTIES: [
+  { levelDiff: 10, multiplier: 0.01 }, // >10 niveles → 1%
+  { levelDiff: 5,  multiplier: 0.05 }, // >5 niveles  → 5%
+  { levelDiff: 2,  multiplier: 0.2  }, // >2 niveles  → 20%
+],
+```
 
 ### Implementación
 
 `gainExp(pokemon, foeName, battleType, foeLevel, activeLevel)` (`pokemon.js`)
-acepta un quinto parámetro `activeLevel` — el nivel del pokemon activo del
-jugador en ese combate. Tras calcular `gained` con los multiplicadores
-habituales (`MULTIPLIERS`, `levelMult`), si
-`activeLevel - foeLevel > EXP_TABLE.EXP_PENALTY.levelDiff`, se aplica
-`gained = Math.round(gained * EXP_TABLE.EXP_PENALTY.multiplier)` **antes** de
-sumarlo a `pokemon.exp` — afecta tanto al pokemon activo como al resto del
-equipo, ya que la comparación de nivel siempre usa el activo, no cada
-miembro individualmente.
+acepta un quinto parámetro `activeLevel`. Tras calcular `gained`, busca con
+`Array.find` el primer tier donde `diff > tier.levelDiff` y aplica su
+`multiplier`:
+
+```js
+const diff = activeLevel - foeLevel;
+const penalty = (EXP_TABLE.EXP_PENALTIES ?? []).find(p => diff > p.levelDiff);
+if (penalty) gained = Math.round(gained * penalty.multiplier);
+```
+
+Afecta tanto al pokemon activo como al resto del equipo (la comparación de
+nivel siempre usa el activo). Si `activeLevel` se omite, vale `foeLevel`
+(diferencia 0 → sin penalización); llamadas antiguas siguen funcionando.
 
 Ambos puntos donde se reparte experiencia pasan `activeLevel`:
 
 - `screens.js` (`_combatEnd`) → `(ctx.activePlayer ?? player).level`
 - `battle.js` (simulador, `runBattleSim`) → `activePlayer.level`
 
-Si `activeLevel` se omite, por defecto vale `foeLevel` (diferencia 0 → sin
-penalización), por lo que llamadas antiguas a `gainExp` sin este parámetro
-siguen funcionando sin cambios de comportamiento.
-
 ### Ejemplo
 
-Con los valores por defecto (`levelDiff: 2`, `multiplier: 0.5`):
-- Activo Nv.12 vs rival Nv.10 → diferencia 2 → **sin penalización**, exp normal.
-- Activo Nv.13 vs rival Nv.10 → diferencia 3 → **penalización**, exp ÷ 2 para
-  todo el equipo (redondeado).
+Con los valores actuales (`levelDiff: 5 → 5%`, `levelDiff: 2 → 20%`):
+
+| Activo | Rival | Diferencia | Tier aplicado | Exp recibida |
+|---|---|---|---|---|
+| Nv.12 | Nv.10 | 2 | ninguno (≤2) | 100% |
+| Nv.13 | Nv.10 | 3 | tier 2 (>2) | 20% |
+| Nv.16 | Nv.10 | 6 | tier 1 (>5) | 5% |
+
+### Curva de experiencia — BASE_EXP_REQUIRED
+
+`expToNext(level)` calcula cuánta exp necesita un pokemon para subir al
+siguiente nivel. La base se define por **tramos de nivel** en
+`BASE_EXP_REQUIRED.ranges`:
+
+```js
+BASE_EXP_REQUIRED: {
+  ranges: [
+    { from:  1, to: 10, base: 10 },
+    { from: 11, to: 20, base: 12 },
+    { from: 21, to: 30, base: 14 },
+    { from: 31, to: 40, base: 18 },
+    { from: 41, to: 50, base: 20 },
+    { from: 51, to: 60, base: 20 },
+    { from: 61, to: 70, base: 21 },
+    { from: 71, to: 80, base: 21 },
+    { from: 81, to: 90, base: 23 },
+    { from: 91, to: 100, base: 25 },
+  ],
+  fallback: 15,   // si el nivel no cae en ningún tramo
+},
+```
+
+Fórmula: `expToNext(level) = base × level`. Así, `expToNext(5) = 10×5 = 50`,
+`expToNext(15) = 12×15 = 180`, y la curva crece de forma progresiva a medida
+que suben los niveles. Para modificar la dificultad de subida de nivel en un
+rango concreto, edita solo el campo `base` de ese tramo — el resto no cambia.
 
 ---
 

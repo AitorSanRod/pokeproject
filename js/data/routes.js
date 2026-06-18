@@ -114,7 +114,7 @@ var ROUTE_DATA = {
     ],
     trainer: [
       {
-        name: 'Youngster Joey', img: 'assets/sprites/trainers/entrenadorjoven.png', rate: 30, pokemon: [
+        name: 'Youngster Joey', img: ENTRENADORES.EntrenadorJoven.img, rate: 30, pokemon: [
           { name: POKEMON.rattata, minLv: 2, maxLv: 3, moveId: MOVES.normal.physical.tackle },
           { name: POKEMON.rattata, minLv: 3, maxLv: 3, moveId: MOVES.normal.physical.tackle },
         ]
@@ -851,6 +851,57 @@ var ROUTE_DATA = {
     title: '¡Enhorabuena!',
     description: 'Has superado este tramo de tu aventura.<br>En el futuro se desbloqueará nuevo contenido.',
   },
+  // ═══════════════════════════════════════════════════════════════════════
+  // OPCIONALES
+  // ═══════════════════════════════════════════════════════════════════════
+
+  'ciudad-verde-info': {
+    type: 'information',
+    bg: 'assets/bg/ciudad-verde.png',
+    title: 'Ciudad Verde',
+    description: 'Es el momento de volver sí<br>se te ha olvidado algo...',
+    optional: {
+      btnName: 'Volver a Pueblo Paleta',
+      area: 'pueblo-paleta-1',
+    },
+  },
+
+  'pueblo-paleta-1': {
+    bg: 'assets/bg/pueblo-paleta.png',
+    combatBg: 'assets/bg/combate.png',
+    get wild() {
+      const [primerInicial, segundoInicial] = ObtenerSegundoInicial(GameState.starterName ?? POKEMON.bulbasaur);
+      return [
+        { name: primerInicial, rate: 50, minLv: 2, maxLv: 3 },
+        { name: segundoInicial, rate: 50, minLv: 2, maxLv: 3 },
+      ];
+    },
+    trainer: [],
+    specialTrainer: {
+      name: 'Azul', img: 'assets/sprites/trainers/rival_kanto.png', pokemon: [
+        { name: 'RIVAL_STARTER', minLv: 3, maxLv: 4 },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Special }, { type: PATH_TYPE.Wild }],
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Ejemplos
+  // ═══════════════════════════════════════════════════════════════════════
+
+  'dev-ruta-opcional': {
+    type: 'information',
+    bg: 'assets/bg/bosque-verde.png',
+    title: 'Cruce de Caminos',
+    description: '<div style="display:flex;justify-content:center"><img src="assets/sprites/others/montanero.gif"></div><br><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">El camino principal sigue al norte. Al este se oye algo en el bosque...</p>',
+    optional: {
+      btnName: 'Explorar el bosque',
+      area: 'route-22',
+    },
+  },
+
 };
 
 // ── Pantalla final ────────────────────────────────────────
@@ -866,6 +917,7 @@ var FINAL_SCREEN = {
 
 var KANTO_ROUTES = [
   { name: 'Ruta 1', area: 'route-1' },
+  { name: 'Ciudad Verde', area: 'ciudad-verde-info' },
   { name: 'Ruta 22', area: 'route-22' },
   { name: 'Ruta 2', area: 'route-2' },
   { name: 'Bosque Verde', area: 'bosque-verde' },
@@ -929,6 +981,13 @@ function pickTrainer(trainerData) {
 function rollLevel(entry) {
   if (entry.level !== undefined) return entry.level;
   return Math.floor(Math.random() * (entry.maxLv - entry.minLv + 1)) + entry.minLv;
+}
+
+function ObtenerSegundoInicial(playerPokemon) {
+  if (playerPokemon === POKEMON.bulbasaur) return [POKEMON.charmander, POKEMON.squirtle];
+  if (playerPokemon === POKEMON.charmander) return [POKEMON.bulbasaur, POKEMON.squirtle];
+  if (playerPokemon === POKEMON.squirtle) return [POKEMON.bulbasaur, POKEMON.charmander];
+  return [POKEMON.eevee, POKEMON.pikachu];
 }
 
 function pickInitialPokemonRival(playerPokemon) { //Debe elegirse el pokemon inicial del rival según el inicial del jugador

@@ -16,6 +16,8 @@ const GameState = {
   specialTrainerUsed:  false,
   _pathRunning:        false,
   combat:              null,
+  _optionalArea:       null,
+  currentArea:         null,
   version:            GAME_VERSION,
 
   init(starter) {
@@ -52,7 +54,9 @@ const GameState = {
     this.specialTrainerUsed = false;
     this._pathRunning       = false;
     this.welcomeShown       = {};
-    this.combat           = null;
+    this.combat             = null;
+    this._optionalArea      = null;
+    this.currentArea        = null;
     console.log('[GAME] Estado reseteado');
   },
 };
