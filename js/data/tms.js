@@ -24,13 +24,13 @@ const MT_SPRITES = {
 }
 
 var TM_LIST = {
-  'tm-surf': {
-    id: 'tm-surf',
-    name: 'MT Surf',
-    moveId: 'surf',
+  'tm-bubble-beam': {
+    id: 'tm-bubble-beam',
+    name: 'MT Rayo Burbuja',
+    moveId: 'bubble-beam',
     types: ['water'],
     pokemons: [],
-    desc: 'Enseña Surf.',
+    desc: 'Enseña Rayo Burbuja.',
     sprite: MT_SPRITES.water,
     fallbackIcon: '💧',
   },
@@ -44,12 +44,12 @@ var TM_LIST = {
     sprite: MT_SPRITES.electric,
     fallbackIcon: '⚡',
   },
-  'tm-ice-beam': {
-    id: 'tm-ice-beam',
+  'tm-icy-wind': {
+    id: 'tm-icy-wind',
     name: 'MT Rayo Hielo',
-    moveId: 'ice-beam',
+    moveId: 'icy-wind',
     types: ['ice', 'water'],
-    pokemons: [],
+    pokemons: ['abra', 'kadabra', 'alakazam'],
     desc: 'Enseña Rayo Hielo.',
     sprite: MT_SPRITES.ice,
     fallbackIcon: '❄️',

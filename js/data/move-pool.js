@@ -73,7 +73,8 @@ var MOVE_POOL = {
     special: [
       { stage: 1, id: 'water-gun', name: 'Pistola Agua', power: 40, pp: 25, type: 'water', damageClass: 'special', effectId: 'raise-spa-10' },
       { stage: 2, id: 'surf', name: 'Surf', power: 90, pp: 15, type: 'water', damageClass: 'special' },
-      { stage: 3, id: 'hydro-pump', name: 'Hidrobomba', power: 110, pp: 5, type: 'water', damageClass: 'special' },
+      { stage: 3, id: 'hydro-pump', name: 'Hidrobomba', power: 110, pp: 99, type: 'water', damageClass: 'special' },
+      { stage: 1, mt: true, id: 'bubble-beam', name: 'Rayo Burbuja', power: 65, pp: 99, type: 'water', damageClass: 'special', effectId: 'clear' },
     ],
   },
   grass: {
@@ -86,7 +87,7 @@ var MOVE_POOL = {
       { stage: 1, id: 'absorb', name: 'Absorber', power: 40, pp: 25, type: 'grass', damageClass: 'special', effectId: 'drain-10' },
       { stage: 2, id: 'magical-leaf', name: 'Hoja Magica', power: 60, pp: 99, type: 'grass', damageClass: 'special', effectId: 'sleep-15' },
       { stage: 3, id: 'solar-beam', name: 'Rayo Solar', power: 120, pp: 99, type: 'grass', damageClass: 'special' },
-      { stage: 4, mt: true, id: 'giga-drain', name: 'Gigadrenado', power: 60, pp: 99, type: 'grass', damageClass: 'special', effectId: 'drain-50'  },
+      { stage: 4, mt: true, id: 'giga-drain', name: 'Gigadrenado', power: 60, pp: 99, type: 'grass', damageClass: 'special', effectId: 'drain-50' },
     ],
   },
   electric: {
@@ -110,43 +111,44 @@ var MOVE_POOL = {
     special: [
       { stage: 1, id: 'powder-snow', name: 'Polvo de Nieve', power: 40, pp: 25, type: 'ice', damageClass: 'special' },
       { stage: 2, id: 'ice-beam', name: 'Rayo Hielo', power: 90, pp: 10, type: 'ice', damageClass: 'special' },
-      { stage: 3, id: 'blizzard', name: 'Ventisca', power: 110, pp: 5, type: 'ice', damageClass: 'special' },
+      { stage: 3, id: 'blizzard', name: 'Ventisca', power: 110, pp: 99, type: 'ice', damageClass: 'special' },
+      { stage: 1, mt: true, id: 'icy-wind', name: 'Viento Hielo', power: 60, pp: 99, type: 'ice', damageClass: 'special', effectId: 'freeze-20' },
     ],
   },
   fighting: {
     physical: [
       { stage: 1, id: 'karate-chop', name: 'Golpe Karate', power: 50, pp: 25, type: 'fighting', damageClass: 'physical', effectId: 'raise-atk-20' },
       { stage: 2, id: 'brick-break', name: 'Romperrocas', power: 75, pp: 15, type: 'fighting', damageClass: 'physical' },
-      { stage: 3, id: 'close-combat', name: 'A Bocajarro', power: 120, pp: 5, type: 'fighting', damageClass: 'physical' },
+      { stage: 3, id: 'close-combat', name: 'A Bocajarro', power: 120, pp: 99, type: 'fighting', damageClass: 'physical' },
     ],
     special: [
       { stage: 1, id: 'vacuum-wave', name: 'Onda Vacio', power: 40, pp: 30, type: 'fighting', damageClass: 'special' },
       { stage: 2, id: 'aura-sphere', name: 'Esfera Aural', power: 80, pp: 20, type: 'fighting', damageClass: 'special' },
-      { stage: 3, id: 'focus-blast', name: 'Onda Certera', power: 120, pp: 5, type: 'fighting', damageClass: 'special' },
+      { stage: 3, id: 'focus-blast', name: 'Onda Certera', power: 120, pp: 99, type: 'fighting', damageClass: 'special' },
     ],
   },
   poison: {
     physical: [
       { stage: 1, id: 'poison-sting', name: 'Aguijon Toxico', power: 35, pp: 35, type: 'poison', damageClass: 'physical', effectId: 'poison-25' },
       { stage: 2, id: 'poison-jab', name: 'Puya Nociva', power: 75, pp: 20, type: 'poison', damageClass: 'physical', effectId: 'poison-50' },
-      { stage: 3, id: 'gunk-shot', name: 'Lanza Mugre', power: 120, pp: 5, type: 'poison', damageClass: 'physical' },
+      { stage: 3, id: 'gunk-shot', name: 'Lanza Mugre', power: 120, pp: 99, type: 'poison', damageClass: 'physical' },
     ],
     special: [
       { stage: 1, id: 'poison-powder', name: 'Polvo Veneno', power: 40, pp: 35, type: 'poison', damageClass: 'special', effectId: 'poison-25' },
       { stage: 2, id: 'sludge-bomb', name: 'Bomba Lodo', power: 90, pp: 10, type: 'poison', damageClass: 'special' },
-      { stage: 3, id: 'sludge-wave', name: 'Onda Toxica', power: 95, pp: 10, type: 'poison', damageClass: 'special' },
+      { stage: 3, id: 'sludge-wave', name: 'Onda Toxica', power: 95, pp: 99, type: 'poison', damageClass: 'special' },
     ],
   },
   ground: {
     physical: [
       { stage: 1, id: 'bulldoze', name: 'Terratemblor', power: 60, pp: 20, type: 'ground', damageClass: 'physical' },
       { stage: 2, id: 'stomping-tantrum', name: 'Pataleta', power: 85, pp: 10, type: 'ground', damageClass: 'physical' },
-      { stage: 3, id: 'earthquake', name: 'Terremoto', power: 100, pp: 10, type: 'ground', damageClass: 'physical' },
+      { stage: 3, id: 'earthquake', name: 'Terremoto', power: 100, pp: 99, type: 'ground', damageClass: 'physical' },
     ],
     special: [
       { stage: 1, id: 'mud-shot', name: 'Disparo Lodo', power: 55, pp: 15, type: 'ground', damageClass: 'special' },
       { stage: 2, id: 'earth-power', name: 'Tierra Viva', power: 90, pp: 10, type: 'ground', damageClass: 'special' },
-      { stage: 3, id: 'sandsear-storm', name: 'Simún de Arena', power: 100, pp: 5, type: 'ground', damageClass: 'special' },
+      { stage: 3, id: 'sandsear-storm', name: 'Simún de Arena', power: 100, pp: 99, type: 'ground', damageClass: 'special' },
     ],
   },
   flying: {
@@ -237,7 +239,7 @@ var MOVE_POOL = {
   },
   steel: {
     physical: [
-      { stage: 1, id: 'metal-claw', name: 'Garra Metal', power: 50, pp: 35, type: 'steel', damageClass: 'physical', effectId: 'raise-def-20' },
+      { stage: 1, id: 'metal-claw', name: 'Garra Metal', power: 50, pp: 35, type: 'steel', damageClass: 'physical', effectId: 'raise-atk-20' },
       { stage: 2, id: 'iron-head', name: 'Cabeza de Hierro', power: 80, pp: 15, type: 'steel', damageClass: 'physical' },
       { stage: 3, id: 'behemoth-blade', name: 'Hoja Behemoth', power: 100, pp: 5, type: 'steel', damageClass: 'physical' },
     ],
