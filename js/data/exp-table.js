@@ -1,8 +1,8 @@
 var EXP_TABLE = {
   BASE_EXP_REQUIRED: {
     ranges: [
-      { from:  1, to: 10, base: 11 },
-      { from: 11, to: 20, base: 11.5 },
+      { from:  1, to: 10, base: 11.5 },
+      { from: 11, to: 20, base: 12 },
       { from: 21, to: 30, base: 15 },
       { from: 31, to: 40, base: 19 },
       { from: 41, to: 50, base: 22 },

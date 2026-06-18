@@ -996,7 +996,10 @@ const Screens = {
       .sort((a, b) => a.sort - b.sort)
       .map(({ p }) => p);
 
+    let _advanced = false;
     const advance = () => {
+      if (_advanced) return;
+      _advanced = true;
       GameState.routeIndex++;
       if (GameState.routeIndex >= KANTO_ROUTES.length) {
         const lastBadge = GameState.badges[GameState.badges.length - 1];

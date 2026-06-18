@@ -391,7 +391,7 @@ var ROUTE_DATA = {
         {
           name: POKEMON.starmie, level: 22, moveId: MOVES.psychic.special.confusion,
           overrides: {
-            evs: { hp: 0, def: 0, spd: 0, spa: 32 },
+            evs: { hp: 0, def: 0, spd: 0, spa: 20 },
             ivs: { hp: 0, def: 0, spd: 0, spa: 31 },
           },
         },
