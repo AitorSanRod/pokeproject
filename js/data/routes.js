@@ -99,7 +99,7 @@ var ROUTE_DATA = {
   // Gimasio de Brock (Ciudad Plateada)
   // ═══════════════════════════════════════════════════════════════════════
 
-  'route-1': {
+  'ruta-1': {
     bg: 'assets/bg/route-1.png',
     combatBg: 'assets/bg/combate.png',
     rewardPokemon: [POKEMON.rattata, POKEMON.pidgey, POKEMON.pikachu],
@@ -133,7 +133,7 @@ var ROUTE_DATA = {
     ]
   },
 
-  'route-22': {
+  'ruta-22': {
     bg: 'assets/bg/route-22.png',
     combatBg: 'assets/bg/combate.png',
     rewardPokemon: [POKEMON.mankey, POKEMON.nidoran_f, POKEMON.nidoran_m],
@@ -146,7 +146,7 @@ var ROUTE_DATA = {
     trainer: [],
     specialTrainer: {
       name: 'Azul', img: 'assets/sprites/trainers/rival_kanto.png', pokemon: [
-        { name: 'RIVAL_STARTER', minLv: 5, maxLv: 7 },
+        { name: 'RIVAL_STARTER', minLv: 5, maxLv: 8 },
       ]
     },
     paths: [
@@ -154,7 +154,7 @@ var ROUTE_DATA = {
     ],
   },
 
-  'route-2': {
+  'ruta-2': {
     bg: 'assets/bg/route-2.png',
     combatBg: 'assets/bg/combate.png',
     rewardPokemon: [POKEMON.caterpie, POKEMON.weedle, POKEMON.pidgey, POKEMON.rattata],
@@ -916,10 +916,10 @@ var FINAL_SCREEN = {
 };
 
 var KANTO_ROUTES = [
-  { name: 'Ruta 1', area: 'route-1' },
+  { name: 'Ruta 1', area: 'ruta-1' },
   { name: 'Ciudad Verde', area: 'ciudad-verde-info' },
-  { name: 'Ruta 22', area: 'route-22' },
-  { name: 'Ruta 2', area: 'route-2' },
+  { name: 'Ruta 22', area: 'ruta-22' },
+  { name: 'Ruta 2', area: 'ruta-2' },
   { name: 'Bosque Verde', area: 'bosque-verde' },
   { name: 'Ciudad Plateada', area: 'ciudad-plateada' },
   { name: 'Ruta 3', area: 'ruta-3' },

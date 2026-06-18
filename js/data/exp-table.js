@@ -1,8 +1,8 @@
 var EXP_TABLE = {
   BASE_EXP_REQUIRED: {
     ranges: [
-      { from:  1, to: 10, base: 10 },
-      { from: 11, to: 20, base: 12 },
+      { from:  1, to: 10, base: 11 },
+      { from: 11, to: 20, base: 13 },
       { from: 21, to: 30, base: 14 },
       { from: 31, to: 40, base: 17 },
       { from: 41, to: 50, base: 20 },
@@ -15,7 +15,7 @@ var EXP_TABLE = {
     fallback: 15,
   },
 
-  MULTIPLIERS: { wild: 1.0, trainer: 1.4, gym: 1.7 },
+  MULTIPLIERS: { wild: 1.0, trainer: 1.3, gym: 1.6 },
 
   // Penalización de experiencia por diferencia de nivel.
   // Tiers ordenados de mayor a menor diferencia — se aplica el primero que se cumpla.
