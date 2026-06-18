@@ -383,13 +383,13 @@ var ROUTE_DATA = {
     gym: {
       leader: [
         {
-          name: POKEMON.staryu, level: 22, moveId: MOVES.water.special.surf,
+          name: POKEMON.staryu, level: 20, moveId: MOVES.water.special.surf,
           overrides: {
             evs: { hp: 32, def: 32, spd: 32, spa: 32 },
           },
         },
         {
-          name: POKEMON.starmie, level: 24, moveId: MOVES.psychic.special.confusion,
+          name: POKEMON.starmie, level: 22, moveId: MOVES.psychic.special.confusion,
           overrides: {
             evs: { hp: 0, def: 0, spd: 0, spa: 32 },
             ivs: { hp: 0, def: 0, spd: 0, spa: 31 },
@@ -430,8 +430,8 @@ var ROUTE_DATA = {
     ],
     specialTrainer: {
       name: 'Soldado Rocket', img: 'assets/sprites/trainers/soldado-rocket.png', pokemon: [
-        { name: POKEMON.golbat, minLv: 16, maxLv: 16, moveId: MOVES.poison.physical.poison_jab },
-        { name: POKEMON.porygon, minLv: 20, maxLv: 25, moveId: MOVES.normal.special.tri_attack },
+        { name: POKEMON.golbat, minLv: 22, maxLv: 24, moveId: MOVES.poison.physical.poison_jab },
+        { name: POKEMON.porygon, minLv: 24, maxLv: 26, moveId: MOVES.normal.special.tri_attack },
       ]
     },
     trainer: [
@@ -488,8 +488,8 @@ var ROUTE_DATA = {
     trainer: [
       {
         name: 'Adrián el dominguero', img: 'assets/sprites/trainers/campista.png', rate: 100, pokemon: [
-          { name: POKEMON.mr_mime, minLv: 25, maxLv: 28, moveId: MOVES.psychic.special.psychic },
-          { name: POKEMON.pinsir, minLv: 26, maxLv: 28, moveId: MOVES.bug.physical.megahorn, shiny: true },
+          { name: POKEMON.mr_mime, minLv: 25, maxLv: 30, moveId: MOVES.psychic.special.psychic },
+          { name: POKEMON.pinsir, minLv: 26, maxLv: 34, moveId: MOVES.bug.physical.megahorn, shiny: true },
         ]
       },
     ],
@@ -879,7 +879,7 @@ var ROUTE_DATA = {
     trainer: [],
     specialTrainer: {
       name: 'Azul', img: 'assets/sprites/trainers/rival_kanto.png', pokemon: [
-        { name: 'RIVAL_STARTER', minLv: 3, maxLv: 4 },
+        { name: 'RIVAL_STARTER', minLv: 5, maxLv: 7 },
       ]
     },
     paths: [

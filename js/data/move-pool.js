@@ -132,7 +132,7 @@ var MOVE_POOL = {
       { stage: 3, id: 'gunk-shot', name: 'Lanza Mugre', power: 120, pp: 5, type: 'poison', damageClass: 'physical' },
     ],
     special: [
-      { stage: 1, id: 'poison-powder', name: 'Polvo Veneno', power: 50, pp: 35, type: 'poison', damageClass: 'special', effectId: 'poison-25' },
+      { stage: 1, id: 'poison-powder', name: 'Polvo Veneno', power: 40, pp: 35, type: 'poison', damageClass: 'special', effectId: 'poison-25' },
       { stage: 2, id: 'sludge-bomb', name: 'Bomba Lodo', power: 90, pp: 10, type: 'poison', damageClass: 'special' },
       { stage: 3, id: 'sludge-wave', name: 'Onda Toxica', power: 95, pp: 10, type: 'poison', damageClass: 'special' },
     ],
