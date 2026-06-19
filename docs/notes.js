@@ -1,5 +1,5 @@
 const NOTES_DATA = {
-  "title": "Actualización 0.0.9 - (Bienvenido Moraleda Variocolor)",
+  "title": "Actualización 0.0.10 - (Bienvenido Moraleda Variocolor)",
   "lines": [
     "Guía incluida en el compendio.",
     "Mas balance de experiencia",
