@@ -1572,6 +1572,10 @@ const Screens = {
         console.log(`[UI] Combate ${GameState.paused ? 'pausado' : 'reanudado'}`);
       });
     }
+
+    // Inicializar badges de estado en los HUDs nada más renderizar la pantalla,
+    // para que quemado/veneno/etc. se vean desde el primer frame sin esperar al ataque.
+    Screens._updateStatusBadges(player, foe);
   },
 
   // Muestra un indicador visual de cambio de stat en el HUD correspondiente

@@ -214,7 +214,7 @@ var HELD_ITEMS = {
     desc: 'Quema al portador al inicio del combate y le resta el 5% de HP al final de cada turno.',
     img: 'assets/sprites/items/flame-orb.png',
     fallbackIcon: '🔥',
-    trigger: HELD_ITEM_TRIGGERS.ON_TURN_END,
+    trigger: HELD_ITEM_TRIGGERS.ON_TURN_START,
     fn(ctx) {
       const { user, log, updateHud } = ctx;
       if (user.currentHp <= 0) return false;

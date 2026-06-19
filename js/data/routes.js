@@ -966,10 +966,10 @@ var ROUTE_DATA = {
     combatBg: 'assets/bg/combate-interior.png',
     pathLength: 5,
     wild: [
-      { name: POKEMON.gastly, rate: 30, minLv: 35, maxLv: 42, moveId: MOVES.electric.special.thunder },
-      { name: POKEMON.gastly, rate: 30, minLv: 35, maxLv: 42, moveId: MOVES.electric.special.thunder },
-      { name: POKEMON.haunter, rate: 30, minLv: 35, maxLv: 42, moveId: MOVES.normal.physical.self_destruct },
-      { name: POKEMON.cubone, rate: 10, minLv: 35, maxLv: 42, moveId: MOVES.normal.special.tri_attack },
+      { name: POKEMON.gastly, rate: 30, minLv: 35, maxLv: 42, moveId: MOVES.electric.special.shadow_ball },
+      { name: POKEMON.gastly, rate: 30, minLv: 35, maxLv: 42, moveId: MOVES.electric.special.hex },
+      { name: POKEMON.haunter, rate: 30, minLv: 35, maxLv: 42, moveId: MOVES.normal.physical.shadow-ball },
+      { name: POKEMON.cubone, rate: 10, minLv: 35, maxLv: 42, moveId: MOVES.normal.special.earthquake },
     ],
     trainer: [
       {

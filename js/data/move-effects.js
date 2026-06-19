@@ -236,6 +236,15 @@ var MOVE_EFFECTS = {
     },
   },
 
+  'sleep-after': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Duerme al rival tras el ataque',
+    statusChance: 1.00,
+    fn(ctx) {
+      StatusEffects.apply(ctx.target, 'sleep', ctx.log);
+    },
+  },
+
   'sleep-10': {
     trigger: TRIGGERS.AFTER_ATTACK,
     desc: 'Tiene un 10% de probabilidad de hacer dormir al rival',
