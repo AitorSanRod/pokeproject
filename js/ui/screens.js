@@ -1502,6 +1502,9 @@ const Screens = {
     // Init pause button
     Screens._setupCombatPauseBtn();
 
+    // Badges de estado inmediatas: quemado/veneno/etc. visibles desde el primer frame
+    Screens._updateStatusBadges(player, foe);
+
     if (isFirstRender) {
       // Si hay overlay de texto, esperar a que termine (~1400ms). Si no
       // (cambio de pokemon del rival a mitad de combate), delay corto.
@@ -1573,9 +1576,6 @@ const Screens = {
       });
     }
 
-    // Inicializar badges de estado en los HUDs nada más renderizar la pantalla,
-    // para que quemado/veneno/etc. se vean desde el primer frame sin esperar al ataque.
-    Screens._updateStatusBadges(player, foe);
   },
 
   // Muestra un indicador visual de cambio de stat en el HUD correspondiente
