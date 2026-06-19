@@ -1039,8 +1039,10 @@
   border-radius: 2px;
   animation: stat-pop 2400ms ease forwards;
   position: absolute;
-  right: 6px;
+  left: 0;
+  right: 0;
   top: 6px;
+  text-align: center;
   pointer-events: none;
   white-space: nowrap;
 }
