@@ -878,7 +878,7 @@ var ROUTE_DATA = {
     combatBg: 'assets/bg/combate-electrico.png',
     wild: [],
     welcome: {
-      title: 'Ciudad Azulona',
+      title: 'Gimnasio de Ciudad Azulona',
       subtitle: 'Gimnasio Pokemon de tipo Planta',
       img: 'assets/bg/ciudad-azulona.png',
     },
@@ -1270,7 +1270,7 @@ var KANTO_ROUTES = [
   { name: 'Guarida Rocket', area: 'guarida-rocket' },
   { name: 'Oficina Rocket', area: 'ultima-planta-rocket-info' },
   { name: 'Líder Rocket Giovanni', area: 'combate-giovanni' },
-  { name: 'Ciudad Azulona', area: 'ciudad-azulona-gym' },
+  { name: 'Gimnasio de Ciudad Azulona', area: 'ciudad-azulona-gym' },
   { name: 'Torre Pokémon', area: 'torre-pokemon' },
   { name: 'Torre Pokémon', area: 'ultima-planta-torre-pokemon' },
   { name: 'Ruta 15', area: 'ruta-15' },
