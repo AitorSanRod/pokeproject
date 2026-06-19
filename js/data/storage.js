@@ -68,6 +68,19 @@ var Storage = {
     return this.getPokedex()[pokemonName]?.caught === true;
   },
 
+  markShiny(pokemonName) {
+    const dex = this.getPokedex();
+    if (!dex[pokemonName]) dex[pokemonName] = {};
+    if (dex[pokemonName].shiny) return;
+    dex[pokemonName].shiny = true;
+    this._set('pokedex', dex);
+    console.log(`[Storage] Pokedex: ${pokemonName} capturado shiny`);
+  },
+
+  isShiny(pokemonName) {
+    return this.getPokedex()[pokemonName]?.shiny === true;
+  },
+
   EV_MAX_PER_STAT: 32,
 
   // ── Líneas evolutivas ─────────────────────────────────────────────────────

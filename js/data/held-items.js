@@ -209,6 +209,47 @@ var HELD_ITEMS = {
     },
   },
 
+  'flame-orb': {
+    name: 'Llamasfera',
+    desc: 'Quema al portador al inicio del combate y le resta el 5% de HP al final de cada turno.',
+    img: 'assets/sprites/items/flame-orb.png',
+    fallbackIcon: '🔥',
+    trigger: HELD_ITEM_TRIGGERS.ON_TURN_END,
+    fn(ctx) {
+      const { user, log, updateHud } = ctx;
+      if (user.currentHp <= 0) return false;
+
+      if (user.statusEffect?.id !== 'burn') {
+        StatusEffects.apply(user, 'burn', log);
+      }
+
+      const drain = Math.max(1, Math.floor(user.stats.hp * 0.05));
+      user.currentHp = Math.max(1, user.currentHp - drain);
+      log(`${user.displayName} pierde ${drain} HP por la Llama Orbe!`);
+      if (updateHud) updateHud();
+      return true;
+    },
+  },
+
+  'lifeorb': {
+    name: 'Vidasfera',
+    desc: 'Aumenta el daño un 100%, pero el pierdes el 10% de su HP al final de cada turno.',
+    img: 'assets/sprites/items/lifeorb.png',
+    fallbackIcon: '🔴',
+    trigger: HELD_ITEM_TRIGGERS.ON_TURN_END,
+    dmgBoost: { mult: 1.0 },
+    fn(ctx) {
+      const { user, log, updateHud } = ctx;
+      if (user.currentHp <= 0) return false;
+
+      const drain = Math.max(1, Math.floor(user.stats.hp * 0.10));
+      user.currentHp = Math.max(1, user.currentHp - drain);
+      log(`${user.displayName} pierde ${drain} HP por la Vida Esfera!`);
+      if (updateHud) updateHud();
+      return true;
+    },
+  },
+
 };
 
 // ── API ──────────────────────────────────────────────────────────────────────

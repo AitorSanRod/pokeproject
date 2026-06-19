@@ -42,6 +42,7 @@ var MOVE_POOL = {
       { stage: 1, id: 'tackle', name: 'Placaje', power: 40, pp: 35, type: 'normal', damageClass: 'physical' },
       { stage: 2, id: 'extreme-speed', name: 'Velocidad Extrema', power: 70, pp: 15, type: 'normal', damageClass: 'physical', effectId: 'priority' },
       { stage: 3, id: 'hyper-fang', name: 'Hiper Colmillo', power: 90, pp: 15, type: 'normal', damageClass: 'physical', effectId: 'shield-10' },
+      { stage: 1, mt: true, id: 'take-down', name: 'Derribo', power: 60, pp: 15, type: 'normal', damageClass: 'physical', effectId: 'guts' },
       { id: 'self-destruct', name: 'Autodestruccion', power: 400, pp: 5, type: 'normal', damageClass: 'physical', effectId: 'self-destruct', boss: true },
       { id: 'false-swipe', name: 'Sonambulo', power: 15, pp: 100, type: 'normal', damageClass: 'physical', effectId: ['recoil-10', 'shield-25', 'sleep-self', 'sleep-attack'], boss: true },
     ],
@@ -61,7 +62,7 @@ var MOVE_POOL = {
     special: [
       { stage: 1, id: 'ember', name: 'Ascuas', power: 40, pp: 25, type: 'fire', damageClass: 'special', effectId: 'burn-10' },
       { stage: 2, id: 'flamethrower', name: 'Lanzallamas', power: 90, pp: 15, type: 'fire', damageClass: 'special', effectId: 'burn-20' },
-      { stage: 3, id: 'fire-blast', name: 'Sofoco', power: 110, pp: 5, type: 'fire', damageClass: 'special', effectId: 'burn-25' },
+      { stage: 3, id: 'fire-blast', name: 'Llamarada', power: 110, pp: 5, type: 'fire', damageClass: 'special', effectId: 'burn-25' },
     ],
   },
   water: {
@@ -94,7 +95,7 @@ var MOVE_POOL = {
     physical: [
       { stage: 1, id: 'thunder-punch', name: 'Puño Trueno', power: 75, pp: 15, type: 'electric', damageClass: 'physical', effectId: 'paralize-25' },
       { stage: 2, id: 'wild-charge', name: 'Voltiocruel', power: 90, pp: 15, type: 'electric', damageClass: 'physical' },
-      { stage: 3, id: 'volt-tackle', name: 'Placaje Eléctrico', power: 120, pp: 15, type: 'electric', damageClass: 'physical' },
+      { stage: 3, id: 'volt-tackle', name: 'Placaje Eléctrico', power: 150, pp: 15, type: 'electric', damageClass: 'physical' },
     ],
     special: [
       { stage: 1, id: 'thunder-shock', name: 'Impactrueno', power: 40, pp: 30, type: 'electric', damageClass: 'special', effectId: 'paralize-25' },
@@ -134,9 +135,9 @@ var MOVE_POOL = {
       { stage: 3, id: 'gunk-shot', name: 'Lanza Mugre', power: 120, pp: 99, type: 'poison', damageClass: 'physical' },
     ],
     special: [
-      { stage: 1, id: 'poison-powder', name: 'Polvo Veneno', power: 40, pp: 35, type: 'poison', damageClass: 'special', effectId: 'poison-25' },
-      { stage: 2, id: 'sludge-bomb', name: 'Bomba Lodo', power: 90, pp: 10, type: 'poison', damageClass: 'special' },
-      { stage: 3, id: 'sludge-wave', name: 'Onda Toxica', power: 95, pp: 99, type: 'poison', damageClass: 'special' },
+      { stage: 1, id: 'poison-powder', name: 'Polvo Veneno', power: 40, pp: 35, type: 'poison', damageClass: 'special' },
+      { stage: 2, id: 'sludge-bomb', name: 'Bomba Lodo', power: 70, pp: 10, type: 'poison', damageClass: 'special', effectId: 'poison-25' },
+      { stage: 3, id: 'sludge-wave', name: 'Onda Toxica', power: 95, pp: 99, type: 'poison', damageClass: 'special', effectId: 'poison-50' },
     ],
   },
   ground: {
@@ -210,7 +211,8 @@ var MOVE_POOL = {
     special: [
       { stage: 1, id: 'hex', name: 'Maldicion', power: 65, pp: 10, type: 'ghost', damageClass: 'special' },
       { stage: 2, id: 'shadow-ball', name: 'Bola Sombra', power: 80, pp: 15, type: 'ghost', damageClass: 'special' },
-      { stage: 3, id: 'astral-barrage', name: 'Bombardeo Astral', power: 120, pp: 5, type: 'ghost', damageClass: 'special' },
+      { stage: 3, id: 'astral-barrage', name: 'Bombardeo Astral', power: 120, pp: 99, type: 'ghost', damageClass: 'special' },
+      { stage: 3, boss: true, id: 'night-shade', name: 'Tinieblas', power: 70, pp: 99, type: 'ghost', damageClass: 'special', effectId: ['sleep-30', 'ventaja'] },
     ],
   },
   dragon: {
@@ -234,7 +236,7 @@ var MOVE_POOL = {
     special: [
       { stage: 1, id: 'feint-attack', name: 'Ataque Furtivo', power: 60, pp: 20, type: 'dark', damageClass: 'special' },
       { stage: 2, id: 'dark-pulse', name: 'Pulso Umbrio', power: 80, pp: 15, type: 'dark', damageClass: 'special' },
-      { stage: 3, id: 'fiery-wrath', name: 'Ira Oscura', power: 90, pp: 10, type: 'dark', damageClass: 'special' },
+      { stage: 3, id: 'fiery-wrath', name: 'Ira Oscura', power: 110, pp: 10, type: 'dark', damageClass: 'special' },
     ],
   },
   steel: {

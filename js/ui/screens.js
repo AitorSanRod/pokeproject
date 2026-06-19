@@ -1,5 +1,22 @@
-// Gestor de pantallas — cada función renderiza una pantalla completa
-// GameState global se lee/escribe aquí
+// ─────────────────────────────────────────────────────────────────────────────
+// CONFIGURACIÓN — edita aquí para cambiar comportamiento sin tocar la lógica
+// ─────────────────────────────────────────────────────────────────────────────
+
+const SCREENS_CONFIG = {
+  STARTERS: [
+    { name: 'bulbasaur',  label: 'Bulbasaur' },
+    { name: 'charmander', label: 'Charmander' },
+    { name: 'squirtle',   label: 'Squirtle' },
+  ],
+  STARTER_LEVEL: 5,
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SCREENS — gestor de pantallas
+// Cada función pública renderiza una pantalla completa en #viewport.
+// Las funciones privadas (_xxx) son helpers internos o sub-pantallas.
+// GameState es el estado global compartido; Storage persiste entre sesiones.
+// ─────────────────────────────────────────────────────────────────────────────
 
 const Screens = {
 
@@ -22,6 +39,77 @@ const Screens = {
     const viewport = document.getElementById('app');
     viewport.innerHTML = `<div class="game-viewport" id="viewport"></div>`;
     screenFn(...args);
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // HELPERS DE PLANTILLA — fragmentos HTML reutilizables
+  // ═══════════════════════════════════════════════════════════════════════
+
+  // Icono shiny en línea — mismo aspecto en todos los contextos.
+  _shinyIcon(size = 10) {
+    return `<img src="assets/sprites/others/shiny.png" style="width:${size}px;height:${size}px;image-rendering:pixelated;vertical-align:middle">`;
+  },
+
+  // Capa de fondo para pantallas de ruta.
+  // withFallback=true → usa gradiente verde si no hay imagen (para pantallas
+  // de información donde el fondo blanco quedaría mal).
+  _bgLayer(url, withFallback = false) {
+    if (url) return `<div class="encounter-bg-layer" style="background-image:url('${url}')"></div>`;
+    if (withFallback) return `<div style="position:absolute;inset:0;background:linear-gradient(160deg,var(--green-dark) 0%,var(--green) 100%);z-index:0"></div>`;
+    return '';
+  },
+
+  // Crea y monta un modal overlay con modal-sheet estándar.
+  // id opcional: permite hacer document.getElementById(id)?.remove() antes de recrearlo.
+  // closeOnBackdrop: si true, cerrar al pulsar fuera del sheet.
+  _makeModal(innerHtml, { id = null, closeOnBackdrop = false } = {}) {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    if (id) overlay.id = id;
+    overlay.innerHTML = `<div class="modal-sheet">${innerHtml}</div>`;
+    document.getElementById('viewport').appendChild(overlay);
+    if (closeOnBackdrop) {
+      overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    }
+    return overlay;
+  },
+
+  // Botón de pokemon estándar en modales de selección (intercambio, EV, MT...).
+  // extra: HTML adicional al final del botón (nivel, stat, badge de estado, etc.)
+  // disabled: grisa y deshabilita el botón.
+  _teamBtn(p, i, extra = '', disabled = false) {
+    return `
+      <button class="btn btn--wide" data-idx="${i}"
+        style="display:flex;align-items:center;gap:10px;justify-content:flex-start;padding:8px 12px${disabled ? ';opacity:0.4' : ''}"
+        ${disabled ? 'disabled' : ''}>
+        <img src="${p.spriteUrl ?? ''}" style="width:28px;height:28px;image-rendering:pixelated" onerror="this.style.opacity=0">
+        <span style="flex:1;text-align:left;font-family:var(--font-pixel);font-size:7px">${p.displayName}</span>
+        ${extra}
+      </button>`;
+  },
+
+  // Pip del equipo en la barra inferior de combate (barra de HP + EXP + nivel).
+  // activePoke: pokemon activo actual para marcar el pip como activo.
+  _pipHtml(p, activePoke) {
+    const ratio    = p.stats.hp > 0 ? p.currentHp / p.stats.hp : 0;
+    const hpLevel  = ratio > 0.5 ? 'high' : ratio > 0.25 ? 'mid' : 'low';
+    const expPct   = p.expToNext > 0 ? Math.max(0, Math.min(100, Math.round((p.exp / p.expToNext) * 100))) : 0;
+    return `
+      <div class="combat-team-pip ${p === activePoke ? 'combat-team-pip--active' : ''} ${!isAlive(p) ? 'combat-team-pip--fainted' : ''}">
+        <img src="${p.spriteUrl ?? ''}" class="combat-team-pip__sprite" alt="${p.displayName}" onerror="this.style.opacity=0">
+        <div class="combat-team-pip__hp-section">
+          <div class="hp-bar-wrap combat-team-pip__hp-bar">
+            <div class="hp-bar-fill" data-level="${hpLevel}" style="width:${Math.max(0, Math.round(ratio * 100))}%"></div>
+          </div>
+          <div class="combat-team-pip__hp-row">
+            <div class="combat-team-pip__level">Nv.${p.level}${p.shiny ? ' ' + Screens._shinyIcon(10) : ''}</div>
+            <div class="combat-team-pip__hp-nums">${p.currentHp}/${p.stats.hp}</div>
+          </div>
+          <div class="combat-team-pip__exp-bar">
+            <div class="combat-team-pip__exp-fill" style="width:${expPct}%"></div>
+          </div>
+        </div>
+      </div>`;
   },
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -146,12 +234,10 @@ const Screens = {
   // ═══════════════════════════════════════════════════════════════════════
   // STARTER SELECT
   // ═══════════════════════════════════════════════════════════════════════
+  // Pantalla de selección de pokemon inicial. Carga cada starter desde la API,
+  // muestra sus stats/tipos y permite elegir uno para comenzar la partida.
   starterSelect() {
-    const starters = [
-      { name: 'bulbasaur',  label: 'Bulbasaur' },
-      { name: 'charmander', label: 'Charmander' },
-      { name: 'squirtle',   label: 'Squirtle' },
-    ];
+    const starters = SCREENS_CONFIG.STARTERS;
 
     document.getElementById('viewport').innerHTML = `
       <div class="screen screen--starter">
@@ -197,12 +283,18 @@ const Screens = {
 
     starters.forEach(async (s) => {
       try {
-        const p = await createPokemon(s.name, 5, true);
+        const isShiny = Math.random() < (typeof SHINY_RATE !== 'undefined' ? SHINY_RATE : 0);
+        const p = await createPokemon(s.name, SCREENS_CONFIG.STARTER_LEVEL, true, null, null, isShiny);
 
         const spriteEl = document.getElementById(`sprite-${s.name}`);
         spriteEl.outerHTML = `<img src="${p.spriteUrl}" alt="${s.label}"
           class="starter-card__sprite" id="sprite-${s.name}"
           onerror="this.style.opacity=0.2">`;
+
+        if (p.shiny) {
+          const label = document.querySelector(`#card-${s.name} .starter-card__name`);
+          if (label) label.insertAdjacentHTML('beforeend', ' ' + Screens._shinyIcon(12));
+        }
 
         document.getElementById(`types-${s.name}`).innerHTML = Render.typeBadges(p.types);
         const storedEvs = Storage.getEvs(s.name);
@@ -215,8 +307,9 @@ const Screens = {
 
         document.getElementById(`card-${s.name}`)
           .addEventListener('click', () => {
-            console.log(`[UI] Starter elegido: ${s.name}`);
+            console.log(`[UI] Starter elegido: ${s.name}${p.shiny ? ' (shiny)' : ''}`);
             GameState.init(p);
+            if (p.shiny) Storage.markShiny(p.name);
             GameState.autoMode = true;
             Screens._saveRun();
             Screens.show(Screens.adventure);
@@ -289,9 +382,7 @@ const Screens = {
   // ni combates: solo un texto y un botón "CONTINUAR" que avanza a la
   // siguiente ruta (o a la pantalla de victoria si es la última).
   _showInformation(route, data) {
-    const bgLayer = data.bg
-      ? `<div class="encounter-bg-layer" style="background-image:url('${data.bg}')"></div>`
-      : `<div style="position:absolute;inset:0;background:linear-gradient(160deg,var(--green-dark) 0%,var(--green) 100%);z-index:0"></div>`;
+    const bgLayer = Screens._bgLayer(data.bg, true);
 
     document.getElementById('viewport').innerHTML = `
       <div class="screen" style="position:relative;
@@ -343,11 +434,12 @@ const Screens = {
     });
   },
 
+  // Pinta el contenedor vacío de la pantalla de aventura con fondo y botones
+  // flotantes (pokédex/compendio). Se llama antes de mostrar la selección de camino
+  // y también para restaurar el fondo al volver de un combate.
   _renderAdventureShell(route) {
     const bg = GameState.currentBg;
-    const bgLayer = bg
-      ? `<div class="encounter-bg-layer" style="background-image:url('${bg}')"></div>`
-      : '';
+    const bgLayer = Screens._bgLayer(bg);
 
     // Botones flotantes arriba-derecha (pokédex + compendio)
     document.getElementById('app').querySelectorAll('.global-dex-btn').forEach(e => e.remove());
@@ -580,10 +672,10 @@ const Screens = {
         gymLeaderName: data.gymLeader ?? route.name,
         onWin: () => {
           // Otorgar medalla — al juego y a la pokédex (toda la cadena evolutiva del equipo)
-          if (data.badge) {
-            GameState.badges.push(data.badge);
-            console.log(`[GYM] Medalla obtenida: ${data.badge}`);
-            for (const p of GameState.team) Storage.addBadge(p.name, data.badge);
+          if (data.badgeId) {
+            GameState.badges.push(data.badgeId);
+            console.log(`[GYM] Medalla obtenida: ${data.badgeId}`);
+            for (const p of GameState.team) Storage.addBadge(p.name, data.badgeId);
           }
           GameState._pathRunning = false;
           Screens._renderAdventureShell(route);
@@ -660,7 +752,7 @@ const Screens = {
             onerror="this.style.opacity=0">
           <div class="route-team-row__info">
             <div style="display:flex;align-items:baseline;gap:6px">
-              <span class="route-team-row__name">${p.displayName}${p.shiny ? ' <span style="color:#FFD700;font-size:9px">★</span>' : ''}</span>
+              <span class="route-team-row__name">${p.displayName}${p.shiny ? ' ' + Screens._shinyIcon(10) : ''}</span>
               <span class="route-team-row__level">Nv.${p.level}</span>
             </div>
             <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
@@ -764,51 +856,52 @@ const Screens = {
     });
   },
 
+  // Modal que aparece al pulsar un pokemon en la barra de ruta: muestra sus
+  // movimientos y permite cambiar el automovimiento activo.
   _showPipMoveModal(poke) {
     document.getElementById('pip-modal')?.remove();
 
-    const overlay = document.createElement('div');
-    overlay.id = 'pip-modal';
-    overlay.className = 'modal-overlay';
     const labels = { atk:'ATK', def:'DEF', spa:'SPA', spd:'SPD', spe:'VEL' };
     const nature = poke.nature;
     const natureLine = nature && (nature.boost || nature.lower)
       ? `<span class="nature-up">+${labels[nature.boost]}</span> / <span class="nature-down">-${labels[nature.lower]}</span>`
-      : `<span style="color:var(--grey)">${nature?.name ?? ''}</span>`;
+      : `<span style="color:var(--grey)">Naturaleza neutra</span>`;
 
     const moveChangeBlocked = heldItemBlocksMoveChange(poke);
     const blockedItem = moveChangeBlocked ? HELD_ITEMS[poke.heldItem] : null;
 
-    overlay.innerHTML = `
-      <div class="modal-sheet">
-        <div class="modal-title">${poke.displayName}</div>
-        <div style="text-align:center;font-family:var(--font-pixel);font-size:7px;margin-bottom:8px">${natureLine}</div>
-        ${moveChangeBlocked ? `
-          <div style="background:var(--off-white);border-radius:var(--radius-sm);padding:8px 10px;
-            border-left:3px solid var(--red);margin-bottom:8px;text-align:center">
-            <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey-dark);line-height:1.8">
-              ${blockedItem.fallbackIcon ?? ''} ${blockedItem.name} bloquea el cambio de movimiento
-            </span>
-          </div>` : ''}
-        <div style="display:flex;flex-direction:column;gap:6px">
-          ${poke.moves.map(m => {
-            const effectDesc = getEffectDescriptions(m);
-            return `
-              <div style="position:relative">
-                <button class="btn ${poke.autoMove === m.id ? 'btn--primary' : ''} btn--wide"
-                  data-moveid="${m.id}" style="justify-content:space-between"
-                  ${moveChangeBlocked ? 'disabled' : ''}>
-                  <span>${m.name}</span>
-                  <span style="opacity:.6;font-size:6px">${m.type.toUpperCase()} · POD:${m.power ?? '—'}</span>
-                </button>
-                ${effectDesc ? `<div class="move-effect-tooltip">✦ ${effectDesc}</div>` : ''}
-              </div>`;
-          }).join('')}
-        </div>
-        <button class="btn btn--ghost btn--wide" id="pip-modal-close">Cerrar</button>
-      </div>`;
-
-    document.getElementById('viewport').appendChild(overlay);
+    const overlay = Screens._makeModal(`
+      <div class="modal-title">${poke.displayName}</div>
+      <div style="display:flex;justify-content:center;margin-bottom:4px">
+        <img src="${poke.spriteUrl ?? ''}" alt="${poke.displayName}"
+          style="width:72px;height:72px;image-rendering:pixelated;object-fit:contain"
+          onerror="this.style.opacity=0.2">
+      </div>
+      <div style="text-align:center;font-family:var(--font-pixel);font-size:7px;margin-bottom:8px">${natureLine}</div>
+      ${moveChangeBlocked ? `
+        <div style="background:var(--off-white);border-radius:var(--radius-sm);padding:8px 10px;
+          border-left:3px solid var(--red);margin-bottom:8px;text-align:center">
+          <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey-dark);line-height:1.8">
+            ${blockedItem.fallbackIcon ?? ''} ${blockedItem.name} bloquea el cambio de movimiento
+          </span>
+        </div>` : ''}
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${poke.moves.map(m => {
+          const effectDesc = getEffectDescriptions(m);
+          return `
+            <div style="position:relative">
+              <button class="btn ${poke.autoMove === m.id ? 'btn--primary' : ''} btn--wide"
+                data-moveid="${m.id}" style="justify-content:space-between"
+                ${moveChangeBlocked ? 'disabled' : ''}>
+                <span>${m.name}</span>
+                <span style="opacity:.6;font-size:6px">${m.type.toUpperCase()} · POD:${m.power ?? '—'}</span>
+              </button>
+              ${effectDesc ? `<div class="move-effect-tooltip">✦ ${effectDesc}</div>` : ''}
+            </div>`;
+        }).join('')}
+      </div>
+      <button class="btn btn--ghost btn--wide" id="pip-modal-close">Cerrar</button>
+    `, { id: 'pip-modal', closeOnBackdrop: true });
 
     overlay.querySelectorAll('[data-moveid]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -821,7 +914,6 @@ const Screens = {
     });
 
     document.getElementById('pip-modal-close').addEventListener('click', () => overlay.remove());
-    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
   },
 
   // Confirmación al pulsar el icono de objeto equipado — si confirma, el
@@ -831,27 +923,21 @@ const Screens = {
     if (!item) return;
 
     document.getElementById('unequip-modal')?.remove();
-    const overlay = document.createElement('div');
-    overlay.id = 'unequip-modal';
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `
-      <div class="modal-sheet">
-        <div class="modal-title">${item.fallbackIcon ?? ''} ${item.name}</div>
-        <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);text-align:center;line-height:1.8">
-          ${item.desc}
-        </p>
-        <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);text-align:center;line-height:1.8">
-          ¿Quitar este objeto a ${poke.displayName}?<br>
-          <span style="color:var(--red)">El objeto se destruira</span> y se perderan
-          todos los cambios que provoca.
-        </p>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn--ghost" id="unequip-cancel" style="flex:1">No quitar</button>
-          <button class="btn btn--primary" id="unequip-confirm" style="flex:1;background:var(--red)">Quitar</button>
-        </div>
-      </div>`;
-
-    document.getElementById('viewport').appendChild(overlay);
+    const overlay = Screens._makeModal(`
+      <div class="modal-title">${item.fallbackIcon ?? ''} ${item.name}</div>
+      <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);text-align:center;line-height:1.8">
+        ${item.desc}
+      </p>
+      <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);text-align:center;line-height:1.8">
+        ¿Quitar este objeto a ${poke.displayName}?<br>
+        <span style="color:var(--red)">El objeto se destruira</span> y se perderan
+        todos los cambios que provoca.
+      </p>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn--ghost" id="unequip-cancel" style="flex:1">No quitar</button>
+        <button class="btn btn--primary" id="unequip-confirm" style="flex:1;background:var(--red)">Quitar</button>
+      </div>
+    `, { id: 'unequip-modal', closeOnBackdrop: true });
 
     document.getElementById('unequip-confirm').addEventListener('click', () => {
       unequipHeldItem(poke);
@@ -859,9 +945,10 @@ const Screens = {
       Screens._renderTeamBar();
     });
     document.getElementById('unequip-cancel').addEventListener('click', () => overlay.remove());
-    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
   },
 
+  // Pantalla de recompensa al completar un camino. Presenta 3 premios (pokemon,
+  // objeto, MT, vitaminas o caramelo) y aplica el elegido al equipo.
   async _showItemReward() {
     const data  = ROUTE_DATA[GameState.currentArea];
     const routeEntry = KANTO_ROUTES.find(r => r.area === GameState.currentArea);
@@ -1088,30 +1175,22 @@ const Screens = {
     });
   },
 
-  // Selector para sustituir un pokemon cuando el equipo está lleno
+  // Selector para sustituir un pokemon cuando el equipo está lleno.
+  // Se usa al capturar o recibir un pokemon de premio con 6 slots ocupados.
   _showPokemonSwapSelector(newPoke, onDone, onCancel = onDone) {
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `
-      <div class="modal-sheet">
-        <div class="modal-title">Equipo completo</div>
-        <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
-          Elige un pokemon para sustituir por<br>
-          <strong>${newPoke.displayName}</strong> Nv.${newPoke.level}
-        </p>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          ${GameState.team.map((p, i) => `
-            <button class="btn btn--wide" data-idx="${i}"
-              style="display:flex;align-items:center;gap:10px;justify-content:flex-start;padding:8px 12px">
-              <img src="${p.spriteUrl ?? ''}" style="width:28px;height:28px;image-rendering:pixelated" onerror="this.style.opacity=0">
-              <span style="flex:1;text-align:left;font-family:var(--font-pixel);font-size:7px">${p.displayName}</span>
-              <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">Nv.${p.level}</span>
-            </button>`).join('')}
-        </div>
-        <button class="btn btn--ghost btn--wide" id="swap-cancel">Cancelar</button>
-      </div>`;
-
-    document.getElementById('viewport').appendChild(overlay);
+    const overlay = Screens._makeModal(`
+      <div class="modal-title">Equipo completo</div>
+      <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
+        Elige un pokemon para sustituir por<br>
+        <strong>${newPoke.displayName}</strong> Nv.${newPoke.level}
+      </p>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${GameState.team.map((p, i) => Screens._teamBtn(p, i,
+          `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">Nv.${p.level}</span>`
+        )).join('')}
+      </div>
+      <button class="btn btn--ghost btn--wide" id="swap-cancel">Cancelar</button>
+    `);
 
     overlay.querySelectorAll('[data-idx]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1129,35 +1208,23 @@ const Screens = {
     });
   },
 
-  // Selector de pokemon para objetos de EV
+  // Selector de pokemon para vitaminas (premios de EV).
   _showEvItemSelector(item, onDone) {
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `
-      <div class="modal-sheet">
-        <div class="modal-title">${item.icon} ${item.name}</div>
-        <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
-          Elige un pokemon para aumentar su ${item.stat.toUpperCase()}
-        </p>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          ${GameState.team.map((p, i) => {
-            const evs = Storage.getEvs(p.name);
-            return `
-              <button class="btn btn--wide" data-idx="${i}"
-                style="display:flex;align-items:center;gap:10px;justify-content:flex-start;padding:8px 12px">
-                <img src="${p.spriteUrl ?? ''}" style="width:28px;height:28px;image-rendering:pixelated"
-                  onerror="this.style.opacity=0">
-                <span style="flex:1;text-align:left;font-family:var(--font-pixel);font-size:7px">${p.displayName}</span>
-                <span style="font-family:var(--font-pixel);font-size:6px;color:var(--blue)">
-                  ${item.stat.toUpperCase()}: ${p.stats[item.stat]} (+${evs[item.stat] ?? 0} EV)
-                </span>
-              </button>`;
-          }).join('')}
-        </div>
-        <button class="btn btn--ghost btn--wide" id="ev-cancel">Cancelar</button>
-      </div>`;
-
-    document.getElementById('viewport').appendChild(overlay);
+    const overlay = Screens._makeModal(`
+      <div class="modal-title">${item.icon} ${item.name}</div>
+      <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
+        Elige un pokemon para aumentar su ${item.stat.toUpperCase()}
+      </p>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${GameState.team.map((p, i) => {
+          const evs = Storage.getEvs(p.name);
+          return Screens._teamBtn(p, i,
+            `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--blue)">${item.stat.toUpperCase()}: ${p.stats[item.stat]} (+${evs[item.stat] ?? 0} EV)</span>`
+          );
+        }).join('')}
+      </div>
+      <button class="btn btn--ghost btn--wide" id="ev-cancel">Cancelar</button>
+    `);
 
     overlay.querySelectorAll('[data-idx]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1177,42 +1244,29 @@ const Screens = {
     });
   },
 
-  // Selector de pokemon para equipar un objeto (premio de fin de ruta, sección 9.5).
+  // Selector de pokemon para equipar un objeto (premio de fin de ruta).
   // Si el pokemon elegido ya lleva un objeto, este se sustituye (el anterior
   // se "pierde" — equipHeldItem revierte su efecto pasivo automáticamente).
   _showHeldItemSelector(item, onDone) {
     const heldItem = HELD_ITEMS[item.itemId];
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `
-      <div class="modal-sheet">
-        <div class="modal-title">${item.icon} ${item.name}</div>
-        <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
-          ${item.desc}
-        </p>
-        <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
-          Elige un pokemon para equipar este objeto
-        </p>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          ${GameState.team.map((p, i) => {
-            const current = p.heldItem ? HELD_ITEMS[p.heldItem] : null;
-            return `
-              <button class="btn btn--wide" data-idx="${i}"
-                style="display:flex;align-items:center;gap:10px;justify-content:flex-start;padding:8px 12px">
-                <img src="${p.spriteUrl ?? ''}" style="width:28px;height:28px;image-rendering:pixelated"
-                  onerror="this.style.opacity=0">
-                <span style="flex:1;text-align:left;font-family:var(--font-pixel);font-size:7px">${p.displayName}</span>
-                ${current ? `
-                  <span style="font-family:var(--font-pixel);font-size:6px;color:var(--red)">
-                    Sustituye: ${current.name}
-                  </span>` : ''}
-              </button>`;
-          }).join('')}
-        </div>
-        <button class="btn btn--ghost btn--wide" id="held-item-cancel">Cancelar</button>
-      </div>`;
-
-    document.getElementById('viewport').appendChild(overlay);
+    const overlay = Screens._makeModal(`
+      <div class="modal-title">${item.icon} ${item.name}</div>
+      <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
+        ${item.desc}
+      </p>
+      <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
+        Elige un pokemon para equipar este objeto
+      </p>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${GameState.team.map((p, i) => {
+          const current = p.heldItem ? HELD_ITEMS[p.heldItem] : null;
+          return Screens._teamBtn(p, i,
+            current ? `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--red)">Sustituye: ${current.name}</span>` : ''
+          );
+        }).join('')}
+      </div>
+      <button class="btn btn--ghost btn--wide" id="held-item-cancel">Cancelar</button>
+    `);
 
     overlay.querySelectorAll('[data-idx]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1229,39 +1283,29 @@ const Screens = {
     });
   },
 
-  // Selector de pokemon para enseñar una MT. Cancelar devuelve a la pantalla de premios.
+  // Selector de pokemon para enseñar una MT. Los pokemon incompatibles o que ya
+  // conocen el movimiento aparecen deshabilitados. Cancelar no avanza la ruta.
   _showTMSelector(item, onDone) {
     const tm   = TM_LIST[item.tmId];
     const move = MOVE_BY_ID[tm.moveId];
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `
-      <div class="modal-sheet">
-        <div class="modal-title">${item.icon} ${item.name}</div>
-        <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
-          Elige un pokemon para enseñar <strong>${move?.name ?? tm.moveId}</strong>
-        </p>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          ${GameState.team.map((p, i) => {
-            const compatible  = canLearnTM(p, item.tmId);
-            const alreadyKnows = p.moves.some(m => m.id === tm.moveId);
-            const disabled = !compatible || alreadyKnows;
-            return `
-              <button class="btn btn--wide" data-idx="${i}" ${disabled ? 'disabled' : ''}
-                style="display:flex;align-items:center;gap:10px;justify-content:flex-start;padding:8px 12px;opacity:${disabled ? '0.4' : '1'}">
-                <img src="${p.spriteUrl ?? ''}" style="width:28px;height:28px;image-rendering:pixelated"
-                  onerror="this.style.opacity=0">
-                <span style="flex:1;text-align:left;font-family:var(--font-pixel);font-size:7px">${p.displayName}</span>
-                <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">
-                  ${alreadyKnows ? 'Ya conoce' : (!compatible ? 'No compatible' : '')}
-                </span>
-              </button>`;
-          }).join('')}
-        </div>
-        <button class="btn btn--ghost btn--wide" id="tm-cancel">Cancelar</button>
-      </div>`;
-
-    document.getElementById('viewport').appendChild(overlay);
+    const overlay = Screens._makeModal(`
+      <div class="modal-title">${item.icon} ${item.name}</div>
+      <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
+        Elige un pokemon para enseñar <strong>${move?.name ?? tm.moveId}</strong>
+      </p>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${GameState.team.map((p, i) => {
+          const compatible   = canLearnTM(p, item.tmId);
+          const alreadyKnows = p.moves.some(m => m.id === tm.moveId);
+          const disabled = !compatible || alreadyKnows;
+          return Screens._teamBtn(p, i,
+            `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">${alreadyKnows ? 'Ya conoce' : (!compatible ? 'No compatible' : '')}</span>`,
+            disabled
+          );
+        }).join('')}
+      </div>
+      <button class="btn btn--ghost btn--wide" id="tm-cancel">Cancelar</button>
+    `);
 
     overlay.querySelectorAll('[data-idx]:not([disabled])').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1280,39 +1324,26 @@ const Screens = {
   // Selector de pokemon para un punto de curación del camino (type:'heal').
   // Cura el HP al 100% y elimina el estado alterado del elegido.
   _showHealSelector(onDone) {
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `
-      <div class="modal-sheet">
-        <div class="modal-title">
-          <img src="assets/sprites/items/potion.png" style="width:20px;height:20px;image-rendering:pixelated;vertical-align:middle;margin-right:4px">
-          Punto de curación
-        </div>
-        <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
-          Elige un pokemon para curar su HP al 100%<br>y eliminar su estado alterado
-        </p>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          ${GameState.team.map((p, i) => {
-            const statusBadge = (typeof StatusEffects !== 'undefined' && p.statusEffect)
-              ? StatusEffects.badge(p)
-              : '';
-            return `
-              <button class="btn btn--wide" data-idx="${i}"
-                style="display:flex;align-items:center;gap:10px;justify-content:flex-start;padding:8px 12px">
-                <img src="${p.spriteUrl ?? ''}" style="width:28px;height:28px;image-rendering:pixelated"
-                  onerror="this.style.opacity=0">
-                <span style="flex:1;text-align:left;font-family:var(--font-pixel);font-size:7px">${p.displayName}</span>
-                <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">
-                  ${p.currentHp}/${p.stats.hp}
-                </span>
-                ${statusBadge}
-              </button>`;
-          }).join('')}
-        </div>
-        <button class="btn btn--ghost btn--wide" id="heal-cancel">No curar a nadie</button>
-      </div>`;
-
-    document.getElementById('viewport').appendChild(overlay);
+    const overlay = Screens._makeModal(`
+      <div class="modal-title">
+        <img src="assets/sprites/items/potion.png" style="width:20px;height:20px;image-rendering:pixelated;vertical-align:middle;margin-right:4px">
+        Punto de curación
+      </div>
+      <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
+        Elige un pokemon para curar su HP al 100%<br>y eliminar su estado alterado
+      </p>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${GameState.team.map((p, i) => {
+          const statusBadge = (typeof StatusEffects !== 'undefined' && p.statusEffect)
+            ? StatusEffects.badge(p)
+            : '';
+          return Screens._teamBtn(p, i,
+            `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">${p.currentHp}/${p.stats.hp}</span>${statusBadge}`
+          );
+        }).join('')}
+      </div>
+      <button class="btn btn--ghost btn--wide" id="heal-cancel">No curar a nadie</button>
+    `);
 
     overlay.querySelectorAll('[data-idx]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -1464,24 +1495,7 @@ const Screens = {
 
         <!-- Mini equipo -->
         <div class="combat-team-bar" id="combat-team-bar">
-          ${GameState.team.map(p => `
-            <div class="combat-team-pip ${p === player ? 'combat-team-pip--active' : ''} ${!isAlive(p) ? 'combat-team-pip--fainted' : ''}">
-              <img src="${p.spriteUrl ?? ''}" class="combat-team-pip__sprite" alt="${p.displayName}" onerror="this.style.opacity=0">
-              <div class="combat-team-pip__hp-section">
-                <div class="hp-bar-wrap combat-team-pip__hp-bar">
-                  <div class="hp-bar-fill" data-level="${p.currentHp/p.stats.hp > 0.5 ? 'high' : p.currentHp/p.stats.hp > 0.25 ? 'mid' : 'low'}"
-                    style="width:${Math.max(0,Math.round(p.currentHp/p.stats.hp*100))}%"></div>
-                </div>
-                <div class="combat-team-pip__hp-row">
-                  <div class="combat-team-pip__level">Nv.${p.level}${p.shiny ? ' <span style="color:#FFD700">★</span>' : ''}</div>
-                  <div class="combat-team-pip__hp-nums">${p.currentHp}/${p.stats.hp}</div>
-                </div>
-                <div class="combat-team-pip__exp-bar">
-                  <div class="combat-team-pip__exp-fill"
-                    style="width:${Math.max(0, Math.min(100, Math.round((p.exp / p.expToNext) * 100)))}%"></div>
-                </div>
-              </div>
-            </div>`).join('')}
+          ${GameState.team.map(p => Screens._pipHtml(p, player)).join('')}
         </div>
       </div>`;
 
@@ -1676,9 +1690,11 @@ const Screens = {
     player._priority  = false;
     player._doubleHit = false;
     player._flinched  = false;
+    player._ventaja   = false;
     foe._priority     = false;
     foe._doubleHit    = false;
     foe._flinched     = false;
+    foe._ventaja      = false;
 
     // before-attack: se evalúa para AMBOS movimientos antes de decidir el orden
     // de turno, ya que efectos como 'priority' (ataca primero) deben poder
@@ -1822,7 +1838,12 @@ const Screens = {
     const calc = calcDamage(attacker, defender, move ?? attacker.moves[0]);
     let dmg = calc.dmg;
     const { isCrit, eff, modifiers } = calc;
-    move.pp = Math.max(0, (move.pp ?? 1) - 1);
+
+    if (attacker._ventaja) {
+      attacker._ventaja = false;
+      dmg = dmg * 2;
+      logFn(`¡${attacker.displayName} aprovecha el estado del rival! ×2`);
+    }
 
     // Callbacks de actualización de HUD para efectos
     const updatePlayerHud = () => {
@@ -1954,10 +1975,9 @@ const Screens = {
 
       // EXP
       const battleType = ctx.isGym ? 'gym' : ctx.isTrainer ? 'trainer' : 'wild';
-      const activeLevel = (ctx.activePlayer ?? player).level; // pokemon ACTIVO del jugador en este combate
       for (const member of GameState.team) {
         if (member.currentHp <= 0) continue;
-        const { gained, levelsGained } = gainExp(member, foe.name, battleType, foe.level, activeLevel);
+        const { gained, levelsGained } = gainExp(member, foe.name, battleType, foe.level);
         console.log(`[COMBAT] ${member.displayName} gano ${gained} exp`);
         if (levelsGained > 0) {
           Screens._updateCombatLog(`${member.displayName} subio al nivel ${member.level}!`);
@@ -2000,6 +2020,7 @@ const Screens = {
             Screens._updateCombatLog(`Gotcha! ${foe.displayName} fue capturado!`);
             console.log(`[COMBAT] Capturado: ${foe.displayName}`);
             Storage.markCaught(foe.name);
+            if (foe.shiny) Storage.markShiny(foe.name);
             // Convertir en pokemon del jugador y cargar MTs aprendidas por la cadena evolutiva
             foe.isPlayer = true;
             const capturedMTs = Storage.getLearnedMTs(foe.name);
@@ -2065,10 +2086,9 @@ const Screens = {
         await Screens._wait(200);
         // EXP para los pokemon vivos del equipo
         const battleType2 = ctx.isGym ? 'gym' : ctx.isTrainer ? 'trainer' : 'wild';
-        const activeLevel2 = ctx.activePlayer.level;
         for (const member of GameState.team) {
           if (member.currentHp <= 0) continue;
-          const { levelsGained } = gainExp(member, foe.name, battleType2, foe.level, activeLevel2);
+          const { levelsGained } = gainExp(member, foe.name, battleType2, foe.level);
           if (levelsGained > 0) {
             Screens._updateCombatLog(`${member.displayName} subio al nivel ${member.level}!`);
             Screens._updateCombatTeamBar();
@@ -2115,6 +2135,7 @@ const Screens = {
       Screens._updateCombatLog(`Gotcha! ${foe.displayName} fue capturado!`);
       console.log(`[COMBAT] Capturado: ${foe.displayName}`);
       Storage.markCaught(foe.name);
+      if (foe.shiny) Storage.markShiny(foe.name);
       foe.isPlayer = true;
       const capturedMTs = Storage.getLearnedMTs(foe.name);
       foe.learnedMTs = capturedMTs;
@@ -2169,24 +2190,7 @@ const Screens = {
     if (!bar) return;
     const ctx    = GameState.combat;
     const active = ctx?.activePlayer ?? GameState.team[0];
-    bar.innerHTML = GameState.team.map(p => `
-      <div class="combat-team-pip ${p === active ? 'combat-team-pip--active' : ''} ${!isAlive(p) ? 'combat-team-pip--fainted' : ''}">
-        <img src="${p.spriteUrl ?? ''}" class="combat-team-pip__sprite" alt="${p.displayName}" onerror="this.style.opacity=0">
-        <div class="combat-team-pip__hp-section">
-          <div class="hp-bar-wrap combat-team-pip__hp-bar">
-            <div class="hp-bar-fill" data-level="${p.currentHp/p.stats.hp > 0.5 ? 'high' : p.currentHp/p.stats.hp > 0.25 ? 'mid' : 'low'}"
-              style="width:${Math.max(0,Math.round(p.currentHp/p.stats.hp*100))}%"></div>
-          </div>
-          <div class="combat-team-pip__hp-row">
-            <div class="combat-team-pip__level">Nv.${p.level}${p.shiny ? ' <span style="color:#FFD700">★</span>' : ''}</div>
-            <div class="combat-team-pip__hp-nums">${p.currentHp}/${p.stats.hp}</div>
-          </div>
-          <div class="combat-team-pip__exp-bar">
-            <div class="combat-team-pip__exp-fill"
-              style="width:${Math.max(0, Math.min(100, Math.round((p.exp / p.expToNext) * 100)))}%"></div>
-          </div>
-        </div>
-      </div>`).join('');
+    bar.innerHTML = GameState.team.map(p => Screens._pipHtml(p, active)).join('');
   },
 
   // Actualiza los badges de estado y modificadores de stat en los HUDs
@@ -2477,26 +2481,21 @@ const Screens = {
 
   _showSettingsModal() {
     const p = GameState.starter;
-    const overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.innerHTML = `
-      <div class="modal-sheet">
-        <div class="modal-title">AJUSTES DE COMBATE</div>
-        <label style="font-family:var(--font-pixel);font-size:8px;display:flex;align-items:center;gap:12px;justify-content:space-between">
-          AutoCombate
-          <input type="checkbox" id="toggle-auto" ${GameState.autoMode ? 'checked' : ''} style="width:20px;height:20px">
-        </label>
-        <div style="font-family:var(--font-pixel);font-size:8px">Automovimiento:</div>
-        <div style="display:flex;flex-direction:column;gap:6px" id="move-btns">
-          ${p.moves.map(m => `
-            <button class="btn btn--sm ${p.autoMove===m.id?'btn--primary':''}" data-moveid="${m.id}">
-              ${m.name} [${m.type}]
-            </button>`).join('')}
-        </div>
-        <button class="btn btn--green btn--wide" id="btn-close-modal">GUARDAR</button>
-      </div>`;
-
-    document.getElementById('viewport').appendChild(overlay);
+    const overlay = Screens._makeModal(`
+      <div class="modal-title">AJUSTES DE COMBATE</div>
+      <label style="font-family:var(--font-pixel);font-size:8px;display:flex;align-items:center;gap:12px;justify-content:space-between">
+        AutoCombate
+        <input type="checkbox" id="toggle-auto" ${GameState.autoMode ? 'checked' : ''} style="width:20px;height:20px">
+      </label>
+      <div style="font-family:var(--font-pixel);font-size:8px">Automovimiento:</div>
+      <div style="display:flex;flex-direction:column;gap:6px" id="move-btns">
+        ${p.moves.map(m => `
+          <button class="btn btn--sm ${p.autoMove===m.id?'btn--primary':''}" data-moveid="${m.id}">
+            ${m.name} [${m.type}]
+          </button>`).join('')}
+      </div>
+      <button class="btn btn--green btn--wide" id="btn-close-modal">GUARDAR</button>
+    `, { closeOnBackdrop: true });
 
     overlay.querySelectorAll('#move-btns .btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -2513,7 +2512,6 @@ const Screens = {
     });
 
     document.getElementById('btn-close-modal').addEventListener('click', () => overlay.remove());
-    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
   },
 
   // ═══════════════════════════════════════════════════════════════════════

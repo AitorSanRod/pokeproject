@@ -50,22 +50,22 @@ const StatusEffects = {
     const meta = STATUS_META[statusId];
     if (log) log(`${pokemon.displayName} fue ${StatusEffects._appliedMsg(statusId)}!`);
 
-    // Burn reduce ATK base un 50% vía combatMods
-    if (statusId === 'burn') {
+    // Burn reduce ATK base un 50% vía combatMods (guts lo ignora)
+    if (statusId === 'burn' && !hasGutsEffect(pokemon)) {
       if (!pokemon.combatMods) pokemon.combatMods = {};
       pokemon.combatMods._burnAtk = true;
       pokemon.combatMods.atk = (pokemon.combatMods.atk ?? 0) - 0.50;
     }
 
-    // Freeze reduce SPA base un 50% vía combatMods
-    if (statusId === 'freeze') {
+    // Freeze reduce SPA base un 50% vía combatMods (guts lo ignora)
+    if (statusId === 'freeze' && !hasGutsEffect(pokemon)) {
       if (!pokemon.combatMods) pokemon.combatMods = {};
       pokemon.combatMods._freezeSpa = true;
       pokemon.combatMods.spa = (pokemon.combatMods.spa ?? 0) - 0.50;
     }
 
-    // Paralysis reduce SPE un 50% — directamente en stats (afecta al orden de turno)
-    if (statusId === 'paralysis') {
+    // Paralysis reduce SPE un 50% — directamente en stats (guts lo ignora)
+    if (statusId === 'paralysis' && !hasGutsEffect(pokemon)) {
       pokemon._baseSpe = pokemon._baseSpe ?? pokemon.stats.spe;
       pokemon.stats.spe = Math.max(1, Math.floor(pokemon.stats.spe * 0.50));
     }

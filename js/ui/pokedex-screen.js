@@ -13,7 +13,6 @@ const PokedexScreen = {
     this._returnFn = onBack ?? (() => Screens.show(Screens.title));
 
     const dex     = Storage.getPokedex();
-    const allEvs  = Storage.getAllEvs();
     const caught  = Object.keys(dex).filter(k => dex[k].caught).length;
 
     document.getElementById('viewport').innerHTML = `
@@ -32,9 +31,7 @@ const PokedexScreen = {
             ${KANTO_DEX.map(entry => {
               const isCaught = dex[entry.name]?.caught;
               const isSeen   = !isCaught && dex[entry.name]?.seen;
-              const evRoot   = Storage.getEvolutionRoot(entry.name);
-              const evs      = allEvs[evRoot];
-              const hasEvs   = evs && Object.values(evs).some(v => v > 0);
+              const isShiny  = isCaught && dex[entry.name]?.shiny;
               return `
                 <div class="dex-entry ${isCaught ? 'dex-entry--caught' : isSeen ? 'dex-entry--seen' : 'dex-entry--unseen'}"
                   data-name="${entry.name}" data-id="${entry.id}">
@@ -55,7 +52,7 @@ const PokedexScreen = {
                     </div>
                   </div>
 
-                  ${hasEvs && isCaught ? `<span class="dex-entry__ev-badge" title="Tiene EVs">EV</span>` : ''}
+                  ${isShiny ? `<img src="assets/sprites/others/shiny.png" style="width:14px;height:14px;image-rendering:pixelated;flex-shrink:0">` : ''}
                   ${isCaught ? `<span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey);flex-shrink:0">›</span>` : ''}
                 </div>`;
             }).join('')}
@@ -92,8 +89,10 @@ const PokedexScreen = {
 
     document.getElementById('dex-detail-back').addEventListener('click', () => PokedexScreen.show(PokedexScreen._returnFn));
 
-    const isCaught = Storage.isCaught(name);
+    const isCaught      = Storage.isCaught(name);
+    const isShinyPokemon = Storage.isShiny(name);
     const entry = await getDexEntry({ id, name, types: KANTO_DEX.find(e => e.name === name)?.types ?? [] });
+    const shinySpriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${id}.png`;
     const evs    = Storage.getEvs(name);
     const badges = Storage.getBadges(name);
     const STAT_LABEL = { hp:'HP', atk:'ATK', def:'DEF', spa:'SPA', spd:'SPD', spe:'VEL' };
@@ -138,9 +137,17 @@ const PokedexScreen = {
 
           <!-- Sprite + tipos -->
           <div style="display:flex;flex-direction:column;align-items:center;gap:var(--sp-sm)">
-            <img src="${entry.spriteUrl}" alt="${name}"
-              style="width:96px;height:96px;image-rendering:pixelated${isCaught ? '' : ';filter:brightness(.15) grayscale(1)'}"
-              onerror="this.style.opacity=0.3">
+            <div style="position:relative;display:inline-flex">
+              <img id="dex-detail-sprite" src="${entry.spriteUrl}" alt="${name}"
+                style="width:96px;height:96px;image-rendering:pixelated${isCaught ? '' : ';filter:brightness(.15) grayscale(1)'}"
+                onerror="this.style.opacity=0.3">
+              ${isShinyPokemon ? `
+                <button id="dex-shiny-toggle" title="Ver forma shiny"
+                  style="position:absolute;bottom:0;right:-8px;background:none;border:none;
+                    cursor:pointer;font-size:16px;line-height:1;padding:2px;opacity:.7">
+                  ↻
+                </button>` : ''}
+            </div>
             <div style="display:flex;gap:var(--sp-xs)">
               ${entry.types.map(t => `<span class="type-badge" data-type="${t}">${t}</span>`).join('')}
             </div>
@@ -157,14 +164,14 @@ const PokedexScreen = {
               const ev = evs[key] ?? 0;
               return `
               <div style="display:flex;align-items:center;gap:var(--sp-sm);margin-bottom:5px">
-                <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey);width:30px">${STAT_LABEL[key]}</span>
+                <span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey);width:30px">${STAT_LABEL[key]}</span>
                 <div style="flex:1;height:8px;background:var(--grey-light);border:2px solid var(--black);border-radius:2px;overflow:hidden">
                   <div style="height:100%;width:${Math.min(100, Math.round(val/255*100))}%;
                     background:${val >= 90 ? 'var(--green)' : val >= 60 ? 'var(--yellow)' : 'var(--red)'}">
                   </div>
                 </div>
-                <span style="font-family:var(--font-pixel);font-size:6px;color:var(--black);width:24px;text-align:right">${val}</span>
-                <span style="font-family:var(--font-pixel);font-size:6px;color:var(--blue);width:22px;text-align:right">+${ev}</span>
+                <span style="font-family:var(--font-pixel);font-size:8px;color:var(--black);width:24px;text-align:right">${val}</span>
+                <span style="font-family:var(--font-pixel);font-size:8px;color:var(--blue);width:22px;text-align:right">+${ev}</span>
               </div>`;
             }).join('')}
           </div>` : ''}
@@ -176,14 +183,18 @@ const PokedexScreen = {
               MEDALLAS
             </div>
             ${badges.length > 0 ? `
-              <div style="display:flex;flex-wrap:wrap;gap:6px">
-                ${badges.map(b => `
-                  <span style="font-family:var(--font-pixel);font-size:6px;color:var(--white);
-                    background:var(--yellow);border:2px solid var(--black);border-radius:var(--radius-sm);
-                    padding:3px 7px;text-shadow:1px 1px 0 rgba(0,0,0,.25)">${b}</span>
-                `).join('')}
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%">
+                ${Object.values(typeof BADGE_LIST !== 'undefined' ? BADGE_LIST : {}).map(b => {
+                  const earned = badges.includes(b.id);
+                  return `<div style="display:flex;justify-content:center;align-items:center">
+                    <img src="${b.img}" alt="${b.name}"
+                      title="${b.name} - ${b.gym}"
+                      style="width:36px;height:36px;image-rendering:pixelated;${earned ? '' : 'filter:grayscale(1) brightness(.4)'}"
+                      onerror="this.outerHTML='<span style=font-family:var(--font-pixel);font-size:8px;color:var(--white);background:${earned ? 'var(--yellow)' : 'var(--grey)'};border:2px solid var(--black);border-radius:var(--radius-sm);padding:3px 7px>${b.name}</span>'">
+                  </div>`;
+                }).join('')}
               </div>
-            ` : `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">Sin medallas aun</span>`}
+            ` : `<span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey)">Sin medallas aun</span>`}
           </div>
 
           <!-- Movimientos -->
@@ -207,7 +218,7 @@ const PokedexScreen = {
                         background:#4a7fc1;border-radius:2px;padding:1px 4px;flex-shrink:0">MT</span>` : ''}
                       <span class="type-badge" data-type="${m.type}" style="font-size:5px;padding:2px 5px;flex-shrink:0">${m.type}</span>
                       <span style="font-family:var(--font-pixel);font-size:7px;flex:1">${m.name}</span>
-                      <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">POD:${m.power ?? '—'}</span>
+                      <span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey)">POD:${m.power ?? '—'}</span>
                       ${effectDesc ? `<div class="move-effect-tooltip">✦ ${effectDesc}</div>` : ''}
                     </div>`;
                 }).join('')}
@@ -223,5 +234,15 @@ const PokedexScreen = {
       </div>`;
 
     document.getElementById('dex-detail-back').addEventListener('click', () => PokedexScreen.show(PokedexScreen._returnFn));
+
+    if (isShinyPokemon) {
+      let showingShiny = false;
+      document.getElementById('dex-shiny-toggle').addEventListener('click', () => {
+        showingShiny = !showingShiny;
+        const sprite = document.getElementById('dex-detail-sprite');
+        sprite.src = showingShiny ? shinySpriteUrl : entry.spriteUrl;
+        document.getElementById('dex-shiny-toggle').style.opacity = showingShiny ? '1' : '.7';
+      });
+    }
   },
 };

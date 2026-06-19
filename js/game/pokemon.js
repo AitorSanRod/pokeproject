@@ -83,7 +83,7 @@ async function createPokemon(nameOrId, level, isPlayer = false, moveId = null, o
     moves,
     autoMove:     moveId && moves.find(m => m.id === moveId)
                      ? moveId
-                     : moves.reduce((best, m) => (m.power ?? 0) > (best?.power ?? 0) ? m : best, moves[0])?.id ?? null,
+                     : moves[0]?.id ?? null,
     isPlayer,
     shiny,
     spriteUrl:    shiny ? (apiData.sprites.front_shiny ?? apiData.sprites.front_default) : apiData.sprites.front_default,
@@ -99,13 +99,14 @@ async function createPokemon(nameOrId, level, isPlayer = false, moveId = null, o
   return pokemon;
 }
 
-function gainExp(pokemon, foeName, battleType = 'wild', foeLevel = 5, activeLevel = foeLevel) {
+function gainExp(pokemon, foeName, battleType = 'wild', foeLevel = 5) {
   const baseExp   = EXP_TABLE.getBaseExp(foeName);
   const mult      = EXP_TABLE.MULTIPLIERS[battleType] ?? 1.0;
   const levelMult = 1.0 + (foeLevel - 5) * 0.05;
   let gained      = Math.round(baseExp * mult * Math.max(0.5, levelMult));
 
-  const diff = activeLevel - foeLevel;
+  // Penalización basada en el nivel propio del pokemon, no en el activo
+  const diff = pokemon.level - foeLevel;
   const penalty = (EXP_TABLE.EXP_PENALTIES ?? []).find(p => diff > p.levelDiff);
   if (penalty) gained = Math.round(gained * penalty.multiplier);
 
@@ -186,6 +187,15 @@ function hasClearEffect(pokemon) {
   if (!active) return false;
   if (Array.isArray(active.effectId)) return active.effectId.includes('clear');
   return active.effectId === 'clear';
+}
+
+// Comprueba si el pokemon tiene effectId:'guts' en su autoMove activo.
+// Guts ignora las penalizaciones de burn/freeze/paralysis y añade +120% daño físico.
+function hasGutsEffect(pokemon) {
+  const active = pokemon?.moves?.find(m => m.id === pokemon?.autoMove) ?? pokemon?.moves?.[0];
+  if (!active) return false;
+  if (Array.isArray(active.effectId)) return active.effectId.includes('guts');
+  return active.effectId === 'guts';
 }
 
 // ── Evoluciones ───────────────────────────────────────────────────────────────

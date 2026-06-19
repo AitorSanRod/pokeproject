@@ -1,11 +1,14 @@
 const NOTES_DATA = {
-  "title": "Actualización 0.0.8",
+  "title": "Actualización 0.0.9 - (Bienvenido Moraleda Variocolor)",
   "lines": [
-    "Nuevas rutas incluidas.",
-    "Varios bugs corregidos.",
-    "Correcciones en MTs.",
-    "Ese tío esta bloqueando la entrada de la montaña.",
-    "EVs al máximo",
-    "El Mewtwo esta triste porque todo el mundo  le gana."
+    "Guía incluida en el compendio.",
+    "Mas balance de experiencia",
+    "Nuevas MTs",
+    "Nuevas rutas y gimnasios",
+    "La Zona Safari se ha vuelto rarilla.",
+    "Nuevos entrenadores misteriosos",
+    "Mejora en las medallas de la pokedex",
+    "Ahora se marcan en la pokedex aquellas capturas de pokemon shiny. Tambien podras ver el sprite del pokemon shiny.",
+    "Los iniciales ahora también pueden ser shiny.",
   ]
 };

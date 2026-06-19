@@ -290,6 +290,15 @@ var MOVE_EFFECTS = {
     },
   },
 
+  'sleep-30': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Tiene un 30% de probabilidad de hacer dormir al rival',
+    statusChance: 0.30,
+    fn(ctx) {
+      StatusEffects.apply(ctx.target, 'sleep', ctx.log);
+    },
+  },
+
   'flinch-20': {
     trigger: TRIGGERS.AFTER_ATTACK,
     statusChance: 0.20,
@@ -353,11 +362,26 @@ var MOVE_EFFECTS = {
   },
 
   // ── PASIVO ────────────────────────────────────────────────────────────────
+  'ventaja': {
+    trigger: TRIGGERS.BEFORE_ATTACK,
+    desc: 'Dobla el daño si el rival sufre un problema de estado',
+    fn(ctx) {
+      if (ctx.target.statusEffect) ctx.user._ventaja = true;
+    },
+  },
+
   'clear': {
     trigger: TRIGGERS.BEFORE_ATTACK,
     desc: 'Inmune a effectos de estado y cambios de estadisticas',
     fn(ctx) {
       // No-op: el efecto es pasivo, ver comentario arriba.
+    },
+  },
+
+  'guts': {
+    trigger: TRIGGERS.BEFORE_ATTACK,
+    desc: 'Ignora las penalizaciones de quemado, paralizado y congelado. +120% daño físico',
+    fn(ctx) {
     },
   },
 

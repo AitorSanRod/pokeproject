@@ -732,6 +732,9 @@
   font-family: var(--font-pixel);
   font-size: 8px;
   color: var(--grey);
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 
 /* Fila nivel (izq) + HP nums (der) bajo la barra */
@@ -1118,7 +1121,7 @@
 .route-team-row__sprite { width: 36px; height: 36px; image-rendering: pixelated; flex-shrink: 0; }
 .route-team-row__info   { flex: 1; min-width: 0; overflow: hidden; }
 .route-team-row__info .hp-bar-wrap { max-width: 160px; }
-.route-team-row__name   { font-family: var(--font-pixel); font-size: 10px; color: var(--black); }
+.route-team-row__name   { font-family: var(--font-pixel); font-size: 10px; color: var(--black); display: inline-flex; align-items: center; gap: 3px; }
 .route-team-row__level  { font-family: var(--font-pixel); font-size: 8px;  color: var(--grey); }
 
 /* ── PATH NODES ROW ─────────────────────────────────────────────────────────── */
@@ -1538,5 +1541,9 @@ div:hover > .move-effect-tooltip { display: block; }
    overflow:hidden de .screen--adventure (sección 22.1 del README) */
 .held-item-tooltip--floating {
   position: fixed;
+}
+
+@media (hover: none) {
+  .held-item-tooltip--floating { display: none !important; }
 }
 

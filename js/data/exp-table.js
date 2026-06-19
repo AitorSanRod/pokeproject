@@ -3,7 +3,7 @@ var EXP_TABLE = {
     ranges: [
       { from:  1, to: 10, base: 11.5 },
       { from: 11, to: 20, base: 12 },
-      { from: 21, to: 30, base: 15 },
+      { from: 21, to: 30, base: 17 },
       { from: 31, to: 40, base: 19 },
       { from: 41, to: 50, base: 22 },
       { from: 51, to: 60, base: 24 },
@@ -20,8 +20,8 @@ var EXP_TABLE = {
   // Penalización de experiencia por diferencia de nivel.
   // Tiers ordenados de mayor a menor diferencia — se aplica el primero que se cumpla.
   EXP_PENALTIES: [
-    { levelDiff: 10, multiplier: 0.01 },
-    { levelDiff: 6, multiplier: 0.5 }, // >2 niveles → 20% exp
+    { levelDiff: 7, multiplier: 0.05 },
+    { levelDiff: 4, multiplier: 0.4 },
   ],
 
   // EXP base al ser derrotado — fuente: PokeAPI / Gen 1 oficial

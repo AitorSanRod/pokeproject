@@ -38,6 +38,7 @@ const CompendiumScreen = {
         <div style="overflow-y:auto;flex:1;min-height:0">
           <!-- layout container: flex separado del scroll -->
           <div style="display:flex;flex-direction:column;gap:var(--sp-md);padding:var(--sp-md)">
+            ${sec('guide',  'GUÍA',              CompendiumScreen._renderGuide())}
             ${sec('status', 'EFECTOS DE ESTADO', CompendiumScreen._renderStatusList())}
             ${sec('types',  'TIPOS',             CompendiumScreen._renderTypeChart())}
             ${sec('moves',  'MOVIMIENTOS',        CompendiumScreen._renderMoveList())}
@@ -63,6 +64,98 @@ const CompendiumScreen = {
     vp.querySelectorAll('[data-move-id]').forEach(el => {
       el.addEventListener('click', () => CompendiumScreen._renderMoveDetail(el.dataset.moveId));
     });
+  },
+
+  // ── Guía de juego ────────────────────────────────────────────────────────
+  _renderGuide() {
+    const sub = (title, color, items) => `
+      <div style="border-radius:var(--radius-sm);border:1px solid ${color}22;
+        background:${color}0d;padding:10px 12px;margin-bottom:8px">
+        <div style="font-family:var(--font-pixel);font-size:7px;color:${color};
+          letter-spacing:1px;margin-bottom:8px">${title}</div>
+        <ul style="margin:0;padding-left:14px">
+          ${items.map(l =>
+            `<li style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-dark);
+              line-height:2.2;margin-bottom:1px">${l}</li>`
+          ).join('')}
+        </ul>
+      </div>`;
+
+    return [
+
+      sub('RUTAS Y CAMINOS', '#2980b9', [
+        'Cada ruta presenta <strong>varios caminos</strong> entre los que elegir antes de empezar.',
+        'Cada camino tiene una secuencia de encuentros: pokémon salvajes, entrenadores y/o puntos de curación.',
+        'Los <strong>puntos de curación</strong> (Poción) permiten sanar al 100% un pokemon su vida y sus efectos alterados.',
+        'En algunas rutas aparece un <strong>entrenador especial</strong>.',
+        'Algunas pantallas de ciudad ofrecen un <strong>botón de ruta opcional</strong> que ofrece buenas recompensas.',
+        'Al terminar una ruta, tus pokémon se curan completamente y podrás elegir entre 3 premios.',
+        "Puedes elegir los movimientos que usa cada pokémon antes de seleccionar una ruta.",
+        "Puedes ordenar tus pokémon antes de seleccionar un camino."
+      ]),
+
+      sub('COMBATE', '#8e44ad', [
+        'El combate funciona en modo automático: <strong>Cada pokémon usa el ataque que hayas seleccionado</strong>.',
+        'El <strong>orden de turno</strong> lo decide la Velocidad; los movimientos de <em>prioridad</em> siempre van primero.',
+        'Si tu pokemon activo cae, el juego <strong>cambia automáticamente</strong> al siguiente vivo del equipo.',
+        'Los <strong>objetos equipados</strong> se activan solos durante el combate sin necesidad de acción del jugador.',
+        'Los <strong>efectos de estado</strong> (veneno, quemadura, parálisis…) se aplican al final del turno — consulta la sección "Efectos de Estado".',
+      ]),
+
+      sub('PREMIOS DE RUTA', '#e67e22', [
+        'Al completar una ruta recibes <strong>3 tarjetas de premio</strong> entre las que elegir una (o pulsar CONTINUAR para saltarla).',
+        '<strong>Pokemon</strong>: añade un nuevo pokemon a tu equipo. Si ya tienes 6, puedes intercambiar uno.',
+        '<strong>Vitamina</strong>: sube +1 EV permanente en una estadística del pokemon que elijas. Esta mejora se mantiene entre runs.',
+        '<strong>Rare Candy</strong>: sube 1 nivel a <strong>todos</strong> los pokemon del equipo a la vez.',
+        '<strong>MT</strong>: enseña un movimiento nuevo a un pokemon compatible. La MT queda registrada permanentemente entre runs.',
+        'Los 3 premios se barajan aleatoriamente en cada partida.',
+      ]),
+
+      sub('EQUIPO', '#16a085', [
+        'Puedes llevar hasta <strong>6 pokemon</strong> en el equipo.',
+        'Los pokemon pueden <strong>evolucionar</strong> al subir de nivel si se dan las condiciones.',
+        'Al evolucionar, el pokemon conserva todos sus EVs y MTs aprendidas a lo largos de las partidas.',
+        'El pokemon que lleves en primer slot es el que usas por defecto al empezar el combate.',
+      ]),
+
+      sub('POKÉDEX', '#2c3e50', [
+        'La Pokédex <strong>persiste entre partidas</strong>: los pokemon que hayas visto o usado quedan registrados para siempre.',
+        'Un pokemon se marca como <strong>visto</strong> en cuanto aparece en combate.',
+        'Se marca como <strong>capturado</strong> cuando los capturas, no es necesario añadirlos al equipo.',
+        'Los pokemon no capturados aparecen como <strong>siluetas</strong> en la Pokédex.',
+        'Las <strong>evoluciones</strong> de un pokemon capturado se desbloquean en la Pokédex automáticamente al evolucionar.',
+        'Desde la Pokédex puedes ver los <strong>movimientos</strong> de cada pokemon y qué entrenadores los usan.',
+        'Puedes abrir la Pokédex <strong>durante una ruta</strong> desde el botón flotante sin perder el progreso.',
+      ]),
+
+      sub('EVS (PUNTOS DE ESFUERZO)', '#c0392b', [
+        'Los EVs son bonificaciones permanentes que aumentan las estadísticas de un pokemon.',
+        'Se consiguen <strong>eligiendo el premio de vitamina</strong> al terminar una ruta.',
+        'Hay 6 estadísticas que pueden subir: HP, ATK, DEF, SPA (At. Esp.), SPD (Def. Esp.) y SPE (Velocidad).',
+        'Máximo <strong>32 EVs por estadística</strong> y por cadena evolutiva.',
+        'Los EVs se guardan por <strong>cadena evolutiva</strong>: si subes EVs a Bulbasaur, Ivysaur y Venusaur comparten esos EVs.',
+        'Los EVs <strong>persisten entre partidas</strong> aunque pierdas o empieces de nuevo.',
+      ]),
+
+      sub('MTS (MÁQUINAS TÉCNICAS)', '#7f8c8d', [
+        'Las MTs enseñan movimientos especiales que el pokemon no aprendería de forma natural.',
+        'Se obtienen como <strong>premio de ruta</strong> al completar un camino.',
+        'Solo pueden aprender una MT los pokemon <strong>del tipo correcto</strong> o los marcados específicamente como compatibles.',
+        'Al recibir una MT, eliges a qué pokemon enseñársela desde el selector.',
+        'Una MT aprendida <strong>persiste entre partidas</strong>: aunque pierdas la run, el movimiento sigue disponible si vuelves a usar ese pokemon.',
+        'Si borras los datos de la Pokédex desde el menú de ajustes, los movimientos de MT también se eliminan.',
+      ]),
+
+      sub('QUÉ PERSISTE ENTRE PARTIDAS', '#34495e', [
+        '<strong>Pokédex</strong>: todos los pokemon vistos y capturados quedan registrados para siempre.',
+        '<strong>EVs</strong>: los puntos de esfuerzo acumulados por cadena evolutiva no se pierden nunca.',
+        '<strong>MTs aprendidas</strong>: los movimientos enseñados por MT se conservan vinculados a la cadena evolutiva.',
+        '<strong>Medallas de gimnasio</strong>: se registran en la Pokédex por cadena evolutiva (no en el equipo de la run).',
+        'La <strong>partida activa</strong> (equipo, ruta actual, medallas de run) sí se pierde si sufres una derrota o inicias una nueva partida.',
+        'Puedes borrar los datos permanentes (Pokédex, EVs, MTs, medallas) con el botón 🗑 en la esquina inferior izquierda.',
+      ]),
+
+    ].join('');
   },
 
   // ── Lista de efectos de estado ────────────────────────────────────────────
@@ -120,7 +213,7 @@ const CompendiumScreen = {
         </div>
         <ul style="margin:0;padding-left:14px">
           ${s.lines.map(l =>
-            `<li style="font-family:var(--font-pixel);font-size:6px;color:var(--grey-dark);
+            `<li style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-dark);
               line-height:2;margin-bottom:1px">${l}</li>`
           ).join('')}
         </ul>
@@ -228,35 +321,37 @@ const CompendiumScreen = {
     return Object.entries(byType).sort(([a],[b]) => a.localeCompare(b)).map(([type, moves]) => `
       <div style="margin-bottom:12px">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
-          <span class="type-badge" data-type="${type}" style="font-size:6px;padding:2px 8px">${type.toUpperCase()}</span>
+          <span class="type-badge" data-type="${type}" style="font-size:8px;padding:2px 8px">${type.toUpperCase()}</span>
         </div>
         <div style="display:flex;flex-direction:column;gap:4px">
-          ${moves.sort((a,b) => (b.power??0)-(a.power??0)).map(m => {
-            const effectIds = m.effectId ? (Array.isArray(m.effectId) ? m.effectId : [m.effectId]) : [];
-            const effects   = typeof MOVE_EFFECTS !== 'undefined'
-              ? effectIds.map(id => MOVE_EFFECTS[id]).filter(Boolean)
-              : [];
-            const effectDesc = effects.map(e => e.desc).filter(Boolean).join(' · ');
-            return `
-              <div class="comp-move-row" data-move-id="${m.id}"
-                style="display:flex;align-items:center;gap:8px;padding:6px 10px;
-                  background:var(--off-white);border:1px solid var(--grey-light);
-                  border-radius:var(--radius-sm);cursor:pointer;position:relative">
-                <span style="font-family:var(--font-pixel);font-size:4px;
-                  color:${m.damageClass === 'special' ? 'var(--blue)' : 'var(--red)'};
-                  border:1px solid currentColor;padding:1px 4px;border-radius:2px;flex-shrink:0">
-                  ${m.damageClass === 'special' ? 'ESP' : 'FIS'}
-                </span>
-                <span style="font-family:var(--font-pixel);font-size:7px;flex:1">${m.name}</span>
-                <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">
-                  POD:${m.power ?? '—'}
-                </span>
-                <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">
-                  PP:${m.pp ?? '—'}
-                </span>
-                ${effectDesc ? `<div class="move-effect-tooltip">✦ ${effectDesc}</div>` : ''}
-              </div>`;
-          }).join('')}
+          ${moves
+            .sort((a,b) => {
+              if (a.damageClass !== b.damageClass)
+                return a.damageClass === 'special' ? -1 : 1;
+              return (a.power ?? 0) - (b.power ?? 0);
+            })
+            .map(m => {
+              const hasEffect = !!m.effectId;
+              const effectIds = hasEffect ? (Array.isArray(m.effectId) ? m.effectId : [m.effectId]) : [];
+              const effects   = typeof MOVE_EFFECTS !== 'undefined'
+                ? effectIds.map(id => MOVE_EFFECTS[id]).filter(Boolean)
+                : [];
+              const effectDesc = effects.map(e => e.desc).filter(Boolean).join(' · ');
+              return `
+                <div class="comp-move-row" data-move-id="${m.id}"
+                  style="display:flex;align-items:center;gap:8px;padding:6px 10px;
+                    background:var(--off-white);border:1px solid var(--grey-light);
+                    border-radius:var(--radius-sm);cursor:pointer;position:relative">
+                  <span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;
+                    background:${m.damageClass === 'special' ? 'var(--blue)' : 'var(--red)'}"></span>
+                  <span style="font-family:var(--font-pixel);font-size:7px;flex:1">${m.name}</span>
+                  <span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey)">
+                    POD:${m.power ?? '—'}
+                  </span>
+                  ${hasEffect ? `<span style="color:var(--yellow);font-size:10px;line-height:1;flex-shrink:0">★</span>` : `<span style="width:10px;flex-shrink:0"></span>`}
+                  ${effectDesc ? `<div class="move-effect-tooltip">✦ ${effectDesc}</div>` : ''}
+                </div>`;
+            }).join('')}
         </div>
       </div>`).join('');
   },
@@ -276,7 +371,7 @@ const CompendiumScreen = {
             ${item.name}
           </span>
           <br>
-          <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey-dark);line-height:1.8">
+          <span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-dark);line-height:1.8">
             ${item.desc}
           </span>
         </div>
@@ -336,12 +431,12 @@ const CompendiumScreen = {
             padding:var(--sp-md);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:8px">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
               <span class="type-badge" data-type="${move.type}">${move.type.toUpperCase()}</span>
-              <span style="font-family:var(--font-pixel);font-size:6px;
+              <span style="font-family:var(--font-pixel);font-size:8px;
                 color:${move.damageClass === 'special' ? 'var(--blue)' : 'var(--red)'};
                 border:1px solid currentColor;padding:2px 6px;border-radius:3px">
                 ${move.damageClass === 'special' ? 'ESPECIAL' : 'FÍSICO'}
               </span>
-              <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey-dark)">
+              <span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-dark)">
                 POD: ${move.power ?? '—'} · PP: ${move.pp ?? '—'}
               </span>
             </div>
@@ -363,7 +458,7 @@ const CompendiumScreen = {
               POKEMON QUE LO USAN (${users.length})
             </div>
             ${users.length === 0
-              ? `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">Ninguno en el sistema</span>`
+              ? `<span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey)">Ninguno en el sistema</span>`
               : `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
                   ${users.map(u => {
                     const dexEntry = typeof KANTO_DEX !== 'undefined'
@@ -381,7 +476,7 @@ const CompendiumScreen = {
                           ${isCaught ? '' : 'filter:brightness(.15) grayscale(1)'}"
                           onerror="this.style.opacity=0">
                         <div style="flex:1;min-width:0">
-                          <div style="font-family:var(--font-pixel);font-size:6px;
+                          <div style="font-family:var(--font-pixel);font-size:8px;
                             color:var(--black);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
                             ${isCaught ? u.name.toUpperCase() : '???'}
                           </div>

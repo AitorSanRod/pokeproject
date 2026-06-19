@@ -23,7 +23,8 @@ const PATH_TYPE = {
   Trainer: 'trainer',
   Wild: 'wild',
   Special: 'special',
-  Heal: 'heal'
+  Heal: 'heal',
+  Lider: 'leader'
 };
 const ENTRENADORES = {
   Rival: {
@@ -85,8 +86,21 @@ const ENTRENADORES = {
   },
   Giovanni: {
     name: 'Giovanni',
-    img: 'assets/sprites/trainers/giovanni.png'
-  }
+    img: 'assets/sprites/trainers/giovanni.png',
+    gif: 'assets/sprites/others/giovani.gif'
+  },
+  ChicoGuay: {
+    name: 'Entrenador Guay',
+    img: 'assets/sprites/trainers/entrenador-guay.png'
+  },
+  ChicaGuay: {
+    name: 'Entrenadora Guay',
+    img: 'assets/sprites/trainers/entrenadora-guay.png'
+  },
+  Chica: {
+    name: 'Chica',
+    img: 'assets/sprites/trainers/chica.png'
+  },
 }
 var SHINY_RATE = 0.005;
 //var SHINY_RATE = 0.05; //5%
@@ -106,7 +120,6 @@ var ROUTE_DATA = {
     // Objetos equipables que pueden aparecer como recompensa de fin de ruta,
     // junto a las 3 opciones base (pokemon, vitamina, rare candy). Opcional —
     // si se omite o es [], solo aparecen las 3 opciones base (sección 11).
-    rewardExtras: [ITEM.carbon, ITEM.mystic_water, ITEM.miracle_seed],
     wild: [
       { name: POKEMON.rattata, rate: 45, minLv: 2, maxLv: 4, moveId: MOVES.normal.physical.tackle },
       { name: POKEMON.pidgey, rate: 45, minLv: 2, maxLv: 3, moveId: MOVES.flying.physical.peck },
@@ -131,6 +144,17 @@ var ROUTE_DATA = {
         ]
       },
     ]
+  },
+
+  'ciudad-verde-info': {
+    type: 'information',
+    bg: 'assets/bg/ciudad-verde.png',
+    title: 'Ciudad Verde',
+    description: 'Es el momento de volver sí<br>se te ha olvidado algo...',
+    optional: {
+      btnName: 'Volver a Pueblo Paleta',
+      area: 'pueblo-paleta-1',
+    },
   },
 
   'ruta-22': {
@@ -239,7 +263,7 @@ var ROUTE_DATA = {
     },
     gymLeader: 'Brock',
     gymType: 'rock',
-    badge: 'Medalla Roca',
+    badgeId: 'boulder-badge',
     gymLeaderImg: 'assets/sprites/trainers/brock.png',
     rewardExtras: [ITEM.leftovers],
     trainer: [
@@ -364,7 +388,7 @@ var ROUTE_DATA = {
     },
     gymLeader: 'Misty',
     gymType: 'water',
-    badge: 'Medalla Agua',
+    badgeId: 'cascade-badge',
     gymLeaderImg: 'assets/sprites/trainers/misty.png',
     rewardExtras: [ITEM.choice_scarf],
     trainer: [
@@ -437,40 +461,40 @@ var ROUTE_DATA = {
     trainer: [
       {
         name: 'Cazabichos', img: 'assets/sprites/trainers/cazabichos.png', rate: 20, pokemon: [
-          { name: POKEMON.metapod, minLv: 18, maxLv: 20, moveId: MOVES.bug.physical.bug_bite }
+          { name: POKEMON.metapod, minLv: 22, maxLv: 26, moveId: MOVES.bug.physical.bug_bite }
         ]
       },
       {
         name: `${ENTRENADORES.Campista.name} aburrido`, img: ENTRENADORES.Campista.img, rate: 20, pokemon: [
-          { name: POKEMON.metapod, minLv: 13, maxLv: 20, moveId: MOVES.bug.physical.bug_bite },
-          { name: POKEMON.caterpie, minLv: 13, maxLv: 20, moveId: MOVES.bug.physical.bug_bite }
+          { name: POKEMON.metapod, minLv: 20, maxLv: 24, moveId: MOVES.bug.physical.bug_bite },
+          { name: POKEMON.caterpie, minLv: 20, maxLv: 24, moveId: MOVES.bug.physical.bug_bite }
         ]
       },
       {
         name: `${ENTRENADORES.Dominguera.name}`, img: ENTRENADORES.Dominguera.img, rate: 15, pokemon: [
-          { name: POKEMON.oddish, minLv: 14, maxLv: 21, moveId: MOVES.grass.special.absorb },
-          { name: POKEMON.butterfree, minLv: 13, maxLv: 20, moveId: MOVES.bug.special.infestation }
+          { name: POKEMON.oddish, minLv: 20, maxLv: 24, moveId: MOVES.grass.special.absorb },
+          { name: POKEMON.butterfree, minLv: 20, maxLv: 25, moveId: MOVES.bug.special.infestation }
         ]
       },
       {
         name: `${ENTRENADORES.Montanero.name}`, img: ENTRENADORES.Montanero.img, rate: 15, pokemon: [
-          { name: POKEMON.onix, minLv: 16, maxLv: 22, moveId: MOVES.rock.physical.rock_throw },
-          { name: POKEMON.onix, minLv: 14, maxLv: 25, moveId: MOVES.ground.physical.bulldoze }
+          { name: POKEMON.onix, minLv: 22, maxLv: 26, moveId: MOVES.rock.physical.rock_throw },
+          { name: POKEMON.onix, minLv: 22, maxLv: 28, moveId: MOVES.ground.physical.bulldoze }
         ]
       },
       {
         name: `${ENTRENADORES.Campista.name} fumao`, img: ENTRENADORES.Campista.img, rate: 10, pokemon: [
-          { name: POKEMON.ivysaur, minLv: 16, maxLv: 21, moveId: MOVES.grass.special.magical_leaf }
+          { name: POKEMON.ivysaur, minLv: 22, maxLv: 26, moveId: MOVES.grass.special.magical_leaf }
         ]
       },
       {
         name: `${ENTRENADORES.Campista.name} fogoso`, img: ENTRENADORES.Campista.img, rate: 10, pokemon: [
-          { name: POKEMON.charmeleon, minLv: 16, maxLv: 21, moveId: MOVES.fire.special.flamethrower }
+          { name: POKEMON.charmeleon, minLv: 22, maxLv: 26, moveId: MOVES.fire.special.flamethrower }
         ]
       },
       {
         name: `${ENTRENADORES.Campista.name} mojado`, img: ENTRENADORES.Campista.img, rate: 10, pokemon: [
-          { name: POKEMON.wartortle, minLv: 16, maxLv: 21, moveId: MOVES.water.special.surf }
+          { name: POKEMON.wartortle, minLv: 22, maxLv: 26, moveId: MOVES.water.special.surf }
         ]
       },
     ],
@@ -479,30 +503,15 @@ var ROUTE_DATA = {
     ],
   },
 
-  'ruta-25': {
-    bg: 'assets/bg/ruta-25.png',
-    combatBg: 'assets/bg/combate.png',
-    rewardPokemon: [POKEMON.pinsir, POKEMON.porygon],
-    rewardExtras: [ITEM.choice_specs],
-    wild: [],
-    trainer: [
-      {
-        name: 'Adrián el dominguero', img: 'assets/sprites/trainers/campista.png', rate: 100, pokemon: [
-          { name: POKEMON.mr_mime, minLv: 25, maxLv: 30, moveId: MOVES.psychic.special.psychic },
-          { name: POKEMON.pinsir, minLv: 26, maxLv: 34, moveId: MOVES.bug.physical.megahorn, shiny: true },
-        ]
-      },
-    ],
-    paths: [
-      [{ type: 'trainer' }],
-    ],
-  },
-
   'info-bill': {
     type: 'information',
     bg: 'assets/bg/ruta-25.png',
     title: 'Laboratorio de Bill',
     description: '<div style="display: flex; justify-content: center;"><img src="assets/sprites/others/bill.gif"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">Tienes una charla con Bill y vuelves al camino</p>',
+    optional: {
+      btnName: 'Visita el jardín de Bill',
+      area: 'jardin-bill',
+    },
   },
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -587,33 +596,33 @@ var ROUTE_DATA = {
     },
     gymLeader: 'Lt. Surge',
     gymType: 'electric',
-    badge: 'Medalla Trueno',
+    badgeId: 'thunder-badge',
     gymLeaderImg: 'assets/sprites/trainers/surge.png',
     rewardPokemon: [POKEMON.voltorb, POKEMON.pikachu, POKEMON.raichu, POKEMON.porygon],
     rewardExtras: [ITEM.choice_band],
     trainer: [
       {
         name: ENTRENADORES.Caballero.name, img: ENTRENADORES.Caballero.img, rate: 50, pokemon: [
-          { name: POKEMON.pikachu, minLv: 24, maxLv: 26, moveId: MOVES.electric.special.thunder_shock },
-          { name: POKEMON.pikachu, minLv: 24, maxLv: 26, moveId: MOVES.electric.special.thunderbolt }
+          { name: POKEMON.pikachu, minLv: 28, maxLv: 30, moveId: MOVES.electric.special.thunder_shock },
+          { name: POKEMON.pikachu, minLv: 28, maxLv: 30, moveId: MOVES.electric.special.thunderbolt }
         ]
       },
       {
         name: ENTRENADORES.Mecanico.name, img: ENTRENADORES.Mecanico.img, rate: 50, pokemon: [
-          { name: POKEMON.raichu, minLv: 22, maxLv: 23, moveId: MOVES.electric.special.thunder },
+          { name: POKEMON.raichu, minLv: 28, maxLv: 30, moveId: MOVES.electric.special.thunder },
         ]
       },
     ],
     gym: {
       leader: [
         {
-          name: POKEMON.pikachu, minLv: 24, maxLv: 26, moveId: MOVES.electric.special.thunder_shock
+          name: POKEMON.pikachu, level: 28, moveId: MOVES.electric.special.thunder_shock
         },
         {
-          name: POKEMON.voltorb, minLv: 24, maxLv: 27, moveId: MOVES.normal.special.hyper_voice
+          name: POKEMON.voltorb, level: 30, moveId: MOVES.normal.special.hyper_voice
         },
         {
-          name: POKEMON.raichu, minLv: 26, maxLv: 32, moveId: MOVES.electric.special.thunder
+          name: POKEMON.raichu, level: 34, moveId: MOVES.electric.special.thunder
         }
       ]
     },
@@ -771,9 +780,6 @@ var ROUTE_DATA = {
           { name: POKEMON.electrode, minLv: 30, maxLv: 36, moveId: MOVES.normal.special.hyper_voice },
         ]
       }
-    ],
-    paths: [
-      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }],
     ]
   },
 
@@ -781,16 +787,61 @@ var ROUTE_DATA = {
     bg: 'assets/bg/guarida-rocket.png',
     combatBg: 'assets/bg/combate-electrico.png',
     wild: [
-      { name: POKEMON.voltorb, rate: 100, minLv: 32, maxLv: 35, moveId: MOVES.electric.special.thunder },
+      { name: POKEMON.voltorb, rate: 30, minLv: 30, maxLv: 32, moveId: MOVES.electric.special.thunder },
+      { name: POKEMON.electrode, rate: 30, minLv: 31, maxLv: 33, moveId: MOVES.electric.special.thunder },
+      { name: POKEMON.electrode, rate: 30, minLv: 31, maxLv: 33, moveId: MOVES.normal.physical.self_destruct },
+      { name: POKEMON.porygon, rate: 10, minLv: 31, maxLv: 33, moveId: MOVES.normal.special.tri_attack },
     ],
     trainer: [
       {
-        name: `${ENTRENADORES.Cientifico.name}`, img: ENTRENADORES.Cientifico.img, rate: 15, pokemon: [
+        name: `${ENTRENADORES.Rocket.name}`, img: ENTRENADORES.Rocket.img, rate: 20, pokemon: [
           { name: POKEMON.voltorb, minLv: 32, maxLv: 35, moveId: MOVES.electric.special.thunder },
           { name: POKEMON.electrode, minLv: 30, maxLv: 36, moveId: MOVES.normal.special.hyper_voice },
         ]
+      },
+      {
+        name: `${ENTRENADORES.Rocket.name}`, img: ENTRENADORES.Rocket.img, rate: 20, pokemon: [
+          { name: POKEMON.sandslash, minLv: 32, maxLv: 35, moveId: MOVES.ground.physical.earthquake },
+          { name: POKEMON.sandshrew, minLv: 30, maxLv: 36, moveId: MOVES.normal.physical.extreme_speed },
+          { name: POKEMON.ekans, minLv: 30, maxLv: 36, moveId: MOVES.poison.physical.gunk_shot },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Rocket.name}`, img: ENTRENADORES.Rocket.img, rate: 20, pokemon: [
+          { name: POKEMON.grimer, minLv: 32, maxLv: 35, moveId: MOVES.poison.special.sludge_bomb },
+          { name: POKEMON.muk, minLv: 30, maxLv: 36, moveId: MOVES.poison.special.sludge_wave },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Rocket.name}`, img: ENTRENADORES.Rocket.img, rate: 20, pokemon: [
+          { name: POKEMON.grimer, minLv: 32, maxLv: 35, moveId: MOVES.poison.special.sludge_bomb },
+          { name: POKEMON.koffing, minLv: 30, maxLv: 36, moveId: MOVES.poison.special.sludge_wave },
+          { name: POKEMON.koffing, minLv: 30, maxLv: 36, moveId: MOVES.dark.special.dark_pulse },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Rocket.name}`, img: ENTRENADORES.Rocket.img, rate: 20, pokemon: [
+          { name: POKEMON.rattata, minLv: 32, maxLv: 35, moveId: MOVES.normal.physical.hyper_fang },
+          { name: POKEMON.rattata, minLv: 32, maxLv: 35, moveId: MOVES.fighting.physical.brick_break },
+          { name: POKEMON.rattata, minLv: 32, maxLv: 35, moveId: MOVES.normal.physical.extreme_speed },
+          { name: POKEMON.rattata, minLv: 32, maxLv: 35, moveId: MOVES.normal.physical.hyper_fang },
+        ]
       }
     ],
+  },
+
+  'ultima-planta-rocket-info': {
+    type: 'information',
+    bg: 'assets/bg/oficina-rocket.png',
+    title: 'Última planta Rocket',
+    description: `<div style="display: flex; justify-content: center;"><img src="${ENTRENADORES.Giovanni.gif}"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">¡Prepárate para el combate!</p>`,
+  },
+
+  'combate-giovanni': {
+    bg: 'assets/bg/oficina-rocket.png',
+    combatBg: 'assets/bg/combate-rocket.png',
+    wild: [],
+    trainer: [],
     specialTrainer: {
       name: 'Jefe Giovanni', img: ENTRENADORES.Giovanni.img, pokemon: [
         {
@@ -814,8 +865,211 @@ var ROUTE_DATA = {
       ]
     },
     paths: [
-      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Special }],
+      [{ type: PATH_TYPE.Special }],
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Gimnasio Erika (Ciudad Azulona)
+  // ═══════════════════════════════════════════════════════════════════════
+
+  'ciudad-azulona-gym': {
+    bg: 'assets/bg/ciudad-azulona.png',
+    combatBg: 'assets/bg/combate-electrico.png',
+    wild: [],
+    welcome: {
+      title: 'Ciudad Azulona',
+      subtitle: 'Gimnasio Pokemon de tipo Planta',
+      img: 'assets/bg/ciudad-azulona.png',
+    },
+    gymLeader: 'Erika',
+    gymType: 'grass',
+    badgeId: 'rainbow-badge',
+    gymLeaderImg: 'assets/sprites/trainers/erika.png',
+    rewardPokemon: [POKEMON.tangela],
+    rewardExtras: [],
+    trainer: [
+      {
+        name: ENTRENADORES.ChicaGuay.name, img: ENTRENADORES.ChicaGuay.img, rate: 25, pokemon: [
+          { name: POKEMON.exeggcute, minLv: 32, maxLv: 37, moveId: MOVES.psychic.special.psychic },
+
+        ]
+      },
+
+      {
+        name: ENTRENADORES.ChicoGuay.name, img: ENTRENADORES.ChicoGuay.img, rate: 25, pokemon: [
+          { name: POKEMON.bellsprout, minLv: 32, maxLv: 36, moveId: MOVES.grass.special.solar_beam },
+          { name: POKEMON.bellsprout, minLv: 32, maxLv: 36, moveId: MOVES.poison.special.sludge_bomb },
+        ]
+      },
+
+      {
+        name: ENTRENADORES.Chica.name, img: ENTRENADORES.Chica.img, rate: 25, pokemon: [
+          {
+            name: POKEMON.venusaur, minLv: 36, maxLv: 40, moveId: MOVES.grass.special.solar_beam,
+            overrides: {
+              evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
+            },
+          },
+
+        ]
+      },
+
+      {
+        name: ENTRENADORES.ChicaGuay.name, img: ENTRENADORES.ChicaGuay.img, rate: 25, pokemon: [
+          { name: POKEMON.exeggcute, minLv: 32, maxLv: 37, moveId: MOVES.psychic.special.psychic },
+
+        ]
+      },
+    ],
+    gym: {
+      leader: [
+        {
+          name: POKEMON.victreebel, level: 41, moveId: MOVES.poison.special.sludge_wave,
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
+          },
+        },
+        {
+          name: POKEMON.exeggutor, level: 39, moveId: MOVES.psychic.special.psychic,
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
+          },
+        },
+        {
+          name: POKEMON.tangela, level: 38, moveId: MOVES.grass.physical.wood_hammer,
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
+          },
+        },
+        {
+          name: POKEMON.vileplume, level: 42, moveId: MOVES.grass.special.giga_drain,
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
+          },
+        }
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }],
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }],
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }]
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Torre Pokémon
+  // ═══════════════════════════════════════════════════════════════════════
+
+  'torre-pokemon': {
+    bg: 'assets/bg/torre-pokemon.png',
+    combatBg: 'assets/bg/combate-interior.png',
+    pathLength: 5,
+    wild: [
+      { name: POKEMON.gastly, rate: 30, minLv: 35, maxLv: 42, moveId: MOVES.electric.special.thunder },
+      { name: POKEMON.gastly, rate: 30, minLv: 35, maxLv: 42, moveId: MOVES.electric.special.thunder },
+      { name: POKEMON.haunter, rate: 30, minLv: 35, maxLv: 42, moveId: MOVES.normal.physical.self_destruct },
+      { name: POKEMON.cubone, rate: 10, minLv: 35, maxLv: 42, moveId: MOVES.normal.special.tri_attack },
+    ],
+    trainer: [
+      {
+        name: `${ENTRENADORES.Rocket.name}`, img: ENTRENADORES.Rocket.img, rate: 20, pokemon: [
+          { name: POKEMON.voltorb, minLv: 35, maxLv: 42, moveId: MOVES.electric.special.thunder },
+          { name: POKEMON.electrode, minLv: 35, maxLv: 42, moveId: MOVES.normal.special.hyper_voice },
+        ]
+      },
+    ],
+  },
+
+  'ultima-planta-torre-pokemon': {
+    type: 'information',
+    bg: 'assets/bg/torre-pokemon.png',
+    title: 'Última planta',
+    description: '<div style="display:flex;justify-content:center"><img src="assets/sprites/others/gastly.gif"></div><br><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">Ya has terminado aquí, pero hay una planta mas...</p>',
+    optional: {
+      btnName: 'Subir a la última planta',
+      area: 'combate-victor',
+    },
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Ciudad Fucsia
+  // ═══════════════════════════════════════════════════════════════════════
+
+  'ruta-15': {
+    bg: 'assets/bg/ruta-15.png',
+    combatBg: 'assets/bg/combate-hierba-alta.png',
+    wild: [
+      { name: POKEMON.pidgeotto, rate: 25, minLv: 38, maxLv: 44, moveId: MOVES.flying.physical.brave_bird },
+      { name: POKEMON.venonat, rate: 25, minLv: 38, maxLv: 44, moveId: MOVES.poison.special.sludge_bomb },
+      { name: POKEMON.gloom, rate: 25, minLv: 38, maxLv: 44, moveId: MOVES.grass.special.magical_leaf },
+      { name: POKEMON.weepinbell, rate: 20, minLv: 38, maxLv: 44, moveId: MOVES.poison.special.sludge_bomb },
+      { name: POKEMON.ditto, rate: 5, minLv: 38, maxLv: 44, moveId: MOVES.normal.special.tri_attack },
+    ],
+    trainer: [],
+    paths: [
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }]
     ]
+  },
+
+  'ciudad-fucsia': {
+    type: 'information',
+    bg: 'assets/bg/ciudad-fucsia.png',
+    title: 'Ciudad Fucsia',
+    description: 'Puedes ir directo al gimnasio o también podrías...',
+    optional: {
+      btnName: 'Explorar la Zona Safari',
+      area: 'zona-safari',
+    },
+  },
+
+  'ciudad-fucsia-gym': {
+    bg: 'assets/bg/ciudad-fucsia.png',
+    combatBg: 'assets/bg/combate-interior.png',
+    wild: [],
+    welcome: {
+      title: 'Ciudad Fucsia',
+      subtitle: 'Gimnasio Pokemon de tipo Veneno',
+      img: 'assets/bg/ciudad-fucsia.png',
+    },
+    gymLeader: 'Koga',
+    gymType: 'poison',
+    badgeId: 'soul-badge',
+    gymLeaderImg: 'assets/sprites/trainers/koga.png',
+    trainer: [],
+    gym: {
+      leader: [
+        {
+          name: POKEMON.koffing, minLv: 44, maxLv: 50, moveId: MOVES.poison.special.sludge_bomb,
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32 },
+          },
+        },
+        {
+          name: POKEMON.koffing, minLv: 44, maxLv: 50, moveId: MOVES.normal.physical.self_destruct,
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32 },
+          },
+        },
+        {
+          name: POKEMON.muk, minLv: 44, maxLv: 50, moveId: MOVES.dark.special.dark_pulse,
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32 },
+          },
+        },
+        {
+          name: POKEMON.weezing, minLv: 44, maxLv: 50, moveId: MOVES.poison.special.sludge_wave,
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32 },
+          },
+        },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Lider }],
+    ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -828,7 +1082,7 @@ var ROUTE_DATA = {
     rewardPokemon: [POKEMON.mew],
     wild: [
       {
-        name: POKEMON.mewtwo, rate: 100, minLv: 50, maxLv: 70, moveId: MOVES.psychic.special.trick,
+        name: POKEMON.mewtwo, rate: 100, minLv: 80, maxLv: 90, moveId: MOVES.psychic.special.trick,
         overrides: {
           evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
         },
@@ -855,20 +1109,10 @@ var ROUTE_DATA = {
   // OPCIONALES
   // ═══════════════════════════════════════════════════════════════════════
 
-  'ciudad-verde-info': {
-    type: 'information',
-    bg: 'assets/bg/ciudad-verde.png',
-    title: 'Ciudad Verde',
-    description: 'Es el momento de volver sí<br>se te ha olvidado algo...',
-    optional: {
-      btnName: 'Volver a Pueblo Paleta',
-      area: 'pueblo-paleta-1',
-    },
-  },
-
   'pueblo-paleta-1': {
     bg: 'assets/bg/pueblo-paleta.png',
     combatBg: 'assets/bg/combate.png',
+    title: 'Pueblo Paleta',
     get wild() {
       const [primerInicial, segundoInicial] = ObtenerSegundoInicial(GameState.starterName ?? POKEMON.bulbasaur);
       return [
@@ -876,6 +1120,7 @@ var ROUTE_DATA = {
         { name: segundoInicial, rate: 50, minLv: 2, maxLv: 3 },
       ];
     },
+    rewardExtras: [ITEM.carbon, ITEM.mystic_water, ITEM.miracle_seed],
     trainer: [],
     specialTrainer: {
       name: 'Azul', img: 'assets/sprites/trainers/rival_kanto.png', pokemon: [
@@ -884,6 +1129,89 @@ var ROUTE_DATA = {
     },
     paths: [
       [{ type: PATH_TYPE.Special }, { type: PATH_TYPE.Wild }],
+    ],
+  },
+
+  'jardin-bill': {
+    bg: 'assets/bg/ruta-25.png',
+    combatBg: 'assets/bg/combate.png',
+    title: 'Jardín de Bill',
+    rewardPokemon: [POKEMON.pinsir],
+    rewardExtras: [ITEM.flame_orb],
+    wild: [],
+    trainer: [
+      {
+        name: 'Adrián el dominguero', img: 'assets/sprites/trainers/campista.png', rate: 100, pokemon: [
+          { name: POKEMON.mr_mime, minLv: 25, maxLv: 30, moveId: MOVES.psychic.special.psychic },
+          { name: POKEMON.pinsir, minLv: 26, maxLv: 34, moveId: MOVES.bug.physical.megahorn, shiny: true },
+        ]
+      },
+    ],
+    paths: [
+      [{ type: 'trainer' }],
+    ],
+  },
+
+  'combate-victor': {
+    bg: 'assets/bg/torre-pokemon.png',
+    combatBg: 'assets/bg/combate-interior.png',
+    title: 'Última planta de la torre',
+    wild: [],
+    trainer: [],
+    rewardPokemon: [POKEMON.kangaskhan],
+    rewardExtras: [ITEM.lifeorb],
+    specialTrainer: {
+      name: 'Atlético Víctor', img: ENTRENADORES.ChicoGuay.img, pokemon: [
+        {
+          name: POKEMON.marowak, minLv: 38, maxLv: 43, moveId: MOVES.normal.physical.extreme_speed
+        },
+        {
+          name: POKEMON.pikachu, minLv: 38, maxLv: 43, moveId: MOVES.electric.special.thunder
+        },
+        {
+          name: POKEMON.chansey, minLv: 38, maxLv: 43, moveId: MOVES.normal.special.hyper_voice
+        },
+        {
+          name: POKEMON.charizard, minLv: 38, maxLv: 43, moveId: MOVES.fire.special.fire_blast
+        },
+        {
+          name: POKEMON.gengar, minLv: 40, maxLv: 45, moveId: MOVES.ghost.special.night_shade,
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
+          },
+        },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Special }],
+    ],
+  },
+
+  'zona-safari': {
+    bg: 'assets/bg/zona-safari.png',
+    combatBg: 'assets/bg/combate.png',
+    title: 'Zona Safari',
+    rewardExtras: [ITEM.lifeorb],
+    wildExclude: [
+      POKEMON.mewtwo,
+      POKEMON.mew,
+      POKEMON.zapdos,
+      POKEMON.moltres,
+      POKEMON.articuno,
+      POKEMON.dragonite,
+      POKEMON.dragonair
+    ],
+    wildLevel: { min: 30, max: 45 },
+    get wild() {
+      const exclude = this.wildExclude ?? [];
+      const { min, max } = this.wildLevel ?? { min: 30, max: 45 };
+      return Object.keys(POKEMON_DB)
+        .filter(name => !exclude.includes(name))
+        .map(name => ({ name, rate: 1, minLv: min, maxLv: max }));
+    },
+    trainer: [],
+    paths: [
+      [{ type: PATH_TYPE.Wild }],
     ],
   },
 
@@ -928,9 +1256,7 @@ var KANTO_ROUTES = [
   { name: 'Ciudad Celeste', area: 'ciudad-celeste' },
   { name: 'Ruta 24 (Entrada)', area: 'ruta-24-1' },
   { name: 'Ruta 24 (Puente)', area: 'ruta-24-2' },
-  { name: 'Ruta 25', area: 'ruta-25' },
   { name: 'Laboratorio de Bill', area: 'info-bill' },
-  { name: 'Ruta 5', area: 'ruta-5' },
   { name: 'Ruta 6', area: 'ruta-6' },
   { name: 'Llega un barco', area: 'info-cgoob' },
   { name: 'SS Anne', area: 'ss-anne' },
@@ -942,6 +1268,16 @@ var KANTO_ROUTES = [
   { name: 'Tunel Roca', area: 'tunel-roca' },
   { name: 'Ciudad Azulona', area: 'ciudad-azulona' },
   { name: 'Guarida Rocket', area: 'guarida-rocket' },
+  { name: 'Oficina Rocket', area: 'ultima-planta-rocket-info' },
+  { name: 'Líder Rocket Giovanni', area: 'combate-giovanni' },
+  { name: 'Ciudad Azulona', area: 'ciudad-azulona-gym' },
+  { name: 'Torre Pokémon', area: 'torre-pokemon' },
+  { name: 'Torre Pokémon', area: 'ultima-planta-torre-pokemon' },
+  { name: 'Ruta 15', area: 'ruta-15' },
+  { name: 'Ciudad Fucsia', area: 'ciudad-fucsia' },
+  { name: 'Gimnasio de Ciudad Fucsia', area: 'ciudad-fucsia-gym' },
+
+  //Final
   { name: '???', area: 'espacio-raro' },
   { name: 'Final', area: 'info-final' }
 ];
@@ -1048,7 +1384,7 @@ function generatePaths(area) {
     ];
   } else {
     // Para cualquier otra longitud, genera combinaciones aleatorias
-    var types = ['trainer', 'wild'];
+    var types = [PATH_TYPE.Trainer, PATH_TYPE.Wild, PATH_TYPE.Heal];
     for (var t = 0; t < 6; t++) {
       var combo = [];
       for (var i = 0; i < len; i++) {

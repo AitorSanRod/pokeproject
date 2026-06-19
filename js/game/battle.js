@@ -73,6 +73,12 @@ function calcDamage(attacker, defender, move) {
     }
   }
 
+  // ── Guts — +120% daño físico cuando el atacante lleva este efecto pasivo
+  if (!isSpecial && hasGutsEffect(attacker)) {
+    dmg = Math.floor(dmg * 2.2);
+    modifiers.push({ label: `Agallas (${attacker.displayName}) +120%`, mult: 2.2 });
+  }
+
   const isCrit = Math.random() < COMBAT_CONFIG.CRIT_CHANCE;
   if (isCrit) dmg = Math.floor(dmg * COMBAT_CONFIG.CRIT_MULTIPLIER);
 
@@ -91,12 +97,12 @@ function enemyChooseMove(enemy, player) {
   // autoMove definido (p.ej. nunca debería pasar, pero por seguridad).
   if (enemy.autoMove) {
     const fixed = enemy.moves.find(m => m.id === enemy.autoMove);
-    if (fixed && fixed.pp > 0) return fixed;
+    if (fixed) return fixed;
   }
 
   let best = null, bestScore = -1;
   for (const move of enemy.moves) {
-    if (!move.pp || move.pp <= 0 || !move.power) continue;
+    if (!move.power) continue;
     const eff   = getEffectiveness(move.type, player.types);
     const score = move.power * eff * (enemy.types.includes(move.type) ? COMBAT_CONFIG.STAB_MULTIPLIER : 1);
     if (score > bestScore) { bestScore = score; best = move; }
@@ -118,12 +124,8 @@ function enemyChooseMove(enemy, player) {
 // Evento: { type, ...datos }
 function executeTurn(attacker, defender, move) {
   const events = [];
-  if (!move || move.pp <= 0) {
-    events.push({ type: 'no-pp', attacker: attacker.displayName });
-    return events;
-  }
+  if (!move) return events;
 
-  move.pp -= 1;
   const { dmg, isCrit, eff } = calcDamage(attacker, defender, move);
   defender.currentHp = Math.max(0, defender.currentHp - dmg);
 
@@ -208,7 +210,7 @@ async function runBattleSim(playerPokemon, foePokemon, options = {}) {
 
     for (const member of fullTeam) {
       if (member.currentHp <= 0) continue;
-      const { gained, levelsGained } = gainExp(member, foePokemon.name, battleType, foePokemon.level, activePlayer.level);
+      const { gained, levelsGained } = gainExp(member, foePokemon.name, battleType, foePokemon.level);
       events.push({ type: 'exp', pokemon: member.displayName, gained });
       if (levelsGained > 0) events.push({ type: 'level-up', pokemon: member.displayName, level: member.level });
     }
