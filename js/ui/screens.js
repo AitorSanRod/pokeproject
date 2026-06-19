@@ -94,6 +94,10 @@ const Screens = {
     const ratio    = p.stats.hp > 0 ? p.currentHp / p.stats.hp : 0;
     const hpLevel  = ratio > 0.5 ? 'high' : ratio > 0.25 ? 'mid' : 'low';
     const expPct   = p.expToNext > 0 ? Math.max(0, Math.min(100, Math.round((p.exp / p.expToNext) * 100))) : 0;
+    const heldItem = p.heldItem ? HELD_ITEMS[p.heldItem] : null;
+    const itemContent = heldItem
+      ? `<img src="${heldItem.img}" alt="${heldItem.name}" title="${heldItem.name}" onerror="this.style.display='none'">`
+      : '';
     return `
       <div class="combat-team-pip ${p === activePoke ? 'combat-team-pip--active' : ''} ${!isAlive(p) ? 'combat-team-pip--fainted' : ''}">
         <img src="${p.spriteUrl ?? ''}" class="combat-team-pip__sprite" alt="${p.displayName}" onerror="this.style.opacity=0">
@@ -109,6 +113,7 @@ const Screens = {
             <div class="combat-team-pip__exp-fill" style="width:${expPct}%"></div>
           </div>
         </div>
+        <div class="combat-team-pip__item-slot">${itemContent}</div>
       </div>`;
   },
 
@@ -1738,6 +1743,7 @@ const Screens = {
       await Screens._animateAttack(first, second, moveOf(first), player);
       if (!isAlive(second)) {
         ctx._turnRunning = false;
+        await Screens._applyAttackerItemEnd(first, player);
         Screens._combatEnd(); return;
       }
     }
@@ -1748,6 +1754,7 @@ const Screens = {
       await Screens._animateAttack(first, second, moveOf(first), player);
       if (!isAlive(second)) {
         ctx._turnRunning = false;
+        await Screens._applyAttackerItemEnd(first, player);
         Screens._combatEnd(); return;
       }
     }
@@ -1764,6 +1771,7 @@ const Screens = {
         await Screens._animateAttack(second, first, moveOf(second), player);
         if (!isAlive(first)) {
           ctx._turnRunning = false;
+          await Screens._applyAttackerItemEnd(second, player);
           Screens._combatEnd(); return;
         }
       }
@@ -1823,6 +1831,25 @@ const Screens = {
       const triggered = applyHeldItemTurnEnd(poke, { log: logFn, updateHud });
       if (triggered) await Screens._wait(400);
     }
+  },
+
+  // Aplica ON_TURN_END del objeto del atacante cuando el combate termina antes del
+  // fin de turno normal (rival derrotado de un golpe). El atacante siempre está vivo.
+  async _applyAttackerItemEnd(attacker, player) {
+    const logFn = (txt) => Screens._updateCombatLog(txt);
+    const isPlayerPoke = attacker === player;
+    const updateHud = isPlayerPoke
+      ? () => {
+          Render.updateHpBar(document.getElementById('hud-player'), player.currentHp, player.stats.hp);
+          const nums = document.getElementById('hp-nums-player');
+          if (nums) nums.textContent = `${player.currentHp}/${player.stats.hp}`;
+          Screens._updateCombatTeamBar();
+        }
+      : () => {
+          Render.updateHpBar(document.getElementById('hud-foe'), attacker.currentHp, attacker.stats.hp);
+        };
+    const triggered = applyHeldItemTurnEnd(attacker, { log: logFn, updateHud });
+    if (triggered) await Screens._wait(400);
   },
 
   async _animateAttack(attacker, defender, move, activePlayer) {

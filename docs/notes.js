@@ -1,6 +1,7 @@
 const NOTES_DATA = {
-  "title": "Actualización 0.1.2 - (Bienvenido Moraleda Variocolor)",
+  "title": "Actualización 0.1.3 - (Bienvenido Moraleda Variocolor)",
   "lines": [
+    "Tabla de tipos debilidades dinámica en la pokédex.",
     "Por razones operativas y que no haga falta avisar en cada arreglo menor, subo a la 0.1.0",
     "Guía incluida en el compendio.",
     "Mas balance de experiencia",

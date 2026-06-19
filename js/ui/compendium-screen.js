@@ -2,6 +2,52 @@
 // COMPENDIUM — referencia de efectos de estado, tipos y movimientos
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Nombres de tipo en español (la clave es el id interno en inglés).
+const TYPE_NAMES_ES = {
+  normal:   'Normal',
+  fire:     'Fuego',
+  water:    'Agua',
+  electric: 'Eléctrico',
+  grass:    'Planta',
+  ice:      'Hielo',
+  fighting: 'Lucha',
+  poison:   'Veneno',
+  ground:   'Tierra',
+  flying:   'Volador',
+  psychic:  'Psíquico',
+  bug:      'Bicho',
+  rock:     'Roca',
+  ghost:    'Fantasma',
+  dragon:   'Dragón',
+  dark:     'Siniestro',
+  steel:    'Acero',
+  fairy:    'Hada',
+};
+
+// Rutas de las imágenes PNG para los botones de tipo en la sección TIPOS.
+// Si un tipo no tiene entrada aquí (o la imagen no existe), se usa la badge
+// de color como fallback automáticamente.
+const TYPE_BADGE_IMGS = {
+  normal:   'assets/sprites/types/normal.png',
+  fire:     'assets/sprites/types/fire.png',
+  water:    'assets/sprites/types/water.png',
+  electric: 'assets/sprites/types/electric.png',
+  grass:    'assets/sprites/types/grass.png',
+  ice:      'assets/sprites/types/ice.png',
+  fighting: 'assets/sprites/types/fighting.png',
+  poison:   'assets/sprites/types/poison.png',
+  ground:   'assets/sprites/types/ground.png',
+  flying:   'assets/sprites/types/flying.png',
+  psychic:  'assets/sprites/types/psychic.png',
+  bug:      'assets/sprites/types/bug.png',
+  rock:     'assets/sprites/types/rock.png',
+  ghost:    'assets/sprites/types/ghost.png',
+  dragon:   'assets/sprites/types/dragon.png',
+  dark:     'assets/sprites/types/dark.png',
+  steel:    'assets/sprites/types/steel.png',
+  fairy:    'assets/sprites/types/fairy.png',
+};
+
 const CompendiumScreen = {
 
   _returnFn: null,
@@ -40,7 +86,7 @@ const CompendiumScreen = {
           <div style="display:flex;flex-direction:column;gap:var(--sp-md);padding:var(--sp-md)">
             ${sec('guide',  'GUÍA',              CompendiumScreen._renderGuide())}
             ${sec('status', 'EFECTOS DE ESTADO', CompendiumScreen._renderStatusList())}
-            ${sec('types',  'TIPOS',             CompendiumScreen._renderTypeChart())}
+            ${sec('types',  'TIPOS',             CompendiumScreen._renderTypeTest())}
             ${sec('moves',  'MOVIMIENTOS',        CompendiumScreen._renderMoveList())}
             ${sec('items',  'OBJETOS EQUIPABLES', CompendiumScreen._renderHeldItemList())}
           </div>
@@ -63,6 +109,14 @@ const CompendiumScreen = {
 
     vp.querySelectorAll('[data-move-id]').forEach(el => {
       el.addEventListener('click', () => CompendiumScreen._renderMoveDetail(el.dataset.moveId));
+    });
+
+    vp.querySelectorAll('[data-select-type]').forEach(el => {
+      el.addEventListener('click', () => {
+        vp.querySelectorAll('[data-select-type]').forEach(b => b.classList.remove('tc-selected'));
+        el.classList.add('tc-selected');
+        CompendiumScreen._showTypeMatchup(el.dataset.selectType);
+      });
     });
   },
 
@@ -220,6 +274,95 @@ const CompendiumScreen = {
       </div>`).join('');
   },
 
+  // ── Sección interactiva: selecciona un tipo y ve sus matchups ────────────
+  _renderTypeTest() {
+    const allTypes = [
+      'normal','fire','water','electric','grass','ice','fighting','poison',
+      'ground','flying','psychic','bug','rock','ghost','dragon','dark','steel','fairy',
+    ];
+
+    const badges = allTypes.map(t => {
+      const imgSrc = TYPE_BADGE_IMGS[t];
+      const imgTag = imgSrc
+        ? `<img src="${imgSrc}" class="tc-type-btn__img" onerror="this.remove()">`
+        : '';
+      return `
+        <div class="tc-type-btn tc-selector" data-type="${t}" data-select-type="${t}">
+          <span class="type-badge tc-type-btn__badge" data-type="${t}">${TYPE_NAMES_ES[t] ?? t.toUpperCase()}</span>
+          ${imgTag}
+        </div>`;
+    }).join('');
+
+    return `
+      <p style="font-family:var(--font-pixel);font-size:8px;color:var(--grey);margin-bottom:10px">
+        Pulsa un tipo para ver sus matchups como defensor y atacante:
+      </p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">${badges}</div>
+      <div id="type-matchup-result"></div>`;
+  },
+
+  _showTypeMatchup(type) {
+    const allTypes = [
+      'normal','fire','water','electric','grass','ice','fighting','poison',
+      'ground','flying','psychic','bug','rock','ghost','dragon','dark','steel','fairy',
+    ];
+
+    const multLabel = m => ({ 4:'×4', 2:'×2', 0.5:'×½', 0.25:'×¼', 0:'×0' }[m] ?? `×${m}`);
+    const multCls   = m => m >= 4 ? 'super' : m >= 2 ? 'weak' : m === 0 ? 'immune' : m <= 0.25 ? 'ultra' : 'resist';
+
+    const renderCol = items => items.length
+      ? items.map(({ t, mul }) => `
+          <div class="tc-row">
+            <span class="type-badge tc-atk-badge" data-type="${t}">${TYPE_NAMES_ES[t] ?? t.toUpperCase()}</span>
+            <span class="tc-mult tc-mult--${multCls(mul)}">${multLabel(mul)}</span>
+          </div>`).join('')
+      : '<span class="tc-none">—</span>';
+
+    // Perspectiva defensora: ataques entrantes vs este tipo
+    const defWeak = [], defResist = [], defImmune = [];
+    for (const atk of allTypes) {
+      const mul = TYPE_CHART[atk]?.[type] ?? 1;
+      if      (mul >= 2)           defWeak.push({ t: atk, mul });
+      else if (mul > 0 && mul < 1) defResist.push({ t: atk, mul });
+      else if (mul === 0)          defImmune.push({ t: atk, mul });
+    }
+    defWeak.sort((a, b)   => b.mul - a.mul);
+    defResist.sort((a, b) => a.mul - b.mul);
+
+    // Perspectiva atacante: qué hace este tipo contra los demás
+    const atkSE = [], atkNVE = [], atkZero = [];
+    for (const def of allTypes) {
+      const mul = TYPE_CHART[type]?.[def] ?? 1;
+      if      (mul >= 2)           atkSE.push({ t: def, mul });
+      else if (mul > 0 && mul < 1) atkNVE.push({ t: def, mul });
+      else if (mul === 0)          atkZero.push({ t: def, mul });
+    }
+    atkSE.sort((a, b)   => b.mul - a.mul);
+    atkNVE.sort((a, b) => a.mul - b.mul);
+
+    const card = (roleLabel, colHeads, cols) => `
+      <div class="tc-card" style="margin-bottom:10px">
+        <div class="tc-card__header">
+          <span class="type-badge tc-card__defender-badge" data-type="${type}">${TYPE_NAMES_ES[type] ?? type.toUpperCase()}</span>
+          <span class="tc-card__defender-label">${roleLabel}</span>
+        </div>
+        <div class="tc-card__table">
+          ${cols.map((items, i) => `
+            <div class="tc-col ${i === 0 ? 'tc-col--weak' : i === 1 ? 'tc-col--resist' : 'tc-col--immune'}">
+              <div class="tc-col__head">${colHeads[i]}</div>
+              <div class="tc-col__body">${renderCol(items)}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+
+    const html =
+      card('DEFENSOR', ['Débil a', 'Resiste',     'Inmune'],        [defWeak, defResist, defImmune]) +
+      card('ATACANTE', ['Super eficaz', 'Poco eficaz', 'Sin efecto'], [atkSE,   atkNVE,   atkZero]);
+
+    const result = document.getElementById('type-matchup-result');
+    if (result) result.innerHTML = html;
+  },
+
   // ── Tabla defensiva de tipos ──────────────────────────────────────────────
   _renderTypeChart() {
     const allTypes = [
@@ -227,8 +370,6 @@ const CompendiumScreen = {
       'ground','flying','psychic','bug','rock','ghost','dragon','dark','steel','fairy',
     ];
 
-    // Matchup defensivo: { tipo defensor → { tipo atacante: multiplicador } }
-    // Solo entradas distintas de x1 (el neutro se omite)
     const chart = {
       normal:   { ghost:0, fighting:2 },
       fire:     { fire:.5, grass:.5, ice:.5, bug:.5, steel:.5, fairy:.5, water:2, ground:2, rock:2 },
@@ -250,45 +391,51 @@ const CompendiumScreen = {
       fairy:    { dragon:0, fighting:.5, bug:.5, dark:.5, poison:2, steel:2 },
     };
 
-    const mulLabel = { 4:'x4', 2:'x2', 0.5:'x½', 0.25:'x¼', 0:'x0' };
-    const mulColor = {
-      4:    '#880000',
-      2:    '#c62828',
-      0.5:  '#2e7d32',
-      0.25: '#1565c0',
-      0:    '#555',
-    };
-    const mulOrder = [4, 2, 0.5, 0.25, 0];
+    const multLabel = m => ({ 4:'×4', 2:'×2', 0.5:'×½', 0.25:'×¼', 0:'×0' }[m] ?? `×${m}`);
+    const multCls   = m => m >= 4 ? 'super' : m >= 2 ? 'weak' : m === 0 ? 'immune' : m <= 0.25 ? 'ultra' : 'resist';
+
+    const renderCol = items => items.length
+      ? items.map(({ atk, mul }) => `
+          <div class="tc-row">
+            <span class="type-badge tc-atk-badge" data-type="${atk}">${atk.toUpperCase()}</span>
+            <span class="tc-mult tc-mult--${multCls(mul)}">${multLabel(mul)}</span>
+          </div>`).join('')
+      : '<span class="tc-none">—</span>';
 
     return allTypes.map(type => {
       const entries = chart[type] ?? {};
-      const groups  = {};
-      for (const [atk, mul] of Object.entries(entries)) {
-        (groups[mul] ??= []).push(atk);
-      }
+      const weak    = [];
+      const resist  = [];
+      const immune  = [];
 
-      const rows = mulOrder
-        .filter(m => groups[m]?.length)
-        .map(m => `
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-            <span style="font-family:var(--font-pixel);font-size:9px;color:${mulColor[m]};
-              flex-shrink:0;min-width:28px;font-weight:bold">
-              ${mulLabel[m]}
-            </span>
-            <div style="display:flex;flex-wrap:wrap;gap:4px">
-              ${groups[m].map(t =>
-                `<span class="type-badge" data-type="${t}" style="font-size:8px;padding:3px 10px">${t.toUpperCase()}</span>`
-              ).join('')}
-            </div>
-          </div>`).join('');
+      for (const [atk, mul] of Object.entries(entries)) {
+        if (mul === 0)    immune.push({ atk, mul });
+        else if (mul < 1) resist.push({ atk, mul });
+        else              weak.push({ atk, mul });
+      }
+      weak.sort((a, b)   => b.mul - a.mul);
+      resist.sort((a, b) => a.mul - b.mul);
 
       return `
-        <div style="border-radius:var(--radius-sm);border:1px solid var(--grey-light);
-          background:var(--off-white);padding:10px 12px;margin-bottom:8px">
-          <div style="display: flex;justify-content: center;margin-bottom:1em">
-            <span class="type-badge" data-type="${type}" style="font-size:14px;padding:4px 16px">${type.toUpperCase()}</span>
+        <div class="tc-card">
+          <div class="tc-card__header">
+            <span class="type-badge tc-card__defender-badge" data-type="${type}">${TYPE_NAMES_ES[type] ?? type.toUpperCase()}</span>
+            <span class="tc-card__defender-label">◄ DEFENSOR</span>
           </div>
-          ${rows || `<span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey)">Sin debilidades ni resistencias especiales</span>`}
+          <div class="tc-card__table">
+            <div class="tc-col tc-col--weak">
+              <div class="tc-col__head">Débil a</div>
+              <div class="tc-col__body">${renderCol(weak)}</div>
+            </div>
+            <div class="tc-col tc-col--resist">
+              <div class="tc-col__head">Resiste</div>
+              <div class="tc-col__body">${renderCol(resist)}</div>
+            </div>
+            <div class="tc-col tc-col--immune">
+              <div class="tc-col__head">Inmune</div>
+              <div class="tc-col__body">${renderCol(immune)}</div>
+            </div>
+          </div>
         </div>`;
     }).join('');
   },
