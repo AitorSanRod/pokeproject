@@ -1545,7 +1545,63 @@ div:hover > .move-effect-tooltip { display: block; }
   position: fixed;
 }
 
+/* Badge del ataque activo en la fila de equipo (selección de ruta) */
+.route-move-badge {
+  font-size: 7px;
+  padding: 3px 7px;
+  flex-shrink: 0;
+}
+
 @media (hover: none) {
   .held-item-tooltip--floating { display: none !important; }
+}
+
+/* ── Estilos específicos de móvil (max-width coincide con --screen-max del juego) ── */
+@media (max-width: 480px) {
+  /* ── Combat team bar ────────────────────────────────────────────────────────
+     Altura fija con scroll: no encoge/crece al aparecer/desaparecer elementos.
+     Las filas de pip se reducen al tamaño de las filas de ruta (sprite 36px). */
+  .combat-team-bar {
+    flex: 0 0 196px;
+    margin-top: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 2px;
+    padding: 4px 8px;
+  }
+
+  /* Pip compacto: flex-shrink:0 impide que se compriman cuando hay muchos pokemon */
+  .combat-team-pip {
+    flex-shrink: 0;
+    gap: 6px;
+    padding: 3px 6px;
+  }
+  .combat-team-pip__sprite {
+    width: 36px;
+    height: 36px;
+  }
+  .combat-team-pip__hp-bar {
+    height: 8px;
+  }
+  .combat-team-pip__level,
+  .combat-team-pip__hp-nums {
+    font-size: 7px;
+  }
+  .combat-team-pip__exp-bar {
+    height: 2px;
+    margin-top: 1px;
+  }
+
+  /* Badge del ataque → círculo de color del tipo (sin texto) */
+  .route-move-badge {
+    width: 14px;
+    height: 14px;
+    min-width: 14px;
+    padding: 0;
+    font-size: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
 }
 

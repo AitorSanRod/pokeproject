@@ -767,8 +767,7 @@ const Screens = {
               })() : ''}
             </div>
           </div>
-          ${autoMove ? `<span class="type-badge" data-type="${autoMove.type}"
-            style="font-size:7px;padding:3px 7px;flex-shrink:0">${autoMove.name}</span>` : ''}
+          ${autoMove ? `<span class="type-badge route-move-badge" data-type="${autoMove.type}">${autoMove.name}</span>` : ''}
           <span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-light);flex-shrink:0;cursor:grab;margin-left:4px">⠿</span>
         </div>`;
     }).join('');
