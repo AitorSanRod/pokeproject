@@ -45,7 +45,7 @@ const NotesPopup = {
         <div style="overflow-y:auto;flex:1;min-height:0;padding:18px 18px">
           <div style="font-family:'Press Start 2P',monospace;font-size:8px;line-height:2;
             color:rgba(255,255,255,.55);margin-bottom:18px;letter-spacing:1px">
-            ${data.title}
+            ${typeof GAME_VERSION !== 'undefined' ? `${GAME_VERSION} — ` : ''}${data.title}
           </div>
           <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:14px">
             ${data.lines.map(line => `

@@ -1136,8 +1136,8 @@
 .route-team-row--fainted { opacity: .4; filter: grayscale(.8); }
 
 .route-team-row__sprite { width: 36px; height: 36px; image-rendering: pixelated; flex-shrink: 0; }
-.route-team-row__info   { flex: 1; min-width: 0; overflow: hidden; }
-.route-team-row__info .hp-bar-wrap { max-width: 160px; }
+.route-team-row__info   { flex: 0 0 auto; min-width: 0; }
+.route-team-row__info .hp-bar-wrap { width: 140px; }
 .route-team-row__name   { font-family: var(--font-pixel); font-size: 10px; color: var(--black); display: inline-flex; align-items: center; gap: 3px; }
 .route-team-row__level  { font-family: var(--font-pixel); font-size: 8px;  color: var(--grey); }
 
@@ -1513,28 +1513,33 @@ div:hover > .move-effect-tooltip { display: block; }
   /* sin transición: se actualiza al instante, sin animación */
 }
 
-/* ── HELD ITEM ICON — objeto equipado junto a la barra de HP ────────────────── */
+/* ── HELD ITEM ICON — objeto equipado en la fila del equipo de ruta ─────────── */
 .held-item-icon {
   position: relative;
-  width: 20px;
-  height: 20px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border: 1px solid var(--grey-light);
+  border: 2px solid var(--grey-light);
   border-radius: var(--radius-sm);
-  background: var(--white);
+  background: var(--off-white);
+}
+.held-item-icon--empty {
+  cursor: default;
+  border-color: transparent;
+  background: transparent;
 }
 .held-item-icon img {
-  width: 16px;
-  height: 16px;
+  width: 28px;
+  height: 28px;
   image-rendering: pixelated;
   object-fit: contain;
 }
 .held-item-icon__fallback {
-  font-size: 12px;
+  font-size: 18px;
   line-height: 1;
 }
 .held-item-tooltip {
@@ -1686,6 +1691,13 @@ div:hover > .move-effect-tooltip { display: block; }
 .tc-col--weak   .tc-col__head { color: #c62828; }
 .tc-col--resist .tc-col__head { color: #2e7d32; }
 .tc-col--immune .tc-col__head { color: #555; }
+
+.tc-col__body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding-top: 2px;
+}
 
 .tc-row {
   display: flex;

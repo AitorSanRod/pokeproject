@@ -36,6 +36,10 @@ const StatusEffects = {
       if (log) log(`${pokemon.displayName} esta protegido y no puede ser afectado!`);
       return false;
     }
+    if (HELD_ITEMS?.[pokemon.heldItem]?.blocksStatus) {
+      if (log) log(`Las Gafas Protectoras de ${pokemon.displayName} bloquean el efecto!`);
+      return false;
+    }
     if (pokemon.statusEffect) {
       if (log) log(`${pokemon.displayName} ya tiene un estado alterado!`);
       return false;

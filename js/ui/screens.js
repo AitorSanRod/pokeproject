@@ -669,7 +669,9 @@ const Screens = {
       }
       const foeTeam = [];
       for (const p of gym.leader) {
-        foeTeam.push(await createPokemon(p.name, rollLevel(p), false, p.moveId ?? null, p.overrides ?? null, p.shiny ?? false));
+        const foe = await createPokemon(p.name, rollLevel(p), false, p.moveId ?? null, p.overrides ?? null, p.shiny ?? false);
+        if (p.heldItem) equipHeldItem(foe, p.heldItem);
+        foeTeam.push(foe);
       }
       Screens.show(Screens.combat, {
         foeTeam,
@@ -720,7 +722,9 @@ const Screens = {
       if (!trainer) { GameState._pathRunning = false; Screens._runNextInPath(); return; }
       const foeTeam = [];
       for (const p of trainer.pokemon) {
-        foeTeam.push(await createPokemon(p.name, rollLevel(p), false, p.moveId ?? null, p.overrides ?? null, p.shiny ?? false));
+        const foe = await createPokemon(p.name, rollLevel(p), false, p.moveId ?? null, p.overrides ?? null, p.shiny ?? false);
+        if (p.heldItem) equipHeldItem(foe, p.heldItem);
+        foeTeam.push(foe);
       }
       Screens.show(Screens.combat, {
         foeTeam,
@@ -734,6 +738,7 @@ const Screens = {
       const entry   = pickWildEncounter(data.wild);
       const isShiny = entry.shiny === true || Math.random() < (typeof SHINY_RATE !== 'undefined' ? SHINY_RATE : 0);
       const foePoke = await createPokemon(entry.name, rollLevel(entry), false, entry.moveId ?? null, entry.overrides ?? null, isShiny);
+      if (entry.heldItem) equipHeldItem(foePoke, entry.heldItem);
       Screens.show(Screens.combat, {
         foeTeam:    [foePoke],
         isWild:     true,
@@ -760,18 +765,17 @@ const Screens = {
               <span class="route-team-row__name">${p.displayName}${p.shiny ? ' ' + Screens._shinyIcon(10) : ''}</span>
               <span class="route-team-row__level">Nv.${p.level}</span>
             </div>
-            <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
-              <div style="max-width:160px;flex:1">${Render.hpBar(p.currentHp, p.stats.hp)}</div>
-              ${p.heldItem ? (() => {
-                const item = HELD_ITEMS[p.heldItem];
-                return `
-                  <div class="held-item-icon" data-idx="${i}" data-item-name="${item.name}" data-item-desc="${item.desc}">
-                    <img src="${item.img}" alt="${item.name}"
-                      onerror="this.outerHTML='<span class=\\'held-item-icon__fallback\\'>${item.fallbackIcon ?? '❓'}</span>'">
-                  </div>`;
-              })() : ''}
-            </div>
+            <div style="margin-top:4px">${Render.hpBar(p.currentHp, p.stats.hp)}</div>
           </div>
+          ${p.heldItem ? (() => {
+            const item = HELD_ITEMS[p.heldItem];
+            return `
+              <div class="held-item-icon" data-idx="${i}" data-item-name="${item.name}" data-item-desc="${item.desc}">
+                <img src="${item.img}" alt="${item.name}"
+                  onerror="this.outerHTML='<span class=\\'held-item-icon__fallback\\'>${item.fallbackIcon ?? '❓'}</span>'">
+              </div>`;
+          })() : ''}
+          <div style="flex:1"></div>
           ${autoMove ? `<span class="type-badge route-move-badge" data-type="${autoMove.type}">${autoMove.name}</span>` : ''}
           <span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-light);flex-shrink:0;cursor:grab;margin-left:4px">⠿</span>
         </div>`;
@@ -922,24 +926,25 @@ const Screens = {
 
   // Confirmación al pulsar el icono de objeto equipado — si confirma, el
   // objeto se "destruye" (revierte su efecto pasivo y desaparece para siempre).
+  // Si el item tiene canChange:true, ofrece además la opción de cambiarlo de pokemon.
   _showUnequipItemConfirm(poke) {
     const item = HELD_ITEMS[poke.heldItem];
     if (!item) return;
 
     document.getElementById('unequip-modal')?.remove();
     const overlay = Screens._makeModal(`
-      <div class="modal-title">${item.fallbackIcon ?? ''} ${item.name}</div>
+      <div class="modal-title">${item.name}</div>
       <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);text-align:center;line-height:1.8">
         ${item.desc}
       </p>
       <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);text-align:center;line-height:1.8">
-        ¿Quitar este objeto a ${poke.displayName}?<br>
-        <span style="color:var(--red)">El objeto se destruira</span> y se perderan
-        todos los cambios que provoca.
+        ¿Qué quieres hacer con este objeto?<br>
+        <span style="color:var(--red)">Quitar lo destruirá</span> para siempre.
       </p>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn--ghost" id="unequip-cancel" style="flex:1">No quitar</button>
-        <button class="btn btn--primary" id="unequip-confirm" style="flex:1;background:var(--red)">Quitar</button>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${item.canChange && GameState.team.length > 1 ? `<button class="btn btn--primary" id="unequip-swap">Cambiar de Pokémon</button>` : ''}
+        <button class="btn btn--primary" id="unequip-confirm" style="background:var(--red)">Quitar objeto</button>
+        <button class="btn btn--ghost" id="unequip-cancel">Cancelar</button>
       </div>
     `, { id: 'unequip-modal', closeOnBackdrop: true });
 
@@ -949,6 +954,64 @@ const Screens = {
       Screens._renderTeamBar();
     });
     document.getElementById('unequip-cancel').addEventListener('click', () => overlay.remove());
+    document.getElementById('unequip-swap')?.addEventListener('click', () => {
+      overlay.remove();
+      Screens._showSwapItemModal(poke);
+    });
+  },
+
+  // Modal para mover el objeto equipado de `poke` a otro pokemon del equipo.
+  // Si el destino lleva un item con canChange:true, se intercambian.
+  // Si el destino lleva un item con canChange:false, aparece deshabilitado.
+  _showSwapItemModal(poke) {
+    const item = HELD_ITEMS[poke.heldItem];
+    if (!item) return;
+
+    document.getElementById('swap-item-modal')?.remove();
+
+    const others = GameState.team
+      .map((p, i) => ({ p, i }))
+      .filter(({ p }) => p !== poke);
+
+    const teamRows = others.map(({ p, i }) => {
+      const targetItem = p.heldItem ? HELD_ITEMS[p.heldItem] : null;
+      const disabled = !!(targetItem && !targetItem.canChange);
+      const itemLabel = targetItem
+        ? `<span style="font-family:var(--font-pixel);font-size:6px;color:${disabled ? 'var(--red)' : 'var(--grey)'}">
+             ${targetItem.name}${disabled ? ' (no transferible)' : ''}
+           </span>`
+        : `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">Sin objeto</span>`;
+      return Screens._teamBtn(p, i, itemLabel, disabled);
+    }).join('');
+
+    const overlay = Screens._makeModal(`
+      <div class="modal-title">Dar ${item.name} a...</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin:12px 0">
+        ${teamRows}
+      </div>
+      <button class="btn btn--ghost btn--wide" id="swap-item-cancel">Cancelar</button>
+    `, { id: 'swap-item-modal', closeOnBackdrop: true });
+
+    document.getElementById('swap-item-cancel').addEventListener('click', () => overlay.remove());
+
+    overlay.querySelectorAll('button[data-idx]:not([disabled])').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = GameState.team[+btn.dataset.idx];
+        if (!target) return;
+
+        const sourceId = poke.heldItem;
+        const targetId = target.heldItem ?? null;
+
+        unequipHeldItem(poke);
+        if (targetId) unequipHeldItem(target);
+
+        equipHeldItem(target, sourceId);
+        if (targetId) equipHeldItem(poke, targetId);
+
+        overlay.remove();
+        Screens._renderTeamBar();
+      });
+    });
   },
 
   // Pantalla de recompensa al completar un camino. Presenta 3 premios (pokemon,
@@ -1169,6 +1232,8 @@ const Screens = {
               }
             }
           }
+          // Curar al 100% tras el nivel — levelUpPokemon solo da +10% HP parcial
+          GameState.team.forEach(p => fullHeal(p));
           advance();
         } else if (chosen.type === 'held-item') {
           Screens._showHeldItemSelector(chosen, advance);
@@ -1942,7 +2007,7 @@ const Screens = {
       await Screens._wait(300);
     }
 
-    if (heldItemTriggered) await Screens._wait(400);
+    if (heldItemTriggered) await Screens._wait(1000);
 
     // Recoil/heal-on-hit pueden haber cambiado el HP de defender/attacker — refrescar HUDs
     if (onHittedHadEffect) {

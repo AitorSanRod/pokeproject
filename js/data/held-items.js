@@ -49,6 +49,7 @@ var HELD_ITEMS = {
     desc: 'Si el HP baja del 50%, restaura el 25% del HP máximo. Solo una vez por ruta.',
     img: 'assets/sprites/items/sitrus-berry.png',
     fallbackIcon: '🍒',
+    canChange: true,
     trigger: HELD_ITEM_TRIGGERS.ON_TURN_START,
     onceFlag: 'sitrus-berry-used',
     fn(ctx) {
@@ -74,6 +75,7 @@ var HELD_ITEMS = {
     desc: 'Aumenta la VEL un 100%, pero bloquea el cambio de movimiento.',
     img: 'assets/sprites/items/choice-scarf.png',
     fallbackIcon: '🧣',
+    canChange: false,
     trigger: HELD_ITEM_TRIGGERS.PASSIVE,
     blocksMoveChange: true,
     fn(ctx) {
@@ -93,6 +95,7 @@ var HELD_ITEMS = {
     desc: 'Aumenta la SPA un 100%, pero bloquea el cambio de movimiento.',
     img: 'assets/sprites/items/gafas-eleccion.png',
     fallbackIcon: '👓',
+    canChange: false,
     trigger: HELD_ITEM_TRIGGERS.PASSIVE,
     blocksMoveChange: true,
     fn(ctx) {
@@ -112,6 +115,7 @@ var HELD_ITEMS = {
     desc: 'Aumenta la ATK un 100%, pero bloquea el cambio de movimiento.',
     img: 'assets/sprites/items/cinta-eleccion.png',
     fallbackIcon: '👓',
+    canChange: false,
     trigger: HELD_ITEM_TRIGGERS.PASSIVE,
     blocksMoveChange: true,
     fn(ctx) {
@@ -131,6 +135,7 @@ var HELD_ITEMS = {
     desc: 'Aumenta un 50% la defensa especial.',
     img: 'assets/sprites/items/assault-vest.png',
     fallbackIcon: '🦺',
+    canChange: true,
     trigger: HELD_ITEM_TRIGGERS.PASSIVE,
     fn(ctx) {
       const { user } = ctx;
@@ -149,6 +154,7 @@ var HELD_ITEMS = {
     desc: 'Aumenta el daño de los movimientos de tipo FUEGO un 25%.',
     img: 'assets/sprites/items/carbon.png',
     fallbackIcon: '🔥',
+    canChange: true,
     trigger: HELD_ITEM_TRIGGERS.PASSIVE,
     // dmgBoost — leído en tiempo real por calcDamage (battle.js):
     //   mult  → multiplicador adicional de daño (0.5 = +50%)
@@ -167,6 +173,7 @@ var HELD_ITEMS = {
     desc: 'Aumenta el daño de los movimientos de tipo AGUA un 25%.',
     img: 'assets/sprites/items/mystic-water.png',
     fallbackIcon: '💧',
+    canChange: true,
     trigger: HELD_ITEM_TRIGGERS.PASSIVE,
     dmgBoost: { mult: 0.25, type: 'water' },
     fn(ctx) { },
@@ -178,6 +185,7 @@ var HELD_ITEMS = {
     desc: 'Aumenta el daño de los movimientos de tipo PLANTA un 25%.',
     img: 'assets/sprites/items/miracle-seed.png',
     fallbackIcon: '🌱',
+    canChange: true,
     trigger: HELD_ITEM_TRIGGERS.PASSIVE,
     dmgBoost: { mult: 0.25, type: 'grass' },
     fn(ctx) { },
@@ -189,6 +197,7 @@ var HELD_ITEMS = {
     desc: 'Cura el 10% del HP máximo del pokemon equipado al final de cada turno.',
     img: 'assets/sprites/items/leftovers.png',
     fallbackIcon: '🍞',
+    canChange: true,
     trigger: HELD_ITEM_TRIGGERS.ON_TURN_END,
     fn(ctx) {
       const { user, log, updateHud } = ctx;
@@ -214,6 +223,7 @@ var HELD_ITEMS = {
     desc: 'Quema al portador al inicio del combate y le resta el 5% de HP al final de cada turno.',
     img: 'assets/sprites/items/flame-orb.png',
     fallbackIcon: '🔥',
+    canChange: true,
     trigger: HELD_ITEM_TRIGGERS.ON_TURN_START,
     fn(ctx) {
       const { user, log, updateHud } = ctx;
@@ -231,11 +241,37 @@ var HELD_ITEMS = {
     },
   },
 
+  'safety-goggles': {
+    name: 'Gafas Protectoras',
+    desc: 'Inmunidad total a efectos de estado.',
+    img: 'assets/sprites/items/safety-goggles.png',
+    fallbackIcon: '🥽',
+    canChange: true,
+    trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+    blocksStatus: true,
+    fn(ctx) { },
+    revert(ctx) { },
+  },
+
+  'light-ball': {
+    name: 'Bola Luminosa',
+    desc: 'Aumenta el daño físico y especial de Pikachu un 150%. Impide que evolucione.',
+    img: 'assets/sprites/items/bola-luminosa.png',
+    fallbackIcon: '⚡',
+    canChange: true,
+    trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+    blocksEvolution: true,
+    dmgBoost: { mult: 1.5, onlyFor: 'pikachu' },
+    fn(ctx) { },
+    revert(ctx) { },
+  },
+
   'lifeorb': {
     name: 'Vidasfera',
     desc: 'Aumenta el daño un 100%, pero el pierdes el 10% de su HP al final de cada turno.',
     img: 'assets/sprites/items/lifeorb.png',
     fallbackIcon: '🔴',
+    canChange: true,
     trigger: HELD_ITEM_TRIGGERS.ON_TURN_END,
     dmgBoost: { mult: 1.0 },
     fn(ctx) {
@@ -358,10 +394,21 @@ function heldItemBlocksMoveChange(pokemon) {
 
 // ── ITEM — acceso por clave con guión bajo, igual que POKEMON/MOVES ──────────
 // Permite escribir ITEM.sitrus_berry / ITEM.choice_scarf en routes.js en vez
-// del id real con guión ('sitrus-berry' / 'choice-scarf'). Se genera
-// automáticamente a partir de las claves de HELD_ITEMS — al añadir un objeto
-// nuevo a HELD_ITEMS, su acceso ITEM.xxx queda disponible sin tocar nada más.
-var ITEM = {};
-for (const id of Object.keys(HELD_ITEMS)) {
-  ITEM[id.replace(/-/g, '_')] = id;
-}
+// del id real con guión ('sitrus-berry' / 'choice-scarf').
+// IMPORTANTE: al añadir un objeto nuevo a HELD_ITEMS, añadir también su entrada
+// aquí para que el IDE ofrezca autocompletado.
+var ITEM = {
+  safety_goggles: 'safety-goggles',
+  light_ball:     'light-ball',
+  sitrus_berry:  'sitrus-berry',
+  choice_scarf:  'choice-scarf',
+  choice_specs:  'choice-specs',
+  choice_band:   'choice-band',
+  assault_vest:  'assault-vest',
+  carbon:        'carbon',
+  mystic_water:  'mystic-water',
+  miracle_seed:  'miracle-seed',
+  leftovers:     'leftovers',
+  flame_orb:     'flame-orb',
+  lifeorb:       'lifeorb',
+};

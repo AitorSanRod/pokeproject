@@ -230,7 +230,7 @@ var POKEMON_DB = {
   tauros:     { stage: 3, types: ['normal'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }] },
 
   // ── Water ─────────────────────────────────────────────────────────────────
-  magikarp:   { stage: 1, types: ['water'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }], evolvesAt: 20, evolvesInto: 'gyarados' },
+  magikarp:   { stage: 1, types: ['water'], damageClass: 'physical', moveLines: [{ type: 'normal', damageClass: 'physical' }], evolvesAt: 40, evolvesInto: 'gyarados' },
   gyarados:   { stage: 2, types: ['water', 'flying'], damageClass: 'physical', moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'flying', damageClass: 'physical' }] },
   lapras:     { stage: 3, types: ['water', 'ice'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'ice', damageClass: 'special' }] },
 

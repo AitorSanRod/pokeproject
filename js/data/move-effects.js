@@ -389,7 +389,7 @@ var MOVE_EFFECTS = {
 
   'guts': {
     trigger: TRIGGERS.BEFORE_ATTACK,
-    desc: 'Ignora las penalizaciones de quemado, paralizado y congelado. +120% daño físico',
+    desc: 'Ignora las penalizaciones de quemado,<br> paralizado y congelado. +120% daño físico',
     fn(ctx) {
     },
   },

@@ -303,7 +303,7 @@ var ROUTE_DATA = {
   'ruta-3': {
     bg: 'assets/bg/ruta-3.png',
     combatBg: 'assets/bg/combate.png',
-    rewardPokemon: [POKEMON.sandshrew, POKEMON.jigglypuff],
+    rewardPokemon: [POKEMON.magikarp],
     wild: [
       { name: POKEMON.pidgey, rate: 20, minLv: 10, maxLv: 14, moveId: MOVES.flying.physical.peck },
       { name: POKEMON.spearow, rate: 20, minLv: 11, maxLv: 15, moveId: MOVES.flying.physical.peck },
@@ -455,7 +455,7 @@ var ROUTE_DATA = {
     specialTrainer: {
       name: 'Soldado Rocket', img: 'assets/sprites/trainers/soldado-rocket.png', pokemon: [
         { name: POKEMON.golbat, minLv: 22, maxLv: 24, moveId: MOVES.poison.physical.poison_jab },
-        { name: POKEMON.porygon, minLv: 24, maxLv: 26, moveId: MOVES.normal.special.tri_attack },
+        { name: POKEMON.porygon, minLv: 24, maxLv: 26, moveId: MOVES.normal.special.tri_attack, heldItem: ITEM.assault_vest },
       ]
     },
     trainer: [
@@ -576,7 +576,7 @@ var ROUTE_DATA = {
       name: `${ENTRENADORES.Pokemaniaco.name} Cgoob`, img: ENTRENADORES.Rojo.img, pokemon: [
         { name: POKEMON.butterfree, minLv: 25, maxLv: 31, moveId: MOVES.bug.special.signal_beam },
         { name: POKEMON.flareon, minLv: 25, maxLv: 29, moveId: MOVES.fire.special.flamethrower },
-        { name: POKEMON.gyarados, minLv: 28, maxLv: 32, moveId: MOVES.water.physical.wave_crash },
+        { name: POKEMON.gyarados, minLv: 28, maxLv: 32, moveId: MOVES.water.physical.wave_crash, heldItem: ITEM.choice_scarf },
       ]
     },
     trainer: [],
@@ -599,7 +599,7 @@ var ROUTE_DATA = {
     badgeId: 'thunder-badge',
     gymLeaderImg: 'assets/sprites/trainers/surge.png',
     rewardPokemon: [POKEMON.voltorb, POKEMON.pikachu, POKEMON.raichu, POKEMON.porygon],
-    rewardExtras: [ITEM.choice_band],
+    rewardExtras: [ITEM.choice_band, ITEM.light_ball],
     trainer: [
       {
         name: ENTRENADORES.Caballero.name, img: ENTRENADORES.Caballero.img, rate: 50, pokemon: [
@@ -616,13 +616,13 @@ var ROUTE_DATA = {
     gym: {
       leader: [
         {
-          name: POKEMON.pikachu, level: 28, moveId: MOVES.electric.special.thunder_shock
+          name: POKEMON.pikachu, level: 28, moveId: MOVES.electric.special.thunder_shock, heldItem: ITEM.light_ball
         },
         {
           name: POKEMON.voltorb, level: 30, moveId: MOVES.normal.special.hyper_voice
         },
         {
-          name: POKEMON.raichu, level: 34, moveId: MOVES.electric.special.thunder
+          name: POKEMON.raichu, level: 34, moveId: MOVES.electric.special.thunder, heldItem: ITEM.choice_specs
         }
       ]
     },
@@ -688,7 +688,7 @@ var ROUTE_DATA = {
     combatBg: 'assets/bg/combate.png',
     wild: [
       { name: POKEMON.voltorb, rate: 40, minLv: 22, maxLv: 26, moveId: MOVES.electric.special.thunderbolt },
-      { name: POKEMON.spearow, rate: 25, minLv: 22, maxLv: 26, moveId: MOVES.normal.physical.tackle },
+      { name: POKEMON.spearow, rate: 15, minLv: 22, maxLv: 26, moveId: MOVES.normal.physical.tackle },
       { name: POKEMON.spearow, rate: 20, minLv: 22, maxLv: 26, moveId: MOVES.flying.physical.wing_attack },
       { name: POKEMON.ekans, rate: 25, minLv: 22, maxLv: 26, moveId: MOVES.poison.physical.poison_jab },
     ],
@@ -737,7 +737,7 @@ var ROUTE_DATA = {
         { name: POKEMON.slowpoke, minLv: 25, maxLv: 35, moveId: MOVES.water.special.surf },
         { name: POKEMON.psyduck, minLv: 22, maxLv: 31, moveId: MOVES.psychic.special.confusion },
         { name: POKEMON.drowzee, minLv: 25, maxLv: 35, moveId: MOVES.psychic.special.psychic },
-        { name: POKEMON.snorlax, minLv: 25, maxLv: 35, moveId: MOVES.normal.physical.false_swipe },
+        { name: POKEMON.snorlax, minLv: 25, maxLv: 35, moveId: MOVES.normal.physical.false_swipe, heldItem: ITEM.leftovers },
         { name: POKEMON.voltorb, minLv: 35, maxLv: 40, moveId: MOVES.normal.physical.self_destruct },
       ]
     },
@@ -753,7 +753,7 @@ var ROUTE_DATA = {
     wild: [
       { name: POKEMON.onix, rate: 40, minLv: 24, maxLv: 30, moveId: MOVES.rock.physical.rock_slide },
       { name: POKEMON.geodude, rate: 40, minLv: 24, maxLv: 30, moveId: MOVES.ground.physical.stomping_tantrum },
-      { name: POKEMON.machoke, rate: 34, minLv: 26, maxLv: 35, moveId: MOVES.fighting.physical.close_combat },
+      { name: POKEMON.machoke, rate: 30, minLv: 26, maxLv: 35, moveId: MOVES.fighting.physical.close_combat },
     ],
     trainer: [
       {
@@ -858,6 +858,7 @@ var ROUTE_DATA = {
         },
         {
           name: POKEMON.kangaskhan, minLv: 40, maxLv: 45, moveId: MOVES.normal.physical.extreme_speed,
+          heldItem: ITEM.lifeorb,
           overrides: {
             evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 },
           },
@@ -1042,25 +1043,26 @@ var ROUTE_DATA = {
     gym: {
       leader: [
         {
-          name: POKEMON.koffing, minLv: 44, maxLv: 50, moveId: MOVES.poison.special.sludge_bomb,
+          name: POKEMON.koffing, level: 47, moveId: MOVES.poison.special.sludge_bomb,
           overrides: {
             evs: { hp: 32, def: 32, spd: 32 },
           },
         },
         {
-          name: POKEMON.koffing, minLv: 44, maxLv: 50, moveId: MOVES.normal.physical.self_destruct,
+          name: POKEMON.koffing, level: 45, moveId: MOVES.normal.physical.self_destruct,
           overrides: {
             evs: { hp: 32, def: 32, spd: 32 },
           },
         },
         {
-          name: POKEMON.muk, minLv: 44, maxLv: 50, moveId: MOVES.dark.special.dark_pulse,
+          name: POKEMON.muk, level: 47, moveId: MOVES.dark.special.dark_pulse,
           overrides: {
             evs: { hp: 32, def: 32, spd: 32 },
           },
         },
         {
-          name: POKEMON.weezing, minLv: 44, maxLv: 50, moveId: MOVES.poison.special.sludge_wave,
+          name: POKEMON.weezing, level: 52, moveId: MOVES.poison.special.sludge_wave,
+          heldItem: ITEM.safety_goggles,
           overrides: {
             evs: { hp: 32, def: 32, spd: 32 },
           },
@@ -1116,8 +1118,8 @@ var ROUTE_DATA = {
     get wild() {
       const [primerInicial, segundoInicial] = ObtenerSegundoInicial(GameState.starterName ?? POKEMON.bulbasaur);
       return [
-        { name: primerInicial, rate: 50, minLv: 2, maxLv: 3 },
-        { name: segundoInicial, rate: 50, minLv: 2, maxLv: 3 },
+        { name: primerInicial, rate: 50, minLv: 5, maxLv: 7 },
+        { name: segundoInicial, rate: 50, minLv: 5, maxLv: 7 },
       ];
     },
     rewardExtras: [ITEM.carbon, ITEM.mystic_water, ITEM.miracle_seed],
@@ -1137,7 +1139,7 @@ var ROUTE_DATA = {
     combatBg: 'assets/bg/combate.png',
     title: 'Jardín de Bill',
     rewardPokemon: [POKEMON.pinsir],
-    rewardExtras: [ITEM.flame_orb],
+    rewardExtras: [ITEM.flame_orb, ITEM.safety_goggles],
     wild: [],
     trainer: [
       {
@@ -1175,7 +1177,8 @@ var ROUTE_DATA = {
           name: POKEMON.charizard, minLv: 38, maxLv: 43, moveId: MOVES.fire.special.fire_blast
         },
         {
-          name: POKEMON.gengar, minLv: 40, maxLv: 45, moveId: MOVES.ghost.special.night_shade,
+          name: POKEMON.gengar, minLv: 40, maxLv: 45, moveId: MOVES.ghost.special.astral_barrage,
+          heldItem: ITEM.sitrus_berry,
           overrides: {
             evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
           },

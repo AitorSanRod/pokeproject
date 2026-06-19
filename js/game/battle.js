@@ -64,7 +64,8 @@ function calcDamage(attacker, defender, move) {
     const { mult, type, class: cls } = heldItem.dmgBoost;
     const typeMatches  = !type || move.type === type;
     const classMatches = !cls  || move.damageClass === cls;
-    if (typeMatches && classMatches) {
+    const ownerMatches = !heldItem.dmgBoost.onlyFor || attacker.name === heldItem.dmgBoost.onlyFor;
+    if (typeMatches && classMatches && ownerMatches) {
       dmg = Math.floor(dmg * (1 + mult));
       modifiers.push({
         label: `${heldItem.name} (${attacker.displayName}) +${Math.round(mult * 100)}%`,

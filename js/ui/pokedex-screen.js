@@ -6,6 +6,7 @@ const PokedexScreen = {
 
   // Guarda la función que restaura la pantalla anterior
   _returnFn: null,
+  _scrollPos: 0,
 
   // Abre la pokédex. onBack es la función que se llama al pulsar ← ATRAS
   show(onBack = null) {
@@ -60,13 +61,17 @@ const PokedexScreen = {
         </div>
       </div>`;
 
+    document.getElementById('dex-list').scrollTop = PokedexScreen._scrollPos;
+
     document.getElementById('dex-back').addEventListener('click', () => {
+      PokedexScreen._scrollPos = 0;
       PokedexScreen._returnFn();
     });
 
     // Click en entrada capturada o vista → detalle
     document.querySelectorAll('.dex-entry--caught, .dex-entry--seen').forEach(el => {
       el.addEventListener('click', () => {
+        PokedexScreen._scrollPos = document.getElementById('dex-list').scrollTop;
         PokedexScreen.showDetail(el.dataset.name, +el.dataset.id);
       });
     });
@@ -151,6 +156,10 @@ const PokedexScreen = {
             <div style="display:flex;gap:var(--sp-xs)">
               ${entry.types.map(t => `<span class="type-badge" data-type="${t}">${t}</span>`).join('')}
             </div>
+            ${dbEntry?.evolvesAt ? `
+              <span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey)">
+                Evoluciona al Nv.${dbEntry.evolvesAt}
+              </span>` : ''}
           </div>
 
           <!-- Stats base + EVs inline -->

@@ -206,6 +206,7 @@ function checkEvolution(pokemon) {
   const db = POKEMON_DB[pokemon.name];
   if (!db?.evolvesAt || !db?.evolvesInto) return null;
   if (pokemon.level < db.evolvesAt) return null;
+  if (HELD_ITEMS?.[pokemon.heldItem]?.blocksEvolution) return null;
   return db.evolvesInto;
 }
 

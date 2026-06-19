@@ -88,6 +88,7 @@ const CompendiumScreen = {
             ${sec('status', 'EFECTOS DE ESTADO', CompendiumScreen._renderStatusList())}
             ${sec('types',  'TIPOS',             CompendiumScreen._renderTypeTest())}
             ${sec('moves',  'MOVIMIENTOS',        CompendiumScreen._renderMoveList())}
+            ${sec('tms',    'MTS',               CompendiumScreen._renderTMList())}
             ${sec('items',  'OBJETOS EQUIPABLES', CompendiumScreen._renderHeldItemList())}
           </div>
         </div>
@@ -311,11 +312,9 @@ const CompendiumScreen = {
     const multCls   = m => m >= 4 ? 'super' : m >= 2 ? 'weak' : m === 0 ? 'immune' : m <= 0.25 ? 'ultra' : 'resist';
 
     const renderCol = items => items.length
-      ? items.map(({ t, mul }) => `
-          <div class="tc-row">
-            <span class="type-badge tc-atk-badge" data-type="${t}">${TYPE_NAMES_ES[t] ?? t.toUpperCase()}</span>
-            <span class="tc-mult tc-mult--${multCls(mul)}">${multLabel(mul)}</span>
-          </div>`).join('')
+      ? items.map(({ t }) =>
+          `<span class="type-badge tc-atk-badge" data-type="${t}">${TYPE_NAMES_ES[t] ?? t.toUpperCase()}</span>`
+        ).join('')
       : '<span class="tc-none">—</span>';
 
     // Perspectiva defensora: ataques entrantes vs este tipo
@@ -356,8 +355,8 @@ const CompendiumScreen = {
       </div>`;
 
     const html =
-      card('DEFENSOR', ['Débil a', 'Resiste',     'Inmune'],        [defWeak, defResist, defImmune]) +
-      card('ATACANTE', ['Super eficaz', 'Poco eficaz', 'Sin efecto'], [atkSE,   atkNVE,   atkZero]);
+      card('DEFENSOR', ['Débil a (×2)', 'Resiste (×½)', 'Inmune (×0)'],          [defWeak, defResist, defImmune]) +
+      card('ATACANTE', ['Super eficaz (×2)', 'Poco eficaz (×½)', 'Sin efecto (×0)'], [atkSE,   atkNVE,   atkZero]);
 
     const result = document.getElementById('type-matchup-result');
     if (result) result.innerHTML = html;
@@ -523,6 +522,58 @@ const CompendiumScreen = {
           </span>
         </div>
       </div>`).join('');
+  },
+
+  // ── Lista de MTs agrupadas por tipo ──────────────────────────────────────
+  _renderTMList() {
+    if (typeof TM_LIST === 'undefined') return '<p>TM_LIST no disponible</p>';
+
+    // Agrupar por tipo del movimiento
+    const byType = {};
+    for (const tm of Object.values(TM_LIST)) {
+      const move = (typeof MOVE_BY_ID !== 'undefined') ? MOVE_BY_ID[tm.moveId] : null;
+      const type = move?.type ?? 'normal';
+      if (!byType[type]) byType[type] = [];
+      byType[type].push({ tm, move });
+    }
+
+    return Object.entries(byType)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([type, entries]) => `
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:center;margin-bottom:6px">
+            <span class="type-badge" data-type="${type}" style="font-size:8px;padding:2px 8px">
+              ${TYPE_NAMES_ES[type] ?? type.toUpperCase()}
+            </span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            ${entries.map(({ tm, move }) => {
+              const dmgClass   = move?.damageClass ?? null;
+              const power      = move?.power ?? null;
+              const effectIds  = move?.effectId
+                ? (Array.isArray(move.effectId) ? move.effectId : [move.effectId])
+                : [];
+              const effectDesc = (typeof MOVE_EFFECTS !== 'undefined')
+                ? effectIds.map(id => MOVE_EFFECTS[id]?.desc).filter(Boolean).join(' · ')
+                : '';
+              return `
+                <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;
+                  background:var(--off-white);border:1px solid var(--grey-light);
+                  border-radius:var(--radius-sm);position:relative">
+                  <span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;
+                    background:${dmgClass === 'special' ? 'var(--blue)' : 'var(--red)'}"></span>
+                  <span style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);flex:1">
+                    ${tm.name}
+                  </span>
+                  ${effectDesc ? `<span style="color:var(--yellow);font-size:10px;line-height:1;flex-shrink:0">★</span>` : `<span style="width:10px;flex-shrink:0"></span>`}
+                  <span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey);flex-shrink:0">
+                    POD:${power ?? '—'}
+                  </span>
+                  ${effectDesc ? `<div class="move-effect-tooltip">✦ ${effectDesc}</div>` : ''}
+                </div>`;
+            }).join('')}
+          </div>
+        </div>`).join('');
   },
 
   // ── Detalle de movimiento: pokemon que lo usan ─────────────────────────────
