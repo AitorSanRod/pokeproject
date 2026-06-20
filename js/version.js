@@ -1,2 +1,2 @@
-var GAME_VERSION = '0.1.6';
+var GAME_VERSION = '0.1.7';
 var RESET_STORAGE_ON_VERSION = false;

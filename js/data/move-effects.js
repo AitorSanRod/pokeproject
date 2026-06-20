@@ -122,6 +122,18 @@ var MOVE_EFFECTS = {
     },
   },
 
+  'lower-self-def-spd-50': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Baja la DEF y SPD del usuario un 50% en cada ataque.',
+    fn(ctx) {
+      if (!ctx.user.combatMods) ctx.user.combatMods = {};
+      ctx.user.combatMods.def = (ctx.user.combatMods.def ?? 0) - 0.50;
+      ctx.user.combatMods.spd = (ctx.user.combatMods.spd ?? 0) - 0.50;
+      ctx.log(`La DEF y SPD de ${ctx.user.displayName} bajaron!`);
+      if (ctx.showStatChange) ctx.showStatChange(ctx.user, 'DEF/SPD', 'down', 50);
+    },
+  },
+
   'lower-spd-20-10': {
     trigger: TRIGGERS.AFTER_ATTACK,
     desc: 'Puede bajar la SPD del rival un 20%',

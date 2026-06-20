@@ -1940,6 +1940,7 @@ const Screens = {
       if (!isAlive(second)) {
         ctx._turnRunning = false;
         await Screens._applyAttackerItemEnd(first, player);
+        await Screens._applyEndOfTurnStatus(player, foe);
         Screens._combatEnd(); return;
       }
     }
@@ -1951,6 +1952,7 @@ const Screens = {
       if (!isAlive(second)) {
         ctx._turnRunning = false;
         await Screens._applyAttackerItemEnd(first, player);
+        await Screens._applyEndOfTurnStatus(player, foe);
         Screens._combatEnd(); return;
       }
     }
@@ -1968,6 +1970,7 @@ const Screens = {
         if (!isAlive(first)) {
           ctx._turnRunning = false;
           await Screens._applyAttackerItemEnd(second, player);
+          await Screens._applyEndOfTurnStatus(player, foe);
           Screens._combatEnd(); return;
         }
       }
@@ -1983,22 +1986,28 @@ const Screens = {
   },
 
   // Aplica daño de fin de turno por estados y actualiza HUDs
+  // Salta los Pokémon ya derrotados para no mostrar daño en muertos,
+  // pero sí aplica al superviviente aunque el rival haya caído ese mismo turno.
   async _applyEndOfTurnStatus(player, foe) {
     const logFn = (txt) => Screens._updateCombatLog(txt);
 
-    const playerDmg = StatusEffects.applyEndOfTurn(player, logFn);
-    if (playerDmg > 0) {
-      Render.updateHpBar(document.getElementById('hud-player'), player.currentHp, player.stats.hp);
-      const nums = document.getElementById('hp-nums-player');
-      if (nums) nums.textContent = `${player.currentHp}/${player.stats.hp}`;
-      Screens._updateCombatTeamBar();
-      await Screens._wait(400);
+    if (isAlive(player)) {
+      const playerDmg = StatusEffects.applyEndOfTurn(player, logFn);
+      if (playerDmg > 0) {
+        Render.updateHpBar(document.getElementById('hud-player'), player.currentHp, player.stats.hp);
+        const nums = document.getElementById('hp-nums-player');
+        if (nums) nums.textContent = `${player.currentHp}/${player.stats.hp}`;
+        Screens._updateCombatTeamBar();
+        await Screens._wait(400);
+      }
     }
 
-    const foeDmg = StatusEffects.applyEndOfTurn(foe, logFn);
-    if (foeDmg > 0) {
-      Render.updateHpBar(document.getElementById('hud-foe'), foe.currentHp, foe.stats.hp);
-      await Screens._wait(400);
+    if (isAlive(foe)) {
+      const foeDmg = StatusEffects.applyEndOfTurn(foe, logFn);
+      if (foeDmg > 0) {
+        Render.updateHpBar(document.getElementById('hud-foe'), foe.currentHp, foe.stats.hp);
+        await Screens._wait(400);
+      }
     }
 
     // Refrescar badges de estado en HUDs
