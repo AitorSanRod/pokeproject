@@ -798,6 +798,7 @@ const Screens = {
       const foeTeam = [];
       for (const p of gym.leader) {
         const foe = await createPokemon(p.name, rollLevel(p), false, p.moveId ?? null, p.overrides ?? null, p.shiny ?? false);
+        if (p.img) foe.spriteUrl = p.img;
         if (p.heldItem) equipHeldItem(foe, p.heldItem);
         foeTeam.push(foe);
       }
@@ -851,6 +852,7 @@ const Screens = {
       const foeTeam = [];
       for (const p of trainer.pokemon) {
         const foe = await createPokemon(p.name, rollLevel(p), false, p.moveId ?? null, p.overrides ?? null, p.shiny ?? false);
+        if (p.img) foe.spriteUrl = p.img;
         if (p.heldItem) equipHeldItem(foe, p.heldItem);
         foeTeam.push(foe);
       }
@@ -866,6 +868,7 @@ const Screens = {
       const entry   = pickWildEncounter(data.wild);
       const isShiny = entry.shiny === true || Math.random() < (typeof SHINY_RATE !== 'undefined' ? SHINY_RATE : 0);
       const foePoke = await createPokemon(entry.name, rollLevel(entry), false, entry.moveId ?? null, entry.overrides ?? null, isShiny);
+      if (entry.img) foePoke.spriteUrl = entry.img;
       if (entry.heldItem) equipHeldItem(foePoke, entry.heldItem);
       Screens.show(Screens.combat, {
         foeTeam:    [foePoke],

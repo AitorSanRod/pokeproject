@@ -1096,6 +1096,87 @@ var ROUTE_DATA = {
     ],
   },
 
+  'info-combate-final': {
+    type: 'information',
+    bg: 'assets/bg/cueva-plateada.png',
+    title: 'Fondo de la cueva',
+    description: '<div style="display:flex;justify-content:center"><img src="assets/sprites/others/rojo-classic.png"></div><br><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">...</p>',
+  },
+
+  'combate-rojo': {
+    bg: 'assets/bg/cueva-plateada.png',
+    combatBg: 'assets/bg/combate-alto-mando.png',
+    wild: [],
+    trainer: [],
+    specialTrainer: {
+      name: ENTRENADORES.Rojo.name, img: ENTRENADORES.Rojo.img, pokemon: [
+        {
+          name: POKEMON.snorlax, 
+          level: 75, 
+          moveId: MOVES.normal.physical.hyper_fang,
+          heldItem: ITEM.leftovers,
+          img: 'assets/sprites/pokemon/snorlax-classic.png',
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
+          },
+        },
+        {
+          name: POKEMON.charizard, 
+          level: 75, 
+          moveId: MOVES.fire.physical.flare_blitz,
+          heldItem: ITEM.assault_vest,
+          img: 'assets/sprites/pokemon/charizard-classic.png',
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
+          },
+        },
+        {
+          name: POKEMON.venusaur, 
+          level: 75, 
+          moveId: MOVES.grass.special.magical_leaf,
+          heldItem: ITEM.miracle_seed,
+          img: 'assets/sprites/pokemon/venusaur-classic.png',
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
+          },
+        },
+        {
+          name: POKEMON.blastoise, 
+          level: 75, 
+          moveId: MOVES.water.special.hydro_pump,
+          heldItem: ITEM.mystic_water,
+          img: 'assets/sprites/pokemon/blastoise-classic.png',
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
+          },
+        },
+        {
+          name: POKEMON.lapras, 
+          level: 75, 
+          moveId: MOVES.ice.special.blizzard,
+          heldItem: ITEM.choice_specs,
+          img: 'assets/sprites/pokemon/lapras-classic.png',
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
+          },
+        },
+        {
+          name: POKEMON.pikachu, 
+          level: 75, 
+          moveId: MOVES.electric.physical.volt_tackle,
+          heldItem: ITEM.light_ball,
+          img: 'assets/sprites/pokemon/pikachu-classic.png',
+          overrides: {
+            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
+          },
+        },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Special }],
+    ],
+  },
+
   // ── Ejemplo de ruta type:'information' ────────────────────────────────
   // Sin caminos ni combates. Se muestra título + descripción + un botón
   // "CONTINUAR" que avanza directamente a la siguiente ruta de KANTO_ROUTES.
@@ -1282,6 +1363,8 @@ var KANTO_ROUTES = [
 
   //Final
   { name: '???', area: 'espacio-raro' },
+  { name: 'Cueva Plateada', area: 'info-combate-final'},
+  { name: 'Final del camino', area: 'combate-rojo' },
   { name: 'Final', area: 'info-final' }
 ];
 

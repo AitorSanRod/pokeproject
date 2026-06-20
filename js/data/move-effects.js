@@ -290,6 +290,15 @@ var MOVE_EFFECTS = {
     },
   },
 
+  'freeze-50': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Tiene un 50% de probabilidad de congelar al rival',
+    statusChance: 0.50,
+    fn(ctx) {
+      StatusEffects.apply(ctx.target, 'freeze', ctx.log);
+    },
+  },
+
   'sleep-15': {
     trigger: TRIGGERS.AFTER_ATTACK,
     desc: 'Tiene un 15% de probabilidad de hacer dormir al rival',
