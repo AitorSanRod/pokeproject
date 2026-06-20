@@ -218,4 +218,29 @@ var Storage = {
       console.warn('[Storage] Error eliminando run', e);
     }
   },
+
+  clearAll() {
+    const prefix = this._PREFIX;
+    try {
+      Object.keys(localStorage)
+        .filter(k => k.startsWith(prefix))
+        .forEach(k => localStorage.removeItem(k));
+      console.log('[Storage] Todos los datos eliminados');
+    } catch (e) {
+      console.warn('[Storage] Error limpiando storage', e);
+    }
+  },
 };
+
+// Detecta cambio de versión y limpia todos los datos guardados
+// Solo actúa si RESET_STORAGE_ON_VERSION = true en version.js
+const _storageVersionGuard = (() => {
+  if (!RESET_STORAGE_ON_VERSION) return;
+  const KEY = 'pkmn_version';
+  const stored = localStorage.getItem(KEY);
+  if (stored !== GAME_VERSION) {
+    Storage.clearAll();
+    localStorage.setItem(KEY, GAME_VERSION);
+    console.log(`[Storage] Versión ${stored ?? 'desconocida'} → ${GAME_VERSION}: storage reseteado`);
+  }
+})();

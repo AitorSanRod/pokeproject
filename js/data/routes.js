@@ -1084,7 +1084,7 @@ var ROUTE_DATA = {
     rewardPokemon: [POKEMON.mew],
     wild: [
       {
-        name: POKEMON.mewtwo, rate: 100, minLv: 80, maxLv: 90, moveId: MOVES.psychic.special.trick,
+        name: POKEMON.mewtwo, rate: 100, minLv: 60, maxLv: 70, moveId: [MOVES.psychic.special.trick, MOVES.fighting.special.focus_blast],
         overrides: {
           evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
         },

@@ -9,7 +9,19 @@ const SCREENS_CONFIG = {
     { name: 'squirtle',   label: 'Squirtle' },
   ],
   STARTER_LEVEL: 5,
+  DEV_POKEDEX: false,
 };
+
+if (SCREENS_CONFIG.DEV_POKEDEX) {
+  Storage.getPokedex = function () {
+    const dex = {};
+    (typeof KANTO_DEX !== 'undefined' ? KANTO_DEX : [])
+      .forEach(e => { dex[e.name] = { caught: true, seen: true }; });
+    return dex;
+  };
+  Storage.isCaught = () => true;
+  Storage.isSeen   = () => true;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SCREENS — gestor de pantallas
@@ -280,6 +292,24 @@ const Screens = {
               </div>
               <div class="starter-card__arrow">→</div>
             </div>`).join('')}
+          ${(() => {
+            const unlocked = Storage.isCaught('mewtwo');
+            return `
+              <div id="card-custom"
+                class="starter-card${unlocked ? '' : ' starter-card--locked'}"
+                style="${unlocked ? '' : 'opacity:0.45;cursor:not-allowed'}">
+                <div class="starter-card__sprite-wrap">
+                  <span style="font-size:28px;line-height:1">${unlocked ? '✨' : '🔒'}</span>
+                </div>
+                <div class="starter-card__info">
+                  <div class="starter-card__name">OTRO...</div>
+                  <div style="font-family:var(--font-pixel);font-size:6px;color:var(--grey);margin-top:4px;line-height:1.6">
+                    ${unlocked ? 'Elige cualquier Pokémon capturado' : 'Captura a Mewtwo para desbloquear'}
+                  </div>
+                </div>
+                <div class="starter-card__arrow">${unlocked ? '→' : ''}</div>
+              </div>`;
+          })()}
         </div>
       </div>`;
 
@@ -326,7 +356,105 @@ const Screens = {
       }
     });
 
+    if (Storage.isCaught('mewtwo')) {
+      document.getElementById('card-custom')
+        .addEventListener('click', () => Screens._showCustomStarterPicker());
+    }
+
     console.log('[UI] Pantalla: Seleccion de inicial');
+  },
+
+  // ── Selector de inicial libre (desbloqueado al capturar Mewtwo) ───────────
+  _showCustomStarterPicker() {
+    const dex = Storage.getPokedex();
+    const caught = KANTO_DEX.filter(e => dex[e.name]?.caught);
+
+    document.getElementById('viewport').innerHTML = `
+      <div class="screen" style="background:var(--off-white);display:flex;flex-direction:column;overflow:hidden">
+        <div class="screen-header">
+          <button class="btn btn--ghost screen-header__back" id="custom-starter-back">${BACK_ARROW_SVG}</button>
+          <span class="screen-header__title">ELIGE TU INICIAL</span>
+        </div>
+        <div style="overflow-y:auto;flex:1;min-height:0;padding:var(--sp-sm)">
+          <div style="display:flex;flex-direction:column;gap:4px">
+            ${caught.map(entry => {
+              const isShiny = Storage.isShiny(entry.name);
+              return `
+              <div class="dex-entry dex-entry--caught" data-name="${entry.name}" data-id="${entry.id}"
+                data-shiny="${isShiny}" style="cursor:pointer">
+                <span class="dex-entry__num">#${String(entry.id).padStart(3,'0')}</span>
+                <div class="dex-entry__sprite-wrap">
+                  <img src="${getDexSpriteUrl(entry.id)}"
+                    class="dex-entry__sprite" alt="${entry.name}" onerror="this.style.opacity=0.3">
+                </div>
+                <div class="dex-entry__info">
+                  <span class="dex-entry__name">${entry.name.toUpperCase()}</span>
+                  <div class="dex-entry__types">
+                    ${entry.types.map(t => `<span class="type-badge" data-type="${t}">${t}</span>`).join('')}
+                  </div>
+                </div>
+                ${isShiny ? `<img src="assets/sprites/others/shiny.png" style="width:14px;height:14px;image-rendering:pixelated;flex-shrink:0">` : ''}
+                <span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey);flex-shrink:0">›</span>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>`;
+
+    document.getElementById('custom-starter-back')
+      .addEventListener('click', () => Screens.show(Screens.starterSelect));
+
+    const _startWith = async (name, useShiny) => {
+      try {
+        const p = await createPokemon(name, SCREENS_CONFIG.STARTER_LEVEL, true, null, null, useShiny);
+        if (useShiny) Storage.markShiny(p.name);
+        console.log(`[UI] Starter personalizado elegido: ${name}${useShiny ? ' (shiny)' : ''}`);
+        GameState.init(p);
+        GameState.autoMode = true;
+        Screens._saveRun();
+        Screens.show(Screens.adventure);
+      } catch (err) {
+        console.error(`[UI] Error cargando starter personalizado ${name}:`, err);
+      }
+    };
+
+    document.querySelectorAll('.dex-entry--caught').forEach(el => {
+      el.addEventListener('click', async () => {
+        const name    = el.dataset.name;
+        const isShiny = el.dataset.shiny === 'true';
+
+        if (!isShiny) { _startWith(name, false); return; }
+
+        // Pokémon capturado shiny — preguntar versión
+        const shinySpriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${el.dataset.id}.png`;
+        const normalSpriteUrl = getDexSpriteUrl(+el.dataset.id);
+
+        const overlay = Screens._makeModal(`
+          <div class="modal-title">${name.toUpperCase()}</div>
+          <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);text-align:center;line-height:1.8;margin-bottom:12px">
+            ¡Tienes una versión shiny! ¿Con cuál quieres jugar?
+          </p>
+          <div style="display:flex;justify-content:center;gap:24px;margin-bottom:16px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+              <img src="${normalSpriteUrl}" style="width:64px;height:64px;image-rendering:pixelated" onerror="this.style.opacity=0.3">
+              <span style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark)">NORMAL</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+              <img src="${shinySpriteUrl}" style="width:64px;height:64px;image-rendering:pixelated" onerror="this.style.opacity=0.3">
+              <span style="font-family:var(--font-pixel);font-size:7px;color:var(--yellow)">✨ SHINY</span>
+            </div>
+          </div>
+          <button class="btn btn--wide" id="pick-normal" style="margin-bottom:6px">NORMAL</button>
+          <button class="btn btn--primary btn--wide" id="pick-shiny">✨ SHINY</button>
+          <button class="btn btn--ghost btn--wide" id="pick-cancel" style="margin-top:6px">Cancelar</button>
+        `, { id: 'shiny-pick-modal', closeOnBackdrop: true });
+
+        overlay.querySelector('#pick-normal').addEventListener('click', () => { overlay.remove(); _startWith(name, false); });
+        overlay.querySelector('#pick-shiny').addEventListener('click',  () => { overlay.remove(); _startWith(name, true);  });
+        overlay.querySelector('#pick-cancel').addEventListener('click', () => overlay.remove());
+
+      });
+    });
   },
 
   // ═══════════════════════════════════════════════════════════════════════

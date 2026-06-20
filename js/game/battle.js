@@ -96,6 +96,12 @@ function enemyChooseMove(enemy, player) {
   // rival — esto es lo que routes.js fija vía moveId (ver sección 5 del README).
   // El cálculo de "mejor movimiento" solo es un fallback para rivales sin
   // autoMove definido (p.ej. nunca debería pasar, pero por seguridad).
+  if (enemy.autoMovePool && enemy.autoMovePool.length > 0) {
+    const pool = enemy.autoMovePool
+      .map(id => enemy.moves.find(m => m.id === id))
+      .filter(Boolean);
+    if (pool.length > 0) return pool[Math.floor(Math.random() * pool.length)];
+  }
   if (enemy.autoMove) {
     const fixed = enemy.moves.find(m => m.id === enemy.autoMove);
     if (fixed) return fixed;

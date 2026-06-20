@@ -55,9 +55,13 @@ async function createPokemon(nameOrId, level, isPlayer = false, moveId = null, o
   const moves = buildMoves(name);
 
   // Movimiento hardcodeado vía moveId (rivales/gym leaders con ataque específico)
-  if (moveId && MOVE_BY_ID[moveId] && !moves.find(m => m.id === moveId)) {
-    const m = MOVE_BY_ID[moveId];
-    moves.push({ ...m, maxPp: m.pp });
+  // moveId puede ser un string o un array de strings
+  const _moveIds = Array.isArray(moveId) ? moveId : (moveId ? [moveId] : []);
+  for (const mid of _moveIds) {
+    if (MOVE_BY_ID[mid] && !moves.find(m => m.id === mid)) {
+      const m = MOVE_BY_ID[mid];
+      moves.push({ ...m, maxPp: m.pp });
+    }
   }
 
   // MTs aprendidas: solo para pokemon del jugador — cargadas desde Storage
@@ -81,9 +85,22 @@ async function createPokemon(nameOrId, level, isPlayer = false, moveId = null, o
     exp:          0,
     expToNext:    EXP_TABLE.expToNext(level),
     moves,
-    autoMove:     moveId && moves.find(m => m.id === moveId)
-                     ? moveId
-                     : moves[0]?.id ?? null,
+    autoMovePool: (() => {
+                    const ids = Array.isArray(moveId) ? moveId : [];
+                    const valid = ids.filter(id => moves.find(m => m.id === id));
+                    return valid.length > 1 ? valid : null;
+                  })(),
+    autoMove:     (() => {
+                    if (Array.isArray(moveId)) {
+                      const valid = moveId.filter(id => moves.find(m => m.id === id));
+                      return valid.length > 0
+                        ? valid[Math.floor(Math.random() * valid.length)]
+                        : moves[0]?.id ?? null;
+                    }
+                    return moveId && moves.find(m => m.id === moveId)
+                      ? moveId
+                      : moves[0]?.id ?? null;
+                  })(),
     isPlayer,
     shiny,
     spriteUrl:    shiny ? (apiData.sprites.front_shiny ?? apiData.sprites.front_default) : apiData.sprites.front_default,

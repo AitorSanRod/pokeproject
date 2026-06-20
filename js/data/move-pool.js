@@ -76,6 +76,7 @@ var MOVE_POOL = {
       { stage: 2, id: 'surf', name: 'Surf', power: 70, pp: 15, type: 'water', damageClass: 'special' },
       { stage: 3, id: 'hydro-pump', name: 'Hidrobomba', power: 90, pp: 99, type: 'water', damageClass: 'special' },
       { stage: 1, mt: true, id: 'bubble-beam', name: 'Rayo Burbuja', power: 65, pp: 99, type: 'water', damageClass: 'special', effectId: 'clear' },
+      { stage: 1, mt: true, id: 'scald ', name: 'Escaldar', power: 70, pp: 99, type: 'water', damageClass: 'special', effectId: 'burn-25' },
     ],
   },
   grass: {

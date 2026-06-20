@@ -24,6 +24,9 @@ const MT_SPRITES = {
 }
 
 var TM_LIST = {
+  // ═══════════════════════════════════════════════════════════════════════
+  // WATER
+  // ═══════════════════════════════════════════════════════════════════════
   'tm-bubble-beam': {
     id: 'tm-bubble-beam',
     name: 'MT Rayo Burbuja',
@@ -34,6 +37,19 @@ var TM_LIST = {
     sprite: MT_SPRITES.water,
     fallbackIcon: '💧',
   },
+  'tm-scald': {
+    id: 'tm-scald',
+    name: 'MT Escaldar',
+    moveId: 'scald',
+    types: ['water'],
+    pokemons: [],
+    desc: 'Enseña Escaldar.',
+    sprite: MT_SPRITES.water,
+    fallbackIcon: '💧',
+  },
+  // ═══════════════════════════════════════════════════════════════════════
+  // ELECTRIC
+  // ═══════════════════════════════════════════════════════════════════════
   'tm-thunderbolt': {
     id: 'tm-thunderbolt',
     name: 'MT Rayo',
@@ -44,6 +60,9 @@ var TM_LIST = {
     sprite: MT_SPRITES.electric,
     fallbackIcon: '⚡',
   },
+  // ═══════════════════════════════════════════════════════════════════════
+  // ICE
+  // ═══════════════════════════════════════════════════════════════════════
   'tm-icy-wind': {
     id: 'tm-icy-wind',
     name: 'MT Viento Hielo',
@@ -54,6 +73,9 @@ var TM_LIST = {
     sprite: MT_SPRITES.ice,
     fallbackIcon: '❄️',
   },
+  // ═══════════════════════════════════════════════════════════════════════
+  // GROUND
+  // ═══════════════════════════════════════════════════════════════════════
   'stomping-tantrum': {
     id: 'stomping-tantrum',
     name: 'MT Pataleta',
@@ -64,6 +86,9 @@ var TM_LIST = {
     sprite: MT_SPRITES.ground,
     fallbackIcon: '🌍',
   },
+  // ═══════════════════════════════════════════════════════════════════════
+  // GRASS
+  // ═══════════════════════════════════════════════════════════════════════
   'tm-giga-drain': {
     id: 'tm-giga-drain',
     name: 'MT Gigadrenado',
@@ -74,6 +99,9 @@ var TM_LIST = {
     sprite: MT_SPRITES.grass,
     fallbackIcon: '🌿',
   },
+  // ═══════════════════════════════════════════════════════════════════════
+  // STEEL
+  // ═══════════════════════════════════════════════════════════════════════
   'tm-metal-claw': {
     id: 'tm-metal-claw',
     name: 'MT Garra Metal',
@@ -84,6 +112,9 @@ var TM_LIST = {
     sprite: MT_SPRITES.steel,
     fallbackIcon: '',
   },
+  // ═══════════════════════════════════════════════════════════════════════
+  // NORMAL
+  // ═══════════════════════════════════════════════════════════════════════
   'tm-take-down': {
     id: 'tm-take-down',
     name: 'MT Derribo',
@@ -93,6 +124,19 @@ var TM_LIST = {
     desc: 'Enseña Derribo',
     sprite: MT_SPRITES.normal,
     fallbackIcon: '',
+    // ═══════════════════════════════════════════════════════════════════════
+    // DARK
+    // ═══════════════════════════════════════════════════════════════════════
+    'tm-crunch': {
+      id: 'tm-crunch',
+      name: 'MT Triturar',
+      moveId: 'crunch',
+      types: ['dark'],
+      pokemons: ['kangaskhan','snorlax', 'gyarados', 'pinsir'],
+      desc: 'Enseña Triturar',
+      sprite: MT_SPRITES.dark,
+      fallbackIcon: '',
+    }
   },
 };
 
