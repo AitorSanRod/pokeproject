@@ -48,7 +48,7 @@
 //                            que aparece al llegar a una ciudad/gimnasio.
 //   gymLeader  (opcional)  : nombre del líder de gimnasio (string).
 //   gymType    (opcional)  : tipo del gimnasio (string, p.ej. 'rock').
-//   badgeId    (opcional)  : id de medalla definida en badges.js.
+//   badgeId    (opcional)  : id de medalla definida en kanto-badges.js.
 //   gymLeaderImg (opcional): sprite del líder de gimnasio.
 //   gym        (opcional)  : { leader: [...] } — array de pokemon del líder.
 //                            Aparece en casillas PATH_TYPE.Lider.
@@ -196,6 +196,18 @@ const ENTRENADORES = {
     name: 'Chica',
     img: 'assets/sprites/trainers/chica.png'
   },
+  Medium: {
+    name: 'Medium',
+    img: 'assets/sprites/trainers/medium.png'
+  },
+  Malabarista: {
+    name: 'Malabarista',
+    img: 'assets/sprites/trainers/malabarista.png'
+  },
+  Ladron: {
+    name: 'Ladrón',
+    img: 'assets/sprites/trainers/ladron.png'
+  }
 };
 
 var ROUTE_DATA = {
@@ -335,12 +347,7 @@ var ROUTE_DATA = {
         ]
       },
     ],
-    paths: [
-      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
-      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Heal }, { type: PATH_TYPE.Wild }],
-      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Heal }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }],
-      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }],
-    ],
+    pathLength: 5
   },
 
   'ciudad-plateada': {
@@ -498,7 +505,7 @@ var ROUTE_DATA = {
           overrides: { evs: { hp: 32, def: 32, spd: 32, spa: 32 } },
         },
         {
-          name: POKEMON.starmie, level: 22, moveId: [MOVES.psychic.special.confusion, MOVES.water.special.scald ],
+          name: POKEMON.starmie, level: 22, moveId: [MOVES.psychic.special.confusion, MOVES.water.special.scald],
           overrides: {
             evs: { hp: 32, def: 0, spd: 32, spa: 14 },
             ivs: { hp: 31, def: 0, spd: 0, spa: 31 },
@@ -539,6 +546,7 @@ var ROUTE_DATA = {
     ],
     specialTrainer: {
       name: 'Soldado Rocket', img: ENTRENADORES.Rocket.img, pokemon: [
+        { name: POKEMON.grimer, minLv: 22, maxLv: 24, moveId: MOVES.poison.special.poison_powder },
         { name: POKEMON.golbat, minLv: 22, maxLv: 24, moveId: MOVES.poison.physical.poison_jab },
         { name: POKEMON.porygon, minLv: 24, maxLv: 26, moveId: MOVES.normal.special.tri_attack, heldItem: ITEM.assault_vest },
       ]
@@ -584,7 +592,7 @@ var ROUTE_DATA = {
       },
     ],
     paths: [
-      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Heal }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Special }]
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Special }]
     ],
   },
 
@@ -661,7 +669,7 @@ var ROUTE_DATA = {
       name: `${ENTRENADORES.Pokemaniaco.name} Cgoob`, img: ENTRENADORES.Rojo.img, pokemon: [
         { name: POKEMON.butterfree, minLv: 25, maxLv: 31, moveId: MOVES.bug.special.signal_beam },
         { name: POKEMON.flareon, minLv: 25, maxLv: 29, moveId: MOVES.fire.special.flamethrower },
-        { name: POKEMON.gyarados, minLv: 28, maxLv: 32, moveId: MOVES.water.physical.wave_crash, heldItem: ITEM.choice_scarf },
+        { name: POKEMON.gyarados, minLv: 28, maxLv: 32, moveId: [MOVES.water.physical.wave_crash, MOVES.dark.physical.bite], heldItem: ITEM.mystic_water },
       ]
     },
     trainer: [],
@@ -1025,18 +1033,32 @@ var ROUTE_DATA = {
   'torre-pokemon': {
     bg: 'assets/bg/torre-pokemon.png',
     combatBg: 'assets/bg/combate-interior.png',
-    pathLength: 5,
+    pathLength: 4,
     wild: [
-      { name: POKEMON.gastly, rate: 30, minLv: 35, maxLv: 42, moveId: MOVES.ghost.special.shadow_ball },
-      { name: POKEMON.gastly, rate: 30, minLv: 35, maxLv: 42, moveId: MOVES.ghost.special.hex },
-      { name: POKEMON.haunter, rate: 30, minLv: 35, maxLv: 42, moveId: MOVES.ghost.special.shadow_ball },
+      { name: POKEMON.gastly, rate: 30, minLv: 35, maxLv: 42, moveId: [MOVES.ghost.special.shadow_ball, MOVES.poison.special.sludge_bomb] },
+      { name: POKEMON.gastly, rate: 30, minLv: 35, maxLv: 42, moveId: [MOVES.ghost.special.hex, MOVES.poison.special.sludge_bomb] },
+      { name: POKEMON.haunter, rate: 30, minLv: 35, maxLv: 42, moveId: [MOVES.ghost.special.shadow_ball, MOVES.dark.special.dark_pulse] },
       { name: POKEMON.cubone, rate: 10, minLv: 35, maxLv: 42, moveId: MOVES.ground.physical.earthquake },
     ],
     trainer: [
       {
-        name: `${ENTRENADORES.Rocket.name}`, img: ENTRENADORES.Rocket.img, rate: 20, pokemon: [
-          { name: POKEMON.voltorb, minLv: 35, maxLv: 42, moveId: MOVES.electric.special.thunder },
-          { name: POKEMON.electrode, minLv: 35, maxLv: 42, moveId: MOVES.normal.special.hyper_voice },
+        name: `${ENTRENADORES.Medium.name}`, img: ENTRENADORES.Medium.img, rate: 33, pokemon: [
+          { name: POKEMON.gastly, level: 38, moveId: [MOVES.ghost.special.shadow_ball, MOVES.poison.special.sludge_bomb] },
+          { name: POKEMON.gastly, level: 40, moveId: [MOVES.ghost.special.shadow_ball, MOVES.poison.special.sludge_bomb] },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Medium.name}`, img: ENTRENADORES.Medium.img, rate: 33, pokemon: [
+          { name: POKEMON.gastly, level: 38, moveId: [MOVES.ghost.special.shadow_ball, MOVES.poison.special.sludge_bomb] },
+          { name: POKEMON.cubone, level: 34, moveId: MOVES.ground.physical.earthquake },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Medium.name}`, img: ENTRENADORES.Medium.img, rate: 34, pokemon: [
+          { name: POKEMON.gastly, level: 34, moveId: [MOVES.ghost.special.shadow_ball, MOVES.poison.special.sludge_bomb] },
+          { name: POKEMON.gastly, level: 32, moveId: [MOVES.ghost.special.shadow_ball, MOVES.poison.special.sludge_bomb] },
+          { name: POKEMON.gastly, level: 35, moveId: [MOVES.ghost.special.shadow_ball, MOVES.poison.special.sludge_bomb] },
+          { name: POKEMON.gastly, level: 38, moveId: [MOVES.ghost.special.shadow_ball, MOVES.poison.special.sludge_bomb] },
         ]
       },
     ],
@@ -1051,6 +1073,40 @@ var ROUTE_DATA = {
       btnName: 'Subir a la última planta',
       area: 'combate-victor',
     },
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Pueblo Lavanda
+  // ═══════════════════════════════════════════════════════════════════════
+
+  'pueblo-lavanda': {
+    bg: 'assets/bg/pueblo-lavanda.png',
+    combatBg: 'assets/bg/combate-noche.png',
+    wild: [],
+    trainer: [],
+    rewardExtras: [ITEM.thunder_stone, ITEM.water_stone, ITEM.fire_stone],
+    specialTrainer: {
+      name: ENTRENADORES.Rival.name, img: ENTRENADORES.Rival.img, pokemon: [
+        {
+          name: POKEMON.pidgeot, level: 34, moveId: MOVES.flying.physical.wing_attack,
+        },
+        {
+          name: POKEMON.exeggcute, level: 33, moveId: MOVES.psychic.special.confusion,
+        },
+        {
+          name: POKEMON.gyarados, level: 32, moveId: MOVES.dark.physical.crunch,
+        },
+        {
+          name: POKEMON.kadabra, level: 35, moveId: MOVES.psychic.special.psychic,
+        },
+        {
+          name: 'RIVAL_STARTER_3', level: 38,
+        },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Special }],
+    ],
   },
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -1070,9 +1126,9 @@ var ROUTE_DATA = {
     trainer: [],
     paths: [
       [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
-      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
-      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
-    ]
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Heal }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Heal }, { type: PATH_TYPE.Wild }],
+    ],
   },
 
   'ciudad-fucsia': {
@@ -1099,7 +1155,33 @@ var ROUTE_DATA = {
     gymType: 'poison',
     badgeId: 'soul-badge',
     gymLeaderImg: 'assets/sprites/trainers/koga.png',
-    trainer: [],
+    trainer: [
+      {
+        name: `${ENTRENADORES.Malabarista.name}`, img: ENTRENADORES.Malabarista.img, rate: 25, pokemon: [
+          { name: POKEMON.arbok, level: 43, moveId: MOVES.poison.physical.poison_jab },
+          { name: POKEMON.sandslash, level: 42, moveId: MOVES.ground.physical.stomping_tantrum },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Malabarista.name}`, img: ENTRENADORES.Malabarista.img, rate: 25, pokemon: [
+          { name: POKEMON.drowzee, level: 43, moveId: MOVES.psychic.special.confusion },
+          { name: POKEMON.kadabra, level: 43, moveId: MOVES.psychic.special.confusion },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Malabarista.name}`, img: ENTRENADORES.Malabarista.img, rate: 25, pokemon: [
+          { name: POKEMON.arbok, level: 43, moveId: MOVES.poison.physical.poison_jab },
+          { name: POKEMON.kadabra, level: 43, moveId: MOVES.psychic.special.confusion },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Malabarista.name}`, img: ENTRENADORES.Malabarista.img, rate: 25, pokemon: [
+          { name: POKEMON.hypno, level: 43, moveId: MOVES.psychic.special.confusion },
+          { name: POKEMON.kadabra, level: 43, moveId: MOVES.psychic.special.psychic },
+          { name: POKEMON.sandslash, level: 44, moveId: MOVES.ground.physical.stomping_tantrum },
+        ]
+      },
+    ],
     gym: {
       leader: [
         {
@@ -1144,23 +1226,234 @@ var ROUTE_DATA = {
   'ciudad-azafran-gym': {
     bg: 'assets/bg/ciudad-azafran.png',
     combatBg: 'assets/bg/combate-interior.png',
-    wild: [],
     welcome: {
       title: 'Ciudad Azafrán',
-      subtitle: 'Gimnasio Pokemon de tipo',
+      subtitle: 'Gimnasio Pokemon de tipo Psiquico',
       img: 'assets/bg/ciudad-azafran.png',
     },
-    gymLeader: '',
-    gymType: '',
-    badgeId: '',
+    gymLeader: 'Sabrina',
+    gymType: 'psychic',
+    badgeId: 'marsh-badge',
     gymLeaderImg: 'assets/sprites/trainers/sabrina.png',
-    trainer: [],
     gym: {
-      leader: []
+      leader: [
+        {
+          name: POKEMON.kadabra, level: 50, moveId: MOVES.psychic.special.psychic,
+          overrides: { evs: { hp: 32, def: 32, spd: 32 } },
+        },
+        {
+          name: POKEMON.mr_mime, level: 48, moveId: MOVES.fairy.special.moonblast,
+          overrides: { evs: { hp: 32, def: 32, spd: 32 } },
+        },
+        {
+          name: POKEMON.venomoth, level: 49, moveId: MOVES.bug.special.signal_beam,
+          overrides: { evs: { hp: 32, def: 32, spd: 32 } },
+        },
+        {
+          name: POKEMON.alakazam, level: 52, moveId: [MOVES.psychic.special.confusion, MOVES.ghost.special.shadow_ball],
+          heldItem: ITEM.safety_goggles,
+          overrides: { evs: { hp: 32, def: 32, spd: 32 } },
+        },
+      ]
     },
     paths: [
       [{ type: PATH_TYPE.Lider }],
     ],
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Gimnasio Blaine (Isla Canela)
+  // ═══════════════════════════════════════════════════════════════════════
+
+  'ruta-20': {
+    bg: 'assets/bg/ruta-20.png',
+    combatBg: 'assets/bg/combate-agua.png',
+    wild: [
+      { name: POKEMON.slowbro, rate: 10, minLv: 42, maxLv: 47, moveId: MOVES.water.special.scald },
+      { name: POKEMON.tentacool, rate: 10, minLv: 42, maxLv: 47, moveId: MOVES.poison.special.sludge_wave },
+      { name: POKEMON.horsea, rate: 10, minLv: 42, maxLv: 47, moveId: MOVES.water.special.surf },
+      { name: POKEMON.psyduck, rate: 10, minLv: 42, maxLv: 47, moveId: MOVES.psychic.special.confusion },
+      { name: POKEMON.staryu, rate: 10, minLv: 42, maxLv: 47, moveId: MOVES.water.special.hydro_pump },
+      { name: POKEMON.seel, rate: 10, minLv: 42, maxLv: 47, moveId: MOVES.water.special.surf },
+      { name: POKEMON.shellder, rate: 10, minLv: 42, maxLv: 47, moveId: MOVES.ice.special.ice_beam },
+      { name: POKEMON.kabuto, rate: 10, minLv: 42, maxLv: 47, moveId: MOVES.water.physical.crabhammer },
+      { name: POKEMON.omanyte, rate: 10, minLv: 42, maxLv: 47, moveId: MOVES.rock.physical.stone_edge },
+      { name: POKEMON.aerodactyl, rate: 10, minLv: 42, maxLv: 47, moveId: [MOVES.rock.physical.stone_edge, MOVES.flying.physical.brave_bird] },
+    ],
+    trainer: [
+      {
+        name: `${ENTRENADORES.Nadador.name}`, img: ENTRENADORES.Nadador.img, rate: 50, pokemon: [
+          { name: POKEMON.krabby, level: 46, moveId: MOVES.water.physical.crabhammer },
+          { name: POKEMON.cloyster, level: 47, moveId: MOVES.ice.special.ice_beam },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Nadador.name}`, img: ENTRENADORES.Nadador.img, rate: 50, pokemon: [
+          { name: POKEMON.krabby, level: 43, moveId: MOVES.water.physical.crabhammer },
+          { name: POKEMON.kingler, level: 48, moveId: MOVES.water.physical.crabhammer },
+        ]
+      },
+    ],
+    pathLength: 5
+  },
+
+  'mansion-pokemon': {
+    bg: 'assets/bg/mansion-pokemon.png',
+    combatBg: 'assets/bg/combate-interior.png',
+    wild: [
+      { name: POKEMON.growlithe, rate: 15, minLv: 45, maxLv: 50, moveId: MOVES.fire.physical.flame_wheel },
+      { name: POKEMON.vulpix, rate: 15, minLv: 45, maxLv: 50, moveId: MOVES.fire.special.flamethrower },
+      { name: POKEMON.ponyta, rate: 15, minLv: 45, maxLv: 50, moveId: MOVES.fire.physical.fire_fang },
+      { name: POKEMON.grimer, rate: 15, minLv: 45, maxLv: 50, moveId: MOVES.poison.special.sludge_bomb },
+      { name: POKEMON.koffing, rate: 15, minLv: 45, maxLv: 50, moveId: MOVES.poison.special.sludge_bomb },
+      { name: POKEMON.ditto, rate: 15, minLv: 45, maxLv: 50, moveId: MOVES.normal.special.boomburst },
+      { name: POKEMON.doduo, rate: 10, minLv: 45, maxLv: 50, moveId: MOVES.flying.physical.wing_attack },
+    ],
+    trainer: [
+      {
+        name: ENTRENADORES.Ladron.name, img: ENTRENADORES.Ladron.img, rate: 50, pokemon: [
+          { name: POKEMON.growlithe, level: 50, moveId: MOVES.fire.physical.flame_wheel },
+          { name: POKEMON.vulpix, level: 47, moveId: MOVES.fire.special.fire_blast },
+        ]
+      },
+      {
+        name: ENTRENADORES.Ladron.name, img: ENTRENADORES.Ladron.img, rate: 50, pokemon: [
+          { name: POKEMON.rapidash, level: 52, moveId: MOVES.fire.physical.flare_blitz },
+        ]
+      },
+    ]
+  },
+
+  'isla-canela-gym': {
+    bg: 'assets/bg/isla-canela.png',
+    combatBg: 'assets/bg/combate-interior.png',
+    welcome: {
+      title: 'Isla Canela',
+      subtitle: 'Gimnasio Pokemon de tipo Fuego',
+      img: 'assets/bg/isla-canela.png',
+    },
+    gymLeader: 'Blaine',
+    gymType: 'fire',
+    badgeId: 'volcano-badge',
+    gymLeaderImg: 'assets/sprites/trainers/blaine.png',
+    rewardExtras: [ITEM.choice_band],
+    gym: {
+      leader: [
+        {
+          name: POKEMON.growlithe, level: 52, moveId: MOVES.fire.physical.flame_wheel,
+          overrides: { evs: { hp: 32, def: 32, spd: 32 } },
+        },
+        {
+          name: POKEMON.ponyta, level: 52, moveId: MOVES.fire.physical.flame_wheel,
+          overrides: { evs: { hp: 32, def: 32, spd: 32 } },
+        },
+        {
+          name: POKEMON.rapidash, level: 55, moveId: [MOVES.fire.physical.flame_wheel, MOVES.dragon.physical.dragon_tail],
+          overrides: { evs: { hp: 32, def: 32, spd: 32 } },
+        },
+        {
+          name: POKEMON.arcanine, level: 57, moveId: [MOVES.fire.physical.flare_blitz, MOVES.normal.physical.extreme_speed],
+          heldItem: ITEM.carbon,
+          overrides: { evs: { hp: 32, def: 32, spd: 32 } },
+        },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Lider }],
+    ],
+  },
+
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Gimasio Giovanni (Ciudad Verde)
+  // ═══════════════════════════════════════════════════════════════════════
+
+  'ciudad-verde-info-2': {
+    type: 'information',
+    bg: 'assets/bg/ciudad-verde.png',
+    title: 'Ciudad Verde',
+    description: 'Te acercas al último gimnasio de la región.',
+  },
+
+  'ciudad-verde-gym': {
+    bg: 'assets/bg/ciudad-verde.png',
+    combatBg: 'assets/bg/combate-interior.png',
+    welcome: {
+      title: 'Isla Canela',
+      subtitle: 'Gimnasio Pokemon de tipo Tierra',
+      img: 'assets/bg/ciudad-verde.png',
+    },
+    gymLeader: 'Giovanni',
+    gymType: 'ground',
+    badgeId: 'earth-badge',
+    gymLeaderImg: 'assets/sprites/trainers/giovanni.png',
+    rewardExtras: [ITEM.choice_band],
+    gym: {
+      leader: [
+        {
+          name: POKEMON.rhyhorn, level: 57, moveId: MOVES.rock.physical.stone_edge,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
+        },
+        {
+          name: POKEMON.dugtrio, level: 55, moveId: MOVES.ground.physical.earthquake,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
+        },
+        {
+          name: POKEMON.nidoking, level: 57, moveId: MOVES.poison.physical.poison_jab,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
+        },
+        {
+          name: POKEMON.nidoqueen, level: 57, moveId: MOVES.poison.physical.gunk_shot,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
+        },
+        {
+          name: POKEMON.kangaskhan, level: 60, moveId: MOVES.normal.physical.extreme_speed,
+          heldItem: ITEM.lifeorb,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
+        },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Lider }],
+    ],
+  },
+
+  'mensaje-medallas': {
+    type: 'information',
+    bg: 'assets/bg/kanto-league.png',
+    title: 'ENHORABUENA',
+    description: 'Has conseguido todas las medallas de Kanto.<br>El alto mando te espera.',
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Calle Victoria
+  // ═══════════════════════════════════════════════════════════════════════
+
+  'calle-victoria': {
+    bg: 'assets/bg/calle-victoria.png',
+    combatBg: 'assets/bg/combate-cueva.png',
+    rewardExtras: [ITEM.assault_vest],
+    wild: [
+      { name: POKEMON.moltres, rate: 25, minLv: 60, maxLv: 65, moveId: MOVES.fire.special.fire_blast },
+      { name: POKEMON.articuno, rate: 25, minLv: 60, maxLv: 65, moveId: MOVES.ice.special.blizzard },
+      { name: POKEMON.zapdos, rate: 25, minLv: 60, maxLv: 65, moveId: MOVES.electric.physical.wild_charge },
+      { name: POKEMON.dratini, rate: 25, minLv: 60, maxLv: 65, moveId: MOVES.dragon.physical.dragon_claw },
+    ],
+    trainer: [],
+    paths: [
+      [{ type: PATH_TYPE.Wild }],
+    ],
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Alto Mando
+  // ═══════════════════════════════════════════════════════════════════════
+
+  'alto-mando-info': {
+    type: 'information',
+    bg: 'assets/bg/kanto-league.png',
+    title: 'ALTO MANDO',
+    description: 'El alto mando esta cerrado por ahora, pronto podrás entrar.',
   },
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -1302,7 +1595,7 @@ var ROUTE_DATA = {
         { name: POKEMON.pikachu, minLv: 38, maxLv: 43, moveId: MOVES.electric.special.thunder },
         { name: POKEMON.chansey, minLv: 38, maxLv: 43, moveId: MOVES.normal.special.hyper_voice },
         { name: POKEMON.charizard, minLv: 38, maxLv: 43, moveId: MOVES.fire.special.fire_blast },
-        { name: POKEMON.gengar, minLv: 40, maxLv: 45, moveId: MOVES.ghost.special.astral_barrage, heldItem: ITEM.safety_goggles },
+        { name: POKEMON.gengar, minLv: 40, maxLv: 45, moveId: [MOVES.ghost.special.astral_barrage, MOVES.dark.physical.crunch], heldItem: ITEM.safety_goggles },
       ]
     },
     paths: [
@@ -1315,15 +1608,65 @@ var ROUTE_DATA = {
     combatBg: 'assets/bg/combate-interior.png',
     title: 'Silph S.A.',
     wild: [],
-    trainer: [],
-    rewardPokemon: [],
-    rewardExtras: [],
+    rewardPokemon: [POKEMON.lapras],
+    rewardExtras: [ITEM.choice_specs],
+    trainer: [
+      {
+        name: `${ENTRENADORES.Rocket.name}`, img: ENTRENADORES.Rocket.img, rate: 20, pokemon: [
+          { name: POKEMON.voltorb, minLv: 35, maxLv: 40, moveId: MOVES.electric.special.thunder },
+          { name: POKEMON.electrode, minLv: 35, maxLv: 40, moveId: MOVES.normal.special.hyper_voice },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Rocket.name}`, img: ENTRENADORES.Rocket.img, rate: 20, pokemon: [
+          { name: POKEMON.sandslash, minLv: 35, maxLv: 40, moveId: MOVES.ground.physical.earthquake },
+          { name: POKEMON.sandshrew, minLv: 35, maxLv: 40, moveId: MOVES.normal.physical.extreme_speed },
+          { name: POKEMON.ekans, minLv: 35, maxLv: 40, moveId: MOVES.poison.physical.gunk_shot },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Rocket.name}`, img: ENTRENADORES.Rocket.img, rate: 20, pokemon: [
+          { name: POKEMON.grimer, minLv: 35, maxLv: 40, moveId: MOVES.poison.special.sludge_bomb },
+          { name: POKEMON.muk, minLv: 35, maxLv: 40, moveId: MOVES.poison.special.sludge_wave },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Rocket.name}`, img: ENTRENADORES.Rocket.img, rate: 20, pokemon: [
+          { name: POKEMON.grimer, minLv: 35, maxLv: 40, moveId: MOVES.poison.special.sludge_bomb },
+          { name: POKEMON.koffing, minLv: 35, maxLv: 40, moveId: MOVES.poison.special.sludge_wave },
+          { name: POKEMON.koffing, minLv: 35, maxLv: 40, moveId: MOVES.dark.special.dark_pulse },
+        ]
+      },
+      {
+        name: `${ENTRENADORES.Rocket.name}`, img: ENTRENADORES.Rocket.img, rate: 20, pokemon: [
+          { name: POKEMON.magnemite, minLv: 35, maxLv: 40, moveId: MOVES.electric.physical.thunder_punch },
+          { name: POKEMON.magneton, minLv: 35, maxLv: 40, moveId: MOVES.electric.special.thunderbolt },
+        ]
+      }
+    ],
     specialTrainer: {
-      name: '',
-      img: ENTRENADORES.ChicoGuay.img,
-      pokemon: []
+      name: 'Jefe Giovanni', img: ENTRENADORES.Giovanni.img, pokemon: [
+        {
+          name: POKEMON.nidorino, level: 37, moveId: MOVES.poison.physical.poison_jab,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
+        },
+        {
+          name: POKEMON.rhyhorn, level: 43, moveId: MOVES.ground.physical.earthquake,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
+        },
+        {
+          name: POKEMON.nidoqueen, level: 45, moveId: MOVES.poison.physical.gunk_shot,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
+        },
+        {
+          name: POKEMON.kangaskhan, level: 48, moveId: MOVES.normal.physical.hyper_fang,
+          heldItem: ITEM.lifeorb,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
+        },
+      ]
     },
     paths: [
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Special }],
       [{ type: PATH_TYPE.Special }],
     ],
   },
@@ -1363,7 +1706,7 @@ var ROUTE_DATA = {
     description: '<div style="display:flex;justify-content:center"><img src="assets/sprites/others/montanero.gif"></div><br><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">El camino principal sigue al norte. Al este se oye algo en el bosque...</p>',
     optional: {
       btnName: 'Explorar el bosque',
-      area: 'route-22',
+      area: 'ruta-22',
     },
   },
 
@@ -1410,8 +1753,16 @@ var KANTO_ROUTES = [
   { name: 'Ruta 15', area: 'ruta-15' },
   { name: 'Ciudad Fucsia', area: 'ciudad-fucsia' },
   { name: 'Gimnasio de Ciudad Fucsia', area: 'ciudad-fucsia-gym' },
-  // { name: 'Ciudad Azafrán', area: 'info-ciudad-azafran' },
-  // { name: 'Gimnasio de Ciudad Azafrán', area: 'ciudad-azafran-gym' },
+  { name: 'Ciudad Azafrán', area: 'info-ciudad-azafran' },
+  { name: 'Gimnasio de Ciudad Azafrán', area: 'ciudad-azafran-gym' },
+  { name: 'Ruta 20', area: 'ruta-20' },
+  { name: 'Mansión Pokémon', area: 'mansion-pokemon' },
+  { name: 'Gimnasio de Isla Canela', area: 'isla-canela-gym' },
+  { name: 'Ciudad Verde', area: 'ciudad-verde-info-2' },
+  { name: 'Gimnasio de Ciudad Verde', area: 'ciudad-verde-gym' },
+  { name: '¡Enhorabuena!', area: 'mensaje-medallas' },
+  { name: 'Calle Victoria', area: 'calle-victoria' },
+  { name: 'ALTO MANDO', area: 'alto-mando-info' },
 
   //Extra
   { name: '???', area: 'espacio-raro' },

@@ -158,6 +158,18 @@ var MOVE_EFFECTS = {
 
   // ── AFTER_ATTACK — Cambios de estadísticas (propio) ───────────────────────
 
+  'raise-atk-5': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Sube el ATK propio un 5% del base',
+    fn(ctx) {
+      if (!ctx.user.combatMods) ctx.user.combatMods = {};
+      ctx.user.combatMods.atk = (ctx.user.combatMods.atk ?? 0) + 0.05;
+      const pct = Math.round(ctx.user.combatMods.atk * 100);
+      ctx.log(`El ATK de ${ctx.user.displayName} subio! (+${pct}% base)`);
+      if (ctx.showStatChange) ctx.showStatChange(ctx.user, 'ATK', 'up', 5);
+    },
+  },
+
   'raise-atk-20': {
     trigger: TRIGGERS.AFTER_ATTACK,
     desc: 'Sube el ATK propio un 20% del base',
@@ -374,7 +386,9 @@ var MOVE_EFFECTS = {
   'sleep-self': {
     trigger: TRIGGERS.BEFORE_ATTACK,
     desc: 'El usuario se duerme antes de atacar cada turno',
-    fn(ctx) { StatusEffects.apply(ctx.user, StatusEffect.SLEEP, ctx.log); },
+    fn(ctx) {
+      if (!ctx.user.statusEffect) StatusEffects.apply(ctx.user, StatusEffect.SLEEP, ctx.log);
+    },
   },
 
   // ── BEFORE_ATTACK — Pasivos ────────────────────────────────────────────────
@@ -443,7 +457,6 @@ var MOVE_EFFECTS = {
     fn(ctx) {
       const reduction = Math.floor(ctx.dmg * 0.10);
       ctx.dmg = Math.max(1, ctx.dmg - reduction);
-      ctx.user.currentHp = Math.max(0, ctx.user.currentHp + reduction);
       ctx.log(`${ctx.user.displayName} redujo el daño del golpe!`);
     },
   },
@@ -454,7 +467,6 @@ var MOVE_EFFECTS = {
     fn(ctx) {
       const reduction = Math.floor(ctx.dmg * 0.25);
       ctx.dmg = Math.max(1, ctx.dmg - reduction);
-      ctx.user.currentHp = Math.max(0, ctx.user.currentHp + reduction);
       ctx.log(`${ctx.user.displayName} redujo el daño del golpe!`);
     },
   },
@@ -465,7 +477,6 @@ var MOVE_EFFECTS = {
     fn(ctx) {
       const reduction = Math.floor(ctx.dmg * 0.50);
       ctx.dmg = Math.max(1, ctx.dmg - reduction);
-      ctx.user.currentHp = Math.max(0, ctx.user.currentHp + reduction);
       ctx.log(`${ctx.user.displayName} redujo el daño del golpe!`);
     },
   },

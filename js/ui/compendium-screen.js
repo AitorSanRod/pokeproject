@@ -85,6 +85,7 @@ const CompendiumScreen = {
           <!-- layout container: flex separado del scroll -->
           <div style="display:flex;flex-direction:column;gap:var(--sp-md);padding:var(--sp-md)">
             ${sec('guide',  'GUÍA',              CompendiumScreen._renderGuide())}
+            ${sec('stats',  'ESTADÍSTICAS',      CompendiumScreen._renderStatsList())}
             ${sec('status', 'EFECTOS DE ESTADO', CompendiumScreen._renderStatusList())}
             ${sec('types',  'TIPOS',             CompendiumScreen._renderTypeTest())}
             ${sec('moves',  'MOVIMIENTOS',        CompendiumScreen._renderMoveList())}
@@ -186,7 +187,7 @@ const CompendiumScreen = {
       sub('EVS (PUNTOS DE ESFUERZO)', '#c0392b', [
         'Los EVs son bonificaciones permanentes que aumentan las estadísticas de un pokemon.',
         'Se consiguen <strong>eligiendo el premio de vitamina</strong> al terminar una ruta.',
-        'Hay 6 estadísticas que pueden subir: HP, ATK, DEF, SPA (At. Esp.), SPD (Def. Esp.) y SPE (Velocidad).',
+        'Hay 6 estadísticas que pueden subir: HP, ATK, DEF, SPA (At. Esp.), SPD (Def. Esp.) y VEL (Velocidad).',
         'Máximo <strong>32 EVs por estadística</strong> y por cadena evolutiva.',
         'Los EVs se guardan por <strong>cadena evolutiva</strong>: si subes EVs a Bulbasaur, Ivysaur y Venusaur comparten esos EVs.',
         'Los EVs <strong>persisten entre partidas</strong> aunque pierdas o empieces de nuevo.',
@@ -211,6 +212,84 @@ const CompendiumScreen = {
       ]),
 
     ].join('');
+  },
+
+  // ── Sección de estadísticas ───────────────────────────────────────────────
+  _renderStatsList() {
+    const stats = [
+      {
+        label: 'HP', color: '#27AE60', bg: '#EAFAF1',
+        name: 'Puntos de Salud',
+        lines: [
+          'Vida total del pokemon.',
+          'Llega a <strong>0</strong> → el pokemon se debilita y no puede seguir combatiendo.',
+          'Se recupera al <strong>100%</strong> al terminar una ruta.',
+          'Sube permanentemente con <strong>EVs de HP</strong>.',
+        ],
+      },
+      {
+        label: 'ATK', color: '#E74C3C', bg: '#FDEDEC',
+        name: 'Ataque',
+        lines: [
+          'Potencia de los movimientos <strong>físicos</strong>.',
+          'Reducida un <strong>50%</strong> mientras el pokemon sufre <em>quemadura</em>.',
+          'Puede subir o bajar durante el combate por efectos de movimientos.',
+        ],
+      },
+      {
+        label: 'DEF', color: '#E67E22', bg: '#FEF9E7',
+        name: 'Defensa',
+        lines: [
+          'Reduce el daño recibido de movimientos <strong>físicos</strong>.',
+          'Puede subir o bajar durante el combate por efectos de movimientos.',
+        ],
+      },
+      {
+        label: 'SPA', color: '#8E44AD', bg: '#F5EEF8',
+        name: 'Ataque Especial',
+        lines: [
+          'Potencia de los movimientos <strong>especiales</strong>.',
+          'Reducida un <strong>50%</strong> mientras el pokemon está <em>congelado</em>.',
+          'Puede subir o bajar durante el combate por efectos de movimientos.',
+        ],
+      },
+      {
+        label: 'SPD', color: '#2980B9', bg: '#EBF5FB',
+        name: 'Defensa Especial',
+        lines: [
+          'Reduce el daño recibido de movimientos <strong>especiales</strong>.',
+          'Puede subir o bajar durante el combate por efectos de movimientos.',
+        ],
+      },
+      {
+        label: 'VEL', color: '#16A085', bg: '#E8F8F5',
+        name: 'Velocidad',
+        lines: [
+          'Determina el <strong>orden de turno</strong>: mayor VEL ataca primero.',
+          'Reducida un <strong>50%</strong> mientras el pokemon está <em>paralizado</em>.',
+          'Los movimientos con <em>prioridad</em> siempre actúan antes, independientemente de la VEL.',
+        ],
+      },
+    ];
+
+    return stats.map(s => `
+      <div style="border-radius:var(--radius-sm);border:1px solid ${s.color};
+        background:${s.bg};padding:10px 12px;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span style="font-family:var(--font-pixel);font-size:8px;color:${s.color};
+            background:white;border:1px solid ${s.color};padding:2px 7px;border-radius:3px;flex-shrink:0">
+            ${s.label}
+          </span>
+          <span style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark)">${s.name}</span>
+        </div>
+        <ul style="margin:0;padding-left:14px">
+          ${s.lines.map(l =>
+            `<li style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-dark);
+              line-height:2.2;margin-bottom:1px">${l}</li>`
+          ).join('')}
+        </ul>
+      </div>`
+    ).join('');
   },
 
   // ── Lista de efectos de estado ────────────────────────────────────────────

@@ -54,8 +54,8 @@ var MOVE_POOL = {
       { stage: 3, id: 'hyper-fang', name: 'Hiper Colmillo', power: 90, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'shield-10' },
       { stage: 1, mt: true, id: 'take-down', name: 'Derribo', power: 60, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'guts', effectData: { dmgMult: 2.5 } },
       { id: 'self-destruct', name: 'Autodestruccion', power: 800, pp: 5, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'self-destruct', boss: true },
-      { id: 'false-swipe', name: 'Sonambulo', power: 30, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['recoil-10', 'shield-25', 'sleep-self', 'sleep-attack'], boss: true },
-      { stage: 1, id: 'natural-gift', name: 'Don Natural', power: 40, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['raise-don-natural'], pokemon: ['eevee'] },
+      { id: 'false-swipe', name: 'Sonambulo', power: 30, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['recoil-10', 'shield-25', 'sleep-self', 'sleep-attack', 'raise-atk-5'], boss: true },
+      { stage: 1, id: 'natural-gift', name: 'Don Natural', power: 15, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['raise-don-natural'], pokemon: ['eevee'] },
     ],
     special: [
       { stage: 1, id: 'swift', name: 'Velocidad', power: 40, pp: 20, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: 'shield-10' },
@@ -100,7 +100,7 @@ var MOVE_POOL = {
       { stage: 1, id: 'absorb', name: 'Absorber', power: 40, pp: 25, type: T.GRASS, damageClass: DC.SPECIAL, effectId: 'drain-10' },
       { stage: 2, id: 'magical-leaf', name: 'Hoja Magica', power: 60, pp: 99, type: T.GRASS, damageClass: DC.SPECIAL, effectId: 'sleep-15' },
       { stage: 3, id: 'solar-beam', name: 'Rayo Solar', power: 90, pp: 99, type: T.GRASS, damageClass: DC.SPECIAL },
-      { stage: 4, mt: true, id: 'giga-drain', name: 'Gigadrenado', power: 60, pp: 99, type: T.GRASS, damageClass: DC.SPECIAL, effectId: 'drain-50' },
+      { stage: 4, mt: true, id: 'giga-drain', name: 'Gigadrenado', power: 50, pp: 99, type: T.GRASS, damageClass: DC.SPECIAL, effectId: 'drain-25' },
     ],
   },
   electric: {
@@ -241,7 +241,7 @@ var MOVE_POOL = {
   },
   dark: {
     physical: [
-      { stage: 1, id: 'bite', name: 'Mordisco', power: 60, pp: 25, type: T.DARK, damageClass: DC.PHYSICAL },
+      { stage: 1, id: 'bite', name: 'Mordisco', power: 50, pp: 25, type: T.DARK, damageClass: DC.PHYSICAL, effectId: 'flinch-20' },
       { stage: 2, id: 'crunch', name: 'Triturar', power: 80, pp: 15, type: T.DARK, damageClass: DC.PHYSICAL },
       { stage: 3, id: 'wicked-blow', name: 'Golpe Perverso', power: 90, pp: 5, type: T.DARK, damageClass: DC.PHYSICAL },
     ],

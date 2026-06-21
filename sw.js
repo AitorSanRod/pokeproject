@@ -25,9 +25,10 @@ self.addEventListener('fetch', event => {
   // Recursos externos (PokeAPI, Google Fonts) — comportamiento normal del navegador
   if (url.origin !== location.origin) return;
 
-  // CSS — network-first: siempre descarga la última versión; caché como fallback.
-  // Esto garantiza que los cambios de estilos llegan sin necesidad de bumpar versión.
-  if (url.pathname.endsWith('.css')) {
+  // HTML y CSS — network-first: siempre descarga la última versión; caché como fallback.
+  // Esto garantiza que los cambios de rutas de archivos (index.html) y estilos llegan
+  // sin necesidad de bumpar versión, evitando pantallas en blanco tras reorganizaciones.
+  if (url.pathname.endsWith('.html') || url.pathname === '/' || url.pathname.endsWith('.css')) {
     event.respondWith(
       fetch(event.request)
         .then(response => {

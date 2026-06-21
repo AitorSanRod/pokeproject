@@ -130,7 +130,7 @@ var POKEMON_DB = {
   rapidash:   { stage: 2, types: ['fire'], damageClass: 'physical', moveLines: [{ type: 'fire', damageClass: 'physical' }] },
 
   // ── Water / Psychic ───────────────────────────────────────────────────────
-  slowpoke:   { stage: 1, types: ['water', 'psychic'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }], evolvesAt: 37, evolvesInto: 'slowbro' },
+  slowpoke:   { stage: 1, types: ['water', 'psychic'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }], evolvesAt: 40, evolvesInto: 'slowbro' },
   slowbro:    { stage: 3, types: ['water', 'psychic'], damageClass: 'special', moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }] },
 
   // ── Electric / Steel ──────────────────────────────────────────────────────

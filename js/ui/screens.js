@@ -1754,7 +1754,10 @@ const Screens = {
       PokedexScreen.show(() => {
         Screens._renderCombatScreen();
         GameState.paused = false;
-        Screens._combatStartTurn();
+        const ctx = GameState.combat;
+        if (!ctx._turnRunning && !ctx._ending) {
+          Screens._combatStartTurn();
+        }
       });
     });
 
@@ -1763,7 +1766,10 @@ const Screens = {
       CompendiumScreen.show(() => {
         Screens._renderCombatScreen();
         GameState.paused = false;
-        Screens._combatStartTurn();
+        const ctx = GameState.combat;
+        if (!ctx._turnRunning && !ctx._ending) {
+          Screens._combatStartTurn();
+        }
       });
     });
 
