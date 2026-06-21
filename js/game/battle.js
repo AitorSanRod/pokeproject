@@ -74,10 +74,12 @@ function calcDamage(attacker, defender, move) {
     }
   }
 
-  // ── Guts — +120% daño físico cuando el atacante lleva este efecto pasivo
+  // ── Guts — daño físico bonus cuando el atacante lleva este efecto pasivo
   if (!isSpecial && hasGutsEffect(attacker)) {
-    dmg = Math.floor(dmg * 2.2);
-    modifiers.push({ label: `Agallas (${attacker.displayName}) +120%`, mult: 2.2 });
+    const activeMove = attacker.moves.find(m => m.id === attacker.autoMove);
+    const gutsMult = activeMove?.effectData?.dmgMult ?? 2.2;
+    dmg = Math.floor(dmg * gutsMult);
+    modifiers.push({ label: `Agallas (${attacker.displayName}) +${Math.round((gutsMult - 1) * 100)}%`, mult: gutsMult });
   }
 
   const isCrit = Math.random() < COMBAT_CONFIG.CRIT_CHANCE;

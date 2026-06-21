@@ -21,7 +21,7 @@ const MT_SPRITES = {
   dark: 'assets/sprites/mts/tm-dark.png',
   steel: 'assets/sprites/mts/tm-steel.png',
   fairy: 'assets/sprites/mts/tm-fairy.png',
-}
+};
 
 var TM_LIST = {
   // ═══════════════════════════════════════════════════════════════════════
@@ -47,6 +47,16 @@ var TM_LIST = {
     sprite: MT_SPRITES.water,
     fallbackIcon: '💧',
   },
+  'tm-surf': {
+    id: 'tm-surf',
+    name: 'MT Surf',
+    moveId: 'surf',
+    types: [],
+    pokemons: [POKEMON.pikachu, POKEMON.rhydon, POKEMON.rhyhorn],
+    desc: 'Enseña Surf.',
+    sprite: MT_SPRITES.water,
+    fallbackIcon: '💧',
+  },
   // ═══════════════════════════════════════════════════════════════════════
   // ELECTRIC
   // ═══════════════════════════════════════════════════════════════════════
@@ -55,7 +65,7 @@ var TM_LIST = {
     name: 'MT Rayo',
     moveId: 'thunderbolt',
     types: ['electric'],
-    pokemons: ['rhydon'],
+    pokemons: [POKEMON.rhydon],
     desc: 'Enseña Rayo.',
     sprite: MT_SPRITES.electric,
     fallbackIcon: '⚡',
@@ -68,7 +78,7 @@ var TM_LIST = {
     name: 'MT Viento Hielo',
     moveId: 'icy-wind',
     types: ['ice', 'water'],
-    pokemons: ['abra', 'kadabra', 'alakazam', 'gastly', 'haunter', 'gengar'],
+    pokemons: [POKEMON.abra, POKEMON.kadabra, POKEMON.alakazam, POKEMON.gastly, POKEMON.haunter, POKEMON.gengar],
     desc: 'Enseña Viento Hielo.',
     sprite: MT_SPRITES.ice,
     fallbackIcon: '❄️',
@@ -81,7 +91,7 @@ var TM_LIST = {
     name: 'MT Pataleta',
     moveId: 'stomping-tantrum',
     types: ['ground', 'rock'],
-    pokemons: ['charmander', 'charmeleon', 'charizard'],
+    pokemons: [POKEMON.charmander, POKEMON.charmeleon, POKEMON.charizard],
     desc: 'Enseña Pataleta.',
     sprite: MT_SPRITES.ground,
     fallbackIcon: '🌍',
@@ -107,7 +117,7 @@ var TM_LIST = {
     name: 'MT Garra Metal',
     moveId: 'metal-claw',
     types: [],
-    pokemons: ['charmander', 'charmeleon', 'charizard'],
+    pokemons: [POKEMON.charmander, POKEMON.charmeleon, POKEMON.charizard],
     desc: 'Enseña Garra Metal',
     sprite: MT_SPRITES.steel,
     fallbackIcon: '',
@@ -120,23 +130,23 @@ var TM_LIST = {
     name: 'MT Derribo',
     moveId: 'take-down',
     types: ['fighting'],
-    pokemons: ['kangaskhan', 'marowak', 'scyther', 'snorlax', 'dragonite'],
+    pokemons: [POKEMON.kangaskhan, POKEMON.marowak, POKEMON.scyther, POKEMON.snorlax, POKEMON.dragonite],
     desc: 'Enseña Derribo',
     sprite: MT_SPRITES.normal,
     fallbackIcon: '',
-    // ═══════════════════════════════════════════════════════════════════════
-    // DARK
-    // ═══════════════════════════════════════════════════════════════════════
-    'tm-crunch': {
-      id: 'tm-crunch',
-      name: 'MT Triturar',
-      moveId: 'crunch',
-      types: ['dark'],
-      pokemons: ['kangaskhan','snorlax', 'gyarados', 'pinsir'],
-      desc: 'Enseña Triturar',
-      sprite: MT_SPRITES.dark,
-      fallbackIcon: '',
-    }
+  },
+  // ═══════════════════════════════════════════════════════════════════════
+  // DARK
+  // ═══════════════════════════════════════════════════════════════════════
+  'tm-crunch': {
+    id: 'tm-crunch',
+    name: 'MT Triturar',
+    moveId: 'crunch',
+    types: ['dark'],
+    pokemons: [POKEMON.kangaskhan, POKEMON.snorlax, POKEMON.gyarados, POKEMON.pinsir],
+    desc: 'Enseña Triturar',
+    sprite: MT_SPRITES.dark,
+    fallbackIcon: '',
   },
 };
 
@@ -144,6 +154,8 @@ var TM_LIST = {
 function canLearnTM(pokemon, tmId) {
   const tm = TM_LIST[tmId];
   if (!tm) return false;
+  const move = MOVE_BY_ID[tm.moveId];
+  if (move?.pokemon?.length > 0 && !move.pokemon.includes(pokemon.name)) return false;
   const pTypes = pokemon.types ?? POKEMON_DB[pokemon.name]?.types ?? [];
   return tm.types.some(t => pTypes.includes(t)) || tm.pokemons.includes(pokemon.name);
 }

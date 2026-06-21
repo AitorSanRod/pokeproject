@@ -1,18 +1,11 @@
 const NOTES_DATA = {
-  "title": "Bienvenido Moraleda Variocolor",
+  "title": "Mewtwo ya no es el final",
   "lines": [
-    "La pokedex ahora guarda la posición del scroll, no vuelve arriba cada vez que miras un pokémon.",
-    "Tabla de tipos debilidades dinámica en la pokédex.",
-    "Por razones operativas y que no haga falta avisar en cada arreglo menor, subo a la 0.1.0",
-    "Guía incluida en el compendio.",
-    "Mas balance de experiencia",
-    "Nuevas MTs",
-    "Nuevas rutas y gimnasios",
-    "La Zona Safari se ha vuelto rarilla.",
-    "Nuevos entrenadores misteriosos",
-    "Mejora en las medallas de la pokedex",
-    "Ahora se marcan en la pokedex aquellas capturas de pokemon shiny. Tambien podras ver el sprite del pokemon shiny.",
-    "Los iniciales ahora también pueden ser shiny.",
-    "Hay un muchachito nuevo en la Torre Pokémon.",
+    "Lo pokémon rivales ahora pueden usar distintos ataques",
+    "Compendio y Pokédex actualizados",
+    "Nuevas rutas.",
+    "Nuevos combates.",
+    "Nuevo modo de juego.",
+    "Nuevos movimientos e items.",
   ]
 };

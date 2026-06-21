@@ -29,18 +29,18 @@ var TRIGGERS = Object.freeze({
 
 var MOVE_EFFECTS = {
 
-  // ── AFTER_ATTACK ──────────────────────────────────────────────────────────
+  // ── AFTER_ATTACK — Absorción ───────────────────────────────────────────────
 
-  'drain-50': {
+  'drain-10': {
     trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Recupera el 50% del daño causado',
+    desc: 'Recupera el 10% del daño causado',
     fn(ctx) {
-      const heal = Math.max(1, Math.floor(ctx.dmg * 0.50));
+      const heal = Math.max(1, Math.floor(ctx.dmg * 0.10));
       const before = ctx.user.currentHp;
       ctx.user.currentHp = Math.min(ctx.user.stats.hp, ctx.user.currentHp + heal);
       const actual = ctx.user.currentHp - before;
       if (actual > 0) {
-        ctx.log(`${ctx.user.displayName} absorbio ${actual} HP!`);
+        ctx.log(`${ctx.user.displayName} absorbió ${actual} HP!`);
         if (ctx.updatePlayerHud) ctx.updatePlayerHud();
       }
     },
@@ -61,11 +61,11 @@ var MOVE_EFFECTS = {
     },
   },
 
-  'drain-10': {
+  'drain-50': {
     trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Recupera el 10% del daño causado',
+    desc: 'Recupera el 50% del daño causado',
     fn(ctx) {
-      const heal = Math.max(1, Math.floor(ctx.dmg * 0.10));
+      const heal = Math.max(1, Math.floor(ctx.dmg * 0.50));
       const before = ctx.user.currentHp;
       ctx.user.currentHp = Math.min(ctx.user.stats.hp, ctx.user.currentHp + heal);
       const actual = ctx.user.currentHp - before;
@@ -75,6 +75,8 @@ var MOVE_EFFECTS = {
       }
     },
   },
+
+  // ── AFTER_ATTACK — Cambios de estadísticas (rival) ────────────────────────
 
   'lower-atk-10': {
     trigger: TRIGGERS.AFTER_ATTACK,
@@ -122,22 +124,10 @@ var MOVE_EFFECTS = {
     },
   },
 
-  'lower-self-def-spd-50': {
-    trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Baja la DEF y SPD del usuario un 50% en cada ataque.',
-    fn(ctx) {
-      if (!ctx.user.combatMods) ctx.user.combatMods = {};
-      ctx.user.combatMods.def = (ctx.user.combatMods.def ?? 0) - 0.50;
-      ctx.user.combatMods.spd = (ctx.user.combatMods.spd ?? 0) - 0.50;
-      ctx.log(`La DEF y SPD de ${ctx.user.displayName} bajaron!`);
-      if (ctx.showStatChange) ctx.showStatChange(ctx.user, 'DEF/SPD', 'down', 50);
-    },
-  },
-
   'lower-spd-20-10': {
     trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Puede bajar la SPD del rival un 20%',
     statusChance: 0.10,
+    desc: 'Puede bajar la SPD del rival un 20%',
     fn(ctx) {
       if (hasClearEffect(ctx.target)) {
         ctx.log(`${ctx.target.displayName} esta protegido y no puede ser debilitado!`);
@@ -152,8 +142,8 @@ var MOVE_EFFECTS = {
 
   'lower-spd-20-20': {
     trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Puede bajar la SPD del rival un 20%',
     statusChance: 0.20,
+    desc: 'Puede bajar la SPD del rival un 20%',
     fn(ctx) {
       if (hasClearEffect(ctx.target)) {
         ctx.log(`${ctx.target.displayName} esta protegido y no puede ser debilitado!`);
@@ -166,18 +156,7 @@ var MOVE_EFFECTS = {
     },
   },
 
-  'raise-spa-10': {
-    trigger: TRIGGERS.AFTER_ATTACK,
-    statusChance: 0.10,
-    desc: 'Sube el SPA propio un 10% del base',
-    fn(ctx) {
-      if (!ctx.user.combatMods) ctx.user.combatMods = {};
-      ctx.user.combatMods.spa = (ctx.user.combatMods.spa ?? 0) + 0.10;
-      const pct = Math.round(ctx.user.combatMods.spa * 100);
-      ctx.log(`El SPA de ${ctx.user.displayName} subio! (+${pct}% base)`);
-      if (ctx.showStatChange) ctx.showStatChange(ctx.user, 'SPA', 'up', 10);
-    },
-  },
+  // ── AFTER_ATTACK — Cambios de estadísticas (propio) ───────────────────────
 
   'raise-atk-20': {
     trigger: TRIGGERS.AFTER_ATTACK,
@@ -203,195 +182,213 @@ var MOVE_EFFECTS = {
     },
   },
 
+  'raise-spa-10': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    statusChance: 0.10,
+    desc: 'Sube el SPA propio un 10% del base',
+    fn(ctx) {
+      if (!ctx.user.combatMods) ctx.user.combatMods = {};
+      ctx.user.combatMods.spa = (ctx.user.combatMods.spa ?? 0) + 0.10;
+      const pct = Math.round(ctx.user.combatMods.spa * 100);
+      ctx.log(`El SPA de ${ctx.user.displayName} subio! (+${pct}% base)`);
+      if (ctx.showStatChange) ctx.showStatChange(ctx.user, 'SPA', 'up', 10);
+    },
+  },
+
+  'raise-don-natural': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Sube todas las estadísticas un 100% tras cada ataque',
+    fn(ctx) {
+      if (!ctx.user.combatMods) ctx.user.combatMods = {};
+      ctx.user.combatMods.atk = (ctx.user.combatMods.atk ?? 0) + 1.0;
+      ctx.user.combatMods.def = (ctx.user.combatMods.def ?? 0) + 1.0;
+      ctx.user.combatMods.spa = (ctx.user.combatMods.spa ?? 0) + 1.0;
+      ctx.user.combatMods.spd = (ctx.user.combatMods.spd ?? 0) + 1.0;
+      ctx.user.combatMods.spe = (ctx.user.combatMods.spe ?? 0) + 1.0;
+      ctx.log(`¡Todas las estadísticas de ${ctx.user.displayName} subieron!`);
+      if (ctx.showStatChange) ctx.showStatChange(ctx.user, 'ALL', 'up', 100);
+    },
+  },
+
+  'lower-self-def-spd-50': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Baja la DEF y SPD del usuario un 50% en cada ataque.',
+    fn(ctx) {
+      if (!ctx.user.combatMods) ctx.user.combatMods = {};
+      ctx.user.combatMods.def = (ctx.user.combatMods.def ?? 0) - 0.50;
+      ctx.user.combatMods.spd = (ctx.user.combatMods.spd ?? 0) - 0.50;
+      ctx.log(`La DEF y SPD de ${ctx.user.displayName} bajaron!`);
+      if (ctx.showStatChange) ctx.showStatChange(ctx.user, 'DEF/SPD', 'down', 50);
+    },
+  },
+
+  // ── AFTER_ATTACK — Estados alterados ──────────────────────────────────────
+
   'burn-10': {
     trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Tiene un 10% de probabilidad de quemar al rival',
     statusChance: 0.10,
-    fn(ctx) {
-      StatusEffects.apply(ctx.target, 'burn', ctx.log);
-    },
+    desc: 'Tiene un 10% de probabilidad de quemar al rival',
+    fn(ctx) { StatusEffects.apply(ctx.target, StatusEffect.BURN, ctx.log); },
   },
 
   'burn-20': {
     trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Tiene un 20% de probabilidad de quemar al rival',
     statusChance: 0.20,
-    fn(ctx) {
-      StatusEffects.apply(ctx.target, 'burn', ctx.log);
-    },
+    desc: 'Tiene un 20% de probabilidad de quemar al rival',
+    fn(ctx) { StatusEffects.apply(ctx.target, StatusEffect.BURN, ctx.log); },
   },
 
   'burn-25': {
     trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Tiene un 25% de probabilidad de quemar al rival',
     statusChance: 0.25,
-    fn(ctx) {
-      StatusEffects.apply(ctx.target, 'burn', ctx.log);
-    },
+    desc: 'Tiene un 25% de probabilidad de quemar al rival',
+    fn(ctx) { StatusEffects.apply(ctx.target, StatusEffect.BURN, ctx.log); },
   },
 
   'poison-25': {
     trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Tiene un 25% de probabilidad de envenenar al rival',
     statusChance: 0.25,
-    fn(ctx) {
-      StatusEffects.apply(ctx.target, 'poison', ctx.log);
-    },
+    desc: 'Tiene un 25% de probabilidad de envenenar al rival',
+    fn(ctx) { StatusEffects.apply(ctx.target, StatusEffect.POISON, ctx.log); },
   },
 
   'poison-50': {
     trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Tiene un 50% de probabilidad de envenenar al rival',
     statusChance: 0.50,
-    fn(ctx) {
-      StatusEffects.apply(ctx.target, 'poison', ctx.log);
-    },
+    desc: 'Tiene un 50% de probabilidad de envenenar al rival',
+    fn(ctx) { StatusEffects.apply(ctx.target, StatusEffect.POISON, ctx.log); },
   },
 
   'sleep-after': {
     trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Duerme al rival tras el ataque',
     statusChance: 1.00,
-    fn(ctx) {
-      StatusEffects.apply(ctx.target, 'sleep', ctx.log);
-    },
+    desc: 'Duerme al rival tras el ataque',
+    fn(ctx) { StatusEffects.apply(ctx.target, StatusEffect.SLEEP, ctx.log); },
   },
 
   'sleep-10': {
     trigger: TRIGGERS.AFTER_ATTACK,
+    statusChance: 0.10,
     desc: 'Tiene un 10% de probabilidad de hacer dormir al rival',
-    statusChance: 0.10,
-    fn(ctx) {
-      StatusEffects.apply(ctx.target, 'sleep', ctx.log);
-    },
-  },
-
-  'paralize-10': {
-    trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Tiene un 10% de probabilidad de paralizar al rival',
-    statusChance: 0.10,
-    fn(ctx) {
-      StatusEffects.apply(ctx.target, 'paralysis', ctx.log);
-    },
-  },
-
-  'paralize-25': {
-    trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Tiene un 25% de probabilidad de paralizar al rival',
-    statusChance: 0.25,
-    fn(ctx) {
-      StatusEffects.apply(ctx.target, 'paralysis', ctx.log);
-    },
-  },
-
-  'freeze-10': {
-    trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Tiene un 10% de probabilidad de congelar al rival',
-    statusChance: 0.10,
-    fn(ctx) {
-      StatusEffects.apply(ctx.target, 'freeze', ctx.log);
-    },
-  },
-
-  'freeze-20': {
-    trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Tiene un 20% de probabilidad de congelar al rival',
-    statusChance: 0.20,
-    fn(ctx) {
-      StatusEffects.apply(ctx.target, 'freeze', ctx.log);
-    },
-  },
-
-  'freeze-50': {
-    trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Tiene un 50% de probabilidad de congelar al rival',
-    statusChance: 0.50,
-    fn(ctx) {
-      StatusEffects.apply(ctx.target, 'freeze', ctx.log);
-    },
+    fn(ctx) { StatusEffects.apply(ctx.target, StatusEffect.SLEEP, ctx.log); },
   },
 
   'sleep-15': {
     trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Tiene un 15% de probabilidad de hacer dormir al rival',
     statusChance: 0.15,
-    fn(ctx) {
-      StatusEffects.apply(ctx.target, 'sleep', ctx.log);
-    },
+    desc: 'Tiene un 15% de probabilidad de hacer dormir al rival',
+    fn(ctx) { StatusEffects.apply(ctx.target, StatusEffect.SLEEP, ctx.log); },
   },
 
   'sleep-30': {
     trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'Tiene un 30% de probabilidad de hacer dormir al rival',
     statusChance: 0.30,
-    fn(ctx) {
-      StatusEffects.apply(ctx.target, 'sleep', ctx.log);
-    },
+    desc: 'Tiene un 30% de probabilidad de hacer dormir al rival',
+    fn(ctx) { StatusEffects.apply(ctx.target, StatusEffect.SLEEP, ctx.log); },
   },
+
+  'paralize-10': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    statusChance: 0.10,
+    desc: 'Tiene un 10% de probabilidad de paralizar al rival',
+    fn(ctx) { StatusEffects.apply(ctx.target, StatusEffect.PARALYSIS, ctx.log); },
+  },
+
+  'paralize-25': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    statusChance: 0.25,
+    desc: 'Tiene un 25% de probabilidad de paralizar al rival',
+    fn(ctx) { StatusEffects.apply(ctx.target, StatusEffect.PARALYSIS, ctx.log); },
+  },
+
+  'freeze-10': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    statusChance: 0.10,
+    desc: 'Tiene un 10% de probabilidad de congelar al rival',
+    fn(ctx) { StatusEffects.apply(ctx.target, StatusEffect.FREEZE, ctx.log); },
+  },
+
+  'freeze-20': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    statusChance: 0.20,
+    desc: 'Tiene un 20% de probabilidad de congelar al rival',
+    fn(ctx) { StatusEffects.apply(ctx.target, StatusEffect.FREEZE, ctx.log); },
+  },
+
+  'freeze-50': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    statusChance: 0.50,
+    desc: 'Tiene un 50% de probabilidad de congelar al rival',
+    fn(ctx) { StatusEffects.apply(ctx.target, StatusEffect.FREEZE, ctx.log); },
+  },
+
+  // ── AFTER_ATTACK — Retroceso (flinch) ─────────────────────────────────────
 
   'flinch-20': {
     trigger: TRIGGERS.AFTER_ATTACK,
     statusChance: 0.20,
     desc: '20% de probabilidad de hacer retroceder al rival',
-    fn(ctx) {
-      ctx.target._flinched = true;
-    },
+    fn(ctx) { ctx.target._flinched = true; },
   },
 
   'flinch-30': {
     trigger: TRIGGERS.AFTER_ATTACK,
     statusChance: 0.30,
     desc: '30% de probabilidad de hacer retroceder al rival',
+    fn(ctx) { ctx.target._flinched = true; },
+  },
+
+  // ── AFTER_ATTACK — Especiales ──────────────────────────────────────────────
+
+  'self-destruct': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'El usuario pierde toda su vida al usar este movimiento',
     fn(ctx) {
-      ctx.target._flinched = true;
+      ctx.user.currentHp = 0;
+      ctx.log(`${ctx.user.displayName} se autodestruyo!`);
+      ctx.updatePlayerHud?.();
     },
   },
 
-  // ── BEFORE_ATTACK ─────────────────────────────────────────────────────────
+  // ── BEFORE_ATTACK — Modificadores de turno ────────────────────────────────
 
-  'sleep': {
+  'priority': {
     trigger: TRIGGERS.BEFORE_ATTACK,
-    desc: 'Duerme al rival.',
-    statusChance: 1.00,
-    fn(ctx) {
-      StatusEffects.apply(ctx.target, 'sleep', ctx.log);
-    },
+    desc: 'Siempre ataca primero, independiente de la velocidad',
+    fn(ctx) { ctx.user._priority = true; },
   },
 
   'double-hit': {
     trigger: TRIGGERS.BEFORE_ATTACK,
     desc: 'Golpea dos veces seguidas en el mismo turno',
-    fn(ctx) {
-      ctx.user._doubleHit = true;
-    },
+    fn(ctx) { ctx.user._doubleHit = true; },
   },
 
-  'priority': {
+  'sleep': {
     trigger: TRIGGERS.BEFORE_ATTACK,
-    desc: 'Siempre ataca primero, independiente de la velocidad',
-    fn(ctx) {
-      ctx.user._priority = true;
-    },
-  },
-
-  'sleep-attack': {
-    trigger: TRIGGERS.BEFORE_ATTACK,
-    desc: 'Permite atacar aunque el usuario este dormido',
-    fn(ctx) {
-      // No-op: la lógica la aplica StatusEffects.checkBeforeAttack al detectar
-      // este effectId en el autoMove — permite atacar ignorando el estado sueño.
-    },
+    statusChance: 1.00,
+    desc: 'Duerme al rival.',
+    fn(ctx) { StatusEffects.apply(ctx.target, StatusEffect.SLEEP, ctx.log); },
   },
 
   'sleep-self': {
     trigger: TRIGGERS.BEFORE_ATTACK,
     desc: 'El usuario se duerme antes de atacar cada turno',
+    fn(ctx) { StatusEffects.apply(ctx.user, StatusEffect.SLEEP, ctx.log); },
+  },
+
+  // ── BEFORE_ATTACK — Pasivos ────────────────────────────────────────────────
+  // Los efectos pasivos no hacen nada en fn(); su lógica se evalúa externamente
+  // leyendo el effectId del autoMove (battle.js, status-effects.js, pokemon.js).
+
+  'sleep-attack': {
+    trigger: TRIGGERS.BEFORE_ATTACK,
+    desc: 'Permite atacar aunque el usuario este dormido',
     fn(ctx) {
-      StatusEffects.apply(ctx.user, 'sleep', ctx.log);
+      // No-op: StatusEffects.checkBeforeAttack detecta este effectId y omite el bloqueo por sueño.
     },
   },
 
-  // ── PASIVO ────────────────────────────────────────────────────────────────
   'ventaja': {
     trigger: TRIGGERS.BEFORE_ATTACK,
     desc: 'Dobla el daño si el rival sufre un problema de estado',
@@ -402,20 +399,21 @@ var MOVE_EFFECTS = {
 
   'clear': {
     trigger: TRIGGERS.BEFORE_ATTACK,
-    desc: 'Inmune a effectos de estado y cambios de estadisticas',
+    desc: 'Inmune a efectos de estado y cambios de estadísticas',
     fn(ctx) {
-      // No-op: el efecto es pasivo, ver comentario arriba.
+      // No-op: hasClearEffect() detecta este effectId — bloquea estados y debuffs.
     },
   },
 
   'guts': {
     trigger: TRIGGERS.BEFORE_ATTACK,
-    desc: 'Ignora las penalizaciones de quemado,<br> paralizado y congelado. +120% daño físico',
+    desc: 'Ignora las penalizaciones de quemado, paralizado y congelado. Aumenta el daño físico.',
     fn(ctx) {
+      // No-op: battle.js lee effectData.dmgMult del movimiento activo para aplicar el bonus.
     },
   },
 
-  // ── ON_HITTED ─────────────────────────────────────────────────────────────
+  // ── ON_HITTED — Rebote ─────────────────────────────────────────────────────
 
   'recoil-10': {
     trigger: TRIGGERS.ON_HITTED,
@@ -436,6 +434,8 @@ var MOVE_EFFECTS = {
       ctx.log(`${ctx.attacker.displayName} recibio ${recoil} de rebote!`);
     },
   },
+
+  // ── ON_HITTED — Escudo ─────────────────────────────────────────────────────
 
   'shield-10': {
     trigger: TRIGGERS.ON_HITTED,
@@ -470,6 +470,8 @@ var MOVE_EFFECTS = {
     },
   },
 
+  // ── ON_HITTED — Curación ───────────────────────────────────────────────────
+
   'heal-on-hit-10': {
     trigger: TRIGGERS.ON_HITTED,
     desc: 'Recupera el 10% del HP maximo al recibir un golpe',
@@ -477,16 +479,6 @@ var MOVE_EFFECTS = {
       const heal = Math.max(1, Math.floor(ctx.user.stats.hp * 0.10));
       ctx.user.currentHp = Math.min(ctx.user.stats.hp, ctx.user.currentHp + heal);
       ctx.log(`${ctx.user.displayName} se recupero parcialmente!`);
-    },
-  },
-
-  'self-destruct': {
-    trigger: TRIGGERS.AFTER_ATTACK,
-    desc: 'El usuario pierde toda su vida al usar este movimiento',
-    fn(ctx) {
-      ctx.user.currentHp = 0;
-      ctx.log(`${ctx.user.displayName} se autodestruyo!`);
-      ctx.updatePlayerHud?.();
     },
   },
 

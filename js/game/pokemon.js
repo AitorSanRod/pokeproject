@@ -252,8 +252,11 @@ async function evolve(pokemon, intoName) {
   newPoke.currentHp = Math.max(1, Math.floor(newPoke.stats.hp * hpRatio));
 
   // Preservar objeto equipado y sus flags
-  newPoke.heldItem       = pokemon.heldItem ?? null;
+  // Usar equipHeldItem para que los efectos PASSIVE (combatMods) se re-apliquen
   newPoke._heldItemFlags = { ...(pokemon._heldItemFlags ?? {}) };
+  if (pokemon.heldItem) {
+    equipHeldItem(newPoke, pokemon.heldItem);
+  }
 
   console.log(`[EVOLUCION] ${pokemon.displayName} → ${newPoke.displayName} Nv.${newPoke.level}`);
   return newPoke;

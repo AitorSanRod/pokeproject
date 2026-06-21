@@ -273,8 +273,8 @@ var POKEMON_DB = {
   mew:        { stage: 3, types: ['psychic'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }] },
 };
 
-// ── POKEMON_LIST ──────────────────────────────────────────────────────────────
-// Catálogo completo de Gen 1. Usar como POKEMON.nombre en routes.js.
+// ── POKEMON_LIST / POKEMON ────────────────────────────────────────────────────
+// Catálogo completo de Gen 1. Usar como POKEMON.nombre en routes.js y tms.js.
 // El valor es el nombre exacto de la PokeAPI (string que recibe createPokemon).
 var POKEMON_LIST = {
   // Starters
@@ -488,3 +488,6 @@ var POKEMON_LIST = {
   mewtwo:      'mewtwo',
   mew:         'mew',
 };
+
+// Alias global — disponible en routes.js, tms.js y cualquier archivo cargado después
+const POKEMON = POKEMON_LIST;

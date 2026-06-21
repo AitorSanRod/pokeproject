@@ -44,6 +44,8 @@ var HELD_ITEM_TRIGGERS = Object.freeze({
 
 var HELD_ITEMS = {
 
+  // ── CURACIÓN ─────────────────────────────────────────────────────────────────
+
   'sitrus-berry': {
     name: 'Baya Zidra',
     desc: 'Si el HP baja del 50%, restaura el 25% del HP máximo. Solo una vez por ruta.',
@@ -69,6 +71,8 @@ var HELD_ITEMS = {
       return true; // consumida — onceFlag se marca aunque actual sea 0
     },
   },
+
+  // ── OBJETOS ELECCIÓN ─────────────────────────────────────────────────────────
 
   'choice-scarf': {
     name: 'Pañuelo Elección',
@@ -130,6 +134,8 @@ var HELD_ITEMS = {
     },
   },
 
+  // ── DEFENSIVOS / UTILIDAD ────────────────────────────────────────────────────
+
   'assault-vest': {
     name: 'Chaleco Asalto',
     desc: 'Aumenta un 50% la defensa especial.',
@@ -148,6 +154,8 @@ var HELD_ITEMS = {
       user.combatMods.spd = (user.combatMods.spd ?? 0) - 0.5;
     },
   },
+
+  // ── POTENCIADORES DE DAÑO ────────────────────────────────────────────────────
 
   'carbon': {
     name: 'Carbón',
@@ -229,8 +237,8 @@ var HELD_ITEMS = {
       const { user, log, updateHud } = ctx;
       if (user.currentHp <= 0) return false;
 
-      if (user.statusEffect?.id !== 'burn') {
-        StatusEffects.apply(user, 'burn', log);
+      if (user.statusEffect?.id !== StatusEffect.BURN) {
+        StatusEffects.apply(user, StatusEffect.BURN, log);
       }
 
       const drain = Math.max(1, Math.floor(user.stats.hp * 0.05));
@@ -284,6 +292,116 @@ var HELD_ITEMS = {
       if (updateHud) updateHud();
       return true;
     },
+  },
+
+  // ── PIEDRAS DE EVOLUCIÓN ─────────────────────────────────────────────────────
+
+  'thunder-stone': {
+    name: 'Piedra Trueno',
+    desc: 'Provoca la evolución instantánea de ciertos pokemon. Se consume al usarla.',
+    img: 'assets/sprites/items/piedra-trueno.png',
+    fallbackIcon: '⚡',
+    canChange: false,
+    pairs: [
+      { preEvo: 'pikachu', evo: 'raichu' },
+      { preEvo: 'eevee', evo: 'jolteon' },
+    ],
+    canEquip(pokemon) {
+      return this.pairs.some(p => p.preEvo === pokemon.name);
+    },
+    trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+    fn(ctx) {
+      const user = ctx.user;
+      const pairs = this.pairs;
+      const pair = pairs.find(p => p.preEvo === user.name);
+      if (!pair) return;
+      user.heldItem = null; // consume stone before evolve to prevent re-equip
+      const idx = GameState.team.indexOf(user);
+      evolve(user, pair.evo).then(evolved => {
+        if (idx !== -1) {
+          GameState.team[idx] = evolved;
+          if (GameState.starter === user) GameState.starter = evolved;
+        }
+        Storage.markCaught(evolved.name);
+        console.log(`[PIEDRA] ${user.displayName} → ${evolved.displayName}`);
+      }).catch(e => {
+        console.error(`[PIEDRA] Error evolucionando ${user.displayName}:`, e.message);
+      });
+    },
+    revert(ctx) { },
+  },
+
+  'fire-stone': {
+    name: 'Piedra Fuego',
+    desc: 'Provoca la evolución instantánea de ciertos pokemon. Se consume al usarla.',
+    img: 'assets/sprites/items/piedra-fuego.png',
+    fallbackIcon: '🔥',
+    canChange: false,
+    pairs: [
+      { preEvo: 'vulpix', evo: 'ninetales' },
+      { preEvo: 'growlithe', evo: 'arcanine' },
+      { preEvo: 'eevee', evo: 'flareon' },
+    ],
+    canEquip(pokemon) {
+      return this.pairs.some(p => p.preEvo === pokemon.name);
+    },
+    trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+    fn(ctx) {
+      const user = ctx.user;
+      const pairs = this.pairs;
+      const pair = pairs.find(p => p.preEvo === user.name);
+      if (!pair) return;
+      user.heldItem = null;
+      const idx = GameState.team.indexOf(user);
+      evolve(user, pair.evo).then(evolved => {
+        if (idx !== -1) {
+          GameState.team[idx] = evolved;
+          if (GameState.starter === user) GameState.starter = evolved;
+        }
+        Storage.markCaught(evolved.name);
+        console.log(`[PIEDRA] ${user.displayName} → ${evolved.displayName}`);
+      }).catch(e => {
+        console.error(`[PIEDRA] Error evolucionando ${user.displayName}:`, e.message);
+      });
+    },
+    revert(ctx) { },
+  },
+
+  'water-stone': {
+    name: 'Piedra Agua',
+    desc: 'Provoca la evolución instantánea de ciertos pokemon. Se consume al usarla.',
+    img: 'assets/sprites/items/piedra-agua.png',
+    fallbackIcon: '💧',
+    canChange: false,
+    pairs: [
+      { preEvo: 'poliwhirl', evo: 'poliwrath' },
+      { preEvo: 'shellder', evo: 'cloyster' },
+      { preEvo: 'staryu', evo: 'starmie' },
+      { preEvo: 'eevee', evo: 'vaporeon' },
+    ],
+    canEquip(pokemon) {
+      return this.pairs.some(p => p.preEvo === pokemon.name);
+    },
+    trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+    fn(ctx) {
+      const user = ctx.user;
+      const pairs = this.pairs;
+      const pair = pairs.find(p => p.preEvo === user.name);
+      if (!pair) return;
+      user.heldItem = null;
+      const idx = GameState.team.indexOf(user);
+      evolve(user, pair.evo).then(evolved => {
+        if (idx !== -1) {
+          GameState.team[idx] = evolved;
+          if (GameState.starter === user) GameState.starter = evolved;
+        }
+        Storage.markCaught(evolved.name);
+        console.log(`[PIEDRA] ${user.displayName} → ${evolved.displayName}`);
+      }).catch(e => {
+        console.error(`[PIEDRA] Error evolucionando ${user.displayName}:`, e.message);
+      });
+    },
+    revert(ctx) { },
   },
 
 };
@@ -399,16 +517,19 @@ function heldItemBlocksMoveChange(pokemon) {
 // aquí para que el IDE ofrezca autocompletado.
 var ITEM = {
   safety_goggles: 'safety-goggles',
-  light_ball:     'light-ball',
-  sitrus_berry:  'sitrus-berry',
-  choice_scarf:  'choice-scarf',
-  choice_specs:  'choice-specs',
-  choice_band:   'choice-band',
-  assault_vest:  'assault-vest',
-  carbon:        'carbon',
-  mystic_water:  'mystic-water',
-  miracle_seed:  'miracle-seed',
-  leftovers:     'leftovers',
-  flame_orb:     'flame-orb',
-  lifeorb:       'lifeorb',
+  light_ball: 'light-ball',
+  sitrus_berry: 'sitrus-berry',
+  choice_scarf: 'choice-scarf',
+  choice_specs: 'choice-specs',
+  choice_band: 'choice-band',
+  assault_vest: 'assault-vest',
+  carbon: 'carbon',
+  mystic_water: 'mystic-water',
+  miracle_seed: 'miracle-seed',
+  leftovers: 'leftovers',
+  flame_orb: 'flame-orb',
+  lifeorb: 'lifeorb',
+  thunder_stone: 'thunder-stone',
+  fire_stone: 'fire-stone',
+  water_stone: 'water-stone',
 };

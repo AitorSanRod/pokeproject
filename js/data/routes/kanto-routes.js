@@ -1,31 +1,119 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// DATOS DE RUTAS
+// RUTAS DE KANTO
 //
-// Usa POKEMON_LIST (de pokemon-db.js) y MOVE_LIST (de move-pool.js)
-// para referencias sin hardcodear strings.
+// Requiere routes-constants.js cargado antes que este archivo.
+// Globals disponibles: MOVES, PATH_TYPE, SHINY_RATE, pickWildEncounter,
+//                      pickTrainer, rollLevel, generatePaths
 //
-// POKEMON_LIST.rattata          → 'rattata'
-// MOVE_LIST.normal.physical.tackle → 'tackle'
-// MOVE_LIST.fire.special.ember     → 'ember'
+// ═══════════════════════════════════════════════════════════════════════════
+// REFERENCIAS RÁPIDAS
+// ═══════════════════════════════════════════════════════════════════════════
 //
-// Cada pokemon puede tener:
-//   name   : POKEMON_LIST.nombre
-//   rate   : probabilidad (wild, suma 100 por tabla)
-//   minLv  : nivel mínimo
-//   maxLv  : nivel máximo
-//   level  : nivel fijo (gym leaders)
-//   moveId : MOVE_LIST.tipo.clase.nombre — ataque exclusivo
+//   POKEMON.rattata                          → id de pokemon ('rattata')
+//   MOVES.normal.physical.tackle             → id de movimiento ('tackle')
+//   MOVES.fire.special.flamethrower          → id de movimiento ('flamethrower')
+//   ITEM.leftovers                           → id de objeto ('leftovers')
+//   PATH_TYPE.Trainer / Wild / Heal / Special / Lider
+//   ENTRENADORES.Campista.name / .img        → nombre y sprite del entrenador
+//
+// ═══════════════════════════════════════════════════════════════════════════
+// ESTRUCTURA DE ROUTE_DATA
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// Cada clave es el area id que referencia KANTO_ROUTES.
+// Existen dos tipos de ruta: combate e información.
+//
+// ── RUTA DE COMBATE ────────────────────────────────────────────────────────
+//
+//   bg         (requerido) : imagen de fondo de la ruta
+//   combatBg   (requerido) : imagen de fondo del combate
+//   wild       (requerido) : array de entradas de pokemon salvaje (ver abajo)
+//   trainer    (requerido) : array de pools de entrenador (ver abajo)
+//
+//   paths      (opcional)  : array de caminos hardcodeados. Si se omite,
+//                            generatePaths() genera 3 combinaciones aleatorias
+//                            usando pathLength como longitud de cada camino.
+//   pathLength (opcional)  : longitud de paths auto-generados. Por defecto 3.
+//
+//   specialTrainer (opcional) : entrenador único que aparece en casillas
+//                               PATH_TYPE.Special. No tiene rate (siempre
+//                               se muestra). Ver estructura de entrenador abajo.
+//
+//   rewardPokemon (opcional) : array de POKEMON.xxx disponibles como
+//                              recompensa de fin de ruta (opción pokemon).
+//   rewardExtras  (opcional) : array de ITEM.xxx disponibles como recompensa
+//                              adicional junto a las 3 opciones base.
+//
+//   welcome    (opcional)  : { title, subtitle, img } — pantalla de bienvenida
+//                            que aparece al llegar a una ciudad/gimnasio.
+//   gymLeader  (opcional)  : nombre del líder de gimnasio (string).
+//   gymType    (opcional)  : tipo del gimnasio (string, p.ej. 'rock').
+//   badgeId    (opcional)  : id de medalla definida en badges.js.
+//   gymLeaderImg (opcional): sprite del líder de gimnasio.
+//   gym        (opcional)  : { leader: [...] } — array de pokemon del líder.
+//                            Aparece en casillas PATH_TYPE.Lider.
+//
+// ── RUTA DE INFORMACIÓN ────────────────────────────────────────────────────
+//
+//   type        : 'information'  (requerido para activar este modo)
+//   bg          (requerido) : imagen de fondo
+//   title       (requerido) : título mostrado en la pantalla
+//   description (opcional)  : HTML mostrado bajo el título
+//   optional    (opcional)  : { btnName, area } — añade un botón secundario
+//                             que redirige a una ruta opcional.
+//
+// ═══════════════════════════════════════════════════════════════════════════
+// ENTRADAS DE POKEMON  (wild · trainer.pokemon · gym.leader · specialTrainer.pokemon)
+// ═══════════════════════════════════════════════════════════════════════════
+//
+//   name     (requerido) : POKEMON.xxx  — id del pokemon
+//   minLv    (requerido) : nivel mínimo (excluir si se usa level)
+//   maxLv    (requerido) : nivel máximo (excluir si se usa level)
+//   level    (requerido) : nivel fijo — reemplaza minLv/maxLv (gym leaders)
+//   rate     (requerido en wild) : peso de aparición. La suma de todos los
+//                                  rate de la tabla no tiene que ser 100,
+//                                  el sistema los normaliza automáticamente.
+//
+//   moveId   (opcional) : MOVES.tipo.clase.nombre — movimiento exclusivo que
+//                         el pokemon usará en combate automático. Puede ser
+//                         un array de dos ids para alternar entre ellos.
+//                         Si se omite, el pokemon usa su movimiento por defecto.
+//   heldItem (opcional) : ITEM.xxx — objeto equipado al pokemon.
+//   shiny    (opcional) : true — fuerza la aparición shiny (ignora SHINY_RATE).
+//   img      (opcional) : ruta a sprite personalizado (sobreescribe el sprite
+//                         por defecto de la PokeAPI).
+//   overrides (opcional): personaliza IVs y/o EVs del pokemon generado.
+//                         Solo se aplican las stats que se indiquen.
+//                         { ivs: { hp, atk, def, spa, spd, spe },
+//                           evs: { hp, atk, def, spa, spd, spe } }
+//
+// ── Marcadores especiales en name ──────────────────────────────────────────
+//
+//   'RIVAL_STARTER'   → sustituido en runtime por el contra-tipo del starter
+//                       del jugador (primera forma).
+//   'RIVAL_STARTER_2' → segunda forma del contra-tipo.
+//   'RIVAL_STARTER_3' → forma final del contra-tipo.
+//
+// ═══════════════════════════════════════════════════════════════════════════
+// ESTRUCTURA DE ENTRENADOR  (trainer[] · specialTrainer)
+// ═══════════════════════════════════════════════════════════════════════════
+//
+//   name    (requerido) : nombre mostrado en combate
+//   img     (requerido) : ruta al sprite del entrenador
+//   rate    (requerido en trainer[]) : peso de selección cuando hay varios
+//                                      entrenadores en el pool.
+//   pokemon (requerido) : array de entradas de pokemon (ver arriba)
+//
+// ── PATH_TYPE — tipos de casilla ──────────────────────────────────────────
+//
+//   PATH_TYPE.Trainer → combate contra entrenador aleatorio de trainer[]
+//   PATH_TYPE.Wild    → encuentro con pokemon salvaje de wild[]
+//   PATH_TYPE.Special → combate contra specialTrainer (único, siempre igual)
+//   PATH_TYPE.Heal    → recuperación automática del equipo
+//   PATH_TYPE.Lider   → combate contra el líder de gimnasio (gym.leader)
+//
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** @type {MoveList} */
-const MOVES = MOVE_LIST;
-const PATH_TYPE = {
-  Trainer: 'trainer',
-  Wild: 'wild',
-  Special: 'special',
-  Heal: 'heal',
-  Lider: 'leader'
-};
 const ENTRENADORES = {
   Rival: {
     name: 'Azul',
@@ -108,11 +196,7 @@ const ENTRENADORES = {
     name: 'Chica',
     img: 'assets/sprites/trainers/chica.png'
   },
-}
-var SHINY_RATE = 0.005;
-//var SHINY_RATE = 0.05; //5%
-// Probabilidad (0–1) de que un Pokémon salvaje aparezca como shiny.
-// 0.001 = 1 de cada 1000 (equivale a 1/1024, similar a los juegos principales).
+};
 
 var ROUTE_DATA = {
 
@@ -124,9 +208,6 @@ var ROUTE_DATA = {
     bg: 'assets/bg/route-1.png',
     combatBg: 'assets/bg/combate.png',
     rewardPokemon: [POKEMON.rattata, POKEMON.pidgey],
-    // Objetos equipables que pueden aparecer como recompensa de fin de ruta,
-    // junto a las 3 opciones base (pokemon, vitamina, rare candy). Opcional —
-    // si se omite o es [], solo aparecen las 3 opciones base (sección 11).
     wild: [
       { name: POKEMON.rattata, rate: 45, minLv: 2, maxLv: 4, moveId: MOVES.normal.physical.tackle },
       { name: POKEMON.pidgey, rate: 45, minLv: 2, maxLv: 3, moveId: MOVES.flying.physical.peck },
@@ -208,12 +289,8 @@ var ROUTE_DATA = {
       },
     ],
     paths: [
-      [
-        { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }
-      ],
-      [
-        { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }
-      ],
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }],
     ]
   },
 
@@ -236,7 +313,7 @@ var ROUTE_DATA = {
         ]
       },
       {
-        name: ENTRENADORES.Cazabichos.name, img: ENTRENADORES.Cazabichos.img, rate: 45, pokemon: [
+        name: ENTRENADORES.Cazabichos.name, img: ENTRENADORES.Cazabichos.img, rate: 20, pokemon: [
           { name: POKEMON.caterpie, minLv: 8, maxLv: 10, moveId: MOVES.bug.physical.bug_bite },
           { name: POKEMON.weedle, minLv: 8, maxLv: 10, moveId: MOVES.poison.physical.poison_sting },
         ]
@@ -246,7 +323,15 @@ var ROUTE_DATA = {
           { name: POKEMON.caterpie, minLv: 6, maxLv: 12, moveId: MOVES.bug.physical.bug_bite },
           { name: POKEMON.caterpie, minLv: 6, maxLv: 12, moveId: MOVES.bug.physical.bug_bite },
           { name: POKEMON.caterpie, minLv: 6, maxLv: 12, moveId: MOVES.bug.physical.bug_bite },
-          { name: POKEMON.caterpie, minLv: 6, maxLv: 12, moveId: MOVES.bug.physical.bug_bite },
+          { name: POKEMON.caterpie, minLv: 6, maxLv: 12, moveId: MOVES.bug.physical.x_scissor },
+        ]
+      },
+      {
+        name: ENTRENADORES.Cazabichos.name, img: ENTRENADORES.Cazabichos.img, rate: 20, pokemon: [
+          { name: POKEMON.metapod, minLv: 6, maxLv: 12, moveId: MOVES.normal.physical.tackle },
+          { name: POKEMON.metapod, minLv: 6, maxLv: 12, moveId: MOVES.bug.physical.bug_bite },
+          { name: POKEMON.metapod, minLv: 6, maxLv: 12, moveId: MOVES.bug.special.infestation },
+          { name: POKEMON.metapod, minLv: 6, maxLv: 12, moveId: MOVES.normal.physical.tackle },
         ]
       },
     ],
@@ -254,7 +339,7 @@ var ROUTE_DATA = {
       [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
       [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Heal }, { type: PATH_TYPE.Wild }],
       [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Heal }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }],
-      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer },]
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }],
     ],
   },
 
@@ -284,15 +369,11 @@ var ROUTE_DATA = {
       leader: [
         {
           name: POKEMON.geodude, level: 12, moveId: MOVES.rock.physical.rock_throw,
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32 },
-          },
+          overrides: { evs: { hp: 32, def: 32, spd: 32 } },
         },
         {
           name: POKEMON.onix, level: 14, moveId: MOVES.rock.physical.rock_throw,
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32 },
-          },
+          overrides: { evs: { hp: 32, def: 32, spd: 32 } },
         },
       ]
     },
@@ -301,10 +382,6 @@ var ROUTE_DATA = {
       [{ type: PATH_TYPE.Lider }],
     ],
   },
-
-  // ═══════════════════════════════════════════════════════════════════════
-  // Gimasio de Misty (Ciudad Celeste)
-  // ═══════════════════════════════════════════════════════════════════════
 
   'ruta-3': {
     bg: 'assets/bg/ruta-3.png',
@@ -383,6 +460,10 @@ var ROUTE_DATA = {
     ],
   },
 
+  // ═══════════════════════════════════════════════════════════════════════
+  // Gimasio de Misty (Ciudad Celeste)
+  // ═══════════════════════════════════════════════════════════════════════
+
   'ciudad-celeste': {
     bg: 'assets/bg/ciudad-celeste.png',
     combatBg: 'assets/bg/combate-agua.png',
@@ -414,15 +495,13 @@ var ROUTE_DATA = {
       leader: [
         {
           name: POKEMON.staryu, level: 20, moveId: MOVES.water.special.surf,
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32, spa: 32 },
-          },
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spa: 32 } },
         },
         {
-          name: POKEMON.starmie, level: 22, moveId: MOVES.psychic.special.confusion,
+          name: POKEMON.starmie, level: 22, moveId: [MOVES.psychic.special.confusion, MOVES.water.special.scald ],
           overrides: {
-            evs: { hp: 0, def: 0, spd: 0, spa: 20 },
-            ivs: { hp: 0, def: 0, spd: 0, spa: 31 },
+            evs: { hp: 32, def: 0, spd: 32, spa: 14 },
+            ivs: { hp: 31, def: 0, spd: 0, spa: 31 },
           },
         },
       ]
@@ -621,21 +700,15 @@ var ROUTE_DATA = {
     ],
     gym: {
       leader: [
-        {
-          name: POKEMON.pikachu, level: 28, moveId: MOVES.electric.special.thunder_shock, heldItem: ITEM.light_ball
-        },
-        {
-          name: POKEMON.voltorb, level: 30, moveId: MOVES.normal.special.hyper_voice
-        },
-        {
-          name: POKEMON.raichu, level: 34, moveId: MOVES.electric.special.thunder, heldItem: ITEM.choice_specs
-        }
+        { name: POKEMON.pikachu, level: 28, moveId: MOVES.electric.special.thunder_shock, heldItem: ITEM.light_ball },
+        { name: POKEMON.voltorb, level: 30, moveId: MOVES.normal.special.hyper_voice },
+        { name: POKEMON.raichu, level: 34, moveId: MOVES.electric.special.thunder, heldItem: ITEM.choice_specs },
       ]
     },
     paths: [
       [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }],
       [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }],
-      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }]
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }],
     ],
   },
 
@@ -745,9 +818,7 @@ var ROUTE_DATA = {
         { name: POKEMON.drowzee, minLv: 25, maxLv: 35, moveId: MOVES.psychic.special.psychic },
         {
           name: POKEMON.snorlax, minLv: 25, maxLv: 35, moveId: MOVES.normal.physical.false_swipe, heldItem: ITEM.leftovers,
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
-          },
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         },
         { name: POKEMON.voltorb, minLv: 35, maxLv: 40, moveId: MOVES.normal.physical.self_destruct },
       ]
@@ -857,22 +928,16 @@ var ROUTE_DATA = {
       name: 'Jefe Giovanni', img: ENTRENADORES.Giovanni.img, pokemon: [
         {
           name: POKEMON.onix, minLv: 32, maxLv: 37, moveId: MOVES.rock.physical.rock_slide,
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 },
-          },
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
         },
         {
           name: POKEMON.rhyhorn, minLv: 32, maxLv: 40, moveId: MOVES.ground.physical.earthquake,
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 },
-          },
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
         },
         {
           name: POKEMON.kangaskhan, minLv: 40, maxLv: 45, moveId: MOVES.normal.physical.extreme_speed,
           heldItem: ITEM.lifeorb,
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 },
-          },
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
         },
       ]
     },
@@ -904,33 +969,25 @@ var ROUTE_DATA = {
       {
         name: ENTRENADORES.ChicaGuay.name, img: ENTRENADORES.ChicaGuay.img, rate: 25, pokemon: [
           { name: POKEMON.exeggcute, minLv: 32, maxLv: 37, moveId: MOVES.psychic.special.psychic },
-
         ]
       },
-
       {
         name: ENTRENADORES.ChicoGuay.name, img: ENTRENADORES.ChicoGuay.img, rate: 25, pokemon: [
           { name: POKEMON.bellsprout, minLv: 32, maxLv: 36, moveId: MOVES.grass.special.solar_beam },
           { name: POKEMON.bellsprout, minLv: 32, maxLv: 36, moveId: MOVES.poison.special.sludge_bomb },
         ]
       },
-
       {
         name: ENTRENADORES.Chica.name, img: ENTRENADORES.Chica.img, rate: 25, pokemon: [
           {
             name: POKEMON.venusaur, minLv: 36, maxLv: 40, moveId: MOVES.grass.special.solar_beam,
-            overrides: {
-              evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
-            },
+            overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
           },
-
         ]
       },
-
       {
         name: ENTRENADORES.ChicaGuay.name, img: ENTRENADORES.ChicaGuay.img, rate: 25, pokemon: [
           { name: POKEMON.exeggcute, minLv: 32, maxLv: 37, moveId: MOVES.psychic.special.psychic },
-
         ]
       },
     ],
@@ -938,34 +995,26 @@ var ROUTE_DATA = {
       leader: [
         {
           name: POKEMON.victreebel, level: 41, moveId: MOVES.poison.special.sludge_wave,
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
-          },
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         },
         {
           name: POKEMON.exeggutor, level: 39, moveId: MOVES.psychic.special.psychic,
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
-          },
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         },
         {
           name: POKEMON.tangela, level: 38, moveId: MOVES.grass.physical.wood_hammer,
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
-          },
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         },
         {
           name: POKEMON.vileplume, level: 42, moveId: MOVES.grass.special.giga_drain,
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
-          },
-        }
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
+        },
       ]
     },
     paths: [
       [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }],
       [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }],
-      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }]
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }],
     ],
   },
 
@@ -1022,7 +1071,7 @@ var ROUTE_DATA = {
     paths: [
       [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
       [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
-      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }]
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
     ]
   },
 
@@ -1055,28 +1104,20 @@ var ROUTE_DATA = {
       leader: [
         {
           name: POKEMON.koffing, level: 47, moveId: MOVES.poison.special.sludge_bomb,
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32 },
-          },
+          overrides: { evs: { hp: 32, def: 32, spd: 32 } },
         },
         {
           name: POKEMON.koffing, level: 45, moveId: MOVES.normal.physical.self_destruct,
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32 },
-          },
+          overrides: { evs: { hp: 32, def: 32, spd: 32 } },
         },
         {
           name: POKEMON.muk, level: 47, moveId: MOVES.dark.special.dark_pulse,
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32 },
-          },
+          overrides: { evs: { hp: 32, def: 32, spd: 32 } },
         },
         {
           name: POKEMON.weezing, level: 52, moveId: MOVES.poison.special.sludge_wave,
           heldItem: ITEM.safety_goggles,
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32 },
-          },
+          overrides: { evs: { hp: 32, def: 32, spd: 32 } },
         },
       ]
     },
@@ -1133,9 +1174,7 @@ var ROUTE_DATA = {
     wild: [
       {
         name: POKEMON.mewtwo, rate: 100, minLv: 60, maxLv: 70, moveId: [MOVES.psychic.special.trick, MOVES.fighting.special.focus_blast],
-        overrides: {
-          evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
-        },
+        overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
       }
     ],
     trainer: [],
@@ -1159,64 +1198,34 @@ var ROUTE_DATA = {
     specialTrainer: {
       name: ENTRENADORES.Rojo.name, img: ENTRENADORES.Rojo.img, pokemon: [
         {
-          name: POKEMON.snorlax,
-          level: 70,
-          moveId: MOVES.normal.physical.hyper_fang,
-          heldItem: ITEM.leftovers,
-          img: 'assets/sprites/pokemon/snorlax-classic.png',
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
-          },
+          name: POKEMON.snorlax, level: 70, moveId: MOVES.normal.physical.hyper_fang,
+          heldItem: ITEM.leftovers, img: 'assets/sprites/pokemon/snorlax-classic.png',
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         },
         {
-          name: POKEMON.charizard,
-          level: 70,
-          moveId: MOVES.fire.physical.flare_blitz,
-          heldItem: ITEM.assault_vest,
-          img: 'assets/sprites/pokemon/charizard-classic.png',
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
-          },
+          name: POKEMON.charizard, level: 70, moveId: MOVES.fire.physical.flare_blitz,
+          heldItem: ITEM.assault_vest, img: 'assets/sprites/pokemon/charizard-classic.png',
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         },
         {
-          name: POKEMON.venusaur,
-          level: 70,
-          moveId: MOVES.grass.special.magical_leaf,
-          heldItem: ITEM.miracle_seed,
-          img: 'assets/sprites/pokemon/venusaur-classic.png',
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
-          },
+          name: POKEMON.venusaur, level: 70, moveId: MOVES.grass.special.magical_leaf,
+          heldItem: ITEM.miracle_seed, img: 'assets/sprites/pokemon/venusaur-classic.png',
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         },
         {
-          name: POKEMON.blastoise,
-          level: 70,
-          moveId: MOVES.water.special.hydro_pump,
-          heldItem: ITEM.mystic_water,
-          img: 'assets/sprites/pokemon/blastoise-classic.png',
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
-          },
+          name: POKEMON.blastoise, level: 70, moveId: MOVES.water.special.hydro_pump,
+          heldItem: ITEM.mystic_water, img: 'assets/sprites/pokemon/blastoise-classic.png',
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         },
         {
-          name: POKEMON.lapras,
-          level: 70,
-          moveId: MOVES.ice.special.blizzard,
-          heldItem: ITEM.choice_specs,
-          img: 'assets/sprites/pokemon/lapras-classic.png',
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
-          },
+          name: POKEMON.lapras, level: 70, moveId: MOVES.ice.special.blizzard,
+          heldItem: ITEM.choice_specs, img: 'assets/sprites/pokemon/lapras-classic.png',
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         },
         {
-          name: POKEMON.pikachu,
-          level: 70,
-          moveId: MOVES.electric.physical.volt_tackle,
-          heldItem: ITEM.light_ball,
-          img: 'assets/sprites/pokemon/pikachu-classic.png',
-          overrides: {
-            evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 },
-          },
+          name: POKEMON.pikachu, level: 70, moveId: MOVES.electric.physical.volt_tackle,
+          heldItem: ITEM.light_ball, img: 'assets/sprites/pokemon/pikachu-classic.png',
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         },
       ]
     },
@@ -1225,11 +1234,6 @@ var ROUTE_DATA = {
     ],
   },
 
-  // ── Ejemplo de ruta type:'information' ────────────────────────────────
-  // Sin caminos ni combates. Se muestra título + descripción + un botón
-  // "CONTINUAR" que avanza directamente a la siguiente ruta de KANTO_ROUTES.
-  // Para usarla, añade su 'area' (p.ej. 'info-ejemplo') a KANTO_ROUTES en
-  // la posición donde quieras que aparezca.
   'info-final': {
     type: 'information',
     bg: 'assets/bg/final.png',
@@ -1294,22 +1298,11 @@ var ROUTE_DATA = {
     rewardExtras: [ITEM.lifeorb],
     specialTrainer: {
       name: 'Atlético Víctor', img: ENTRENADORES.ChicoGuay.img, pokemon: [
-        {
-          name: POKEMON.marowak, minLv: 38, maxLv: 43, moveId: MOVES.normal.physical.extreme_speed
-        },
-        {
-          name: POKEMON.pikachu, minLv: 38, maxLv: 43, moveId: MOVES.electric.special.thunder
-        },
-        {
-          name: POKEMON.chansey, minLv: 38, maxLv: 43, moveId: MOVES.normal.special.hyper_voice
-        },
-        {
-          name: POKEMON.charizard, minLv: 38, maxLv: 43, moveId: MOVES.fire.special.fire_blast
-        },
-        {
-          name: POKEMON.gengar, minLv: 40, maxLv: 45, moveId: MOVES.ghost.special.astral_barrage,
-          heldItem: ITEM.safety_goggles
-        },
+        { name: POKEMON.marowak, minLv: 38, maxLv: 43, moveId: MOVES.normal.physical.extreme_speed },
+        { name: POKEMON.pikachu, minLv: 38, maxLv: 43, moveId: MOVES.electric.special.thunder },
+        { name: POKEMON.chansey, minLv: 38, maxLv: 43, moveId: MOVES.normal.special.hyper_voice },
+        { name: POKEMON.charizard, minLv: 38, maxLv: 43, moveId: MOVES.fire.special.fire_blast },
+        { name: POKEMON.gengar, minLv: 40, maxLv: 45, moveId: MOVES.ghost.special.astral_barrage, heldItem: ITEM.safety_goggles },
       ]
     },
     paths: [
@@ -1326,7 +1319,7 @@ var ROUTE_DATA = {
     rewardPokemon: [],
     rewardExtras: [],
     specialTrainer: {
-      name: '', 
+      name: '',
       img: ENTRENADORES.ChicoGuay.img,
       pokemon: []
     },
@@ -1347,7 +1340,7 @@ var ROUTE_DATA = {
       POKEMON.moltres,
       POKEMON.articuno,
       POKEMON.dragonite,
-      POKEMON.dragonair
+      POKEMON.dragonair,
     ],
     wildLevel: { min: 30, max: 45 },
     get wild() {
@@ -1363,10 +1356,6 @@ var ROUTE_DATA = {
     ],
   },
 
-  // ═══════════════════════════════════════════════════════════════════════
-  // Ejemplos
-  // ═══════════════════════════════════════════════════════════════════════
-
   'dev-ruta-opcional': {
     type: 'information',
     bg: 'assets/bg/bosque-verde.png',
@@ -1381,12 +1370,9 @@ var ROUTE_DATA = {
 };
 
 // ── Pantalla final ────────────────────────────────────────
-// Personaliza título, subtítulo (HTML permitido), fondo y texto del botón
-// de la pantalla de victoria final (Screens.victory). Si se omite o se
-// dejan campos sin definir, se usan los valores por defecto.
 var FINAL_SCREEN = {
   title: '¡HAS GANADO!',
-  subtitle: 'Enhorabuena, gracias por jugar!', // opcional — si se omite, usa la última medalla obtenida
+  subtitle: 'Enhorabuena, gracias por jugar!',
   bg: 'assets/bg/final.png',
   btnText: 'NUEVA PARTIDA',
 };
@@ -1424,52 +1410,17 @@ var KANTO_ROUTES = [
   { name: 'Ruta 15', area: 'ruta-15' },
   { name: 'Ciudad Fucsia', area: 'ciudad-fucsia' },
   { name: 'Gimnasio de Ciudad Fucsia', area: 'ciudad-fucsia-gym' },
-  { name: 'Ciudad Azafrán', area: 'info-ciudad-azafran' },
-  { name: 'Gimnasio de Ciudad Azafrán', area: 'ciudad-azafran-gym' },
+  // { name: 'Ciudad Azafrán', area: 'info-ciudad-azafran' },
+  // { name: 'Gimnasio de Ciudad Azafrán', area: 'ciudad-azafran-gym' },
 
-  //Final
+  //Extra
   { name: '???', area: 'espacio-raro' },
   { name: 'Cueva Plateada', area: 'info-combate-final' },
   { name: 'Final del camino', area: 'combate-rojo' },
-  { name: 'Final', area: 'info-final' }
+  { name: 'Final', area: 'info-final' },
 ];
 
-// ── Helpers ────────────────────────────────────────────────────────────────
-
-function pickWildEncounter(wildTable) {
-  const total = wildTable.reduce(function (s, e) { return s + e.rate; }, 0);
-  const roll = Math.floor(Math.random() * total);
-  var acc = 0;
-  for (var i = 0; i < wildTable.length; i++) {
-    acc += wildTable[i].rate;
-    if (roll < acc) return wildTable[i];
-  }
-  return wildTable[wildTable.length - 1];
-}
-
-function pickTrainer(trainerData) {
-  if (!trainerData) return null;
-  const pool = Array.isArray(trainerData) ? trainerData : [trainerData];
-  if (pool.length === 0) return null;
-  if (pool.length === 1) return pool[0];
-  const hasRates = pool.every(function (t) { return typeof t.rate === 'number'; });
-  if (hasRates) {
-    const total = pool.reduce(function (s, t) { return s + t.rate; }, 0);
-    const roll = Math.floor(Math.random() * total);
-    var acc = 0;
-    for (var i = 0; i < pool.length; i++) {
-      acc += pool[i].rate;
-      if (roll < acc) return pool[i];
-    }
-    return pool[pool.length - 1];
-  }
-  return pool[Math.floor(Math.random() * pool.length)];
-}
-
-function rollLevel(entry) {
-  if (entry.level !== undefined) return entry.level;
-  return Math.floor(Math.random() * (entry.maxLv - entry.minLv + 1)) + entry.minLv;
-}
+// ── Helpers específicos de Kanto ───────────────────────────────────────────
 
 function ObtenerSegundoInicial(playerPokemon) {
   if (playerPokemon === POKEMON.bulbasaur) return [POKEMON.charmander, POKEMON.squirtle];
@@ -1478,20 +1429,20 @@ function ObtenerSegundoInicial(playerPokemon) {
   return [POKEMON.eevee, POKEMON.pikachu];
 }
 
-function pickInitialPokemonRival(playerPokemon) { //Debe elegirse el pokemon inicial del rival según el inicial del jugador
+function pickInitialPokemonRival(playerPokemon) {
   if (playerPokemon === POKEMON.bulbasaur) return POKEMON.charmander;
   if (playerPokemon === POKEMON.charmander) return POKEMON.squirtle;
   if (playerPokemon === POKEMON.squirtle) return POKEMON.bulbasaur;
-  return POKEMON.eevee; // Default fallback
+  return POKEMON.eevee;
 }
 
 // Segunda forma del contra-tipo del starter del jugador.
-// Usar con el marcador 'RIVAL_STARTER_2' en specialTrainer.pokemon (ver README sección 2).
+// Usar con el marcador 'RIVAL_STARTER_2' en specialTrainer.pokemon.
 function pickRivalSecondForm(playerPokemon) {
   if (playerPokemon === POKEMON.bulbasaur) return POKEMON.charmeleon;
   if (playerPokemon === POKEMON.charmander) return POKEMON.wartortle;
   if (playerPokemon === POKEMON.squirtle) return POKEMON.ivysaur;
-  return POKEMON.eevee; // fallback
+  return POKEMON.eevee;
 }
 
 // Tercera forma (evolución final) del contra-tipo del starter del jugador.
@@ -1500,54 +1451,5 @@ function pickRivalThirdForm(playerPokemon) {
   if (playerPokemon === POKEMON.bulbasaur) return POKEMON.charizard;
   if (playerPokemon === POKEMON.charmander) return POKEMON.blastoise;
   if (playerPokemon === POKEMON.squirtle) return POKEMON.venusaur;
-  return POKEMON.eevee; // fallback
-}
-
-function generatePaths(area) {
-  const data = ROUTE_DATA[area];
-  if (!data) return [];
-
-  // Paths hardcodeados — pueden tener cualquier longitud
-  if (data.paths) return data.paths;
-
-  // Longitud configurable por ruta (por defecto 3)
-  const len = data.pathLength ?? 3;
-
-  // Genera combinaciones con al menos 1 entrenador y 1 salvaje si len >= 2
-  // Para len == 1 o len > 4 simplifica a combinaciones aleatorias
-  var templates = [];
-  if (len === 2) {
-    templates = [
-      ['trainer', 'wild'],
-      ['wild', 'trainer'],
-      ['trainer', 'trainer'],
-      ['wild', 'wild'],
-    ];
-  } else if (len === 3) {
-    templates = [
-      ['wild', 'wild', 'wild'],
-      ['trainer', 'wild', 'wild'],
-      ['wild', 'trainer', 'wild'],
-      ['wild', 'wild', 'trainer'],
-      ['trainer', 'trainer', 'wild'],
-      ['wild', 'trainer', 'trainer'],
-      ['trainer', 'trainer', 'trainer'],
-      ['trainer', 'heal', 'trainer'],
-    ];
-  } else {
-    // Para cualquier otra longitud, genera combinaciones aleatorias
-    var types = [PATH_TYPE.Trainer, PATH_TYPE.Wild, PATH_TYPE.Heal];
-    for (var t = 0; t < 6; t++) {
-      var combo = [];
-      for (var i = 0; i < len; i++) {
-        combo.push(types[Math.floor(Math.random() * 2)]);
-      }
-      templates.push(combo);
-    }
-  }
-
-  var shuffled = templates.slice().sort(function () { return Math.random() - .5; });
-  return shuffled.slice(0, 3).map(function (types) {
-    return types.map(function (type) { return { type: type }; });
-  });
+  return POKEMON.eevee;
 }

@@ -4,7 +4,14 @@
 // Usa TYPES y DAMAGE_CLASS en vez de strings para evitar errores tipográficos.
 // Uso: type: TYPES.FIRE, damageClass: DAMAGE_CLASS.SPECIAL
 //
-// mt: true hace que el movimiento solo se pueda aprender por mt
+// mt: true        → solo se puede aprender por MT (buildMoves lo omite)
+// boss: true      → solo accesible vía moveId explícito en routes.js
+// pokemon: ['x']  → EXCLUSIVO de esos pokemon. Ningún otro puede aprenderlo
+//                   ni por stage, ni por MT. Los rivales configurados con ese
+//                   moveId explícito en routes.js no se ven afectados.
+//                   NOTA: este archivo carga antes que pokemon-db.js, por lo
+//                   que aquí NO se puede usar POKEMON.xxx — usar strings crudos
+//                   ('eevee', 'pikachu', etc.)
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -45,9 +52,10 @@ var MOVE_POOL = {
       { stage: 1, id: 'tackle', name: 'Placaje', power: 40, pp: 35, type: T.NORMAL, damageClass: DC.PHYSICAL },
       { stage: 2, id: 'extreme-speed', name: 'Velocidad Extrema', power: 70, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'priority' },
       { stage: 3, id: 'hyper-fang', name: 'Hiper Colmillo', power: 90, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'shield-10' },
-      { stage: 1, mt: true, id: 'take-down', name: 'Derribo', power: 60, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'guts' },
+      { stage: 1, mt: true, id: 'take-down', name: 'Derribo', power: 60, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'guts', effectData: { dmgMult: 2.5 } },
       { id: 'self-destruct', name: 'Autodestruccion', power: 800, pp: 5, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'self-destruct', boss: true },
-      { id: 'false-swipe', name: 'Sonambulo', power: 15, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['recoil-10', 'shield-25', 'sleep-self', 'sleep-attack'], boss: true },
+      { id: 'false-swipe', name: 'Sonambulo', power: 30, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['recoil-10', 'shield-25', 'sleep-self', 'sleep-attack'], boss: true },
+      { stage: 1, id: 'natural-gift', name: 'Don Natural', power: 40, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['raise-don-natural'], pokemon: ['eevee'] },
     ],
     special: [
       { stage: 1, id: 'swift', name: 'Velocidad', power: 40, pp: 20, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: 'shield-10' },
@@ -76,10 +84,10 @@ var MOVE_POOL = {
     ],
     special: [
       { stage: 1, id: 'water-gun', name: 'Pistola Agua', power: 40, pp: 25, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'raise-spa-10' },
-      { stage: 2, id: 'surf', name: 'Surf', power: 70, pp: 15, type: T.WATER, damageClass: DC.SPECIAL },
+      { stage: 2, id: 'surf', name: 'Surf', power: 75, pp: 15, type: T.WATER, damageClass: DC.SPECIAL },
       { stage: 3, id: 'hydro-pump', name: 'Hidrobomba', power: 90, pp: 99, type: T.WATER, damageClass: DC.SPECIAL },
       { stage: 1, mt: true, id: 'bubble-beam', name: 'Rayo Burbuja', power: 65, pp: 99, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'clear' },
-      { stage: 1, mt: true, id: 'scald', name: 'Escaldar', power: 70, pp: 99, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'burn-25' },
+      { stage: 1, mt: true, id: 'scald', name: 'Escaldar', power: 60, pp: 99, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'burn-25' },
     ],
   },
   grass: {
@@ -312,6 +320,7 @@ function buildMoves(pokemonName) {
     const progression = getMoveProgression(line.type, line.damageClass);
     for (const move of progression) {
       if (move && !move.boss && !move.mt && (move.stage ?? 1) <= pokemonStage && !seenIds.has(move.id)) {
+        if (move.pokemon?.length > 0 && !move.pokemon.includes(pokemonName.toLowerCase())) continue;
         seenIds.add(move.id);
         moves.push({ ...move, maxPp: move.pp });
       }

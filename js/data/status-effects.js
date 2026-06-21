@@ -5,19 +5,29 @@
 //
 // Estructura de statusEffect:
 // {
-//   id:       'poison' | 'paralysis' | 'burn' | 'sleep' | 'freeze'
+//   id:       StatusEffect.POISON | StatusEffect.PARALYSIS | StatusEffect.BURN | StatusEffect.SLEEP | StatusEffect.FREEZE
 //   turnsActive: 0    ← se incrementa al inicio de cada turno del pokemon
 // }
 //
 // CÓMO APLICAR UN ESTADO DESDE UN MOVIMIENTO:
 //   En move-effects.js, dentro del fn del efecto:
-//     StatusEffects.apply(ctx.target, 'poison', ctx.log);  // aplica al rival
-//     StatusEffects.apply(ctx.user,   'burn',   ctx.log);  // aplica al propio pokemon
+//     StatusEffects.apply(ctx.target, StatusEffect.POISON, ctx.log);  // aplica al rival
+//     StatusEffects.apply(ctx.user,   StatusEffect.BURN,   ctx.log);  // aplica al propio pokemon
 //
 // ICONOS que se muestran en el HUD:
-//   poison   → 💜 PSN   burn  → 🔥 QEM   sleep → 💤 SLE
-//   paralysis→ ⚡ PAR   freeze→ 🧊 CON
+//   StatusEffect.POISON   → 💜 PSN   StatusEffect.BURN  → 🔥 QEM   StatusEffect.SLEEP → 💤 SLE
+//   StatusEffect.PARALYSIS→ ⚡ PAR   StatusEffect.FREEZE→ 🧊 CON
 // ─────────────────────────────────────────────────────────────────────────────
+
+// Lista cerrada de identificadores de estado válidos
+var STATUS = Object.freeze({
+  BURN:      'burn',
+  POISON:    'poison',
+  SLEEP:     'sleep',
+  PARALYSIS: 'paralysis',
+  FREEZE:    'freeze',
+});
+const StatusEffect = STATUS;
 
 const STATUS_META = {
   poison:    { label: 'PSN', icon: '💜', color: '#9B59B6', bg: '#F5EEF8' },
@@ -55,21 +65,21 @@ const StatusEffects = {
     if (log) log(`${pokemon.displayName} fue ${StatusEffects._appliedMsg(statusId)}!`);
 
     // Burn reduce ATK base un 50% vía combatMods (guts lo ignora)
-    if (statusId === 'burn' && !hasGutsEffect(pokemon)) {
+    if (statusId === StatusEffect.BURN && !hasGutsEffect(pokemon)) {
       if (!pokemon.combatMods) pokemon.combatMods = {};
       pokemon.combatMods._burnAtk = true;
       pokemon.combatMods.atk = (pokemon.combatMods.atk ?? 0) - 0.50;
     }
 
     // Freeze reduce SPA base un 50% vía combatMods (guts lo ignora)
-    if (statusId === 'freeze' && !hasGutsEffect(pokemon)) {
+    if (statusId === StatusEffect.FREEZE && !hasGutsEffect(pokemon)) {
       if (!pokemon.combatMods) pokemon.combatMods = {};
       pokemon.combatMods._freezeSpa = true;
       pokemon.combatMods.spa = (pokemon.combatMods.spa ?? 0) - 0.50;
     }
 
     // Paralysis reduce SPE un 50% — directamente en stats (guts lo ignora)
-    if (statusId === 'paralysis' && !hasGutsEffect(pokemon)) {
+    if (statusId === StatusEffect.PARALYSIS && !hasGutsEffect(pokemon)) {
       pokemon._baseSpe = pokemon._baseSpe ?? pokemon.stats.spe;
       pokemon.stats.spe = Math.max(1, Math.floor(pokemon.stats.spe * 0.50));
     }
@@ -84,15 +94,15 @@ const StatusEffects = {
     const id = pokemon.statusEffect.id;
 
     // Revertir efectos de stat
-    if (id === 'burn' && pokemon.combatMods?._burnAtk) {
+    if (id === StatusEffect.BURN && pokemon.combatMods?._burnAtk) {
       pokemon.combatMods.atk = (pokemon.combatMods.atk ?? 0) + 0.50;
       delete pokemon.combatMods._burnAtk;
     }
-    if (id === 'freeze' && pokemon.combatMods?._freezeSpa) {
+    if (id === StatusEffect.FREEZE && pokemon.combatMods?._freezeSpa) {
       pokemon.combatMods.spa = (pokemon.combatMods.spa ?? 0) + 0.50;
       delete pokemon.combatMods._freezeSpa;
     }
-    if (id === 'paralysis' && pokemon._baseSpe) {
+    if (id === StatusEffect.PARALYSIS && pokemon._baseSpe) {
       pokemon.stats.spe = pokemon._baseSpe;
       delete pokemon._baseSpe;
     }
@@ -110,7 +120,7 @@ const StatusEffects = {
 
     s.turnsActive++;
 
-    if (s.id === 'sleep') {
+    if (s.id === StatusEffect.SLEEP) {
       // Comprobar si el autoMove tiene el efecto 'sleep-attack' (atacar dormido)
       const activeMove = pokemon.moves?.find(m => m.id === pokemon.autoMove);
       const hasSleepAttack = activeMove && (
@@ -137,7 +147,7 @@ const StatusEffects = {
       return { canAttack: false, message: `${pokemon.displayName} esta dormido...` };
     }
 
-    if (s.id === 'paralysis') {
+    if (s.id === StatusEffect.PARALYSIS) {
       if (Math.random() < 0.10) {
         return { canAttack: false, message: `${pokemon.displayName} esta paralizado!` };
       }
@@ -154,19 +164,19 @@ const StatusEffects = {
 
     let dmg = 0;
 
-    if (s.id === 'poison') {
+    if (s.id === StatusEffect.POISON) {
       dmg = Math.max(1, Math.floor(pokemon.stats.hp * 0.10));
       pokemon.currentHp = Math.max(0, pokemon.currentHp - dmg);
       if (log) log(`${pokemon.displayName} sufre daño por veneno! (-${dmg} HP)`);
     }
 
-    if (s.id === 'burn') {
+    if (s.id === StatusEffect.BURN) {
       dmg = Math.max(1, Math.floor(pokemon.stats.hp * 0.05));
       pokemon.currentHp = Math.max(0, pokemon.currentHp - dmg);
       if (log) log(`${pokemon.displayName} sufre daño por quemadura! (-${dmg} HP)`);
     }
 
-    if (s.id === 'freeze') {
+    if (s.id === StatusEffect.FREEZE) {
       dmg = Math.max(1, Math.floor(pokemon.stats.hp * 0.05));
       pokemon.currentHp = Math.max(0, pokemon.currentHp - dmg);
       if (log) log(`${pokemon.displayName} sufre daño por congelacion! (-${dmg} HP)`);

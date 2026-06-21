@@ -1459,16 +1459,18 @@ const Screens = {
       </p>
       <div style="display:flex;flex-direction:column;gap:6px">
         ${GameState.team.map((p, i) => {
+          const compatible = !heldItem.canEquip || heldItem.canEquip(p);
           const current = p.heldItem ? HELD_ITEMS[p.heldItem] : null;
-          return Screens._teamBtn(p, i,
-            current ? `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--red)">Sustituye: ${current.name}</span>` : ''
-          );
+          const extra = !compatible
+            ? `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">No compatible</span>`
+            : current ? `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--red)">Sustituye: ${current.name}</span>` : '';
+          return Screens._teamBtn(p, i, extra, !compatible);
         }).join('')}
       </div>
       <button class="btn btn--ghost btn--wide" id="held-item-cancel">Cancelar</button>
     `);
 
-    overlay.querySelectorAll('[data-idx]').forEach(btn => {
+    overlay.querySelectorAll('[data-idx]:not([disabled])').forEach(btn => {
       btn.addEventListener('click', () => {
         const p = GameState.team[+btn.dataset.idx];
         equipHeldItem(p, item.itemId);
@@ -1939,7 +1941,6 @@ const Screens = {
       await Screens._animateAttack(first, second, moveOf(first), player);
       if (!isAlive(second)) {
         ctx._turnRunning = false;
-        await Screens._applyAttackerItemEnd(first, player);
         await Screens._applyEndOfTurnStatus(player, foe);
         Screens._combatEnd(); return;
       }
@@ -1951,7 +1952,6 @@ const Screens = {
       await Screens._animateAttack(first, second, moveOf(first), player);
       if (!isAlive(second)) {
         ctx._turnRunning = false;
-        await Screens._applyAttackerItemEnd(first, player);
         await Screens._applyEndOfTurnStatus(player, foe);
         Screens._combatEnd(); return;
       }
@@ -1969,7 +1969,6 @@ const Screens = {
         await Screens._animateAttack(second, first, moveOf(second), player);
         if (!isAlive(first)) {
           ctx._turnRunning = false;
-          await Screens._applyAttackerItemEnd(second, player);
           await Screens._applyEndOfTurnStatus(player, foe);
           Screens._combatEnd(); return;
         }
@@ -2038,24 +2037,6 @@ const Screens = {
     }
   },
 
-  // Aplica ON_TURN_END del objeto del atacante cuando el combate termina antes del
-  // fin de turno normal (rival derrotado de un golpe). El atacante siempre está vivo.
-  async _applyAttackerItemEnd(attacker, player) {
-    const logFn = (txt) => Screens._updateCombatLog(txt);
-    const isPlayerPoke = attacker === player;
-    const updateHud = isPlayerPoke
-      ? () => {
-          Render.updateHpBar(document.getElementById('hud-player'), player.currentHp, player.stats.hp);
-          const nums = document.getElementById('hp-nums-player');
-          if (nums) nums.textContent = `${player.currentHp}/${player.stats.hp}`;
-          Screens._updateCombatTeamBar();
-        }
-      : () => {
-          Render.updateHpBar(document.getElementById('hud-foe'), attacker.currentHp, attacker.stats.hp);
-        };
-    const triggered = applyHeldItemTurnEnd(attacker, { log: logFn, updateHud });
-    if (triggered) await Screens._wait(400);
-  },
 
   async _animateAttack(attacker, defender, move, activePlayer) {
     const ctx       = GameState.combat;
