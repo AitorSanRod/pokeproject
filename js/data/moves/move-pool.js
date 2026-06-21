@@ -50,12 +50,12 @@ var MOVE_POOL = {
   normal: {
     physical: [
       { stage: 1, id: 'tackle', name: 'Placaje', power: 40, pp: 35, type: T.NORMAL, damageClass: DC.PHYSICAL },
-      { stage: 2, id: 'extreme-speed', name: 'Velocidad Extrema', power: 70, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'priority' },
+      { stage: 2, id: 'extreme-speed', name: 'Velocidad Extrema', power: 60, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'priority' },
       { stage: 3, id: 'hyper-fang', name: 'Hiper Colmillo', power: 90, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'shield-10' },
       { stage: 1, mt: true, id: 'take-down', name: 'Derribo', power: 60, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'guts', effectData: { dmgMult: 2.5 } },
       { id: 'self-destruct', name: 'Autodestruccion', power: 800, pp: 5, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'self-destruct', boss: true },
       { id: 'false-swipe', name: 'Sonambulo', power: 30, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['recoil-10', 'shield-25', 'sleep-self', 'sleep-attack', 'raise-atk-5'], boss: true },
-      { stage: 1, id: 'natural-gift', name: 'Don Natural', power: 15, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['raise-don-natural'], pokemon: ['eevee'] },
+      { stage: 1, id: 'natural-gift', name: 'Don Natural', power: 5, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['raise-don-natural', 'versatil'], pokemon: ['eevee'] },
     ],
     special: [
       { stage: 1, id: 'swift', name: 'Velocidad', power: 40, pp: 20, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: 'shield-10' },
@@ -66,9 +66,9 @@ var MOVE_POOL = {
   },
   fire: {
     physical: [
-      { stage: 1, id: 'flame-wheel', name: 'Rueda Fuego', power: 40, pp: 25, type: T.FIRE, damageClass: DC.PHYSICAL },
-      { stage: 2, id: 'fire-fang', name: 'Colmillo Igneo', power: 65, pp: 15, type: T.FIRE, damageClass: DC.PHYSICAL },
-      { stage: 3, id: 'flare-blitz', name: 'Llamarada', power: 110, pp: 15, type: T.FIRE, damageClass: DC.PHYSICAL },
+      { stage: 1, id: 'flame-wheel', name: 'Rueda Fuego', power: 40, pp: 25, type: T.FIRE, damageClass: DC.PHYSICAL, effectId: 'burn-10' },
+      { stage: 2, id: 'fire-fang', name: 'Colmillo Igneo', power: 65, pp: 15, type: T.FIRE, damageClass: DC.PHYSICAL, effectId: 'flinch-10' },
+      { stage: 3, id: 'flare-blitz', name: 'Llamarada', power: 110, pp: 15, type: T.FIRE, damageClass: DC.PHYSICAL, effectId: ['raise-atk-5', 'lower-self-def-spd-50'] },
     ],
     special: [
       { stage: 1, id: 'ember', name: 'Ascuas', power: 40, pp: 25, type: T.FIRE, damageClass: DC.SPECIAL, effectId: 'burn-10' },
@@ -92,8 +92,8 @@ var MOVE_POOL = {
   },
   grass: {
     physical: [
-      { stage: 1, id: 'vine-whip', name: 'Latigo Cepa', power: 40, pp: 25, type: T.GRASS, damageClass: DC.PHYSICAL },
-      { stage: 2, id: 'razor-leaf', name: 'Hoja afilada', power: 70, pp: 25, type: T.GRASS, damageClass: DC.PHYSICAL },
+      { stage: 1, id: 'vine-whip', name: 'Latigo Cepa', power: 60, pp: 25, type: T.GRASS, damageClass: DC.PHYSICAL },
+      { stage: 2, id: 'razor-leaf', name: 'Hoja afilada', power: 80, pp: 25, type: T.GRASS, damageClass: DC.PHYSICAL },
       { stage: 3, id: 'wood-hammer', name: 'Mazazo', power: 110, pp: 15, type: T.GRASS, damageClass: DC.PHYSICAL },
     ],
     special: [
@@ -130,7 +130,7 @@ var MOVE_POOL = {
   },
   fighting: {
     physical: [
-      { stage: 1, id: 'karate-chop', name: 'Golpe Karate', power: 50, pp: 25, type: T.FIGHTING, damageClass: DC.PHYSICAL, effectId: 'raise-atk-20' },
+      { stage: 1, id: 'karate-chop', name: 'Golpe Karate', power: 45, pp: 25, type: T.FIGHTING, damageClass: DC.PHYSICAL, effectId: 'raise-atk-20' },
       { stage: 2, id: 'brick-break', name: 'Romperrocas', power: 75, pp: 15, type: T.FIGHTING, damageClass: DC.PHYSICAL },
       { stage: 3, id: 'close-combat', name: 'A Bocajarro', power: 120, pp: 99, type: T.FIGHTING, damageClass: DC.PHYSICAL, effectId: 'lower-self-def-spd-50' },
     ],
@@ -144,10 +144,10 @@ var MOVE_POOL = {
     physical: [
       { stage: 1, id: 'poison-sting', name: 'Aguijon Toxico', power: 35, pp: 35, type: T.POISON, damageClass: DC.PHYSICAL, effectId: 'poison-25' },
       { stage: 2, id: 'poison-jab', name: 'Puya Nociva', power: 70, pp: 20, type: T.POISON, damageClass: DC.PHYSICAL, effectId: 'poison-50' },
-      { stage: 3, id: 'gunk-shot', name: 'Lanza Mugre', power: 100, pp: 99, type: T.POISON, damageClass: DC.PHYSICAL },
+      { stage: 3, id: 'gunk-shot', name: 'Lanza Mugre', power: 100, pp: 99, type: T.POISON, damageClass: DC.PHYSICAL, effectId: 'ventaja' },
     ],
     special: [
-      { stage: 1, id: 'poison-powder', name: 'Polvo Veneno', power: 30, pp: 35, type: T.POISON, damageClass: DC.SPECIAL },
+      { stage: 1, id: 'poison-powder', name: 'Polvo Veneno', power: 40, pp: 35, type: T.POISON, damageClass: DC.SPECIAL },
       { stage: 2, id: 'sludge-bomb', name: 'Bomba Lodo', power: 60, pp: 10, type: T.POISON, damageClass: DC.SPECIAL, effectId: 'poison-25' },
       { stage: 3, id: 'sludge-wave', name: 'Onda Toxica', power: 90, pp: 99, type: T.POISON, damageClass: DC.SPECIAL, effectId: 'poison-50' },
     ],
@@ -187,7 +187,7 @@ var MOVE_POOL = {
       { stage: 2, id: 'psychic', name: 'Psiquico', power: 50, pp: 10, type: T.PSYCHIC, damageClass: DC.SPECIAL, effectId: 'clear' },
       { stage: 3, id: 'psystrike', name: 'Golpe Psi', power: 90, pp: 10, type: T.PSYCHIC, damageClass: DC.SPECIAL },
       { id: 'teleport', name: 'Teletransporte', power: 0, pp: 99, type: T.PSYCHIC, damageClass: DC.SPECIAL, boss: true },
-      { id: 'trick', name: 'Truco', power: 40, pp: 99, type: T.PSYCHIC, damageClass: DC.SPECIAL, boss: true, effectId: ['clear', 'sleep-after', 'lower-spd-20'] },
+      { id: 'trick', name: 'Truco', power: 40, pp: 99, type: T.PSYCHIC, damageClass: DC.SPECIAL, boss: true, effectId: ['clear', 'sleep-after', 'lower-spe-20'] },
     ],
   },
   bug: {

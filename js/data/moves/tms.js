@@ -127,11 +127,11 @@ var TM_LIST = {
   // ═══════════════════════════════════════════════════════════════════════
   'tm-take-down': {
     id: 'tm-take-down',
-    name: 'MT Derribo',
+    name: 'MT Fachada',
     moveId: 'take-down',
     types: ['fighting'],
     pokemons: [POKEMON.kangaskhan, POKEMON.marowak, POKEMON.scyther, POKEMON.snorlax, POKEMON.dragonite],
-    desc: 'Enseña Derribo',
+    desc: 'Enseña Fachada',
     sprite: MT_SPRITES.normal,
     fallbackIcon: '',
   },
@@ -143,7 +143,7 @@ var TM_LIST = {
     name: 'MT Triturar',
     moveId: 'crunch',
     types: ['dark'],
-    pokemons: [POKEMON.kangaskhan, POKEMON.snorlax, POKEMON.gyarados, POKEMON.pinsir],
+    pokemons: [POKEMON.kangaskhan, POKEMON.snorlax, POKEMON.gyarados, POKEMON.pinsir, POKEMON.squirtle, POKEMON.wartortle, POKEMON.blastoise],
     desc: 'Enseña Triturar',
     sprite: MT_SPRITES.dark,
     fallbackIcon: '',

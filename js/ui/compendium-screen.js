@@ -561,7 +561,7 @@ const CompendiumScreen = {
               const effects   = typeof MOVE_EFFECTS !== 'undefined'
                 ? effectIds.map(id => MOVE_EFFECTS[id]).filter(Boolean)
                 : [];
-              const effectDesc = effects.map(e => e.desc).filter(Boolean).join(' · ');
+              const effectDesc = effects.map(e => e.desc).filter(Boolean).join('<br>');
               return `
                 <div class="comp-move-row" data-move-id="${m.id}"
                   style="display:flex;align-items:center;gap:8px;padding:6px 10px;
@@ -633,7 +633,7 @@ const CompendiumScreen = {
                 ? (Array.isArray(move.effectId) ? move.effectId : [move.effectId])
                 : [];
               const effectDesc = (typeof MOVE_EFFECTS !== 'undefined')
-                ? effectIds.map(id => MOVE_EFFECTS[id]?.desc).filter(Boolean).join(' · ')
+                ? effectIds.map(id => MOVE_EFFECTS[id]?.desc).filter(Boolean).join('<br>')
                 : '';
               return `
                 <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;

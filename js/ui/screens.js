@@ -3,10 +3,22 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 const SCREENS_CONFIG = {
-  STARTERS: [
-    { name: 'bulbasaur',  label: 'Bulbasaur' },
-    { name: 'charmander', label: 'Charmander' },
-    { name: 'squirtle',   label: 'Squirtle' },
+  // Cada región tiene: id, gen (etiqueta), name, routesGlobal (nombre del global
+  // de rutas cargado por su script, p.ej. 'KANTO_ROUTES'), y starters[].
+  // Para añadir una nueva generación: añadir entrada aquí y cargar su script
+  // de rutas en index.html antes de que se use.
+  REGIONS: [
+    {
+      id: 'kanto',
+      gen: 'GEN I',
+      name: 'KANTO',
+      routesGlobal: 'KANTO_ROUTES',
+      starters: [
+        { name: 'bulbasaur',  label: 'Bulbasaur' },
+        { name: 'charmander', label: 'Charmander' },
+        { name: 'squirtle',   label: 'Squirtle' },
+      ],
+    },
   ],
   STARTER_LEVEL: 5,
   DEV_POKEDEX: false,
@@ -15,12 +27,25 @@ const SCREENS_CONFIG = {
 if (SCREENS_CONFIG.DEV_POKEDEX) {
   Storage.getPokedex = function () {
     const dex = {};
-    (typeof KANTO_DEX !== 'undefined' ? KANTO_DEX : [])
-      .forEach(e => { dex[e.name] = { caught: true, seen: true }; });
+    const allEntries = typeof DEX_GENERATIONS !== 'undefined'
+      ? DEX_GENERATIONS.flatMap(g => g.entries)
+      : (typeof KANTO_DEX !== 'undefined' ? KANTO_DEX : []);
+    allEntries.forEach(e => { dex[e.name] = { caught: true, seen: true }; });
     return dex;
   };
   Storage.isCaught = () => true;
   Storage.isSeen   = () => true;
+
+  const _DEV_ALL_BADGES = ['boulder','cascade','thunder','rainbow','soul','marsh','volcano','earth'];
+  Storage.getBadges    = () => [..._DEV_ALL_BADGES];
+  Storage.getAllBadges  = () => {
+    const all = {};
+    const allEntries = typeof DEX_GENERATIONS !== 'undefined'
+      ? DEX_GENERATIONS.flatMap(g => g.entries)
+      : (typeof KANTO_DEX !== 'undefined' ? KANTO_DEX : []);
+    allEntries.forEach(e => { all[e.name] = [..._DEV_ALL_BADGES]; });
+    return all;
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -219,23 +244,11 @@ const Screens = {
         </div>
         <div class="region-grid">
           <div class="region-card" id="region-kanto">
-            <span class="region-card__number">GEN I</span>
             <span class="region-card__name">KANTO</span>
             <span class="region-card__badge region-card__badge--available">DISPONIBLE</span>
           </div>
           <div class="region-card region-card--locked">
-            <span class="region-card__number">GEN II</span>
             <span class="region-card__name">JOHTO</span>
-            <span class="region-card__badge region-card__badge--soon">PRONTO</span>
-          </div>
-          <div class="region-card region-card--locked">
-            <span class="region-card__number">GEN III</span>
-            <span class="region-card__name">HOENN</span>
-            <span class="region-card__badge region-card__badge--soon">PRONTO</span>
-          </div>
-          <div class="region-card region-card--locked">
-            <span class="region-card__number">GEN IV</span>
-            <span class="region-card__name">SINNOH</span>
             <span class="region-card__badge region-card__badge--soon">PRONTO</span>
           </div>
         </div>
@@ -244,7 +257,10 @@ const Screens = {
     document.getElementById('btn-back')
       .addEventListener('click', () => Screens.show(Screens.title));
     document.getElementById('region-kanto')
-      .addEventListener('click', () => Screens.show(Screens.starterSelect));
+      .addEventListener('click', () => {
+        Screens._region = SCREENS_CONFIG.REGIONS.find(r => r.id === 'kanto');
+        Screens.show(Screens.starterSelect);
+      });
     console.log('[UI] Pantalla: Seleccion de region');
   },
 
@@ -254,7 +270,8 @@ const Screens = {
   // Pantalla de selección de pokemon inicial. Carga cada starter desde la API,
   // muestra sus stats/tipos y permite elegir uno para comenzar la partida.
   starterSelect() {
-    const starters = SCREENS_CONFIG.STARTERS;
+    const region   = Screens._region ?? SCREENS_CONFIG.REGIONS[0];
+    const starters = region.starters;
 
     document.getElementById('viewport').innerHTML = `
       <div class="screen screen--starter">
@@ -293,7 +310,7 @@ const Screens = {
               <div class="starter-card__arrow">→</div>
             </div>`).join('')}
           ${(() => {
-            const unlocked = Storage.isCaught('mewtwo');
+            const unlocked = Object.values(Storage.getAllBadges()).some(b => b.length >= 8);
             return `
               <div id="card-custom"
                 class="starter-card${unlocked ? '' : ' starter-card--locked'}"
@@ -304,7 +321,7 @@ const Screens = {
                 <div class="starter-card__info">
                   <div class="starter-card__name">OTRO...</div>
                   <div style="font-family:var(--font-pixel);font-size:6px;color:var(--grey);margin-top:4px;line-height:1.6">
-                    ${unlocked ? 'Elige cualquier Pokémon capturado' : 'Captura a Mewtwo para desbloquear'}
+                    ${unlocked ? 'Elige cualquier Pokémon capturado' : 'Consigue las 8 medallas con cualquier Pokémon'}
                   </div>
                 </div>
                 <div class="starter-card__arrow">${unlocked ? '→' : ''}</div>
@@ -356,7 +373,7 @@ const Screens = {
       }
     });
 
-    if (Storage.isCaught('mewtwo')) {
+    if (Object.values(Storage.getAllBadges()).some(b => b.length >= 8)) {
       document.getElementById('card-custom')
         .addEventListener('click', () => Screens._showCustomStarterPicker());
     }
@@ -364,10 +381,11 @@ const Screens = {
     console.log('[UI] Pantalla: Seleccion de inicial');
   },
 
-  // ── Selector de inicial libre (desbloqueado al capturar Mewtwo) ───────────
+  // ── Selector de inicial libre (desbloqueado al conseguir las 8 medallas) ───
   _showCustomStarterPicker() {
     const dex = Storage.getPokedex();
-    const caught = KANTO_DEX.filter(e => dex[e.name]?.caught);
+    const allEntries = typeof DEX_GENERATIONS !== 'undefined' ? DEX_GENERATIONS.flatMap(g => g.entries) : KANTO_DEX;
+    const caught = allEntries.filter(e => dex[e.name]?.caught);
 
     document.getElementById('viewport').innerHTML = `
       <div class="screen" style="background:var(--off-white);display:flex;flex-direction:column;overflow:hidden">
@@ -1295,83 +1313,102 @@ const Screens = {
       }
     };
 
-    document.getElementById('viewport').innerHTML = `
-      <div class="screen" style="background:${REWARD_BG};
-        align-items:center;justify-content:center;gap:20px;padding:32px 24px;text-align:center;display:flex;flex-direction:column;">
-        <span style="font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.7);letter-spacing:2px">COMPLETADA</span>
-        <span style="font-family:var(--font-pixel);font-size:16px;color:var(--white);text-shadow:3px 3px 0 rgba(0,0,0,.3);line-height:1.6">${route.name.toUpperCase()}</span>
-        <span style="font-family:var(--font-pixel);font-size:8px;color:var(--yellow)">Elige una recompensa:</span>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:340px">
-          ${prizes.map(p => `
-            <div class="item-card" data-prize="${p.id}" data-desc="${p.desc}">
-              <div class="item-card__icon">${p.icon}</div>
-              <div class="item-card__name">${p.name}</div>
-            </div>`).join('')}
-        </div>
-        <button id="reward-skip" class="btn btn--wide"
-          style="max-width:340px;width:100%;background:var(--white);border:var(--border);box-shadow:var(--shadow-sm)">
-          CONTINUAR
-        </button>
-      </div>`;
+    // Botones flotantes pokédex / compendio (mismo patrón que _renderAdventureShell)
+    document.getElementById('app').querySelectorAll('.global-dex-btn').forEach(e => e.remove());
+    const rewardDexWrap = document.createElement('div');
+    rewardDexWrap.className = 'global-dex-btn';
+    rewardDexWrap.style.cssText = 'position:fixed;top:12px;right:12px;z-index:1000;display:flex;gap:4px';
+    const _rBtnStyle = 'min-height:32px;padding:4px 10px;font-size:10px;background:rgba(255,255,255,.92);border-color:var(--black);box-shadow:var(--shadow-sm)';
+    rewardDexWrap.innerHTML = `
+      <button class="btn btn--sm" id="btn-dex-reward"        style="${_rBtnStyle}" title="Pokédex">📖</button>
+      <button class="btn btn--sm" id="btn-compendium-reward" style="${_rBtnStyle}" title="Compendio">📋</button>`;
+    document.getElementById('app').appendChild(rewardDexWrap);
 
-    document.getElementById('reward-skip').addEventListener('click', advance);
+    const _renderReward = () => {
+      document.getElementById('viewport').innerHTML = `
+        <div class="screen" style="background:${REWARD_BG};
+          align-items:center;justify-content:center;gap:20px;padding:32px 24px;text-align:center;display:flex;flex-direction:column;">
+          <span style="font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.7);letter-spacing:2px">COMPLETADA</span>
+          <span style="font-family:var(--font-pixel);font-size:16px;color:var(--white);text-shadow:3px 3px 0 rgba(0,0,0,.3);line-height:1.6">${route.name.toUpperCase()}</span>
+          <span style="font-family:var(--font-pixel);font-size:8px;color:var(--yellow)">Elige una recompensa:</span>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:340px">
+            ${prizes.map(p => `
+              <div class="item-card" data-prize="${p.id}" data-desc="${p.desc}">
+                <div class="item-card__icon">${p.icon}</div>
+                <div class="item-card__name">${p.name}</div>
+              </div>`).join('')}
+          </div>
+          <button id="reward-skip" class="btn btn--wide"
+            style="max-width:340px;width:100%;background:var(--white);border:var(--border);box-shadow:var(--shadow-sm)">
+            CONTINUAR
+          </button>
+        </div>`;
 
-    document.querySelectorAll('.item-card').forEach(el => {
-      let tipEl = null;
-      el.addEventListener('mouseenter', () => {
-        tipEl = document.createElement('div');
-        tipEl.className = 'held-item-tooltip held-item-tooltip--floating';
-        tipEl.textContent = el.dataset.desc;
-        document.body.appendChild(tipEl);
-        const rect = el.getBoundingClientRect();
-        tipEl.style.left = `${rect.left}px`;
-        tipEl.style.top  = `${rect.top - tipEl.offsetHeight - 6}px`;
-        if (parseFloat(tipEl.style.top) < 4) tipEl.style.top = `${rect.bottom + 6}px`;
-      });
-      el.addEventListener('mouseleave', () => { tipEl?.remove(); tipEl = null; });
+      document.getElementById('reward-skip').addEventListener('click', advance);
 
-      el.addEventListener('click', async () => {
-        const prizeId = el.dataset.prize;
-        const chosen  = prizes.find(p => p.id === prizeId);
-        console.log(`[ADVENTURE] Premio elegido: ${chosen.name}`);
+      document.querySelectorAll('.item-card').forEach(el => {
+        let tipEl = null;
+        el.addEventListener('mouseenter', () => {
+          tipEl = document.createElement('div');
+          tipEl.className = 'held-item-tooltip held-item-tooltip--floating';
+          tipEl.textContent = el.dataset.desc;
+          document.body.appendChild(tipEl);
+          const rect = el.getBoundingClientRect();
+          tipEl.style.left = `${rect.left}px`;
+          tipEl.style.top  = `${rect.top - tipEl.offsetHeight - 6}px`;
+          if (parseFloat(tipEl.style.top) < 4) tipEl.style.top = `${rect.bottom + 6}px`;
+        });
+        el.addEventListener('mouseleave', () => { tipEl?.remove(); tipEl = null; });
 
-        if (chosen.type === 'pokemon') {
-          if (GameState.team.length < 6) {
-            GameState.team.push(rewardPoke);
-            advance();
-          } else {
-            // Equipo lleno — elegir cual sustituir
-            Screens._showPokemonSwapSelector(rewardPoke, advance, null);
-          }
-        } else if (chosen.type === 'ev-stat') {
-          Screens._showEvItemSelector(chosen, advance);
-        } else if (chosen.type === 'candy') {
-          for (const p of GameState.team) levelUpPokemon(p, 1);
-          // Procesar evoluciones pendientes silenciosamente
-          for (let i = 0; i < GameState.team.length; i++) {
-            const p = GameState.team[i];
-            if (p._pendingEvolution) {
-              const intoName = p._pendingEvolution;
-              delete p._pendingEvolution;
-              try {
-                const evolved = await evolve(p, intoName);
-                GameState.team[i] = evolved;
-                if (p === GameState.starter) GameState.starter = evolved;
-                Storage.markCaught(evolved.name);
-              } catch (e) {
-                console.error('[EVOLUCION] Error en caramelo:', e.message);
+        el.addEventListener('click', async () => {
+          const prizeId = el.dataset.prize;
+          const chosen  = prizes.find(p => p.id === prizeId);
+          console.log(`[ADVENTURE] Premio elegido: ${chosen.name}`);
+
+          if (chosen.type === 'pokemon') {
+            if (GameState.team.length < 6) {
+              GameState.team.push(rewardPoke);
+              advance();
+            } else {
+              Screens._showPokemonSwapSelector(rewardPoke, advance, null);
+            }
+          } else if (chosen.type === 'ev-stat') {
+            Screens._showEvItemSelector(chosen, advance);
+          } else if (chosen.type === 'candy') {
+            for (const p of GameState.team) levelUpPokemon(p, 1);
+            for (let i = 0; i < GameState.team.length; i++) {
+              const p = GameState.team[i];
+              if (p._pendingEvolution) {
+                const intoName = p._pendingEvolution;
+                delete p._pendingEvolution;
+                try {
+                  const evolved = await evolve(p, intoName);
+                  GameState.team[i] = evolved;
+                  if (p === GameState.starter) GameState.starter = evolved;
+                  Storage.markCaught(evolved.name);
+                } catch (e) {
+                  console.error('[EVOLUCION] Error en caramelo:', e.message);
+                }
               }
             }
+            GameState.team.forEach(p => fullHeal(p));
+            advance();
+          } else if (chosen.type === 'held-item') {
+            Screens._showHeldItemSelector(chosen, advance);
+          } else if (chosen.type === 'tm') {
+            Screens._showTMSelector(chosen, advance);
           }
-          // Curar al 100% tras el nivel — levelUpPokemon solo da +10% HP parcial
-          GameState.team.forEach(p => fullHeal(p));
-          advance();
-        } else if (chosen.type === 'held-item') {
-          Screens._showHeldItemSelector(chosen, advance);
-        } else if (chosen.type === 'tm') {
-          Screens._showTMSelector(chosen, advance);
-        }
+        });
       });
+    };
+
+    _renderReward();
+
+    document.getElementById('btn-dex-reward')?.addEventListener('click', () => {
+      PokedexScreen.show(() => _renderReward());
+    });
+    document.getElementById('btn-compendium-reward')?.addEventListener('click', () => {
+      CompendiumScreen.show(() => _renderReward());
     });
   },
 
@@ -2225,7 +2262,7 @@ const Screens = {
             if (ctx.activePlayer === member) ctx.activePlayer = evolved;
             // Marcar la evolución como capturada en la pokédex
             Storage.markCaught(evolved.name);
-            Screens._updateCombatLog(`Felicidades! ${evolved.displayName}!`);
+            Screens._updateCombatLog(`Felicidades! Tu ${member.displayName} a evolucionado a ${evolved.displayName}!`);
             console.log(`[EVOLUCION] ${member.displayName} → ${evolved.displayName}`);
             Screens._updateCombatTeamBar();
             await Screens._wait(800);
@@ -2440,13 +2477,19 @@ const Screens = {
       // Modificadores de stat activos
       const mods = poke.combatMods ?? {};
       const STAT_LABEL = { atk:'ATK', def:'DEF', spa:'SPA', spd:'SPD', spe:'VEL' };
-      for (const [key, val] of Object.entries(mods)) {
-        if (key.startsWith('_')) continue; // flags internos
-        if (val === 0) continue;
-        const label = STAT_LABEL[key] ?? key.toUpperCase();
-        const pct   = Math.round(Math.abs(val) * 100);
-        const up    = val > 0;
-        parts.push(`<span class="stat-mod-badge stat-mod-badge--${up ? 'up' : 'down'}">${label} ${up ? '+' : '-'}${pct}%</span>`);
+      const activeMods = Object.entries(mods).filter(([k, v]) => !k.startsWith('_') && v !== 0);
+      if (activeMods.length >= 3 && activeMods.every(([, v]) => v === activeMods[0][1])) {
+        const val = activeMods[0][1];
+        const pct = Math.round(Math.abs(val) * 100);
+        const up  = val > 0;
+        parts.push(`<span class="stat-mod-badge stat-mod-badge--${up ? 'up' : 'down'}">... ${up ? '+' : '-'}${pct}%</span>`);
+      } else {
+        for (const [key, val] of activeMods) {
+          const label = STAT_LABEL[key] ?? key.toUpperCase();
+          const pct   = Math.round(Math.abs(val) * 100);
+          const up    = val > 0;
+          parts.push(`<span class="stat-mod-badge stat-mod-badge--${up ? 'up' : 'down'}">${label} ${up ? '+' : '-'}${pct}%</span>`);
+        }
       }
 
       statusEl.innerHTML = parts.join('');

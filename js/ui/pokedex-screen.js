@@ -15,6 +15,8 @@ const PokedexScreen = {
 
     const dex     = Storage.getPokedex();
     const caught  = Object.keys(dex).filter(k => dex[k].caught).length;
+    const gens    = typeof DEX_GENERATIONS !== 'undefined' ? DEX_GENERATIONS : [{ gen: 1, label: 'GEN I — KANTO', entries: KANTO_DEX }];
+    const total   = gens.reduce((s, g) => s + g.entries.length, 0);
 
     document.getElementById('viewport').innerHTML = `
       <div class="screen" style="background:var(--off-white);display:flex;flex-direction:column;">
@@ -23,39 +25,52 @@ const PokedexScreen = {
         <div class="screen-header" style="background:var(--red)">
           <button class="btn btn--ghost screen-header__back" id="dex-back">${BACK_ARROW_SVG}</button>
           <span class="screen-header__title">POKÉDEX</span>
-          <span class="screen-header__extra">${caught}/151</span>
+          <span class="screen-header__extra">${caught}/${total}</span>
         </div>
 
         <!-- Lista -->
         <div id="dex-list" style="overflow-y:auto;flex:1;padding:var(--sp-sm)">
           <div style="display:flex;flex-direction:column;gap:4px">
-            ${KANTO_DEX.map(entry => {
-              const isCaught = dex[entry.name]?.caught;
-              const isSeen   = !isCaught && dex[entry.name]?.seen;
-              const isShiny  = isCaught && dex[entry.name]?.shiny;
+            ${gens.map(gen => {
+              const genCaught = gen.entries.filter(e => dex[e.name]?.caught).length;
               return `
-                <div class="dex-entry ${isCaught ? 'dex-entry--caught' : isSeen ? 'dex-entry--seen' : 'dex-entry--unseen'}"
-                  data-name="${entry.name}" data-id="${entry.id}">
-                  <span class="dex-entry__num">#${String(entry.id).padStart(3,'0')}</span>
+                <details open>
+                  <summary style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-dark);
+                    padding:6px 8px;cursor:pointer;list-style:none;display:flex;align-items:center;
+                    justify-content:space-between;background:var(--grey-light);border:var(--border);
+                    border-radius:var(--radius-sm);margin-bottom:4px;user-select:none">
+                    <span>${gen.label}</span>
+                    <span>${genCaught}/${gen.entries.length}</span>
+                  </summary>
+                  ${gen.entries.map(entry => {
+                    const isCaught = dex[entry.name]?.caught;
+                    const isSeen   = !isCaught && dex[entry.name]?.seen;
+                    const isShiny  = isCaught && dex[entry.name]?.shiny;
+                    return `
+                      <div class="dex-entry ${isCaught ? 'dex-entry--caught' : isSeen ? 'dex-entry--seen' : 'dex-entry--unseen'}"
+                        data-name="${entry.name}" data-id="${entry.id}">
+                        <span class="dex-entry__num">#${String(entry.id).padStart(3,'0')}</span>
 
-                  <div class="dex-entry__sprite-wrap">
-                    ${isCaught
-                      ? `<img src="${getDexSpriteUrl(entry.id)}" class="dex-entry__sprite" alt="${entry.name}" onerror="this.style.opacity=0.3">`
-                      : isSeen
-                      ? `<img src="${getDexSpriteUrl(entry.id)}" class="dex-entry__sprite dex-entry__sprite--seen" alt="${entry.name}" onerror="this.style.opacity=0.3">`
-                      : `<div class="dex-entry__silhouette">?</div>`}
-                  </div>
+                        <div class="dex-entry__sprite-wrap">
+                          ${isCaught
+                            ? `<img src="${getDexSpriteUrl(entry.id)}" class="dex-entry__sprite" alt="${entry.name}" onerror="this.style.opacity=0.3">`
+                            : isSeen
+                            ? `<img src="${getDexSpriteUrl(entry.id)}" class="dex-entry__sprite dex-entry__sprite--seen" alt="${entry.name}" onerror="this.style.opacity=0.3">`
+                            : `<div class="dex-entry__silhouette">?</div>`}
+                        </div>
 
-                  <div class="dex-entry__info">
-                    <span class="dex-entry__name">${isCaught || isSeen ? entry.name.toUpperCase() : '???'}</span>
-                    <div class="dex-entry__types">
-                      ${isCaught || isSeen ? entry.types.map(t => `<span class="type-badge" data-type="${t}">${t}</span>`).join('') : ''}
-                    </div>
-                  </div>
+                        <div class="dex-entry__info">
+                          <span class="dex-entry__name">${isCaught || isSeen ? entry.name.toUpperCase() : '???'}</span>
+                          <div class="dex-entry__types">
+                            ${isCaught || isSeen ? entry.types.map(t => `<span class="type-badge" data-type="${t}">${t}</span>`).join('') : ''}
+                          </div>
+                        </div>
 
-                  ${isShiny ? `<img src="assets/sprites/others/shiny.png" style="width:14px;height:14px;image-rendering:pixelated;flex-shrink:0">` : ''}
-                  ${isCaught ? `<span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey);flex-shrink:0">›</span>` : ''}
-                </div>`;
+                        ${isShiny ? `<img src="assets/sprites/others/shiny.png" style="width:14px;height:14px;image-rendering:pixelated;flex-shrink:0">` : ''}
+                        ${isCaught ? `<span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey);flex-shrink:0">›</span>` : ''}
+                      </div>`;
+                  }).join('')}
+                </details>`;
             }).join('')}
           </div>
         </div>
@@ -96,7 +111,8 @@ const PokedexScreen = {
 
     const isCaught      = Storage.isCaught(name);
     const isShinyPokemon = Storage.isShiny(name);
-    const entry = await getDexEntry({ id, name, types: KANTO_DEX.find(e => e.name === name)?.types ?? [] });
+    const _allDexEntries = typeof DEX_GENERATIONS !== 'undefined' ? DEX_GENERATIONS.flatMap(g => g.entries) : KANTO_DEX;
+    const entry = await getDexEntry({ id, name, types: _allDexEntries.find(e => e.name === name)?.types ?? [] });
     const shinySpriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${id}.png`;
     const evs    = Storage.getEvs(name);
     const badges = Storage.getBadges(name);

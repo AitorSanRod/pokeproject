@@ -454,7 +454,7 @@
   flex: 0 0 auto;
   position: relative;
   background: linear-gradient(180deg, #87CEEB 0%, #87CEEB 55%, #8DB870 55%, #6A9B50 100%);
-  border-bottom: var(--border);
+  /* border-bottom: var(--border); */
   height: var(--combat-field-height);
   overflow: hidden;
   background-size: cover;
@@ -1578,12 +1578,17 @@ div:hover > .move-effect-tooltip { display: block; }
 
 /* ── Estilos específicos de móvil (max-width coincide con --screen-max del juego) ── */
 @media (max-width: 480px) {
+  /* ── Combat log — absorbe el espacio sobrante para que acciones + equipo
+     queden juntos en la parte inferior sin hueco entre ellos. */
+  /* .combat-log {
+    margin-top: auto;
+  } */
+
   /* ── Combat team bar ────────────────────────────────────────────────────────
      Altura fija con scroll: no encoge/crece al aparecer/desaparecer elementos.
      Las filas de pip se reducen al tamaño de las filas de ruta (sprite 36px). */
   .combat-team-bar {
     flex: 0 0 196px;
-    margin-top: auto;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     gap: 2px;

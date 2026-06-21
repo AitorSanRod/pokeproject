@@ -39,6 +39,7 @@ movimientos, efectos, estados, evoluciones, recompensas y pantallas.
 24. [Penalización de experiencia por diferencia de nivel](#24-penalización-de-experiencia-por-diferencia-de-nivel)
 25. [Pokémon Shiny](#25-pokémon-shiny)
 26. [MTs — Máquinas Técnicas](#26-mts--máquinas-técnicas)
+27. [API Sync — integración con base de datos](#27-api-sync--integración-con-base-de-datos)
 
 ---
 
@@ -2177,4 +2178,404 @@ newPoke.autoMove = (pokemon.autoMove && newPoke.moves.find(m => m.id === pokemon
 
 Si el autoMove era una MT aprendida, la evolución lo conserva porque esa MT
 se vuelve a cargar desde Storage en `createPokemon`.
+
+---
+
+## 27. API Sync — integración con base de datos
+
+**Estado**: pendiente de integración. El archivo existe y está documentado pero
+no está cargado en `index.html` ni conectado a ningún servidor. No hay que
+tocar nada para activarlo excepto configurar `BASE_URL`.
+
+### Archivo
+
+`js/api-sync.js` — expone el objeto global `ApiSync` con doce funciones (seis
+de envío y seis de carga). No depende de ningún módulo externo; solo necesita
+que `Storage` esté disponible (cargado antes en `index.html`).
+
+### Activar la integración
+
+1. Añadir el `<script>` en `index.html` **después** de `storage.js`:
+   ```html
+   <script src="js/api-sync.js"></script>
+   ```
+2. Cambiar `BASE_URL` en la línea 19 del archivo:
+   ```js
+   const BASE_URL = 'https://api.tu-servidor.com';
+   ```
+3. Usar `syncAll()` para subir el estado y `loadAll()` para restaurarlo:
+   ```js
+   await ApiSync.syncAll();   // al completar una ruta, o al cerrar la app
+   await ApiSync.loadAll();   // al abrir la app en un dispositivo nuevo
+   ```
+
+### Funciones públicas — envío (POST)
+
+```js
+await ApiSync.syncAll();      // un único POST con todo el storage (recomendado)
+await ApiSync.syncPokedex();  // POST /pokedex — solo la pokédex
+await ApiSync.syncEvs();      // POST /evs     — solo EVs por cadena evolutiva
+await ApiSync.syncMts();      // POST /mts     — solo MTs aprendidas
+await ApiSync.syncBadges();   // POST /badges  — solo medallas por cadena
+await ApiSync.syncRun();      // POST /run     — solo la partida activa
+```
+
+Todas devuelven una `Promise` con la respuesta del servidor (JSON) o `null`
+si no hay datos que enviar. Lanzan `Error` si la respuesta no es 2xx.
+
+### Funciones públicas — carga (GET)
+
+```js
+await ApiSync.loadAll();      // GET /sync    — descarga y restaura todo el storage
+await ApiSync.loadPokedex();  // GET /pokedex — restaura solo la pokédex
+await ApiSync.loadEvs();      // GET /evs     — restaura solo los EVs
+await ApiSync.loadMts();      // GET /mts     — restaura solo las MTs
+await ApiSync.loadBadges();   // GET /badges  — restaura solo las medallas
+await ApiSync.loadRun();      // GET /run     — restaura solo la partida activa
+```
+
+Todas las funciones GET pasan `user_id` como query param (`?user_id=...`).
+Devuelven el objeto escrito en storage. Si el servidor devuelve `run_data: null`
+en `loadRun()` / `loadAll()`, la run local se elimina con `Storage.clearRun()`.
+
+### user_id — identificador de dispositivo
+
+Cada petición incluye un campo `user_id` (UUID). Se genera con
+`crypto.randomUUID()` la primera vez y se persiste en `localStorage`
+bajo la clave `pkmn_user_id`. No es autenticación — identifica al cliente
+para asociar sus datos en la base de datos.
+
+### Payload de `syncAll` — POST /sync
+
+Un único objeto JSON con todos los dominios:
+
+```js
+{
+  user_id:      string,        // UUID del dispositivo (generado automáticamente)
+  pkmn_version: string|null,   // versión del juego del guard de storage (pkmn_version)
+
+  pokedex: PokedexRow[],       // → tabla pokedex
+  evs:     EvRow[],            // → tabla evs
+  mts:     MtRow[],            // → tabla mts
+  badges:  BadgeRow[],         // → tabla badges
+
+  run_data: RunData|null,      // → tabla runs  (null si no hay run activa)
+  run_team: RunTeamSlot[],     // → tabla run_team ([] si no hay run activa)
+}
+```
+
+---
+
+### Respuesta esperada del servidor — GET /sync
+
+El servidor debe devolver exactamente la misma estructura que recibió en el
+POST /sync, sin el campo `user_id` (ya lo conoce por la query param).
+La función `loadAll()` reconstruye el storage a partir de este JSON.
+
+```js
+{
+  "pkmn_version": "1.0.0",
+
+  "pokedex": [
+    { "pokemon_name": "bulbasaur", "seen": true,  "caught": true,  "shiny": false },
+    { "pokemon_name": "pikachu",   "seen": true,  "caught": false, "shiny": false }
+  ],
+
+  "evs": [
+    { "evolution_root": "bulbasaur", "hp": 0, "atk": 8, "def": 0, "spa": 16, "spd": 0, "spe": 4 }
+  ],
+
+  "mts": [
+    { "evolution_root": "bulbasaur", "move_id": "earthquake" },
+    { "evolution_root": "bulbasaur", "move_id": "ice-beam"   }
+  ],
+
+  "badges": [
+    { "evolution_root": "bulbasaur", "badge_id": "boulder-badge"  },
+    { "evolution_root": "bulbasaur", "badge_id": "cascade-badge"  }
+  ],
+
+  "run_data": {
+    "version":      "1.0.0",
+    "route_index":  3,
+    "starter_name": "bulbasaur",
+    "badges":       ["boulder-badge"],
+    "items":        []
+  },
+
+  "run_team": [
+    {
+      "slot":          0,
+      "pokemon_name":  "ivysaur",
+      "display_name":  "Ivysaur",
+      "level":         18,
+      "current_hp":    45,
+      "max_hp":        58,
+      "nature":        "modest",
+      "exp":           340,
+      "shiny":         false,
+      "held_item":     "sitrus-berry",
+      "auto_move":     "magical-leaf",
+      "status_effect": null,
+      "evs":  { "hp": 0, "atk": 8, "def": 0, "spa": 16, "spd": 0, "spe": 4 },
+      "ivs":  { "hp": 31, "atk": 31, "def": 31, "spa": 31, "spd": 31, "spe": 31 },
+      "moves": [
+        { "id": "absorb",        "name": "Absorber",     "pp": 20, "max_pp": 25 },
+        { "id": "magical-leaf",  "name": "Hoja Magica",  "pp": 99, "max_pp": 99 },
+        { "id": "poison-powder", "name": "Polvo Veneno", "pp": 30, "max_pp": 35 }
+      ],
+      "learned_mts": ["earthquake"]
+    },
+    {
+      "slot":          1,
+      "pokemon_name":  "pikachu",
+      "display_name":  "Pikachu",
+      "level":         12,
+      "current_hp":    32,
+      "max_hp":        38,
+      "nature":        "jolly",
+      "exp":           80,
+      "shiny":         true,
+      "held_item":     null,
+      "auto_move":     "thunder-shock",
+      "status_effect": { "id": "poison", "turnsActive": 2 },
+      "evs":  { "hp": 0, "atk": 0, "def": 0, "spa": 0, "spd": 0, "spe": 4 },
+      "ivs":  { "hp": 31, "atk": 31, "def": 31, "spa": 31, "spd": 31, "spe": 31 },
+      "moves": [
+        { "id": "thunder-shock", "name": "Impactrueno", "pp": 25, "max_pp": 30 }
+      ],
+      "learned_mts": []
+    }
+  ]
+}
+```
+
+Si no hay run activa el servidor debe devolver `"run_data": null, "run_team": []`.
+
+Los endpoints individuales (`GET /pokedex`, `GET /evs`, etc.) devuelven solo
+su sección correspondiente, p.ej. `GET /pokedex` → `{ "pokedex": [...] }`.
+
+---
+
+### Tipos detallados
+
+#### `PokedexRow` — tabla `pokedex`
+
+Una fila por pokemon que haya sido visto o capturado al menos una vez.
+
+```js
+{
+  pokemon_name: string,   // nombre interno ('bulbasaur', 'nidoran-f'...)
+  seen:         boolean,  // true si apareció como rival aunque no se capturara
+  caught:       boolean,  // true si fue capturado al menos una vez (persistente)
+  shiny:        boolean,  // true si se capturó alguna vez en versión shiny
+}
+```
+
+Fuente: `Storage.getPokedex()` → `localStorage['pkmn_pokedex']`
+
+---
+
+#### `EvRow` — tabla `evs`
+
+Una fila por **cadena evolutiva** (no por pokémon individual).
+Bulbasaur/Ivysaur/Venusaur comparten la misma fila bajo `evolution_root: 'bulbasaur'`.
+Máximo 32 EVs por stat. Cada 4 EVs dan +1 punto de stat visible.
+
+```js
+{
+  evolution_root: string,  // primer eslabón de la cadena ('bulbasaur', 'rattata'...)
+  hp:             number,  // EVs de PS            (0–32)
+  atk:            number,  // EVs de Ataque        (0–32)
+  def:            number,  // EVs de Defensa       (0–32)
+  spa:            number,  // EVs de Atq. Especial (0–32)
+  spd:            number,  // EVs de Def. Especial (0–32)
+  spe:            number,  // EVs de Velocidad     (0–32)
+}
+```
+
+Fuente: `Storage.getAllEvs()` → `localStorage['pkmn_evs']`
+
+---
+
+#### `MtRow` — tabla `mts`
+
+Una fila por combinación cadena+movimiento (relación N:M).
+Si Bulbasaur aprendió Terremoto y Rayo Hielo, genera 2 filas.
+
+```js
+{
+  evolution_root: string,  // primer eslabón de la cadena ('bulbasaur'...)
+  move_id:        string,  // id del movimiento aprendido ('earthquake', 'ice-beam'...)
+}
+```
+
+Fuente: `Storage._get('mts')` → `localStorage['pkmn_mts']`
+
+---
+
+#### `BadgeRow` — tabla `badges`
+
+Una fila por combinación cadena+medalla (relación N:M).
+Ganar una medalla con Bulbasaur genera también filas para Ivysaur y Venusaur
+(mismo `evolution_root`).
+
+```js
+{
+  evolution_root: string,  // primer eslabón de la cadena ('bulbasaur'...)
+  badge_id:       string,  // id de la medalla ('boulder-badge', 'cascade-badge'...)
+}
+```
+
+IDs de medallas disponibles: `boulder-badge`, `cascade-badge`, `thunder-badge`,
+`rainbow-badge`, `soul-badge`, `marsh-badge`, `volcano-badge`, `earth-badge`
+(definidos en `js/data/routes/kanto-badges.js`).
+
+Fuente: `Storage.getAllBadges()` → `localStorage['pkmn_badges']`
+
+---
+
+#### `RunData` — tabla `runs`
+
+Cabecera de la partida activa. Solo existe una run por usuario a la vez.
+
+```js
+{
+  version:      string,    // versión del juego al guardar — guard de compatibilidad
+  route_index:  number,    // índice en KANTO_ROUTES de la ruta actual (0-based)
+  starter_name: string,    // nombre del pokémon inicial elegido ('bulbasaur'...)
+  badges:       string[],  // medallas de gimnasio obtenidas en esta run
+  items:        string[],  // objetos consumibles del jugador en esta run
+}
+```
+
+Fuente: `Storage.loadRun()` → `localStorage['pkmn_run']`
+
+---
+
+#### `RunTeamSlot` — tabla `run_team`
+
+Un objeto por cada pokémon del equipo activo (máximo 6). El campo `slot`
+indica la posición en el equipo (0 = primero).
+
+```js
+{
+  slot:          number,       // posición en el equipo (0–5)
+  pokemon_name:  string,       // nombre interno ('ivysaur', 'pikachu'...)
+  display_name:  string,       // nombre para mostrar ('Ivysaur', 'Pikachu'...)
+  level:         number,       // nivel actual (1–100)
+  current_hp:    number,       // PS actuales (puede ser 0 si está debilitado)
+  max_hp:        number,       // PS máximos computados (base + IVs + EVs + nature)
+  nature:        string,       // naturaleza ('modest', 'adamant', 'jolly'... — 25 posibles)
+  exp:           number,       // experiencia acumulada en el nivel actual
+  shiny:         boolean,      // true si es la variante de color alternativo
+  held_item:     string|null,  // id del objeto equipado ('sitrus-berry', 'carbon'... o null)
+  auto_move:     string|null,  // id del movimiento activo en modo automático (o null)
+  status_effect: {             // estado alterado activo, o null si no tiene ninguno
+    id:          string,       //   'poison' | 'paralysis' | 'burn' | 'sleep' | 'freeze'
+    turnsActive: number,       //   turnos que lleva con el estado
+  } | null,
+  evs: {                       // EVs actuales del pokémon (comparte valor con su cadena)
+    hp:  number,               //   0–32 cada stat
+    atk: number,
+    def: number,
+    spa: number,
+    spd: number,
+    spe: number,
+  },
+  ivs: {                       // IVs individuales (por defecto todos a 31)
+    hp:  number,               //   0–31 cada stat
+    atk: number,
+    def: number,
+    spa: number,
+    spd: number,
+    spe: number,
+  },
+  moves: Array<{               // moveset actual (máximo ~6 movimientos)
+    id:     string,            //   id del movimiento ('ember', 'tackle'...)
+    name:   string,            //   nombre visible ('Ascuas', 'Placaje'...)
+    pp:     number,            //   PP restantes
+    max_pp: number,            //   PP máximos del movimiento
+  }>,
+  learned_mts: string[],       // ids de MTs cargadas en este pokémon (['earthquake'...])
+}
+```
+
+Fuente: `Storage.loadRun().team` → `localStorage['pkmn_run']`
+
+---
+
+### Esquema SQL sugerido
+
+```sql
+-- Identificador de dispositivo (no es autenticación)
+-- user_id se recibe en cada request como campo del body
+
+TABLE pokedex (
+  user_id      TEXT    NOT NULL,
+  pokemon_name TEXT    NOT NULL,
+  seen         BOOLEAN NOT NULL DEFAULT FALSE,
+  caught       BOOLEAN NOT NULL DEFAULT FALSE,
+  shiny        BOOLEAN NOT NULL DEFAULT FALSE,
+  PRIMARY KEY (user_id, pokemon_name)
+);
+
+TABLE evs (
+  user_id        TEXT    NOT NULL,
+  evolution_root TEXT    NOT NULL,
+  hp             INTEGER NOT NULL DEFAULT 0 CHECK (hp  BETWEEN 0 AND 32),
+  atk            INTEGER NOT NULL DEFAULT 0 CHECK (atk BETWEEN 0 AND 32),
+  def            INTEGER NOT NULL DEFAULT 0 CHECK (def BETWEEN 0 AND 32),
+  spa            INTEGER NOT NULL DEFAULT 0 CHECK (spa BETWEEN 0 AND 32),
+  spd            INTEGER NOT NULL DEFAULT 0 CHECK (spd BETWEEN 0 AND 32),
+  spe            INTEGER NOT NULL DEFAULT 0 CHECK (spe BETWEEN 0 AND 32),
+  PRIMARY KEY (user_id, evolution_root)
+);
+
+TABLE mts (
+  user_id        TEXT NOT NULL,
+  evolution_root TEXT NOT NULL,
+  move_id        TEXT NOT NULL,
+  PRIMARY KEY (user_id, evolution_root, move_id)
+);
+
+TABLE badges (
+  user_id        TEXT NOT NULL,
+  evolution_root TEXT NOT NULL,
+  badge_id       TEXT NOT NULL,
+  PRIMARY KEY (user_id, evolution_root, badge_id)
+);
+
+TABLE runs (
+  run_id       UUID    PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      TEXT    NOT NULL,
+  version      TEXT    NOT NULL,
+  route_index  INTEGER NOT NULL,
+  starter_name TEXT    NOT NULL,
+  badges       JSONB   NOT NULL DEFAULT '[]',
+  items        JSONB   NOT NULL DEFAULT '[]',
+  saved_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+TABLE run_team (
+  run_id         UUID    NOT NULL REFERENCES runs(run_id) ON DELETE CASCADE,
+  slot           INTEGER NOT NULL CHECK (slot BETWEEN 0 AND 5),
+  pokemon_name   TEXT    NOT NULL,
+  display_name   TEXT    NOT NULL,
+  level          INTEGER NOT NULL CHECK (level BETWEEN 1 AND 100),
+  current_hp     INTEGER NOT NULL,
+  max_hp         INTEGER NOT NULL,
+  nature         TEXT    NOT NULL,
+  exp            INTEGER NOT NULL DEFAULT 0,
+  shiny          BOOLEAN NOT NULL DEFAULT FALSE,
+  held_item      TEXT,
+  auto_move      TEXT,
+  status_effect  JSONB,          -- { id, turnsActive } o null
+  evs            JSONB   NOT NULL DEFAULT '{}',
+  ivs            JSONB   NOT NULL DEFAULT '{}',
+  moves          JSONB   NOT NULL DEFAULT '[]',
+  learned_mts    JSONB   NOT NULL DEFAULT '[]',
+  PRIMARY KEY (run_id, slot)
+);
+```
 

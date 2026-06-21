@@ -24,7 +24,7 @@ var BADGE_LIST = {
     gym:    'Ciudad Plateada',
     leader: 'Brock',
     type:   'Roca',
-    img:    'assets/sprites/badges/medalla-roca.png',
+    img:    BADGE_IMG.boulder,
   },
 
   'cascade-badge': {
@@ -34,7 +34,7 @@ var BADGE_LIST = {
     gym:    'Ciudad Celeste',
     leader: 'Misty',
     type:   'Agua',
-    img:    'assets/sprites/badges/medalla-cascada.png',
+    img:    BADGE_IMG.cascade,
   },
 
   'thunder-badge': {
@@ -44,7 +44,7 @@ var BADGE_LIST = {
     gym:    'Ciudad Carmín',
     leader: 'Lt. Surge',
     type:   'Electrico',
-    img:    'assets/sprites/badges/medalla-trueno.png',
+    img:    BADGE_IMG.thunder,
   },
 
   'rainbow-badge': {
@@ -54,7 +54,7 @@ var BADGE_LIST = {
     gym:    'Ciudad Azulona',
     leader: 'Erika',
     type:   'Planta',
-    img:    'assets/sprites/badges/medalla-arcoiris.png',
+    img:    BADGE_IMG.rainbow,
   },
 
   'soul-badge': {
@@ -64,7 +64,7 @@ var BADGE_LIST = {
     gym:    'Gimnasio de Fucsia',
     leader: 'Koga',
     type:   'Veneno',
-    img:    'assets/sprites/badges/medalla-alma.png',
+    img:    BADGE_IMG.soul,
   },
 
   'marsh-badge': {
@@ -74,7 +74,7 @@ var BADGE_LIST = {
     gym:    'Gimnasio de Azafrán',
     leader: 'Sabrina',
     type:   'Psíquico',
-    img:    'assets/sprites/badges/medalla-pantano.png',
+    img:    BADGE_IMG.marsh,
   },
 
   'volcano-badge': {
@@ -84,7 +84,7 @@ var BADGE_LIST = {
     gym:    'Gimnasio de Canela',
     leader: 'Blaine',
     type:   'Fuego',
-    img:    'assets/sprites/badges/medalla-volcan.png',
+    img:    BADGE_IMG.volcano,
   },
 
   'earth-badge': {
@@ -94,7 +94,7 @@ var BADGE_LIST = {
     gym:    'Gimnasio de Verde',
     leader: 'Giovanni',
     type:   'Tierra',
-    img:    'assets/sprites/badges/medalla-tierra.png',
+    img:    BADGE_IMG.earth,
   },
 
 };

@@ -28,7 +28,11 @@ function calcDamage(attacker, defender, move) {
   let dmg = Math.floor((((2 * attacker.level / 5 + 2) * move.power * atk) / def) / 50) + 2;
 
   const stab   = attacker.types.includes(move.type) ? COMBAT_CONFIG.STAB_MULTIPLIER : 1.0;
-  const eff    = getEffectiveness(move.type, defender.types);
+  let eff      = getEffectiveness(move.type, defender.types);
+  if (eff === 0) {
+    const ids = Array.isArray(move.effectId) ? move.effectId : [move.effectId];
+    if (ids.includes('versatil')) eff = 1;
+  }
   const rnd    = COMBAT_CONFIG.RANDOM_MIN + Math.random() * (COMBAT_CONFIG.RANDOM_MAX - COMBAT_CONFIG.RANDOM_MIN);
 
   dmg = Math.floor(dmg * stab * eff * rnd);

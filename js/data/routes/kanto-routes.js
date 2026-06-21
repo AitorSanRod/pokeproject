@@ -114,101 +114,7 @@
 //
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ENTRENADORES = {
-  Rival: {
-    name: 'Azul',
-    img: 'assets/sprites/trainers/rival_kanto.png',
-  },
-  Cazabichos: {
-    name: 'Cazabichos',
-    img: 'assets/sprites/trainers/cazabichos.png',
-  },
-  EntrenadorJoven: {
-    name: 'Entrenador joven',
-    img: 'assets/sprites/trainers/entrenadorjoven.png',
-  },
-  Campista: {
-    name: 'Campista',
-    img: 'assets/sprites/trainers/campista.png',
-  },
-  Montanero: {
-    name: 'Montañero',
-    img: 'assets/sprites/trainers/montanero.png',
-  },
-  Dominguera: {
-    name: 'Dominguera',
-    img: 'assets/sprites/trainers/dominguera.png',
-  },
-  DomingueroFuego: {
-    name: 'Dominguero Fogoso',
-    img: 'assets/sprites/trainers/dominguero-fuego.png',
-  },
-  DomingueroAgua: {
-    name: 'Dominguero Mojado',
-    img: 'assets/sprites/trainers/dominguero-agua.png',
-  },
-  Nadador: {
-    name: 'Nadador',
-    img: 'assets/sprites/trainers/nadador.png',
-  },
-  Caballero: {
-    name: 'Caballero',
-    img: 'assets/sprites/trainers/caballero.png',
-  },
-  Mecanico: {
-    name: 'Mecanico',
-    img: 'assets/sprites/trainers/mecanico.png',
-  },
-  Pokemaniaco: {
-    name: 'Pokemaniaco',
-    img: 'assets/sprites/trainers/pokemaniaco.png'
-  },
-  Rojo: {
-    name: 'Rojo',
-    img: 'assets/sprites/trainers/rojo.png'
-  },
-  Cientifico: {
-    name: 'Cientifico',
-    img: 'assets/sprites/trainers/cientifico.png'
-  },
-  Marinero: {
-    name: 'Marinero',
-    img: 'assets/sprites/trainers/marinero.png'
-  },
-  Rocket: {
-    name: 'Rocket',
-    img: 'assets/sprites/trainers/soldado-rocket.png'
-  },
-  Giovanni: {
-    name: 'Giovanni',
-    img: 'assets/sprites/trainers/giovanni.png',
-    gif: 'assets/sprites/others/giovani.gif'
-  },
-  ChicoGuay: {
-    name: 'Entrenador Guay',
-    img: 'assets/sprites/trainers/entrenador-guay.png'
-  },
-  ChicaGuay: {
-    name: 'Entrenadora Guay',
-    img: 'assets/sprites/trainers/entrenadora-guay.png'
-  },
-  Chica: {
-    name: 'Chica',
-    img: 'assets/sprites/trainers/chica.png'
-  },
-  Medium: {
-    name: 'Medium',
-    img: 'assets/sprites/trainers/medium.png'
-  },
-  Malabarista: {
-    name: 'Malabarista',
-    img: 'assets/sprites/trainers/malabarista.png'
-  },
-  Ladron: {
-    name: 'Ladrón',
-    img: 'assets/sprites/trainers/ladron.png'
-  }
-};
+// ENTRENADORES definido en routes-assets.js
 
 var ROUTE_DATA = {
 
@@ -217,8 +123,8 @@ var ROUTE_DATA = {
   // ═══════════════════════════════════════════════════════════════════════
 
   'ruta-1': {
-    bg: 'assets/bg/route-1.png',
-    combatBg: 'assets/bg/combate.png',
+    bg: BG.ruta1,
+    combatBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.rattata, POKEMON.pidgey],
     wild: [
       { name: POKEMON.rattata, rate: 45, minLv: 2, maxLv: 4, moveId: MOVES.normal.physical.tackle },
@@ -247,7 +153,7 @@ var ROUTE_DATA = {
 
   'ciudad-verde-info': {
     type: 'information',
-    bg: 'assets/bg/ciudad-verde.png',
+    bg: BG.ciudadVerde,
     title: 'Ciudad Verde',
     description: 'Es el momento de volver sí<br>se te ha olvidado algo...',
     optional: {
@@ -257,8 +163,8 @@ var ROUTE_DATA = {
   },
 
   'ruta-22': {
-    bg: 'assets/bg/route-22.png',
-    combatBg: 'assets/bg/combate.png',
+    bg: BG.ruta22,
+    combatBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.mankey, POKEMON.nidoran_f, POKEMON.nidoran_m],
     wild: [
       { name: POKEMON.nidoran_m, rate: 30, minLv: 3, maxLv: 5, moveId: MOVES.poison.physical.poison_sting },
@@ -278,8 +184,8 @@ var ROUTE_DATA = {
   },
 
   'ruta-2': {
-    bg: 'assets/bg/route-2.png',
-    combatBg: 'assets/bg/combate.png',
+    bg: BG.ruta2,
+    combatBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.caterpie, POKEMON.weedle, POKEMON.pidgey, POKEMON.rattata],
     wild: [
       { name: POKEMON.rattata, rate: 35, minLv: 3, maxLv: 5, moveId: MOVES.normal.physical.tackle },
@@ -307,8 +213,8 @@ var ROUTE_DATA = {
   },
 
   'bosque-verde': {
-    bg: 'assets/bg/bosque-verde.png',
-    combatBg: 'assets/bg/combate.png',
+    bg: BG.bosqueVerde,
+    combatBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.pikachu, POKEMON.jigglypuff, POKEMON.caterpie, POKEMON.weedle],
     wild: [
       { name: POKEMON.caterpie, rate: 30, minLv: 6, maxLv: 10, moveId: MOVES.bug.physical.bug_bite },
@@ -351,18 +257,18 @@ var ROUTE_DATA = {
   },
 
   'ciudad-plateada': {
-    bg: 'assets/bg/ciudad-plateada.png',
-    combatBg: 'assets/bg/combate.png',
+    bg: BG.ciudadPlateada,
+    combatBg: COMBAT_BG.default,
     wild: [],
     welcome: {
       title: 'Ciudad Plateada',
       subtitle: 'Gimnasio Pokemon de tipo Roca',
-      img: 'assets/bg/ciudad-plateada.png',
+      img: BG.ciudadPlateada,
     },
     gymLeader: 'Brock',
     gymType: 'rock',
     badgeId: 'boulder-badge',
-    gymLeaderImg: 'assets/sprites/trainers/brock.png',
+    gymLeaderImg: TRAINER_IMG.brock,
     rewardExtras: [ITEM.leftovers],
     trainer: [
       {
@@ -391,8 +297,8 @@ var ROUTE_DATA = {
   },
 
   'ruta-3': {
-    bg: 'assets/bg/ruta-3.png',
-    combatBg: 'assets/bg/combate.png',
+    bg: BG.ruta3,
+    combatBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.magikarp],
     wild: [
       { name: POKEMON.pidgey, rate: 20, minLv: 10, maxLv: 14, moveId: MOVES.flying.physical.peck },
@@ -430,8 +336,8 @@ var ROUTE_DATA = {
   },
 
   'mt-moon': {
-    bg: 'assets/bg/mt-moon.png',
-    combatBg: 'assets/bg/combate-cueva.png',
+    bg: BG.mtMoon,
+    combatBg: COMBAT_BG.cueva,
     rewardPokemon: [POKEMON.zubat, POKEMON.clefairy, POKEMON.geodude],
     rewardExtras: [ITEM.sitrus_berry],
     wild: [
@@ -453,8 +359,8 @@ var ROUTE_DATA = {
   },
 
   'ruta-4': {
-    bg: 'assets/bg/ruta-4.png',
-    combatBg: 'assets/bg/combate.png',
+    bg: BG.ruta4,
+    combatBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.spearow, POKEMON.pidgey],
     wild: [
       { name: POKEMON.pidgey, rate: 40, minLv: 10, maxLv: 14, moveId: MOVES.flying.physical.peck },
@@ -472,18 +378,18 @@ var ROUTE_DATA = {
   // ═══════════════════════════════════════════════════════════════════════
 
   'ciudad-celeste': {
-    bg: 'assets/bg/ciudad-celeste.png',
-    combatBg: 'assets/bg/combate-agua.png',
+    bg: BG.ciudadCeleste,
+    combatBg: COMBAT_BG.agua,
     wild: [],
     welcome: {
       title: 'Ciudad Celeste',
       subtitle: 'Gimnasio Pokemon de tipo Agua',
-      img: 'assets/bg/ciudad-celeste.png',
+      img: BG.ciudadCeleste,
     },
     gymLeader: 'Misty',
     gymType: 'water',
     badgeId: 'cascade-badge',
-    gymLeaderImg: 'assets/sprites/trainers/misty.png',
+    gymLeaderImg: TRAINER_IMG.misty,
     rewardExtras: [ITEM.mystic_water],
     trainer: [
       {
@@ -520,8 +426,8 @@ var ROUTE_DATA = {
   },
 
   'ruta-24-1': {
-    bg: 'assets/bg/ruta-24.png',
-    combatBg: 'assets/bg/combate.png',
+    bg: BG.ruta24,
+    combatBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.abra],
     wild: [],
     specialTrainer: {
@@ -538,8 +444,8 @@ var ROUTE_DATA = {
   },
 
   'ruta-24-2': {
-    bg: 'assets/bg/ruta-24.png',
-    combatBg: 'assets/bg/combate.png',
+    bg: BG.ruta24,
+    combatBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.oddish, POKEMON.onix, POKEMON.ivysaur, POKEMON.charmeleon, POKEMON.wartortle],
     wild: [
       { name: POKEMON.pidgey, rate: 40, minLv: 10, maxLv: 14, moveId: MOVES.flying.physical.peck },
@@ -598,9 +504,9 @@ var ROUTE_DATA = {
 
   'info-bill': {
     type: 'information',
-    bg: 'assets/bg/ruta-25.png',
+    bg: BG.ruta25,
     title: 'Laboratorio de Bill',
-    description: '<div style="display: flex; justify-content: center;"><img src="assets/sprites/others/bill.gif"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">Tienes una charla con Bill y vuelves al camino</p>',
+    description: `<div style="display: flex; justify-content: center;"><img src="${GIF.bill}"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">Tienes una charla con Bill y vuelves al camino</p>`,
     optional: {
       btnName: 'Visita el jardín de Bill',
       area: 'jardin-bill',
@@ -612,8 +518,8 @@ var ROUTE_DATA = {
   // ═══════════════════════════════════════════════════════════════════════
 
   'ruta-5': {
-    bg: 'assets/bg/ruta-5.png',
-    combatBg: 'assets/bg/combate.png',
+    bg: BG.ruta5,
+    combatBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.bellsprout, POKEMON.meowth],
     wild: [
       { name: POKEMON.bellsprout, rate: 45, minLv: 18, maxLv: 24, moveId: MOVES.grass.special.absorb },
@@ -629,8 +535,8 @@ var ROUTE_DATA = {
   },
 
   'ruta-6': {
-    bg: 'assets/bg/ruta-6.png',
-    combatBg: 'assets/bg/combate.png',
+    bg: BG.ruta6,
+    combatBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.magikarp, POKEMON.meowth],
     wild: [
       { name: POKEMON.magikarp, rate: 65, minLv: 18, maxLv: 24, moveId: MOVES.water.special.water_gun },
@@ -655,14 +561,14 @@ var ROUTE_DATA = {
 
   'info-cgoob': {
     type: 'information',
-    bg: 'assets/bg/ss-anne.png',
+    bg: BG.ssAnne,
     title: 'SS Anne',
-    description: '<div style="display: flex; justify-content: center;"><img src="assets/sprites/others/rojo.gif"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">¿Quien es ese tío?</p>',
+    description: `<div style="display: flex; justify-content: center;"><img src="${GIF.rojo}"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">¿Quien es ese tío?</p>`,
   },
 
   'ss-anne': {
-    bg: 'assets/bg/ss-anne.png',
-    combatBg: 'assets/bg/combate-electrico.png',
+    bg: BG.ssAnne,
+    combatBg: COMBAT_BG.electrico,
     rewardPokemon: [POKEMON.magikarp, POKEMON.meowth],
     wild: [],
     specialTrainer: {
@@ -679,18 +585,18 @@ var ROUTE_DATA = {
   },
 
   'ciudad-carmin': {
-    bg: 'assets/bg/ciudad-carmin.png',
-    combatBg: 'assets/bg/combate-electrico.png',
+    bg: BG.ciudadCarmin,
+    combatBg: COMBAT_BG.electrico,
     wild: [],
     welcome: {
       title: 'Ciudad Carmin',
       subtitle: 'Gimnasio Pokemon de tipo Eléctrico',
-      img: 'assets/bg/ciudad-carmin.png',
+      img: BG.ciudadCarmin,
     },
     gymLeader: 'Lt. Surge',
     gymType: 'electric',
     badgeId: 'thunder-badge',
-    gymLeaderImg: 'assets/sprites/trainers/surge.png',
+    gymLeaderImg: TRAINER_IMG.surge,
     rewardPokemon: [POKEMON.voltorb, POKEMON.pikachu, POKEMON.raichu, POKEMON.porygon],
     rewardExtras: [ITEM.choice_band, ITEM.light_ball],
     trainer: [
@@ -725,8 +631,8 @@ var ROUTE_DATA = {
   // ═══════════════════════════════════════════════════════════════════════
 
   'ruta-9': {
-    bg: 'assets/bg/ruta-9.png',
-    combatBg: 'assets/bg/combate.png',
+    bg: BG.ruta9,
+    combatBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.rattata, POKEMON.spearow, POKEMON.ekans, POKEMON.sandshrew],
     rewardExtras: [ITEM.miracle_seed],
     wild: [
@@ -771,8 +677,8 @@ var ROUTE_DATA = {
   },
 
   'ruta-10': {
-    bg: 'assets/bg/ruta-10.png',
-    combatBg: 'assets/bg/combate.png',
+    bg: BG.ruta10,
+    combatBg: COMBAT_BG.default,
     wild: [
       { name: POKEMON.voltorb, rate: 40, minLv: 22, maxLv: 26, moveId: MOVES.electric.special.thunderbolt },
       { name: POKEMON.spearow, rate: 15, minLv: 22, maxLv: 26, moveId: MOVES.normal.physical.tackle },
@@ -808,14 +714,14 @@ var ROUTE_DATA = {
 
   'entrada-tunel-roca-info': {
     type: 'information',
-    bg: 'assets/bg/tunel-roca.png',
+    bg: BG.tunelRoca,
     title: 'Entrada del Tunel Roca',
-    description: '<div style="display: flex; justify-content: center;"><img src="assets/sprites/others/montanero.gif"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">Un montañero bloquea la entrada al Tunel Roca</p>',
+    description: `<div style="display: flex; justify-content: center;"><img src="${GIF.montanero}"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">Un montañero bloquea la entrada al Tunel Roca</p>`,
   },
 
   'entrada-tunel-roca': {
-    bg: 'assets/bg/tunel-roca.png',
-    combatBg: 'assets/bg/combate-cueva.png',
+    bg: BG.tunelRoca,
+    combatBg: COMBAT_BG.cueva,
     rewardPokemon: [POKEMON.snorlax],
     wild: [],
     trainer: [],
@@ -837,9 +743,9 @@ var ROUTE_DATA = {
   },
 
   'tunel-roca': {
-    bg: 'assets/bg/tunel-roca.png',
-    combatBg: 'assets/bg/combate-cueva.png',
-    rewardExtras: [ITEM.miracle_seed, ITEM.carbon, ITEM.assault_vest],
+    bg: BG.tunelRoca,
+    combatBg: COMBAT_BG.cueva,
+    rewardExtras: [ITEM.moon_stone],
     wild: [
       { name: POKEMON.onix, rate: 40, minLv: 24, maxLv: 30, moveId: MOVES.rock.physical.rock_slide },
       { name: POKEMON.geodude, rate: 40, minLv: 24, maxLv: 30, moveId: MOVES.ground.physical.stomping_tantrum },
@@ -856,8 +762,8 @@ var ROUTE_DATA = {
   },
 
   'ciudad-azulona': {
-    bg: 'assets/bg/ciudad-azulona.png',
-    combatBg: 'assets/bg/combate.png',
+    bg: BG.ciudadAzulona,
+    combatBg: COMBAT_BG.default,
     wild: [
       { name: POKEMON.eevee, rate: 5, minLv: 10, maxLv: 30, moveId: MOVES.normal.physical.tackle },
       { name: POKEMON.growlithe, rate: 5, minLv: 22, maxLv: 25, moveId: MOVES.fire.physical.fire_fang },
@@ -874,8 +780,8 @@ var ROUTE_DATA = {
   },
 
   'guarida-rocket': {
-    bg: 'assets/bg/guarida-rocket.png',
-    combatBg: 'assets/bg/combate-electrico.png',
+    bg: BG.guaridaRocket,
+    combatBg: COMBAT_BG.electrico,
     wild: [
       { name: POKEMON.voltorb, rate: 30, minLv: 30, maxLv: 32, moveId: MOVES.electric.special.thunder },
       { name: POKEMON.electrode, rate: 30, minLv: 31, maxLv: 33, moveId: MOVES.electric.special.thunder },
@@ -922,14 +828,14 @@ var ROUTE_DATA = {
 
   'ultima-planta-rocket-info': {
     type: 'information',
-    bg: 'assets/bg/oficina-rocket.png',
+    bg: BG.oficinaRocket,
     title: 'Última planta Rocket',
     description: `<div style="display: flex; justify-content: center;"><img src="${ENTRENADORES.Giovanni.gif}"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">¡Prepárate para el combate!</p>`,
   },
 
   'combate-giovanni': {
-    bg: 'assets/bg/oficina-rocket.png',
-    combatBg: 'assets/bg/combate-rocket.png',
+    bg: BG.oficinaRocket,
+    combatBg: COMBAT_BG.rocket,
     wild: [],
     trainer: [],
     specialTrainer: {
@@ -959,18 +865,18 @@ var ROUTE_DATA = {
   // ═══════════════════════════════════════════════════════════════════════
 
   'ciudad-azulona-gym': {
-    bg: 'assets/bg/ciudad-azulona.png',
-    combatBg: 'assets/bg/combate-electrico.png',
+    bg: BG.ciudadAzulona,
+    combatBg: COMBAT_BG.electrico,
     wild: [],
     welcome: {
       title: 'Gimnasio de Ciudad Azulona',
       subtitle: 'Gimnasio Pokemon de tipo Planta',
-      img: 'assets/bg/ciudad-azulona.png',
+      img: BG.ciudadAzulona,
     },
     gymLeader: 'Erika',
     gymType: 'grass',
     badgeId: 'rainbow-badge',
-    gymLeaderImg: 'assets/sprites/trainers/erika.png',
+    gymLeaderImg: TRAINER_IMG.erika,
     rewardPokemon: [POKEMON.tangela],
     rewardExtras: [ITEM.miracle_seed],
     trainer: [
@@ -1031,8 +937,8 @@ var ROUTE_DATA = {
   // ═══════════════════════════════════════════════════════════════════════
 
   'torre-pokemon': {
-    bg: 'assets/bg/torre-pokemon.png',
-    combatBg: 'assets/bg/combate-interior.png',
+    bg: BG.torrePokemon,
+    combatBg: COMBAT_BG.interior,
     pathLength: 4,
     wild: [
       { name: POKEMON.gastly, rate: 30, minLv: 35, maxLv: 42, moveId: [MOVES.ghost.special.shadow_ball, MOVES.poison.special.sludge_bomb] },
@@ -1066,9 +972,9 @@ var ROUTE_DATA = {
 
   'ultima-planta-torre-pokemon': {
     type: 'information',
-    bg: 'assets/bg/torre-pokemon.png',
+    bg: BG.torrePokemon,
     title: 'Última planta',
-    description: '<div style="display:flex;justify-content:center"><img src="assets/sprites/others/gastly.gif"></div><br><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">Ya has terminado aquí, pero hay una planta mas...</p>',
+    description: `<div style="display:flex;justify-content:center"><img src="${GIF.gastly}"></div><br><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">Ya has terminado aquí, pero hay una planta mas...</p>`,
     optional: {
       btnName: 'Subir a la última planta',
       area: 'combate-victor',
@@ -1080,8 +986,8 @@ var ROUTE_DATA = {
   // ═══════════════════════════════════════════════════════════════════════
 
   'pueblo-lavanda': {
-    bg: 'assets/bg/pueblo-lavanda.png',
-    combatBg: 'assets/bg/combate-noche.png',
+    bg: BG.puebloLavanda,
+    combatBg: COMBAT_BG.noche,
     wild: [],
     trainer: [],
     rewardExtras: [ITEM.thunder_stone, ITEM.water_stone, ITEM.fire_stone],
@@ -1114,8 +1020,8 @@ var ROUTE_DATA = {
   // ═══════════════════════════════════════════════════════════════════════
 
   'ruta-15': {
-    bg: 'assets/bg/ruta-15.png',
-    combatBg: 'assets/bg/combate-hierba-alta.png',
+    bg: BG.ruta15,
+    combatBg: COMBAT_BG.hierbaAlta,
     wild: [
       { name: POKEMON.pidgeotto, rate: 25, minLv: 38, maxLv: 44, moveId: MOVES.flying.physical.brave_bird },
       { name: POKEMON.venonat, rate: 25, minLv: 38, maxLv: 44, moveId: MOVES.poison.special.sludge_bomb },
@@ -1133,7 +1039,7 @@ var ROUTE_DATA = {
 
   'ciudad-fucsia': {
     type: 'information',
-    bg: 'assets/bg/ciudad-fucsia.png',
+    bg: BG.ciudadFucsia,
     title: 'Ciudad Fucsia',
     description: 'Puedes ir directo al gimnasio o también podrías...',
     optional: {
@@ -1143,18 +1049,18 @@ var ROUTE_DATA = {
   },
 
   'ciudad-fucsia-gym': {
-    bg: 'assets/bg/ciudad-fucsia.png',
-    combatBg: 'assets/bg/combate-interior.png',
+    bg: BG.ciudadFucsia,
+    combatBg: COMBAT_BG.interior,
     wild: [],
     welcome: {
       title: 'Ciudad Fucsia',
       subtitle: 'Gimnasio Pokemon de tipo Veneno',
-      img: 'assets/bg/ciudad-fucsia.png',
+      img: BG.ciudadFucsia,
     },
     gymLeader: 'Koga',
     gymType: 'poison',
     badgeId: 'soul-badge',
-    gymLeaderImg: 'assets/sprites/trainers/koga.png',
+    gymLeaderImg: TRAINER_IMG.koga,
     trainer: [
       {
         name: `${ENTRENADORES.Malabarista.name}`, img: ENTRENADORES.Malabarista.img, rate: 25, pokemon: [
@@ -1214,7 +1120,7 @@ var ROUTE_DATA = {
 
   'info-ciudad-azafran': {
     type: 'information',
-    bg: 'assets/bg/ciudad-azafran.png',
+    bg: BG.ciudadAzafran,
     title: 'Ciudad Azafrán',
     description: 'Llegas a Ciudad Azafrán',
     optional: {
@@ -1224,17 +1130,17 @@ var ROUTE_DATA = {
   },
 
   'ciudad-azafran-gym': {
-    bg: 'assets/bg/ciudad-azafran.png',
-    combatBg: 'assets/bg/combate-interior.png',
+    bg: BG.ciudadAzafran,
+    combatBg: COMBAT_BG.interior,
     welcome: {
       title: 'Ciudad Azafrán',
       subtitle: 'Gimnasio Pokemon de tipo Psiquico',
-      img: 'assets/bg/ciudad-azafran.png',
+      img: BG.ciudadAzafran,
     },
     gymLeader: 'Sabrina',
     gymType: 'psychic',
     badgeId: 'marsh-badge',
-    gymLeaderImg: 'assets/sprites/trainers/sabrina.png',
+    gymLeaderImg: TRAINER_IMG.sabrina,
     gym: {
       leader: [
         {
@@ -1266,8 +1172,8 @@ var ROUTE_DATA = {
   // ═══════════════════════════════════════════════════════════════════════
 
   'ruta-20': {
-    bg: 'assets/bg/ruta-20.png',
-    combatBg: 'assets/bg/combate-agua.png',
+    bg: BG.ruta20,
+    combatBg: COMBAT_BG.agua,
     wild: [
       { name: POKEMON.slowbro, rate: 10, minLv: 42, maxLv: 47, moveId: MOVES.water.special.scald },
       { name: POKEMON.tentacool, rate: 10, minLv: 42, maxLv: 47, moveId: MOVES.poison.special.sludge_wave },
@@ -1298,8 +1204,8 @@ var ROUTE_DATA = {
   },
 
   'mansion-pokemon': {
-    bg: 'assets/bg/mansion-pokemon.png',
-    combatBg: 'assets/bg/combate-interior.png',
+    bg: BG.mansionPokemon,
+    combatBg: COMBAT_BG.interior,
     wild: [
       { name: POKEMON.growlithe, rate: 15, minLv: 45, maxLv: 50, moveId: MOVES.fire.physical.flame_wheel },
       { name: POKEMON.vulpix, rate: 15, minLv: 45, maxLv: 50, moveId: MOVES.fire.special.flamethrower },
@@ -1325,17 +1231,17 @@ var ROUTE_DATA = {
   },
 
   'isla-canela-gym': {
-    bg: 'assets/bg/isla-canela.png',
-    combatBg: 'assets/bg/combate-interior.png',
+    bg: BG.islaCanela,
+    combatBg: COMBAT_BG.interior,
     welcome: {
       title: 'Isla Canela',
       subtitle: 'Gimnasio Pokemon de tipo Fuego',
-      img: 'assets/bg/isla-canela.png',
+      img: BG.islaCanela,
     },
     gymLeader: 'Blaine',
     gymType: 'fire',
     badgeId: 'volcano-badge',
-    gymLeaderImg: 'assets/sprites/trainers/blaine.png',
+    gymLeaderImg: TRAINER_IMG.blaine,
     rewardExtras: [ITEM.choice_band],
     gym: {
       leader: [
@@ -1370,23 +1276,23 @@ var ROUTE_DATA = {
 
   'ciudad-verde-info-2': {
     type: 'information',
-    bg: 'assets/bg/ciudad-verde.png',
+    bg: BG.ciudadVerde,
     title: 'Ciudad Verde',
     description: 'Te acercas al último gimnasio de la región.',
   },
 
   'ciudad-verde-gym': {
-    bg: 'assets/bg/ciudad-verde.png',
-    combatBg: 'assets/bg/combate-interior.png',
+    bg: BG.ciudadVerde,
+    combatBg: COMBAT_BG.interior,
     welcome: {
       title: 'Isla Canela',
       subtitle: 'Gimnasio Pokemon de tipo Tierra',
-      img: 'assets/bg/ciudad-verde.png',
+      img: BG.ciudadVerde,
     },
     gymLeader: 'Giovanni',
     gymType: 'ground',
     badgeId: 'earth-badge',
-    gymLeaderImg: 'assets/sprites/trainers/giovanni.png',
+    gymLeaderImg: TRAINER_IMG.giovanni,
     rewardExtras: [ITEM.choice_band],
     gym: {
       leader: [
@@ -1420,7 +1326,7 @@ var ROUTE_DATA = {
 
   'mensaje-medallas': {
     type: 'information',
-    bg: 'assets/bg/kanto-league.png',
+    bg: BG.kantoLeague,
     title: 'ENHORABUENA',
     description: 'Has conseguido todas las medallas de Kanto.<br>El alto mando te espera.',
   },
@@ -1430,8 +1336,8 @@ var ROUTE_DATA = {
   // ═══════════════════════════════════════════════════════════════════════
 
   'calle-victoria': {
-    bg: 'assets/bg/calle-victoria.png',
-    combatBg: 'assets/bg/combate-cueva.png',
+    bg: BG.calleVictoria,
+    combatBg: COMBAT_BG.cueva,
     rewardExtras: [ITEM.assault_vest],
     wild: [
       { name: POKEMON.moltres, rate: 25, minLv: 60, maxLv: 65, moveId: MOVES.fire.special.fire_blast },
@@ -1451,18 +1357,18 @@ var ROUTE_DATA = {
 
   'alto-mando-info': {
     type: 'information',
-    bg: 'assets/bg/kanto-league.png',
+    bg: BG.kantoLeague,
     title: 'ALTO MANDO',
     description: 'El alto mando esta cerrado por ahora, pronto podrás entrar.',
   },
 
   // ═══════════════════════════════════════════════════════════════════════
-  // Extra
+  // Extras
   // ═══════════════════════════════════════════════════════════════════════
 
   'espacio-raro': {
-    bg: 'assets/bg/espacio-raro.png',
-    combatBg: 'assets/bg/combate-espacio-raro.png',
+    bg: BG.espacioRaro,
+    combatBg: COMBAT_BG.espacioRaro,
     rewardPokemon: [POKEMON.mew],
     wild: [
       {
@@ -1478,46 +1384,46 @@ var ROUTE_DATA = {
 
   'info-combate-final': {
     type: 'information',
-    bg: 'assets/bg/cueva-plateada.png',
+    bg: BG.cuevaPlateada,
     title: 'Fondo de la cueva',
-    description: '<div style="display:flex;justify-content:center"><img src="assets/sprites/others/rojo-classic.png"></div><br><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">...</p>',
+    description: `<div style="display:flex;justify-content:center"><img src="${GIF.rojoClassic}"></div><br><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">...</p>`,
   },
 
   'combate-rojo': {
-    bg: 'assets/bg/cueva-plateada.png',
-    combatBg: 'assets/bg/combate-alto-mando.png',
+    bg: BG.cuevaPlateada,
+    combatBg: COMBAT_BG.altoMando,
     wild: [],
     trainer: [],
     specialTrainer: {
       name: ENTRENADORES.Rojo.name, img: ENTRENADORES.Rojo.img, pokemon: [
         {
           name: POKEMON.snorlax, level: 70, moveId: MOVES.normal.physical.hyper_fang,
-          heldItem: ITEM.leftovers, img: 'assets/sprites/pokemon/snorlax-classic.png',
+          heldItem: ITEM.leftovers, img: POKEMON_SPRITE.snorlaxClassic,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         },
         {
           name: POKEMON.charizard, level: 70, moveId: MOVES.fire.physical.flare_blitz,
-          heldItem: ITEM.assault_vest, img: 'assets/sprites/pokemon/charizard-classic.png',
+          img: POKEMON_SPRITE.charizardClassic,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         },
         {
           name: POKEMON.venusaur, level: 70, moveId: MOVES.grass.special.magical_leaf,
-          heldItem: ITEM.miracle_seed, img: 'assets/sprites/pokemon/venusaur-classic.png',
+          heldItem: ITEM.miracle_seed, img: POKEMON_SPRITE.venusaurClassic,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         },
         {
           name: POKEMON.blastoise, level: 70, moveId: MOVES.water.special.hydro_pump,
-          heldItem: ITEM.mystic_water, img: 'assets/sprites/pokemon/blastoise-classic.png',
+          heldItem: ITEM.mystic_water, img: POKEMON_SPRITE.blastoiseClassic,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         },
         {
           name: POKEMON.lapras, level: 70, moveId: MOVES.ice.special.blizzard,
-          heldItem: ITEM.choice_specs, img: 'assets/sprites/pokemon/lapras-classic.png',
+          heldItem: ITEM.choice_specs, img: POKEMON_SPRITE.laprasClassic,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         },
         {
           name: POKEMON.pikachu, level: 70, moveId: MOVES.electric.physical.volt_tackle,
-          heldItem: ITEM.light_ball, img: 'assets/sprites/pokemon/pikachu-classic.png',
+          heldItem: ITEM.light_ball, img: POKEMON_SPRITE.pikachuClassic,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         },
       ]
@@ -1529,9 +1435,9 @@ var ROUTE_DATA = {
 
   'info-final': {
     type: 'information',
-    bg: 'assets/bg/final.png',
+    bg: BG.final,
     title: '¡Enhorabuena!',
-    description: 'Has superado este tramo de tu aventura.<br>En el futuro se desbloqueará nuevo contenido.',
+    description: 'Has superado la aventura.<br>¡Gracias por jugar!',
   },
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -1539,8 +1445,8 @@ var ROUTE_DATA = {
   // ═══════════════════════════════════════════════════════════════════════
 
   'pueblo-paleta-1': {
-    bg: 'assets/bg/pueblo-paleta.png',
-    combatBg: 'assets/bg/combate.png',
+    bg: BG.puebloPaleta,
+    combatBg: COMBAT_BG.default,
     title: 'Pueblo Paleta',
     get wild() {
       const [primerInicial, segundoInicial] = ObtenerSegundoInicial(GameState.starterName ?? POKEMON.bulbasaur);
@@ -1562,8 +1468,8 @@ var ROUTE_DATA = {
   },
 
   'jardin-bill': {
-    bg: 'assets/bg/ruta-25.png',
-    combatBg: 'assets/bg/combate.png',
+    bg: BG.ruta25,
+    combatBg: COMBAT_BG.default,
     title: 'Jardín de Bill',
     rewardPokemon: [POKEMON.pinsir],
     rewardExtras: [ITEM.flame_orb, ITEM.safety_goggles],
@@ -1582,8 +1488,8 @@ var ROUTE_DATA = {
   },
 
   'combate-victor': {
-    bg: 'assets/bg/torre-pokemon.png',
-    combatBg: 'assets/bg/combate-interior.png',
+    bg: BG.torrePokemon,
+    combatBg: COMBAT_BG.interior,
     title: 'Última planta de la torre',
     wild: [],
     trainer: [],
@@ -1604,8 +1510,8 @@ var ROUTE_DATA = {
   },
 
   'silph': {
-    bg: 'assets/bg/silph.png',
-    combatBg: 'assets/bg/combate-interior.png',
+    bg: BG.silph,
+    combatBg: COMBAT_BG.interior,
     title: 'Silph S.A.',
     wild: [],
     rewardPokemon: [POKEMON.lapras],
@@ -1672,8 +1578,8 @@ var ROUTE_DATA = {
   },
 
   'zona-safari': {
-    bg: 'assets/bg/zona-safari.png',
-    combatBg: 'assets/bg/combate.png',
+    bg: BG.zonaSafari,
+    combatBg: COMBAT_BG.default,
     title: 'Zona Safari',
     rewardExtras: [],
     wildExclude: [
@@ -1690,7 +1596,7 @@ var ROUTE_DATA = {
       const exclude = this.wildExclude ?? [];
       const { min, max } = this.wildLevel ?? { min: 30, max: 45 };
       return Object.keys(POKEMON_DB)
-        .filter(name => !exclude.includes(name))
+        .filter(name => !exclude.includes(name) && (POKEMON_STATS[name]?.id ?? 0) <= 151)
         .map(name => ({ name, rate: 1, minLv: min, maxLv: max }));
     },
     trainer: [],
@@ -1701,9 +1607,9 @@ var ROUTE_DATA = {
 
   'dev-ruta-opcional': {
     type: 'information',
-    bg: 'assets/bg/bosque-verde.png',
+    bg: BG.bosqueVerde,
     title: 'Cruce de Caminos',
-    description: '<div style="display:flex;justify-content:center"><img src="assets/sprites/others/montanero.gif"></div><br><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">El camino principal sigue al norte. Al este se oye algo en el bosque...</p>',
+    description: `<div style="display:flex;justify-content:center"><img src="${GIF.montanero}"></div><br><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">El camino principal sigue al norte. Al este se oye algo en el bosque...</p>`,
     optional: {
       btnName: 'Explorar el bosque',
       area: 'ruta-22',
@@ -1716,9 +1622,13 @@ var ROUTE_DATA = {
 var FINAL_SCREEN = {
   title: '¡HAS GANADO!',
   subtitle: 'Enhorabuena, gracias por jugar!',
-  bg: 'assets/bg/final.png',
+  bg: BG.final,
   btnText: 'NUEVA PARTIDA',
 };
+
+// ═══════════════════════════════════════════════════════════════════════
+// KANTO
+// ═══════════════════════════════════════════════════════════════════════
 
 var KANTO_ROUTES = [
   { name: 'Ruta 1', area: 'ruta-1' },

@@ -404,6 +404,42 @@ var HELD_ITEMS = {
     revert(ctx) { },
   },
 
+  'moon-stone': {
+    name: 'Piedra Lunar',
+    desc: 'Provoca la evolución instantánea de ciertos pokemon. Se consume al usarla.',
+    img: 'assets/sprites/items/piedra-lunar.png',
+    fallbackIcon: '🌙',
+    canChange: false,
+    pairs: [
+      { preEvo: 'nidorina', evo: 'nidoqueen' },
+      { preEvo: 'nidorino', evo: 'nidoking' },
+      { preEvo: 'clefairy', evo: 'clefable' },
+      { preEvo: 'jigglypuff', evo: 'wigglytuff' },
+    ],
+    canEquip(pokemon) {
+      return this.pairs.some(p => p.preEvo === pokemon.name);
+    },
+    trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+    fn(ctx) {
+      const user = ctx.user;
+      const pairs = this.pairs;
+      const pair = pairs.find(p => p.preEvo === user.name);
+      if (!pair) return;
+      user.heldItem = null;
+      const idx = GameState.team.indexOf(user);
+      evolve(user, pair.evo).then(evolved => {
+        if (idx !== -1) {
+          GameState.team[idx] = evolved;
+          if (GameState.starter === user) GameState.starter = evolved;
+        }
+        Storage.markCaught(evolved.name);
+        console.log(`[PIEDRA] ${user.displayName} → ${evolved.displayName}`);
+      }).catch(e => {
+        console.error(`[PIEDRA] Error evolucionando ${user.displayName}:`, e.message);
+      });
+    },
+    revert(ctx) { },
+  },
 };
 
 // ── API ──────────────────────────────────────────────────────────────────────
@@ -532,4 +568,5 @@ var ITEM = {
   thunder_stone: 'thunder-stone',
   fire_stone: 'fire-stone',
   water_stone: 'water-stone',
+  moon_stone: 'moon-stone',
 };

@@ -1,12 +1,10 @@
 const NOTES_DATA = {
-  "title": "Mewtwo ya no es el final",
+  "title": "Todos los gimnasios disponibles",
   "lines": [
-    "Lo pokémon rivales ahora pueden usar distintos ataques",
-    "Compendio y Pokédex actualizados.",
-    "Nuevas rutas.",
-    "Nuevos combates.",
-    "Nuevo modo de juego.",
-    "Nuevos movimientos e items.",
-    "Bug que congela la partida al abrir el compendio arreglado"
+    "Mejoras visuales para algunos moviles.",
+    "Mejoras en los movimientos (Balance).",
+    "Nuevos items.",
+    "Mejoras en las descripciones: Ahora las descripciones largas se verán correctamente.",
+    "Ya no es necesario tener a Mewtwo para empezar con nuevos iniciales. Hay que conseguir todos las medallas con algún pokémon."
   ]
 };
