@@ -36,7 +36,7 @@ if (SCREENS_CONFIG.DEV_POKEDEX) {
   Storage.isCaught = () => true;
   Storage.isSeen   = () => true;
 
-  const _DEV_ALL_BADGES = ['boulder','cascade','thunder','rainbow','soul','marsh','volcano','earth'];
+  const _DEV_ALL_BADGES = ['boulder-badge','cascade-badge','thunder-badge','rainbow-badge','soul-badge','marsh-badge','volcano-badge','earth-badge'];
   Storage.getBadges    = () => [..._DEV_ALL_BADGES];
   Storage.getAllBadges  = () => {
     const all = {};
@@ -46,6 +46,7 @@ if (SCREENS_CONFIG.DEV_POKEDEX) {
     allEntries.forEach(e => { all[e.name] = [..._DEV_ALL_BADGES]; });
     return all;
   };
+  Storage.isKantoCompleted = () => true;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -582,6 +583,7 @@ const Screens = {
   // ni combates: solo un texto y un botón "CONTINUAR" que avanza a la
   // siguiente ruta (o a la pantalla de victoria si es la última).
   _showInformation(route, data) {
+    if (route.area === 'info-final-kanto') Storage.setKantoCompleted();
     const bgLayer = Screens._bgLayer(data.bg, true);
 
     document.getElementById('viewport').innerHTML = `

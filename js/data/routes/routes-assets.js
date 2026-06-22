@@ -58,6 +58,7 @@ const BG = {
   cuevaPlateada: 'assets/bg/cueva-plateada.png',
   silph: 'assets/bg/silph.png',
   zonaSafari: 'assets/bg/zona-safari.png',
+  mesetaAnil: 'assets/bg/meseta-anil.png',
   final: 'assets/bg/final.png',
 };
 
@@ -111,6 +112,11 @@ const TRAINER_IMG = {
   koga: 'assets/sprites/trainers/koga.png',
   sabrina: 'assets/sprites/trainers/sabrina.png',
   blaine: 'assets/sprites/trainers/blaine.png',
+  loreleiBig: 'assets/sprites/others/lorelei-big.png',
+  lorelei: 'assets/sprites/trainers/lorelei.png',
+  bruno: 'assets/sprites/trainers/bruno.png',
+  agatha: 'assets/sprites/trainers/agatha.png',
+  lance: 'assets/sprites/trainers/lance.png'
 };
 
 // ── Sprites y gifs misceláneos (escenas de historia) ─────────────────────────
@@ -123,6 +129,10 @@ const GIF = {
   gastly: 'assets/sprites/others/gastly.gif',
   rojoClassic: 'assets/sprites/others/rojo-classic.png',
   oak: 'assets/sprites/others/oak.gif',
+  bruno: 'assets/sprites/others/bruno.png',
+  agatha: 'assets/sprites/others/agatha.png',
+  lance: 'assets/sprites/trainers/lance.png',
+  azul: 'assets/sprites/others/azul.gif',
 };
 
 // ── Sprites especiales de pokémon ─────────────────────────────────────────────

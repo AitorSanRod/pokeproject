@@ -242,7 +242,7 @@ var HELD_ITEMS = {
       }
 
       const drain = Math.max(1, Math.floor(user.stats.hp * 0.05));
-      user.currentHp = Math.max(1, user.currentHp - drain);
+      user.currentHp = Math.max(0, user.currentHp - drain);
       log(`${user.displayName} pierde ${drain} HP por la Llama Orbe!`);
       if (updateHud) updateHud();
       return true;
@@ -287,7 +287,7 @@ var HELD_ITEMS = {
       if (user.currentHp <= 0) return false;
 
       const drain = Math.max(1, Math.floor(user.stats.hp * 0.10));
-      user.currentHp = Math.max(1, user.currentHp - drain);
+      user.currentHp = Math.max(0, user.currentHp - drain);
       log(`${user.displayName} pierde ${drain} HP por la Vida Esfera!`);
       if (updateHud) updateHud();
       return true;

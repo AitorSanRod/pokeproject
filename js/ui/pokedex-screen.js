@@ -202,9 +202,16 @@ const PokedexScreen = {
           </div>` : ''}
 
           <!-- Medallas obtenidas con este pokemon (o su línea evolutiva) en el equipo -->
-          <div style="background:var(--white);border:var(--border);border-radius:var(--radius-md);
+          ${(() => {
+            const kantoFinished = Storage.isKantoCompleted();
+            const medalBg = kantoFinished
+              ? `background:url('assets/bg/kanto-league-bg.jpg') center/cover no-repeat;position:relative`
+              : `background:var(--white)`;
+            return `<div style="${medalBg};border:var(--border);border-radius:var(--radius-md);
             padding:var(--sp-md);box-shadow:var(--shadow-sm)">
-            <div style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);margin-bottom:var(--sp-sm)">
+            ${kantoFinished ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,.45);border-radius:var(--radius-md);pointer-events:none"></div>` : ''}
+            <div style="position:relative;z-index:1">
+            <div style="font-family:var(--font-pixel);font-size:7px;color:${kantoFinished ? 'var(--white)' : 'var(--grey-dark)'};margin-bottom:var(--sp-sm)">
               MEDALLAS
             </div>
             ${badges.length > 0 ? `
@@ -221,6 +228,9 @@ const PokedexScreen = {
               </div>
             ` : `<span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey)">Sin medallas aun</span>`}
           </div>
+          </div>
+          `;
+          })()}
 
           <!-- Movimientos -->
           <div style="background:var(--white);border:var(--border);border-radius:var(--radius-md);

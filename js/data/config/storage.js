@@ -9,6 +9,7 @@
 //   pkmn_evs       → { [root]: { hp, atk, def, spa, spd, spe } }
 //   pkmn_mts       → { [root]: ['move-id-1', 'move-id-2'] }  ← se borra con pokédex
 //   pkmn_items     → { [itemId]: true }  ← objetos equipables recogidos alguna vez
+//   pkmn_kanto_done → true  ← se ha visto la pantalla info-final-kanto al menos una vez
 // ─────────────────────────────────────────────────────────────────────────────
 
 var Storage = {
@@ -209,6 +210,20 @@ var Storage = {
 
   isItemCollected(itemId) {
     return this.getCollectedItems()[itemId] === true;
+  },
+
+  // ── Final de Kanto ────────────────────────────────────────────────────────
+  // Se activa al llegar a info-final-kanto por primera vez. No se borra nunca
+  // (ni con reset de run): es un logro permanente del jugador.
+
+  isKantoCompleted() {
+    return this._get('kanto_done') === true;
+  },
+
+  setKantoCompleted() {
+    if (this.isKantoCompleted()) return;
+    this._set('kanto_done', true);
+    console.log('[Storage] ¡Liga Kanto completada!');
   },
 
   // ── Run State ────────────────────────────────────────────────────────────

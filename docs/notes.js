@@ -1,9 +1,8 @@
 const NOTES_DATA = {
-  "title": "GUARDADO",
+  "title": "GEN 1 COMPLETA",
   "lines": [
+    "Todos los gimnasios y alto mando disponibles.",
     "Guardado local mejorado con exportación e importación.",
-    "Coreción de errores, nombres y descripciones en MTs.",
-    "Ahora Mew puede aprender todas las MTs del juego.",
-    "En la sección de objetos del compendio ahora se marcarán los objetos obtenidos."
+    "Bug en objetos corregido: Objetos que restaban vida al usuario no llegaban a derrotarlo."
   ]
 };

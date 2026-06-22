@@ -520,17 +520,19 @@ var ROUTE_DATA = {
   'ruta-5': {
     bg: BG.ruta5,
     combatBg: COMBAT_BG.default,
-    rewardPokemon: [POKEMON.bellsprout, POKEMON.meowth],
+    rewardPokemon: [POKEMON.bellsprout, POKEMON.meowth, POKEMON.poliwag],
     wild: [
       { name: POKEMON.bellsprout, rate: 45, minLv: 18, maxLv: 24, moveId: MOVES.grass.special.absorb },
-      { name: POKEMON.meowth, rate: 45, minLv: 18, maxLv: 25, moveId: MOVES.normal.physical.extreme_speed },
+      { name: POKEMON.meowth, rate: 25, minLv: 18, maxLv: 25, moveId: MOVES.normal.physical.extreme_speed },
+      { name: POKEMON.poliwag, rate: 15, minLv: 18, maxLv: 25, moveId: MOVES.water.physical.waterfall },
       { name: POKEMON.growlithe, rate: 10, minLv: 18, maxLv: 22, moveId: MOVES.normal.physical.extreme_speed },
+      { name: POKEMON.farfetch_d, rate: 5, minLv: 18, maxLv: 22, moveId: MOVES.normal.physical.take_down },
     ],
     trainer: [],
     paths: [
-      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
-      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
-      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }]
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }]
     ],
   },
 
@@ -749,7 +751,8 @@ var ROUTE_DATA = {
     wild: [
       { name: POKEMON.onix, rate: 40, minLv: 24, maxLv: 30, moveId: MOVES.rock.physical.rock_slide },
       { name: POKEMON.geodude, rate: 40, minLv: 24, maxLv: 30, moveId: MOVES.ground.physical.stomping_tantrum },
-      { name: POKEMON.machoke, rate: 30, minLv: 26, maxLv: 35, moveId: MOVES.fighting.physical.close_combat },
+      { name: POKEMON.machoke, rate: 20, minLv: 26, maxLv: 35, moveId: MOVES.fighting.physical.brick_break },
+      { name: POKEMON.diglett, rate: 10, minLv: 26, maxLv: 35, moveId: MOVES.ground.physical.bulldoze },
     ],
     trainer: [
       {
@@ -785,7 +788,8 @@ var ROUTE_DATA = {
     wild: [
       { name: POKEMON.voltorb, rate: 30, minLv: 30, maxLv: 32, moveId: MOVES.electric.special.thunder },
       { name: POKEMON.electrode, rate: 30, minLv: 31, maxLv: 33, moveId: MOVES.electric.special.thunder },
-      { name: POKEMON.electrode, rate: 30, minLv: 31, maxLv: 33, moveId: MOVES.normal.physical.self_destruct },
+      { name: POKEMON.lickitung, rate: 15, minLv: 31, maxLv: 33, moveId: MOVES.normal.physical.tackle },
+      { name: POKEMON.magnemite, rate: 15, minLv: 31, maxLv: 33, moveId: MOVES.electric.special.thunder },
       { name: POKEMON.porygon, rate: 10, minLv: 31, maxLv: 33, moveId: MOVES.normal.special.tri_attack },
     ],
     trainer: [
@@ -1026,7 +1030,8 @@ var ROUTE_DATA = {
       { name: POKEMON.pidgeotto, rate: 25, minLv: 38, maxLv: 44, moveId: MOVES.flying.physical.brave_bird },
       { name: POKEMON.venonat, rate: 25, minLv: 38, maxLv: 44, moveId: MOVES.poison.special.sludge_bomb },
       { name: POKEMON.gloom, rate: 25, minLv: 38, maxLv: 44, moveId: MOVES.grass.special.magical_leaf },
-      { name: POKEMON.weepinbell, rate: 20, minLv: 38, maxLv: 44, moveId: MOVES.poison.special.sludge_bomb },
+      { name: POKEMON.weepinbell, rate: 10, minLv: 38, maxLv: 44, moveId: MOVES.poison.special.sludge_bomb },
+      { name: POKEMON.scyther, rate: 10, minLv: 38, maxLv: 44, moveId: MOVES.bug.physical.x_scissor },
       { name: POKEMON.ditto, rate: 5, minLv: 38, maxLv: 44, moveId: MOVES.normal.special.tri_attack },
     ],
     trainer: [],
@@ -1200,7 +1205,7 @@ var ROUTE_DATA = {
         ]
       },
     ],
-    pathLength: 5
+    pathLength: 6
   },
 
   'mansion-pokemon': {
@@ -1227,7 +1232,8 @@ var ROUTE_DATA = {
           { name: POKEMON.rapidash, level: 52, moveId: MOVES.fire.physical.flare_blitz },
         ]
       },
-    ]
+    ],
+    pathLength: 5
   },
 
   'isla-canela-gym': {
@@ -1359,7 +1365,225 @@ var ROUTE_DATA = {
     type: 'information',
     bg: BG.kantoLeague,
     title: 'ALTO MANDO',
-    description: 'El alto mando esta cerrado por ahora, pronto podrás entrar.',
+    description: '¡Preparate, el reto te espera!',
+  },
+
+  //LORELEI
+
+  'alto-mando-lorelei': {
+    type: 'information',
+    bg: BG.kantoLeague,
+    title: 'Lorelei',
+    description: `<div style="display:flex;justify-content:center;align-items:flex-end;">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/91.png" alt="Cloyster" style="position: relative;transform: translateX(157px);z-index: 1;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/87.png" alt="Dewgong" style="position: relative;transform: translateX(101px);z-index: 2;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/80.png" alt="Slowbro" style="position: relative;transform: rotateY(175deg) translateX(-78px);z-index: 1;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/124.png" alt="Jynx" style="position: relative;transform: rotateY(175deg) translateX(-19px);z-index: 0;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/131.png" alt="Lapras" style="position: relative;transform: rotateY(175deg) translateX(80px) translateY(-13px);scale: 2;z-index: -3;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="${TRAINER_IMG.loreleiBig}" style="position: relative;z-index: 3;height: 96px;object-fit: contain;right: 245px;">
+    </div><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">Alto Mando de tipo Hielo</p>`,
+  },
+
+  'combate-lorelei': {
+    bg: BG.mesetaAnil,
+    combatBg: COMBAT_BG.altoMando,
+    specialTrainer: {
+      name: 'Lorelei', img: TRAINER_IMG.lorelei, pokemon: [
+        {
+          name: POKEMON.dewgong, level: 62, moveId: MOVES.water.special.surf
+        },
+        {
+          name: POKEMON.cloyster, level: 61, moveId: MOVES.ice.physical.icicle_crash
+        },
+        {
+          name: POKEMON.slowbro, level: 63, moveId: [MOVES.psychic.special.psychic, MOVES.water.special.hydro_pump]
+        },
+        {
+          name: POKEMON.jynx, level: 65, moveId: MOVES.ice.special.blizzard
+        },
+        {
+          name: POKEMON.lapras, level: 65, moveId: [MOVES.ice.special.ice_beam, MOVES.water.special.scald]
+        }
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Special }],
+    ],
+  },
+
+  //BRUNO
+
+  'alto-mando-bruno': {
+    type: 'information',
+    bg: BG.kantoLeague,
+    title: 'Bruno',
+    description: `<div style="display:flex;justify-content:center;align-items:flex-end;">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/95.png" alt="" style="position: relative;transform: translateX(157px);z-index: 1;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/107.png" alt="" style="position: relative;transform: translateX(101px);z-index: 2;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/106.png" alt="" style="position: relative;transform: rotateY(175deg) translateX(-78px);z-index: 1;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/95.png" alt="" style="position: relative;transform: rotateY(175deg) translateX(-19px);z-index: 0;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/68.png" alt="" style="position: relative;transform: rotateY(175deg) translateX(80px) translateY(-13px);scale: 2;z-index: -3;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="${GIF.bruno}" style="position: relative;z-index: 3;height: 70px;object-fit: contain;right: 238px;">
+    </div><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">Alto Mando de tipo Lucha</p>`,
+  },
+
+  'combate-bruno': {
+    bg: BG.mesetaAnil,
+    combatBg: COMBAT_BG.altoMando,
+    specialTrainer: {
+      name: 'Bruno', img: TRAINER_IMG.bruno, pokemon: [
+        {
+          name: POKEMON.onix, level: 64, moveId: MOVES.rock.physical.rock_slide
+        },
+        {
+          name: POKEMON.hitmonlee, level: 64, moveId: MOVES.fighting.physical.brick_break
+        },
+        {
+          name: POKEMON.hitmonchan, level: 63, moveId: MOVES.fighting.physical.brick_break
+        },
+        {
+          name: POKEMON.onix, level: 65, moveId: MOVES.ground.physical.earthquake
+        },
+        {
+          name: POKEMON.machamp, level: 66, moveId: MOVES.fighting.physical.close_combat
+        },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Special }],
+    ],
+  },
+
+  //AGATHA
+
+  'alto-mando-agatha': {
+    type: 'information',
+    bg: BG.kantoLeague,
+    title: 'Agatha',
+    description: `<div style="display:flex;justify-content:center;align-items:flex-end;">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png" alt="" style="position: relative;transform: translateX(157px);z-index: 1;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/42.png" alt="" style="position: relative;transform: translateX(101px);z-index: 2;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/93.png" alt="" style="position: relative;transform: rotateY(175deg) translateX(-78px);z-index: 1;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/24.png" alt="" style="position: relative;transform: rotateY(175deg) translateX(-19px);z-index: 0;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png" alt="" style="position: relative;transform: rotateY(175deg) translateX(80px) translateY(-13px);scale: 2;z-index: -3;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="${GIF.agatha}" style="position: relative;z-index: 3;height: 70px;object-fit: contain;right: 238px;">
+    </div><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">Alto Mando de tipo Veneno</p>`,
+  },
+
+  'combate-agatha': {
+    bg: BG.mesetaAnil,
+    combatBg: COMBAT_BG.altoMando,
+    specialTrainer: {
+      name: 'Agatha', img: TRAINER_IMG.agatha, pokemon: [
+        {
+          name: POKEMON.gengar, level: 65, moveId: MOVES.ghost.physical.shadow_claw
+        },
+        {
+          name: POKEMON.golbat, level: 64, moveId: MOVES.poison.physical.gunk_shot
+        },
+        {
+          name: POKEMON.haunter, level: 66, moveId: MOVES.ghost.special.shadow_ball
+        },
+        {
+          name: POKEMON.arbok, level: 67, moveId: MOVES.poison.physical.gunk_shot
+        },
+        {
+          name: POKEMON.gengar, level: 67, moveId: [MOVES.ghost.special.shadow_ball, MOVES.psychic.special.confusion]
+        },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Special }],
+    ],
+  },
+
+  //LANCE
+
+  'alto-mando-lance': {
+    type: 'information',
+    bg: BG.kantoLeague,
+    title: 'Lance',
+    description: `<div style="display:flex;justify-content:center;align-items:flex-end;">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/130.png" alt="" style="position: relative;transform: translateX(157px);z-index: 1;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/148.png" alt="" style="position: relative;transform: translateX(101px);z-index: 2;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/148.png" alt="" style="position: relative;transform: rotateY(175deg) translateX(-48px);z-index: 1;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/142.png" alt="" style="position: relative;transform: rotateY(175deg) translateX(4px);z-index: 0;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/149.png" alt="" style="position: relative;transform: rotateY(175deg) translateX(80px) translateY(-13px);scale: 2;z-index: -3;image-rendering: pixelated;" onerror="this.style.opacity=0.2">
+    <img src="${GIF.lance}" style="position: relative;z-index: 3;height: 70px;object-fit: contain;right: 238px;">
+    </div><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">Alto Mando de tipo Dragon</p>`,
+  },
+
+  'combate-lance': {
+    bg: BG.mesetaAnil,
+    combatBg: COMBAT_BG.altoMando,
+    specialTrainer: {
+      name: 'Lance', img: TRAINER_IMG.lance, pokemon: [
+        {
+          name: POKEMON.gyarados, level: 65, moveId: MOVES.water.physical.wave_crash
+        },
+        {
+          name: POKEMON.dragonair, level: 66, moveId: MOVES.dragon.physical.dragon_claw
+        },
+        {
+          name: POKEMON.dragonair, level: 68, moveId: MOVES.dragon.physical.dragon_tail
+        },
+        {
+          name: POKEMON.aerodactyl, level: 68, moveId: MOVES.rock.physical.stone_edge
+        },
+        {
+          name: POKEMON.dragonite, level: 70, moveId: MOVES.dragon.physical.outrage
+        }
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Special }],
+    ],
+  },
+
+  //RIVAL
+
+  'campeon-pokemon-info': {
+    type: 'information',
+    bg: BG.kantoLeague,
+    title: 'AZUL',
+    description: `<div style="display:flex;justify-content:center"><img src="${GIF.azul}"></div><br><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">Campeón de la Liga Pokémon</p>`,
+  },
+
+  'campeon-pokemon': {
+    bg: BG.mesetaAnil,
+    combatBg: COMBAT_BG.altoMando,
+    specialTrainer: {
+      name: 'AZUL', img: TRAINER_IMG.rival, pokemon: [
+        {
+          name: POKEMON.pidgeot, level: 70, moveId: MOVES.flying.physical.brave_bird
+        },
+        {
+          name: POKEMON.alakazam, level: 70, moveId: MOVES.psychic.special.confusion
+        },
+        {
+          name: POKEMON.rhydon, level: 71, moveId: [MOVES.ground.physical.earthquake, MOVES.electric.special.thunder]
+        },
+        {
+          name: POKEMON.exeggutor, level: 72, moveId: MOVES.grass.special.solar_beam
+        },
+        {
+          name: POKEMON.gyarados, level: 72, moveId: MOVES.water.physical.wave_crash
+        },
+        {
+          name: POKEMON.charizard, level: 75, moveId: MOVES.fire.physical.flare_blitz
+        },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Special }],
+    ],
+  },
+
+  'info-final-kanto': {
+    type: 'information',
+    bg: BG.final,
+    title: '¡Enhorabuena!',
+    description: 'Has superado la aventura.<br>¡Gracias por jugar!',
   },
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -1437,7 +1661,7 @@ var ROUTE_DATA = {
     type: 'information',
     bg: BG.final,
     title: '¡Enhorabuena!',
-    description: 'Has superado la aventura.<br>¡Gracias por jugar!',
+    description: '¡Has superado el contenido extra!',
   },
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -1672,7 +1896,26 @@ var KANTO_ROUTES = [
   { name: 'Gimnasio de Ciudad Verde', area: 'ciudad-verde-gym' },
   { name: '¡Enhorabuena!', area: 'mensaje-medallas' },
   { name: 'Calle Victoria', area: 'calle-victoria' },
+
+  //ALTO MANDO
   { name: 'ALTO MANDO', area: 'alto-mando-info' },
+
+  { name: 'LORELEI', area: 'alto-mando-lorelei' },
+  { name: 'ALTO MANDO LORELEI', area: 'combate-lorelei' },
+
+  { name: 'BRUNO', area: 'alto-mando-bruno' },
+  { name: 'ALTO MANDO BRUNO', area: 'combate-bruno' },
+
+  { name: 'AGATHA', area: 'alto-mando-agatha' },
+  { name: 'ALTO MANDO AGATHA', area: 'combate-agatha' },
+
+  { name: 'LANCE', area: 'alto-mando-lance' },
+  { name: 'ALTO MANDO LANCE', area: 'combate-lance' },
+
+  { name: 'AZUL', area: 'campeon-pokemon-info' },
+  { name: 'CAMPEÓN DE LA LIGA POKÉMON', area: 'campeon-pokemon' },
+
+  { name: 'CAMPEÓN DE LA LIGA', area: 'info-final-kanto' },
 
   //Extra
   { name: '???', area: 'espacio-raro' },
