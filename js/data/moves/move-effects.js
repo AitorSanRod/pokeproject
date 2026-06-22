@@ -37,6 +37,12 @@ var MOVE_EFFECTS = {
     desc: 'Ignora las inmunidades de tipo: trata ×0 como ×1.',
   },
 
+  'crit-75': {
+    // Sin trigger ni fn — la lógica vive en calcDamage (battle.js):
+    // sustituye COMBAT_CONFIG.CRIT_CHANCE por 0.75 para este movimiento.
+    desc: 'Alta probabilidad de golpe crítico (75%).',
+  },
+
   // ── AFTER_ATTACK — Absorción ───────────────────────────────────────────────
 
   'drain-10': {
@@ -356,6 +362,13 @@ var MOVE_EFFECTS = {
     statusChance: 0.50,
     desc: 'Tiene un 50% de probabilidad de congelar al rival.',
     fn(ctx) { StatusEffects.apply(ctx.target, StatusEffect.FREEZE, ctx.log); },
+  },
+
+  'conf-20': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    statusChance: 0.20,
+    desc: 'Tiene un 20% de probabilidad de confundir al rival.',
+    fn(ctx) { StatusEffects.apply(ctx.target, StatusEffect.CONFUSION, ctx.log); },
   },
 
   // ── AFTER_ATTACK — Retroceso (flinch) ─────────────────────────────────────

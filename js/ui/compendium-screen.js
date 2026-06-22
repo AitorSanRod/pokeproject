@@ -333,6 +333,15 @@ const CompendiumScreen = {
           'Reduce el <strong>Ataque Especial base un 50%</strong> mientras dure.',
         ],
       },
+      {
+        id: 'confusion', icon: '💫', label: 'CNF', color: '#7d22e6', bg: '#F3E9FE',
+        lines: [
+          'Dura un máximo de <strong>5 turnos</strong>.',
+          'Cada turno: <strong>33%</strong> de curarse espontáneamente.',
+          'Si no se cura: <strong>50%</strong> de golpearse a sí mismo (Normal físico, 60 base).',
+          'El autogolpe <strong>ignora inmunidades de tipo</strong> (afecta a todos).',
+        ],
+      },
     ];
 
     return statuses.map(s => `
@@ -585,22 +594,29 @@ const CompendiumScreen = {
   _renderHeldItemList() {
     if (typeof HELD_ITEMS === 'undefined') return '<p>HELD_ITEMS no disponible</p>';
 
-    return Object.values(HELD_ITEMS).map(item => `
+    const collected = (typeof Storage !== 'undefined') ? Storage.getCollectedItems() : {};
+
+    return Object.entries(HELD_ITEMS).map(([id, item]) => {
+      const obtained = collected[id] === true;
+      return `
       <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;margin-bottom:6px;
-        background:var(--off-white);border:1px solid var(--grey-light);border-radius:var(--radius-sm)">
+        background:var(--off-white);border:1px solid var(--grey-light);border-radius:var(--radius-sm);
+        ${obtained ? '' : 'opacity:0.55'}">
         <img src="${item.img}" alt="${item.name}"
-          style="width:28px;height:28px;image-rendering:pixelated;object-fit:contain;flex-shrink:0"
-          onerror="this.outerHTML='<span style=font-size:22px>${item.fallbackIcon ?? '❓'}</span>'">
+          style="width:28px;height:28px;image-rendering:pixelated;object-fit:contain;flex-shrink:0;
+            ${obtained ? '' : 'filter:brightness(.15) grayscale(1)'}"
+          onerror="this.outerHTML='<span style=font-size:22px;${obtained ? '' : 'filter:brightness(.15) grayscale(1)'}'>${item.fallbackIcon ?? '❓'}</span>'">
         <div style="flex:1">
-        <span style="font-family:var(--font-pixel);font-size:12px;color:var(--grey-dark);line-height:1.8">
+          <span style="font-family:var(--font-pixel);font-size:12px;color:var(--grey-dark);line-height:1.8">
             ${item.name}
           </span>
           <br>
           <span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-dark);line-height:1.8">
-            ${item.desc}
+            ${obtained ? item.desc : '???'}
           </span>
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
   },
 
   // ── Lista de MTs agrupadas por tipo ──────────────────────────────────────

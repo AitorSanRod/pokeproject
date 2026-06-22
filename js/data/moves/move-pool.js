@@ -52,7 +52,7 @@ var MOVE_POOL = {
       { stage: 1, id: 'tackle', name: 'Placaje', power: 40, pp: 35, type: T.NORMAL, damageClass: DC.PHYSICAL },
       { stage: 2, id: 'extreme-speed', name: 'Velocidad Extrema', power: 60, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'priority' },
       { stage: 3, id: 'hyper-fang', name: 'Hiper Colmillo', power: 90, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'shield-10' },
-      { stage: 1, mt: true, id: 'take-down', name: 'Derribo', power: 60, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'guts', effectData: { dmgMult: 2.5 } },
+      { stage: 1, mt: true, id: 'facade', name: 'Fachada', power: 60, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'guts', effectData: { dmgMult: 2.5 } },
       { id: 'self-destruct', name: 'Autodestruccion', power: 800, pp: 5, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'self-destruct', boss: true },
       { id: 'false-swipe', name: 'Sonambulo', power: 30, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['recoil-10', 'shield-25', 'sleep-self', 'sleep-attack', 'raise-atk-5'], boss: true },
       { stage: 1, id: 'natural-gift', name: 'Don Natural', power: 5, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['raise-don-natural', 'versatil'], pokemon: ['eevee'] },
@@ -86,15 +86,16 @@ var MOVE_POOL = {
       { stage: 1, id: 'water-gun', name: 'Pistola Agua', power: 40, pp: 25, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'raise-spa-10' },
       { stage: 2, id: 'surf', name: 'Surf', power: 75, pp: 15, type: T.WATER, damageClass: DC.SPECIAL },
       { stage: 3, id: 'hydro-pump', name: 'Hidrobomba', power: 90, pp: 99, type: T.WATER, damageClass: DC.SPECIAL },
-      { stage: 1, mt: true, id: 'bubble-beam', name: 'Rayo Burbuja', power: 65, pp: 99, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'clear' },
+      { stage: 1, mt: true, id: 'bubble-beam', name: 'Rayo Burbuja', power: 65, pp: 99, type: T.WATER, damageClass: DC.SPECIAL, effectId: ['clear', 'conf-20'] },
       { stage: 1, mt: true, id: 'scald', name: 'Escaldar', power: 60, pp: 99, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'burn-25' },
     ],
   },
   grass: {
     physical: [
-      { stage: 1, id: 'vine-whip', name: 'Latigo Cepa', power: 60, pp: 25, type: T.GRASS, damageClass: DC.PHYSICAL },
+      { stage: 1, id: 'vine-whip', name: 'Latigo Cepa', power: 50, pp: 25, type: T.GRASS, damageClass: DC.PHYSICAL },
       { stage: 2, id: 'razor-leaf', name: 'Hoja afilada', power: 80, pp: 25, type: T.GRASS, damageClass: DC.PHYSICAL },
       { stage: 3, id: 'wood-hammer', name: 'Mazazo', power: 110, pp: 15, type: T.GRASS, damageClass: DC.PHYSICAL },
+      { stage: 2, mt: true, id: 'flower-trick', name: 'Truco Floral', power: 60, pp: 25, type: T.GRASS, damageClass: DC.PHYSICAL, effectId: 'crit-75' },
     ],
     special: [
       { stage: 1, id: 'absorb', name: 'Absorber', power: 40, pp: 25, type: T.GRASS, damageClass: DC.SPECIAL, effectId: 'drain-10' },
@@ -131,7 +132,7 @@ var MOVE_POOL = {
   fighting: {
     physical: [
       { stage: 1, id: 'karate-chop', name: 'Golpe Karate', power: 45, pp: 25, type: T.FIGHTING, damageClass: DC.PHYSICAL, effectId: 'raise-atk-20' },
-      { stage: 2, id: 'brick-break', name: 'Romperrocas', power: 75, pp: 15, type: T.FIGHTING, damageClass: DC.PHYSICAL },
+      { stage: 2, id: 'brick-break', name: 'Romperrocas', power: 75, pp: 15, type: T.FIGHTING, damageClass: DC.PHYSICAL, effectId: 'crit-75' },
       { stage: 3, id: 'close-combat', name: 'A Bocajarro', power: 120, pp: 99, type: T.FIGHTING, damageClass: DC.PHYSICAL, effectId: 'lower-self-def-spd-50' },
     ],
     special: [
@@ -144,7 +145,7 @@ var MOVE_POOL = {
     physical: [
       { stage: 1, id: 'poison-sting', name: 'Aguijon Toxico', power: 35, pp: 35, type: T.POISON, damageClass: DC.PHYSICAL, effectId: 'poison-25' },
       { stage: 2, id: 'poison-jab', name: 'Puya Nociva', power: 70, pp: 20, type: T.POISON, damageClass: DC.PHYSICAL, effectId: 'poison-50' },
-      { stage: 3, id: 'gunk-shot', name: 'Lanza Mugre', power: 100, pp: 99, type: T.POISON, damageClass: DC.PHYSICAL, effectId: 'ventaja' },
+      { stage: 3, id: 'gunk-shot', name: 'Lanza Mugre', power: 100, pp: 99, type: T.POISON, damageClass: DC.PHYSICAL, effectId: ['poison-25', 'ventaja'] },
     ],
     special: [
       { stage: 1, id: 'poison-powder', name: 'Polvo Veneno', power: 40, pp: 35, type: T.POISON, damageClass: DC.SPECIAL },
@@ -154,7 +155,7 @@ var MOVE_POOL = {
   },
   ground: {
     physical: [
-      { stage: 1, id: 'bulldoze', name: 'Terratemblor', power: 60, pp: 20, type: T.GROUND, damageClass: DC.PHYSICAL },
+      { stage: 1, id: 'bulldoze', name: 'Terratemblor', power: 60, pp: 20, type: T.GROUND, damageClass: DC.PHYSICAL, effectId: 'lower-spe-20' },
       { stage: 2, id: 'stomping-tantrum', name: 'Pataleta', power: 75, pp: 10, type: T.GROUND, damageClass: DC.PHYSICAL },
       { stage: 3, id: 'earthquake', name: 'Terremoto', power: 95, pp: 99, type: T.GROUND, damageClass: DC.PHYSICAL },
     ],
@@ -167,7 +168,7 @@ var MOVE_POOL = {
   flying: {
     physical: [
       { stage: 1, id: 'peck', name: 'Picotazo', power: 35, pp: 35, type: T.FLYING, damageClass: DC.PHYSICAL, effectId: 'lower-atk-10' },
-      { stage: 2, id: 'wing-attack', name: 'Ataque Ala', power: 60, pp: 35, type: T.FLYING, damageClass: DC.PHYSICAL },
+      { stage: 2, id: 'wing-attack', name: 'Ataque Ala', power: 70, pp: 35, type: T.FLYING, damageClass: DC.PHYSICAL, effectId: 'conf-20' },
       { stage: 3, id: 'brave-bird', name: 'Pajaro Osado', power: 100, pp: 15, type: T.FLYING, damageClass: DC.PHYSICAL },
     ],
     special: [
@@ -199,7 +200,7 @@ var MOVE_POOL = {
     special: [
       { stage: 1, id: 'infestation', name: 'Infestacion', power: 20, pp: 20, type: T.BUG, damageClass: DC.SPECIAL },
       { stage: 2, id: 'signal-beam', name: 'Rayo Señal', power: 75, pp: 15, type: T.BUG, damageClass: DC.SPECIAL },
-      { stage: 3, id: 'bug-buzz', name: 'Zumbido', power: 100, pp: 10, type: T.BUG, damageClass: DC.SPECIAL },
+      { stage: 3, id: 'bug-buzz', name: 'Zumbido', power: 100, pp: 10, type: T.BUG, damageClass: DC.SPECIAL, effectId: 'conf-20' },
     ],
   },
   rock: {
@@ -222,7 +223,7 @@ var MOVE_POOL = {
     ],
     special: [
       { stage: 1, id: 'hex', name: 'Maldicion', power: 40, pp: 10, type: T.GHOST, damageClass: DC.SPECIAL },
-      { stage: 2, id: 'shadow-ball', name: 'Bola Sombra', power: 60, pp: 15, type: T.GHOST, damageClass: DC.SPECIAL },
+      { stage: 2, id: 'shadow-ball', name: 'Bola Sombra', power: 70, pp: 15, type: T.GHOST, damageClass: DC.SPECIAL, effectId: 'lower-spd-20-20' },
       { stage: 3, id: 'astral-barrage', name: 'Bombardeo Astral', power: 100, pp: 99, type: T.GHOST, damageClass: DC.SPECIAL },
       { stage: 3, boss: true, id: 'night-shade', name: 'Tinieblas', power: 70, pp: 99, type: T.GHOST, damageClass: DC.SPECIAL, effectId: ['sleep-30', 'ventaja'] },
     ],
@@ -242,37 +243,37 @@ var MOVE_POOL = {
   dark: {
     physical: [
       { stage: 1, id: 'bite', name: 'Mordisco', power: 50, pp: 25, type: T.DARK, damageClass: DC.PHYSICAL, effectId: 'flinch-20' },
-      { stage: 2, id: 'crunch', name: 'Triturar', power: 80, pp: 15, type: T.DARK, damageClass: DC.PHYSICAL },
-      { stage: 3, id: 'wicked-blow', name: 'Golpe Perverso', power: 90, pp: 5, type: T.DARK, damageClass: DC.PHYSICAL },
+      { stage: 2, id: 'crunch', name: 'Triturar', power: 80, pp: 15, type: T.DARK, damageClass: DC.PHYSICAL, effectId: 'flinch-20' },
+      { stage: 3, id: 'wicked-blow', name: 'Golpe Oscuro', power: 90, pp: 5, type: T.DARK, damageClass: DC.PHYSICAL },
     ],
     special: [
-      { stage: 1, id: 'feint-attack', name: 'Ataque Furtivo', power: 40, pp: 20, type: T.DARK, damageClass: DC.SPECIAL },
+      { stage: 1, id: 'feint-attack', name: 'Finta', power: 40, pp: 20, type: T.DARK, damageClass: DC.SPECIAL },
       { stage: 2, id: 'dark-pulse', name: 'Pulso Umbrio', power: 70, pp: 15, type: T.DARK, damageClass: DC.SPECIAL },
-      { stage: 3, id: 'fiery-wrath', name: 'Ira Oscura', power: 90, pp: 10, type: T.DARK, damageClass: DC.SPECIAL },
+      { stage: 3, id: 'fiery-wrath', name: 'Furia Candente', power: 90, pp: 10, type: T.DARK, damageClass: DC.SPECIAL },
     ],
   },
   steel: {
     physical: [
       { stage: 1, id: 'metal-claw', name: 'Garra Metal', power: 50, pp: 35, type: T.STEEL, damageClass: DC.PHYSICAL, effectId: 'raise-atk-20' },
       { stage: 2, id: 'iron-head', name: 'Cabeza de Hierro', power: 65, pp: 15, type: T.STEEL, damageClass: DC.PHYSICAL },
-      { stage: 3, id: 'behemoth-blade', name: 'Hoja Behemoth', power: 95, pp: 5, type: T.STEEL, damageClass: DC.PHYSICAL },
+      { stage: 3, id: 'behemoth-blade', name: 'Tajo Supremo', power: 95, pp: 5, type: T.STEEL, damageClass: DC.PHYSICAL },
     ],
     special: [
-      { stage: 1, id: 'mirror-shot', name: 'Destello', power: 65, pp: 10, type: T.STEEL, damageClass: DC.SPECIAL },
-      { stage: 2, id: 'flash-cannon', name: 'Canon Destello', power: 80, pp: 10, type: T.STEEL, damageClass: DC.SPECIAL },
-      { stage: 3, id: 'steel-beam', name: 'Rayo Acero', power: 140, pp: 5, type: T.STEEL, damageClass: DC.SPECIAL },
+      { stage: 1, id: 'mirror-shot', name: 'Disparo Espejo', power: 65, pp: 10, type: T.STEEL, damageClass: DC.SPECIAL },
+      { stage: 2, id: 'flash-cannon', name: 'Cañon Resplandor', power: 80, pp: 10, type: T.STEEL, damageClass: DC.SPECIAL },
+      { stage: 3, id: 'steel-beam', name: 'Metaláser', power: 140, pp: 5, type: T.STEEL, damageClass: DC.SPECIAL },
     ],
   },
   fairy: {
     physical: [
       { stage: 1, id: 'fairy-wind', name: 'Viento Feerico', power: 35, pp: 30, type: T.FAIRY, damageClass: DC.PHYSICAL },
       { stage: 2, id: 'play-rough', name: 'Carantoña', power: 70, pp: 10, type: T.FAIRY, damageClass: DC.PHYSICAL },
-      { stage: 3, id: 'tectonic-rage', name: 'Furia Telurica', power: 100, pp: 10, type: T.FAIRY, damageClass: DC.PHYSICAL },
+      { stage: 3, id: 'tectonic-rage', name: 'Barrena Telúrica', power: 100, pp: 10, type: T.FAIRY, damageClass: DC.PHYSICAL },
     ],
     special: [
       { stage: 1, id: 'disarming-voice', name: 'Voz Cautivadora', power: 30, pp: 15, type: T.FAIRY, damageClass: DC.SPECIAL, effectId: 'sleep-10' },
       { stage: 2, id: 'moonblast', name: 'Fuerza Lunar', power: 70, pp: 15, type: T.FAIRY, damageClass: DC.SPECIAL, effectId: 'lower-spd-20-20' },
-      { stage: 3, id: 'sparkling-aria', name: 'Aria Luminosa', power: 90, pp: 10, type: T.FAIRY, damageClass: DC.SPECIAL },
+      { stage: 3, id: 'sparkling-aria', name: 'Aria Burbuja', power: 90, pp: 10, type: T.FAIRY, damageClass: DC.SPECIAL },
     ],
   },
 };

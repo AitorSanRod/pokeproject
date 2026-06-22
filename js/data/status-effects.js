@@ -5,7 +5,7 @@
 //
 // Estructura de statusEffect:
 // {
-//   id:       StatusEffect.POISON | StatusEffect.PARALYSIS | StatusEffect.BURN | StatusEffect.SLEEP | StatusEffect.FREEZE
+//   id:       StatusEffect.POISON | StatusEffect.PARALYSIS | StatusEffect.BURN | StatusEffect.SLEEP | StatusEffect.FREEZE | StatusEffect.CONFUSION
 //   turnsActive: 0    ← se incrementa al inicio de cada turno del pokemon
 // }
 //
@@ -15,8 +15,11 @@
 //     StatusEffects.apply(ctx.user,   StatusEffect.BURN,   ctx.log);  // aplica al propio pokemon
 //
 // ICONOS que se muestran en el HUD:
-//   StatusEffect.POISON   → 💜 PSN   StatusEffect.BURN  → 🔥 QEM   StatusEffect.SLEEP → 💤 SLE
-//   StatusEffect.PARALYSIS→ ⚡ PAR   StatusEffect.FREEZE→ 🧊 CON
+//   StatusEffect.POISON    → 💜 PSN   StatusEffect.BURN      → 🔥 QEM   StatusEffect.SLEEP → 💤 SLE
+//   StatusEffect.PARALYSIS → ⚡ PAR   StatusEffect.FREEZE    → 🧊 CON   StatusEffect.CONFUSION → 💫 CNF
+//
+// CONFUSIÓN (StatusEffect.CONFUSION):
+//   Dura máximo 5 turnos. Cada turno: 33% autocura → 50% autogolpe (Normal físico 60 base, ignora inmunidades).
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Lista cerrada de identificadores de estado válidos
@@ -26,6 +29,7 @@ var STATUS = Object.freeze({
   SLEEP:     'sleep',
   PARALYSIS: 'paralysis',
   FREEZE:    'freeze',
+  CONFUSION: 'confusion',
 });
 const StatusEffect = STATUS;
 
@@ -35,7 +39,15 @@ const STATUS_META = {
   burn:      { label: 'QEM', icon: '🔥', color: '#E74C3C', bg: '#FDEDEC' },
   sleep:     { label: 'SLE', icon: '💤', color: '#7F8C8D', bg: '#F2F3F4' },
   freeze:    { label: 'CON', icon: '🧊', color: '#5DADE2', bg: '#EBF5FB' },
+  confusion: { label: 'CNF', icon: '💫', color: '#7d22e6', bg: '#FEF5E7' },
 };
+
+// Movimiento de autogolpe al atacarse confundido (Normal físico 40 base)
+const CONFUSION_SELF_HIT = Object.freeze({
+  id: 'confusion-hit', name: 'Confusión', power: 60,
+  type: 'normal', damageClass: 'physical', pp: 999, maxPp: 999,
+  effectId: 'versatil',
+});
 
 const StatusEffects = {
 
@@ -153,6 +165,24 @@ const StatusEffects = {
       }
     }
 
+    if (s.id === StatusEffect.CONFUSION) {
+      // Máximo 5 turnos — se cura automáticamente
+      if (s.turnsActive >= 5) {
+        StatusEffects.cure(pokemon, null);
+        return { canAttack: true, hitSelf: false, message: `${pokemon.displayName} ya no esta confundido!` };
+      }
+      // 33% de curarse cada turno
+      if (Math.random() < 0.33) {
+        StatusEffects.cure(pokemon, null);
+        return { canAttack: true, hitSelf: false, message: `${pokemon.displayName} ya no esta confundido!` };
+      }
+      // 50% de golpearse a sí mismo
+      if (Math.random() < 0.50) {
+        return { canAttack: true, hitSelf: true, message: `${pokemon.displayName} esta confundido y se golpea a si mismo!` };
+      }
+      return { canAttack: true, hitSelf: false, message: `${pokemon.displayName} esta confundido!` };
+    }
+
     return { canAttack: true, message: null };
   },
 
@@ -202,6 +232,7 @@ const StatusEffects = {
       burn:      'quemado',
       sleep:     'dormido',
       freeze:    'congelado',
+      confusion: 'confundido',
     }[id] ?? 'afectado';
   },
 };

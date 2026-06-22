@@ -71,12 +71,7 @@ window.addEventListener('DOMContentLoaded', () => {
   globalControls.style.cssText = 'position:fixed;bottom:12px;left:12px;z-index:9999;display:flex;gap:6px;align-items:center';
   document.body.appendChild(globalControls);
 
-  // Botón de reset — fijo en la pantalla global, fuera del viewport del juego
-  const resetBtn = document.createElement('button');
-  resetBtn.id = 'btn-reset-global';
-  resetBtn.textContent = '🗑';
-  resetBtn.title = 'Borrar datos guardados (pokédex y EVs)';
-  resetBtn.style.cssText = [
+  const _btnBase = [
     'font-size:14px',
     'background:rgba(0,0,0,.35)',
     'border:1px solid rgba(255,255,255,.2)',
@@ -87,9 +82,41 @@ window.addEventListener('DOMContentLoaded', () => {
     'line-height:1',
   ].join(';');
 
+  // ── Botón engranaje — siempre visible, abre el panel ─────────────────────
+  const gearBtn = document.createElement('button');
+  gearBtn.id = 'btn-gear-global';
+  gearBtn.title = 'Opciones';
+  gearBtn.textContent = '⚙️';
+  gearBtn.style.cssText = _btnBase;
+  gearBtn.addEventListener('mouseenter', () => gearBtn.style.background = 'rgba(0,0,0,.6)');
+  gearBtn.addEventListener('mouseleave', () => gearBtn.style.background = 'rgba(0,0,0,.35)');
+  globalControls.appendChild(gearBtn);
+
+  // ── Panel expandible — oculto por defecto ─────────────────────────────────
+  const gearPanel = document.createElement('div');
+  gearPanel.id = 'gear-panel';
+  gearPanel.style.cssText = 'display:none;gap:6px;align-items:center';
+  globalControls.appendChild(gearPanel);
+
+  const _openPanel = () => {
+    gearBtn.style.display = 'none';
+    gearPanel.style.display = 'flex';
+  };
+  const _closePanel = () => {
+    gearPanel.style.display = 'none';
+    gearBtn.style.display = '';
+  };
+
+  gearBtn.addEventListener('click', _openPanel);
+
+  // ── Botón de reset ────────────────────────────────────────────────────────
+  const resetBtn = document.createElement('button');
+  resetBtn.id = 'btn-reset-global';
+  resetBtn.textContent = '🗑';
+  resetBtn.title = 'Borrar datos guardados (pokédex y EVs)';
+  resetBtn.style.cssText = _btnBase;
   resetBtn.addEventListener('mouseenter', () => resetBtn.style.background = 'rgba(0,0,0,.6)');
   resetBtn.addEventListener('mouseleave', () => resetBtn.style.background = 'rgba(0,0,0,.35)');
-
   resetBtn.addEventListener('click', () => {
     const ok = confirm('¿Borrar todos los datos guardados?\n\nSe eliminará el progreso de la Pokédex, los EVs, las medallas y los movimientos aprendidos por MT.\n\nEsta acción no se puede deshacer.');
     if (!ok) return;
@@ -105,29 +132,28 @@ window.addEventListener('DOMContentLoaded', () => {
       resetBtn.style.color = 'rgba(255,255,255,.6)';
     }, 1500);
   });
+  // ── Botón X — cierra el panel — siempre primero ──────────────────────────
+  const closeBtn = document.createElement('button');
+  closeBtn.title = 'Cerrar';
+  closeBtn.textContent = '✕';
+  closeBtn.style.cssText = _btnBase + ';color:#e74c3c;border-color:rgba(231,76,60,.4)';
+  closeBtn.addEventListener('mouseenter', () => closeBtn.style.background = 'rgba(231,76,60,.25)');
+  closeBtn.addEventListener('mouseleave', () => closeBtn.style.background = 'rgba(0,0,0,.35)');
+  closeBtn.addEventListener('click', _closePanel);
+  gearPanel.appendChild(closeBtn);
 
-  globalControls.appendChild(resetBtn);
+  gearPanel.appendChild(resetBtn);
 
-  // Botón de notas — mismo estilo que el reset, abre popup con docs/notes.json
+  // ── Botón de notas ────────────────────────────────────────────────────────
   const notesBtn = document.createElement('button');
   notesBtn.id = 'btn-notes-global';
   notesBtn.title = 'Notas';
   notesBtn.textContent = '📋';
-  notesBtn.style.cssText = [
-    'display:none',
-    'font-size:14px',
-    'background:rgba(0,0,0,.35)',
-    'border:1px solid rgba(255,255,255,.2)',
-    'color:rgba(255,255,255,.6)',
-    'padding:6px 8px',
-    'border-radius:6px',
-    'cursor:pointer',
-    'line-height:1',
-  ].join(';');
+  notesBtn.style.cssText = 'display:none;' + _btnBase;
   notesBtn.addEventListener('mouseenter', () => notesBtn.style.background = 'rgba(0,0,0,.6)');
   notesBtn.addEventListener('mouseleave', () => notesBtn.style.background = 'rgba(0,0,0,.35)');
   notesBtn.addEventListener('click', () => NotesPopup.open());
-  globalControls.appendChild(notesBtn);
+  gearPanel.appendChild(notesBtn);
 
   Screens.show(Screens.title);
 });

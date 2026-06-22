@@ -189,6 +189,10 @@ const Screens = {
           <button class="btn btn--wide" id="btn-compendium-title">
             COMPENDIO
           </button>
+          <button class="btn btn--wide" id="btn-datos-title"
+            style="background:var(--blue);color:var(--white);margin-top:8px">
+            DATOS
+          </button>
         </div>
       </div>`;
 
@@ -228,8 +232,53 @@ const Screens = {
       .addEventListener('click', () => PokedexScreen.show(() => Screens.show(Screens.title)));
     document.getElementById('btn-compendium-title')
       .addEventListener('click', () => CompendiumScreen.show(() => Screens.show(Screens.title)));
+
+    document.getElementById('btn-datos-title').addEventListener('click', () => {
+      Screens._showDatosMenu();
+    });
+
     document.getElementById('btn-notes-global')?.style.removeProperty('display');
     console.log('[UI] Pantalla: Titulo');
+  },
+
+  // ── Menú de datos: importar / exportar storage ───────────────────────────
+  _showDatosMenu() {
+    const overlay = Screens._makeModal(`
+      <div class="modal-title" style="color:var(--blue)">DATOS</div>
+      <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8;margin-bottom:16px">
+        Exporta o importa todos los datos guardados<br>(pokédex, EVs, medallas, objetos).
+      </p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button class="btn btn--wide" id="btn-datos-export"
+          style="background:var(--blue);color:var(--white)">
+          EXPORTAR
+        </button>
+        <button class="btn btn--wide" id="btn-datos-import">
+          IMPORTAR
+        </button>
+      </div>
+      <button class="btn btn--wide" id="btn-datos-cancel" style="margin-top:8px">CANCELAR</button>
+    `);
+
+    document.getElementById('btn-datos-cancel').addEventListener('click', () => overlay.remove());
+
+    document.getElementById('btn-datos-export').addEventListener('click', () => {
+      SaveData.exportar();
+    });
+
+    document.getElementById('btn-datos-import').addEventListener('click', () => {
+      SaveData.importar(
+        () => {
+          overlay.remove();
+          const toast = document.createElement('div');
+          toast.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:99999;pointer-events:none';
+          toast.innerHTML = `<div style="background:var(--blue);color:white;font-family:var(--font-pixel);font-size:9px;padding:14px 24px;border-radius:8px;box-shadow:var(--shadow-md)">¡Datos importados!</div>`;
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 2000);
+        },
+        (msg) => alert(`Error al importar:\n${msg}`),
+      );
+    });
   },
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -1511,6 +1560,7 @@ const Screens = {
       btn.addEventListener('click', () => {
         const p = GameState.team[+btn.dataset.idx];
         equipHeldItem(p, item.itemId);
+        Storage.markItemCollected(item.itemId);
         console.log(`[ITEM] ${heldItem.name} → ${p.displayName}`);
         overlay.remove();
         onDone();
@@ -1765,18 +1815,22 @@ const Screens = {
   // Helper separado para el botón de pausa (evita duplicar código)
   _setupCombatPauseBtn() {
 
-    // Botones flotantes: pokédex + pausa — se añaden al contenedor global
+    // Botones de combate — se insertan en el gear-panel antes del botón ✕ (último hijo)
     document.querySelectorAll('.global-pause-btn').forEach(e => e.remove());
-    const globalControls = document.getElementById('global-controls');
+    const gearPanel = document.getElementById('gear-panel');
     const btnStyle = 'font-size:14px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);padding:6px 8px;border-radius:6px;cursor:pointer;line-height:1';
     const pauseWrap = document.createElement('div');
     pauseWrap.className = 'global-pause-btn';
-    pauseWrap.style.cssText = 'display:flex;gap:6px';
+    pauseWrap.style.cssText = 'display:contents';
     pauseWrap.innerHTML = `
       <button id="btn-dex-combat"        style="${btnStyle}" title="Pokédex">📖</button>
       <button id="btn-compendium-combat" style="${btnStyle}" title="Compendio">📋</button>
       <button id="btn-pause-combat"      style="${btnStyle}" title="Pausar/Reanudar">⏸</button>`;
-    (globalControls || document.body).appendChild(pauseWrap);
+    if (gearPanel) {
+      gearPanel.insertBefore(pauseWrap, gearPanel.children[1]);
+    } else {
+      document.body.appendChild(pauseWrap);
+    }
 
     pauseWrap.querySelectorAll('button').forEach(btn => {
       btn.addEventListener('mouseenter', () => btn.style.background = 'rgba(0,0,0,.6)');
@@ -1981,16 +2035,25 @@ const Screens = {
     const firstCheck = StatusEffects.checkBeforeAttack(first);
     if (firstCheck.message) { logFn(firstCheck.message); await Screens._wait(500); }
     if (firstCheck.canAttack) {
-      await Screens._animateAttack(first, second, moveOf(first), player);
-      if (!isAlive(second)) {
-        ctx._turnRunning = false;
-        await Screens._applyEndOfTurnStatus(player, foe);
-        Screens._combatEnd(); return;
+      if (firstCheck.hitSelf) {
+        await Screens._animateAttack(first, first, CONFUSION_SELF_HIT, player);
+        if (!isAlive(first)) {
+          ctx._turnRunning = false;
+          await Screens._applyEndOfTurnStatus(player, foe);
+          Screens._combatEnd(); return;
+        }
+      } else {
+        await Screens._animateAttack(first, second, moveOf(first), player);
+        if (!isAlive(second)) {
+          ctx._turnRunning = false;
+          await Screens._applyEndOfTurnStatus(player, foe);
+          Screens._combatEnd(); return;
+        }
       }
     }
 
-    // Double-hit: segunda animación — tanto para jugador como para rival
-    if (first._doubleHit && firstCheck.canAttack) {
+    // Double-hit: segunda animación — solo si no se golpeó a sí mismo
+    if (first._doubleHit && firstCheck.canAttack && !firstCheck.hitSelf) {
       first._doubleHit = false;
       await Screens._animateAttack(first, second, moveOf(first), player);
       if (!isAlive(second)) {
@@ -2009,11 +2072,20 @@ const Screens = {
       const secondCheck = StatusEffects.checkBeforeAttack(second);
       if (secondCheck.message) { logFn(secondCheck.message); await Screens._wait(500); }
       if (secondCheck.canAttack) {
-        await Screens._animateAttack(second, first, moveOf(second), player);
-        if (!isAlive(first)) {
-          ctx._turnRunning = false;
-          await Screens._applyEndOfTurnStatus(player, foe);
-          Screens._combatEnd(); return;
+        if (secondCheck.hitSelf) {
+          await Screens._animateAttack(second, second, CONFUSION_SELF_HIT, player);
+          if (!isAlive(second)) {
+            ctx._turnRunning = false;
+            await Screens._applyEndOfTurnStatus(player, foe);
+            Screens._combatEnd(); return;
+          }
+        } else {
+          await Screens._animateAttack(second, first, moveOf(second), player);
+          if (!isAlive(first)) {
+            ctx._turnRunning = false;
+            await Screens._applyEndOfTurnStatus(player, foe);
+            Screens._combatEnd(); return;
+          }
         }
       }
     }

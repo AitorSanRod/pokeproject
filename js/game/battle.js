@@ -86,7 +86,9 @@ function calcDamage(attacker, defender, move) {
     modifiers.push({ label: `Agallas (${attacker.displayName}) +${Math.round((gutsMult - 1) * 100)}%`, mult: gutsMult });
   }
 
-  const isCrit = Math.random() < COMBAT_CONFIG.CRIT_CHANCE;
+  const _effectIds = Array.isArray(move.effectId) ? move.effectId : [move.effectId];
+  const critChance = _effectIds.includes('crit-75') ? 0.75 : COMBAT_CONFIG.CRIT_CHANCE;
+  const isCrit = Math.random() < critChance;
   if (isCrit) dmg = Math.floor(dmg * COMBAT_CONFIG.CRIT_MULTIPLIER);
 
   return { dmg: Math.max(1, dmg), isCrit, eff, modifiers };

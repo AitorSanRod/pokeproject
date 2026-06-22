@@ -7,6 +7,9 @@
 // ENVÍO  → ApiSync.sync*()  ·  POST al servidor con los datos del storage
 // CARGA  → ApiSync.load*()  ·  GET del servidor y escritura en storage
 //
+// Endpoints cubiertos:
+//   /pokedex  · /evs  · /mts  · /badges  · /items  · /run  · /sync (todo en uno)
+//
 // Uso rápido:
 //   await ApiSync.syncAll();   // sube todo el storage al servidor
 //   await ApiSync.loadAll();   // descarga todo del servidor y lo escribe en storage
@@ -210,6 +213,25 @@ var ApiSync = (() => {
   }
 
   /**
+   * Construye las filas de la tabla `items`.
+   * Fuente: Storage.getCollectedItems() → localStorage clave `pkmn_items`
+   *
+   * Un objeto recogido es un booleano permanente — nunca vuelve a false.
+   * Una fila por objeto recogido (no se almacenan los no recogidos).
+   *
+   * Tabla SQL destino:
+   *   items (user_id PK, item_id PK)
+   *
+   * @returns {Array<{ item_id: string }>}
+   */
+  function _buildItemRows() {
+    const data = Storage.getCollectedItems();
+    return Object.entries(data)
+      .filter(([, v]) => v === true)
+      .map(([item_id]) => ({ item_id }));
+  }
+
+  /**
    * Construye el payload de la run activa (cabecera + equipo).
    * Fuente: Storage.loadRun() → localStorage clave `pkmn_run`
    *
@@ -394,6 +416,19 @@ var ApiSync = (() => {
   }
 
   /**
+   * Convierte el array de filas de items al formato de localStorage.
+   * @param {Array<{ item_id: string }>} rows
+   * @returns {{ [item_id: string]: true }}
+   */
+  function _parseItemRows(rows) {
+    const result = {};
+    for (const row of (rows ?? [])) {
+      result[row.item_id] = true;
+    }
+    return result;
+  }
+
+  /**
    * Convierte run_data + run_team al formato que Storage.saveRun() espera.
    * Reconstruye el array `team` con el formato de objeto pokémon del juego,
    * ordenado por slot. Los campos snake_case se convierten de vuelta a camelCase.
@@ -495,6 +530,17 @@ var ApiSync = (() => {
   }
 
   /**
+   * Envía los objetos recogidos al servidor.
+   * POST /items → { user_id, items: ItemRow[] }
+   */
+  async function syncItems() {
+    const user_id = _getUserId();
+    const items = _buildItemRows();
+    console.log(`[ApiSync] Enviando objetos recogidos — ${items.length} registros`);
+    return _post('/items', { user_id, items });
+  }
+
+  /**
    * Envía la partida activa (cabecera + equipo completo).
    * No hace nada si no hay ninguna run guardada.
    * POST /run → { user_id, run_data: RunData, run_team: RunTeamSlot[] }
@@ -532,6 +578,7 @@ var ApiSync = (() => {
     const evs        = _buildEvRows();
     const mts        = _buildMtRows();
     const badges     = _buildBadgeRows();
+    const items      = _buildItemRows();
     const runPayload = _buildRunPayload();
 
     const body = {
@@ -541,13 +588,14 @@ var ApiSync = (() => {
       evs,
       mts,
       badges,
+      items,
       run_data: runPayload?.run_data ?? null,
       run_team: runPayload?.run_team ?? [],
     };
 
     console.log(
       `[ApiSync] syncAll — pokédex:${pokedex.length} evs:${evs.length}` +
-      ` mts:${mts.length} medallas:${badges.length}` +
+      ` mts:${mts.length} medallas:${badges.length} objetos:${items.length}` +
       ` run:${runPayload ? `ruta ${body.run_data.route_index}` : 'ninguna'}`
     );
 
@@ -648,6 +696,29 @@ var ApiSync = (() => {
     const parsed = _parseBadgeRows(data.badges);
     Storage._set('badges', parsed);
     console.log(`[ApiSync] Medallas cargadas — ${data.badges?.length ?? 0} registros`);
+    return parsed;
+  }
+
+  /**
+   * Descarga los objetos recogidos del servidor y los escribe en localStorage.
+   *
+   * GET /items?user_id=...
+   *
+   * Respuesta esperada del backend:
+   * {
+   *   "items": [
+   *     { "item_id": "carbon" },
+   *     { "item_id": "sitrus-berry" }
+   *   ]
+   * }
+   *
+   * @returns {Promise<object>} El objeto escrito en storage
+   */
+  async function loadItems() {
+    const data = await _get('/items');
+    const parsed = _parseItemRows(data.items);
+    Storage._set('items', parsed);
+    console.log(`[ApiSync] Objetos cargados — ${data.items?.length ?? 0} registros`);
     return parsed;
   }
 
@@ -757,12 +828,14 @@ var ApiSync = (() => {
     const evs     = _parseEvRows(data.evs);
     const mts     = _parseMtRows(data.mts);
     const badges  = _parseBadgeRows(data.badges);
+    const items   = _parseItemRows(data.items);
     const run     = _parseRunPayload(data.run_data, data.run_team);
 
     Storage._set('pokedex', pokedex);
     Storage._set('evs',     evs);
     Storage._set('mts',     mts);
     Storage._set('badges',  badges);
+    Storage._set('items',   items);
 
     if (run) {
       Storage.saveRun(run);
@@ -779,17 +852,18 @@ var ApiSync = (() => {
       ` evs:${Object.keys(evs).length}` +
       ` mts:${data.mts?.length ?? 0}` +
       ` medallas:${data.badges?.length ?? 0}` +
+      ` objetos:${data.items?.length ?? 0}` +
       ` run:${run ? `ruta ${run.routeIndex}` : 'ninguna'}`
     );
 
-    return { pokedex, evs, mts, badges, run };
+    return { pokedex, evs, mts, badges, items, run };
   }
 
   return {
     // Envío
-    syncPokedex, syncEvs, syncMts, syncBadges, syncRun, syncAll,
+    syncPokedex, syncEvs, syncMts, syncBadges, syncItems, syncRun, syncAll,
     // Carga
-    loadPokedex, loadEvs, loadMts, loadBadges, loadRun, loadAll,
+    loadPokedex, loadEvs, loadMts, loadBadges, loadItems, loadRun, loadAll,
   };
 
 })();

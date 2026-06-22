@@ -8,6 +8,7 @@
 //   pkmn_pokedex   → { [name]: { caught: bool } }
 //   pkmn_evs       → { [root]: { hp, atk, def, spa, spd, spe } }
 //   pkmn_mts       → { [root]: ['move-id-1', 'move-id-2'] }  ← se borra con pokédex
+//   pkmn_items     → { [itemId]: true }  ← objetos equipables recogidos alguna vez
 // ─────────────────────────────────────────────────────────────────────────────
 
 var Storage = {
@@ -188,6 +189,26 @@ var Storage = {
       this._set('mts', all);
       console.log(`[Storage] MT: cadena ${root} aprende ${moveId}`);
     }
+  },
+
+  // ── Objetos recogidos ─────────────────────────────────────────────────────
+  // { [itemId]: true }  — booleano, solo marca que se obtuvo alguna vez.
+  // No depende del pokemon activo ni de la partida en curso.
+
+  getCollectedItems() {
+    return this._get('items') ?? {};
+  },
+
+  markItemCollected(itemId) {
+    const all = this.getCollectedItems();
+    if (all[itemId]) return;
+    all[itemId] = true;
+    this._set('items', all);
+    console.log(`[Storage] Objeto recogido: ${itemId}`);
+  },
+
+  isItemCollected(itemId) {
+    return this.getCollectedItems()[itemId] === true;
   },
 
   // ── Run State ────────────────────────────────────────────────────────────

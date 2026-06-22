@@ -1,10 +1,9 @@
 const NOTES_DATA = {
-  "title": "Todos los gimnasios disponibles",
+  "title": "GUARDADO",
   "lines": [
-    "Mejoras visuales para algunos moviles.",
-    "Mejoras en los movimientos (Balance).",
-    "Nuevos items.",
-    "Mejoras en las descripciones: Ahora las descripciones largas se verán correctamente.",
-    "Ya no es necesario tener a Mewtwo para empezar con nuevos iniciales. Hay que conseguir todos las medallas con algún pokémon."
+    "Guardado local mejorado con exportación e importación.",
+    "Coreción de errores, nombres y descripciones en MTs.",
+    "Ahora Mew puede aprender todas las MTs del juego.",
+    "En la sección de objetos del compendio ahora se marcarán los objetos obtenidos."
   ]
 };
