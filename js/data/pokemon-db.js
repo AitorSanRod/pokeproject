@@ -264,9 +264,9 @@ var POKEMON_DB = {
   moltres:    { stage: 3, types: ['fire', 'flying'], damageClass: 'special', moveLines: [{ type: 'fire', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }] },
 
   // ── Dragon ────────────────────────────────────────────────────────────────
-  dratini:    { stage: 1, types: ['dragon'], damageClass: 'special', moveLines: [{ type: 'dragon', damageClass: 'special' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 30, evolvesInto: 'dragonair' },
-  dragonair:  { stage: 2, types: ['dragon'], damageClass: 'special', moveLines: [{ type: 'dragon', damageClass: 'special' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 55, evolvesInto: 'dragonite' },
-  dragonite:  { stage: 3, types: ['dragon', 'flying'], damageClass: 'special', moveLines: [{ type: 'dragon', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }] },
+  dratini:    { stage: 1, types: ['dragon'], damageClass: 'physical', moveLines: [{ type: 'dragon', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 30, evolvesInto: 'dragonair' },
+  dragonair:  { stage: 2, types: ['dragon'], damageClass: 'physical', moveLines: [{ type: 'dragon', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 55, evolvesInto: 'dragonite' },
+  dragonite:  { stage: 3, types: ['dragon', 'flying'], damageClass: 'physical', moveLines: [{ type: 'dragon', damageClass: 'physical' }, { type: 'flying', damageClass: 'special' }] },
 
   // ── Psychic ───────────────────────────────────────────────────────────────
   mewtwo:     { stage: 3, types: ['psychic'], damageClass: 'special', moveLines: [{ type: 'psychic', damageClass: 'special' }] },

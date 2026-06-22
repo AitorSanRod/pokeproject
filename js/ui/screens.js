@@ -60,6 +60,14 @@ const Screens = {
 
   // ── Guarda la run actual en localStorage ────────────────────────────────
   _saveRun() {
+    // Re-sincronizar learnedMTs de cada pokemon al Storage antes de guardar.
+    // Garantiza que Storage.mts refleje lo que hay en memoria, aunque un write
+    // previo haya fallado silenciosamente (quota, private mode, etc.).
+    for (const p of GameState.team) {
+      if (p.isPlayer && p.learnedMTs?.length) {
+        for (const mtId of p.learnedMTs) Storage.addLearnedMT(p.name, mtId);
+      }
+    }
     Storage.saveRun({
       version:     GameState.version,
       routeIndex:  GameState.routeIndex,
@@ -208,11 +216,17 @@ const Screens = {
         GameState.team             = save.team       ?? [];
         GameState.starter          = save.starterName ? { name: save.starterName } : null;
         GameState.starterName      = save.starterName ?? null;
-        // Re-sincronizar MTs desde Storage: si el jugador borró los datos de pokédex
-        // (que también limpia Storage.mts), los movimientos de MT se eliminan del equipo.
+        // Re-sincronizar MTs desde Storage:
+        // 1. Eliminar movimientos MT que ya no están en Storage (p.ej. pokédex reseteada).
+        // 2. Re-añadir movimientos que Storage tenga pero que falten en p.moves (edge case
+        //    donde el JSON del run perdió el move pero Storage.mts sí lo tiene).
         GameState.team.forEach(p => {
           const validMTs = Storage.getLearnedMTs(p.name);
-          p.moves     = (p.moves ?? []).filter(m => !MOVE_BY_ID[m.id]?.mt || validMTs.includes(m.id));
+          p.moves = (p.moves ?? []).filter(m => !MOVE_BY_ID[m.id]?.mt || validMTs.includes(m.id));
+          for (const mtId of validMTs) {
+            const m = MOVE_BY_ID[mtId];
+            if (m && !p.moves.find(mv => mv.id === mtId)) p.moves.push({ ...m, maxPp: m.pp });
+          }
           p.learnedMTs = validMTs;
         });
         GameState.autoMode         = true;

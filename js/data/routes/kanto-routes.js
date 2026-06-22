@@ -522,9 +522,10 @@ var ROUTE_DATA = {
     combatBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.bellsprout, POKEMON.meowth, POKEMON.poliwag],
     wild: [
-      { name: POKEMON.bellsprout, rate: 45, minLv: 18, maxLv: 24, moveId: MOVES.grass.special.absorb },
+      { name: POKEMON.bellsprout, rate: 25, minLv: 18, maxLv: 24, moveId: MOVES.grass.special.absorb },
       { name: POKEMON.meowth, rate: 25, minLv: 18, maxLv: 25, moveId: MOVES.normal.physical.extreme_speed },
       { name: POKEMON.poliwag, rate: 15, minLv: 18, maxLv: 25, moveId: MOVES.water.physical.waterfall },
+      { name: POKEMON.krabby, rate: 20, minLv: 18, maxLv: 25, moveId: MOVES.water.physical.waterfall },
       { name: POKEMON.growlithe, rate: 10, minLv: 18, maxLv: 22, moveId: MOVES.normal.physical.extreme_speed },
       { name: POKEMON.farfetch_d, rate: 5, minLv: 18, maxLv: 22, moveId: MOVES.normal.physical.take_down },
     ],
@@ -683,9 +684,9 @@ var ROUTE_DATA = {
     combatBg: COMBAT_BG.default,
     wild: [
       { name: POKEMON.voltorb, rate: 40, minLv: 22, maxLv: 26, moveId: MOVES.electric.special.thunderbolt },
-      { name: POKEMON.spearow, rate: 15, minLv: 22, maxLv: 26, moveId: MOVES.normal.physical.tackle },
       { name: POKEMON.spearow, rate: 20, minLv: 22, maxLv: 26, moveId: MOVES.flying.physical.wing_attack },
       { name: POKEMON.ekans, rate: 25, minLv: 22, maxLv: 26, moveId: MOVES.poison.physical.poison_jab },
+      { name: POKEMON.drowzee, rate: 20, minLv: 22, maxLv: 26, moveId: MOVES.psychic.special.psychic },
     ],
     trainer: [
       {
@@ -751,7 +752,7 @@ var ROUTE_DATA = {
     wild: [
       { name: POKEMON.onix, rate: 40, minLv: 24, maxLv: 30, moveId: MOVES.rock.physical.rock_slide },
       { name: POKEMON.geodude, rate: 40, minLv: 24, maxLv: 30, moveId: MOVES.ground.physical.stomping_tantrum },
-      { name: POKEMON.machoke, rate: 20, minLv: 26, maxLv: 35, moveId: MOVES.fighting.physical.brick_break },
+      { name: POKEMON.machop, rate: 20, minLv: 26, maxLv: 35, moveId: MOVES.fighting.physical.brick_break },
       { name: POKEMON.diglett, rate: 10, minLv: 26, maxLv: 35, moveId: MOVES.ground.physical.bulldoze },
     ],
     trainer: [
@@ -842,6 +843,7 @@ var ROUTE_DATA = {
     combatBg: COMBAT_BG.rocket,
     wild: [],
     trainer: [],
+    rewardPokemon: [POKEMON.hitmonlee, POKEMON.hitmonchan],
     specialTrainer: {
       name: 'Jefe Giovanni', img: ENTRENADORES.Giovanni.img, pokemon: [
         {
@@ -1057,6 +1059,7 @@ var ROUTE_DATA = {
     bg: BG.ciudadFucsia,
     combatBg: COMBAT_BG.interior,
     wild: [],
+    rewardPokemon: [POKEMON.exeggcute],
     welcome: {
       title: 'Ciudad Fucsia',
       subtitle: 'Gimnasio Pokemon de tipo Veneno',
@@ -1146,6 +1149,7 @@ var ROUTE_DATA = {
     gymType: 'psychic',
     badgeId: 'marsh-badge',
     gymLeaderImg: TRAINER_IMG.sabrina,
+    rewardPokemon: [POKEMON.rhyhorn],
     gym: {
       leader: [
         {
@@ -1299,6 +1303,7 @@ var ROUTE_DATA = {
     gymType: 'ground',
     badgeId: 'earth-badge',
     gymLeaderImg: TRAINER_IMG.giovanni,
+    rewardPokemon: [POKEMON.jynx],
     rewardExtras: [ITEM.choice_band],
     gym: {
       leader: [
@@ -1345,6 +1350,7 @@ var ROUTE_DATA = {
     bg: BG.calleVictoria,
     combatBg: COMBAT_BG.cueva,
     rewardExtras: [ITEM.assault_vest],
+    rewardPokemon: [POKEMON.electabuzz, POKEMON.magmar, POKEMON.chansey],
     wild: [
       { name: POKEMON.moltres, rate: 25, minLv: 60, maxLv: 65, moveId: MOVES.fire.special.fire_blast },
       { name: POKEMON.articuno, rate: 25, minLv: 60, maxLv: 65, moveId: MOVES.ice.special.blizzard },
@@ -1552,6 +1558,7 @@ var ROUTE_DATA = {
   'campeon-pokemon': {
     bg: BG.mesetaAnil,
     combatBg: COMBAT_BG.altoMando,
+    rewardPokemon: [POKEMON.tauros],
     specialTrainer: {
       name: 'AZUL', img: TRAINER_IMG.rival, pokemon: [
         {
