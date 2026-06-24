@@ -1103,7 +1103,7 @@ const Screens = {
             ${blockedItem.fallbackIcon ?? ''} ${blockedItem.name} bloquea el cambio de movimiento
           </span>
         </div>` : ''}
-      <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:55vh">
         ${poke.moves.map(m => {
           const effectDesc = getEffectDescriptions(m);
           return `
@@ -1860,9 +1860,25 @@ const Screens = {
         }, 600);
       }, introDelay);
     } else {
-      // Solo iniciar turno si no hay uno ya en curso (p.ej. vuelta de Pokédex mid-turn)
       if (!ctx._turnRunning && !ctx._ending) {
         Screens._combatStartTurn();
+      } else if (ctx._turnRunning && ctx.chosenMove) {
+        // Turno en curso: restaurar el botón de movimiento en el área para que
+        // el combate no parezca congelado al volver de Pokédex/Compendio.
+        const area     = document.getElementById('combat-actions-area');
+        const autoMove = ctx.chosenMove;
+        if (area) {
+          area.innerHTML = `
+            <div style="padding:6px var(--sp-md)">
+              <div class="move-btn move-btn--display" data-type="${autoMove.type}" style="cursor:default;opacity:.9">
+                <span class="move-btn__name">${autoMove.name}</span>
+                <span class="move-btn__meta">
+                  <span class="type-badge" data-type="${autoMove.type}" style="font-size:5px;padding:2px 4px">${autoMove.type}</span>
+                  <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey-dark)">POD: ${autoMove.power ?? '—'}</span>
+                </span>
+              </div>
+            </div>`;
+        }
       }
     }
   },
@@ -2432,27 +2448,45 @@ const Screens = {
             Screens._advanceFoeOrEnd();
           }
         } else {
-          area.innerHTML = `
-            <div style="display:flex;gap:8px;padding:8px 16px;align-items:center">
-              <button class="btn btn--primary pokeball-btn" style="flex:1" id="btn-catch" title="Capturar">
-                <svg class="pokeball-spin" viewBox="0 0 16 16" width="22" height="22">
-                  <!-- circulo exterior negro (borde) -->
-                  <circle cx="8" cy="8" r="7.5" fill="#1A1A1A"/>
-                  <!-- mitad superior roja (recortada al circulo, ligeramente mas pequeña para dejar borde) -->
-                  <path d="M 1 8 A 7 7 0 0 1 15 8 Z" fill="#E74C3C"/>
-                  <!-- mitad inferior blanca -->
-                  <path d="M 1 8 A 7 7 0 0 0 15 8 Z" fill="#FFFFFF"/>
-                  <!-- banda central negra -->
-                  <rect x="1" y="7" width="14" height="2" fill="#1A1A1A"/>
-                  <!-- boton central: anillo negro + nucleo blanco, ambos circulares -->
-                  <circle cx="8" cy="8" r="3"   fill="#1A1A1A"/>
-                  <circle cx="8" cy="8" r="1.7" fill="#FFFFFF"/>
-                </svg>
-              </button>
-              <button class="btn" style="flex:1" id="btn-no-catch">CONTINUAR</button>
-            </div>`;
-          document.getElementById('btn-catch').addEventListener('click', () => Screens._attemptCatch(foe));
-          document.getElementById('btn-no-catch').addEventListener('click', () => Screens._advanceFoeOrEnd());
+          const renderCatchChoice = () => {
+            const catchArea = document.getElementById('combat-actions-area');
+            if (!catchArea) return;
+            catchArea.innerHTML = `
+              <div style="display:flex;gap:8px;padding:8px 16px;align-items:center">
+                <button class="btn btn--primary pokeball-btn" style="flex:1" id="btn-catch" title="Capturar">
+                  <svg class="pokeball-spin" viewBox="0 0 16 16" width="22" height="22">
+                    <!-- circulo exterior negro (borde) -->
+                    <circle cx="8" cy="8" r="7.5" fill="#1A1A1A"/>
+                    <!-- mitad superior roja (recortada al circulo, ligeramente mas pequeña para dejar borde) -->
+                    <path d="M 1 8 A 7 7 0 0 1 15 8 Z" fill="#E74C3C"/>
+                    <!-- mitad inferior blanca -->
+                    <path d="M 1 8 A 7 7 0 0 0 15 8 Z" fill="#FFFFFF"/>
+                    <!-- banda central negra -->
+                    <rect x="1" y="7" width="14" height="2" fill="#1A1A1A"/>
+                    <!-- boton central: anillo negro + nucleo blanco, ambos circulares -->
+                    <circle cx="8" cy="8" r="3"   fill="#1A1A1A"/>
+                    <circle cx="8" cy="8" r="1.7" fill="#FFFFFF"/>
+                  </svg>
+                </button>
+                <button class="btn" style="flex:1" id="btn-no-catch">CONTINUAR</button>
+              </div>`;
+            document.getElementById('btn-catch').addEventListener('click', () => Screens._attemptCatch(foe));
+            document.getElementById('btn-no-catch').addEventListener('click', () => Screens._advanceFoeOrEnd());
+            // Recablear pokédex/compendio para restaurar esta vista al cerrar
+            [['btn-dex-combat', PokedexScreen], ['btn-compendium-combat', CompendiumScreen]].forEach(([id, screen]) => {
+              const b = document.getElementById(id);
+              if (!b) return;
+              const clone = b.cloneNode(true);
+              b.replaceWith(clone);
+              clone.addEventListener('click', () => {
+                GameState.paused = true;
+                screen.show(() => { GameState.paused = false; renderCatchChoice(); });
+              });
+              clone.addEventListener('mouseenter', () => clone.style.background = 'rgba(0,0,0,.6)');
+              clone.addEventListener('mouseleave', () => clone.style.background = 'rgba(0,0,0,.35)');
+            });
+          };
+          renderCatchChoice();
         }
         return;
       }
