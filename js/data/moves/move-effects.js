@@ -113,13 +113,28 @@ var MOVE_EFFECTS = {
     desc: 'Baja el ATK del rival un 20%.',
     fn(ctx) {
       if (hasClearEffect(ctx.target)) {
-        ctx.log(`${ctx.target.displayName} esta protegido y no puede ser debilitado!`);
+        ctx.log(`${ctx.target.displayName} esta protegido!`);
         return;
       }
       if (!ctx.target.combatMods) ctx.target.combatMods = {};
       ctx.target.combatMods.atk = (ctx.target.combatMods.atk ?? 0) - 0.20;
       ctx.log(`El ATK de ${ctx.target.displayName} bajo!`);
       if (ctx.showStatChange) ctx.showStatChange(ctx.target, 'ATK', 'down', 20);
+    },
+  },
+
+  'lower-atk-50': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Baja el ATK del rival un 50%.',
+    fn(ctx) {
+      if (hasClearEffect(ctx.target)) {
+        ctx.log(`${ctx.target.displayName} esta protegido!`);
+        return;
+      }
+      if (!ctx.target.combatMods) ctx.target.combatMods = {};
+      ctx.target.combatMods.atk = (ctx.target.combatMods.atk ?? 0) - 0.50;
+      ctx.log(`El ATK de ${ctx.target.displayName} bajo!`);
+      if (ctx.showStatChange) ctx.showStatChange(ctx.target, 'ATK', 'down', 50);
     },
   },
 
@@ -237,6 +252,18 @@ var MOVE_EFFECTS = {
     },
   },
 
+  'raise-spa-10-100': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Sube el SPA propio un 10% del base.',
+    fn(ctx) {
+      if (!ctx.user.combatMods) ctx.user.combatMods = {};
+      ctx.user.combatMods.spa = (ctx.user.combatMods.spa ?? 0) + 0.10;
+      const pct = Math.round(ctx.user.combatMods.spa * 100);
+      ctx.log(`El SPA de ${ctx.user.displayName} subio! (+${pct}% base)`);
+      if (ctx.showStatChange) ctx.showStatChange(ctx.user, 'SPA', 'up', 10);
+    },
+  },
+
   'raise-don-natural': {
     trigger: TRIGGERS.AFTER_ATTACK,
     desc: 'Sube todas las estadísticas un 50% tras cada ataque.',
@@ -248,7 +275,7 @@ var MOVE_EFFECTS = {
       ctx.user.combatMods.spd = (ctx.user.combatMods.spd ?? 0) + 0.5;
       ctx.user.combatMods.spe = (ctx.user.combatMods.spe ?? 0) + 0.5;
       ctx.log(`¡Todas las estadísticas de ${ctx.user.displayName} subieron!`);
-      if (ctx.showStatChange) ctx.showStatChange(ctx.user, 'ALL', 'up', 100);
+      if (ctx.showStatChange) ctx.showStatChange(ctx.user, 'ALL', 'up', 50);
     },
   },
 
@@ -396,6 +423,19 @@ var MOVE_EFFECTS = {
 
   // ── AFTER_ATTACK — Especiales ──────────────────────────────────────────────
 
+  'self-hurt': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'El usuario pierde el 15% de su HP máximo tras atacar.',
+    fn(ctx) {
+      const { user, log, updatePlayerHud } = ctx;
+      if (user.currentHp <= 0) return;
+      const dmg = Math.max(1, Math.floor(user.stats.hp * 0.15));
+      user.currentHp = Math.max(0, user.currentHp - dmg);
+      log(`${user.displayName} sufrió ${dmg} HP de daño de retroceso!`);
+      updatePlayerHud?.();
+    },
+  },
+
   'self-destruct': {
     trigger: TRIGGERS.AFTER_ATTACK,
     desc: 'El usuario pierde toda su vida al usar este movimiento.',
@@ -534,6 +574,23 @@ var MOVE_EFFECTS = {
       const heal = Math.max(1, Math.floor(ctx.user.stats.hp * 0.10));
       ctx.user.currentHp = Math.min(ctx.user.stats.hp, ctx.user.currentHp + heal);
       ctx.log(`${ctx.user.displayName} se recupero parcialmente!`);
+    },
+  },
+
+  // ── ON_HITTED — Absorción de tipo ─────────────────────────────────────────
+
+  'colector': {
+    trigger: TRIGGERS.ON_HITTED,
+    desc: 'Anula el daño de ataques de tipo Agua y sube el SPA un 25%.',
+    fn(ctx) {
+      const attackerMove = ctx.attacker.moves?.find(m => m.id === ctx.attacker.autoMove) ?? ctx.attacker.moves?.[0];
+      if (attackerMove?.type !== 'water') return;
+      ctx.dmg = 0;
+      if (!ctx.user.combatMods) ctx.user.combatMods = {};
+      ctx.user.combatMods.spa = (ctx.user.combatMods.spa ?? 0) + 0.25;
+      ctx.log(`¡${ctx.user.displayName} absorbió el ataque de agua y aumentó su SPA!`);
+      ctx.showStatChange?.(ctx.user, 'SPA', 'up', 25);
+      ctx.updatePlayerHud?.();
     },
   },
 

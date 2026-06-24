@@ -25,6 +25,16 @@ const PATH_TYPE = Object.freeze({
 var SHINY_RATE = 0.005;
 // var SHINY_RATE = 0.05; // 5% para pruebas
 
+// Tasa de shiny aumentada cuando se tienen los 151 Pokémon de Kanto capturados
+const SHINY_RATE_COMPLETE_DEX = 0.1;
+
+// Devuelve la tasa de shiny activa según el estado de la Pokédex de Kanto
+function getActiveShinyRate() {
+  if (typeof KANTO_DEX === 'undefined' || typeof Storage === 'undefined') return SHINY_RATE;
+  if (KANTO_DEX.every(e => Storage.isCaught(e.name))) return SHINY_RATE_COMPLETE_DEX;
+  return SHINY_RATE;
+}
+
 // ── Helpers compartidos ────────────────────────────────────────────────────
 
 function pickWildEncounter(wildTable) {

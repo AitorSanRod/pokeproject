@@ -558,18 +558,31 @@ var ApiSync = (() => {
   }
 
   /**
+   * Envía la planta más alta alcanzada en el Frente Batalla.
+   * POST /bf-floor → { user_id, bf_max_floor: number }
+   */
+  async function syncBfFloor() {
+    const user_id     = _getUserId();
+    const bf_max_floor = Storage.getBfMaxFloor();
+    console.log(`[ApiSync] Enviando planta máxima BF — ${bf_max_floor}`);
+    return _post('/bf-floor', { user_id, bf_max_floor });
+  }
+
+  /**
    * Envía TODO el storage en un único POST.
    * El servidor puede procesar todas las tablas en una sola transacción.
    *
    * POST /sync → {
-   *   user_id:      string,          // ID de dispositivo (UUID)
-   *   pkmn_version: string|null,     // versión de juego del guard de storage ('pkmn_version')
-   *   pokedex:      PokedexRow[],    // filas de la tabla pokedex
-   *   evs:          EvRow[],         // filas de la tabla evs
-   *   mts:          MtRow[],         // filas de la tabla mts
-   *   badges:       BadgeRow[],      // filas de la tabla badges
-   *   run_data:     RunData|null,    // cabecera de la run activa (null si no hay run)
-   *   run_team:     RunTeamSlot[],   // equipo de la run activa ([] si no hay run)
+   *   user_id:       string,          // ID de dispositivo (UUID)
+   *   pkmn_version:  string|null,     // versión de juego del guard de storage ('pkmn_version')
+   *   pokedex:       PokedexRow[],    // filas de la tabla pokedex
+   *   evs:           EvRow[],         // filas de la tabla evs
+   *   mts:           MtRow[],         // filas de la tabla mts
+   *   badges:        BadgeRow[],      // filas de la tabla badges
+   *   items:         ItemRow[],       // filas de la tabla items
+   *   bf_max_floor:  number,          // planta más alta alcanzada en Frente Batalla
+   *   run_data:      RunData|null,    // cabecera de la run activa (null si no hay run)
+   *   run_team:      RunTeamSlot[],   // equipo de la run activa ([] si no hay run)
    * }
    */
   async function syncAll() {
@@ -583,12 +596,13 @@ var ApiSync = (() => {
 
     const body = {
       user_id,
-      pkmn_version: localStorage.getItem('pkmn_version') ?? null,
+      pkmn_version:  localStorage.getItem('pkmn_version') ?? null,
       pokedex,
       evs,
       mts,
       badges,
       items,
+      bf_max_floor:  Storage.getBfMaxFloor(),
       run_data: runPayload?.run_data ?? null,
       run_team: runPayload?.run_team ?? [],
     };
@@ -596,6 +610,7 @@ var ApiSync = (() => {
     console.log(
       `[ApiSync] syncAll — pokédex:${pokedex.length} evs:${evs.length}` +
       ` mts:${mts.length} medallas:${badges.length} objetos:${items.length}` +
+      ` bf_max_floor:${body.bf_max_floor}` +
       ` run:${runPayload ? `ruta ${body.run_data.route_index}` : 'ninguna'}`
     );
 
@@ -803,6 +818,29 @@ var ApiSync = (() => {
   }
 
   /**
+   * Descarga la planta más alta del Frente Batalla y la escribe en localStorage.
+   * El valor del servidor siempre sobreescribe el local (la nube es autoritativa).
+   *
+   * GET /bf-floor?user_id=...
+   *
+   * Respuesta esperada del backend:
+   * { "bf_max_floor": 40 }
+   *
+   * @returns {Promise<number>} La planta cargada
+   */
+  async function loadBfFloor() {
+    const data  = await _get('/bf-floor');
+    if (data.bf_max_floor == null) {
+      console.log('[ApiSync] Planta máxima BF no presente en servidor — sin cambios locales.');
+      return null;
+    }
+    const floor = typeof data.bf_max_floor === 'number' ? data.bf_max_floor : 0;
+    Storage._set('bf_max_floor', floor);
+    console.log(`[ApiSync] Planta máxima BF cargada — ${floor}`);
+    return floor;
+  }
+
+  /**
    * Descarga TODO el storage del servidor y lo escribe en localStorage.
    * Equivale a llamar a todos los load* en orden en una sola petición.
    *
@@ -810,32 +848,38 @@ var ApiSync = (() => {
    *
    * Respuesta esperada del backend (todos los campos del syncAll combinados):
    * {
-   *   "pkmn_version": "1.0.0",
-   *   "pokedex": [ ...PokedexRow[] ],
-   *   "evs":     [ ...EvRow[]      ],
-   *   "mts":     [ ...MtRow[]      ],
-   *   "badges":  [ ...BadgeRow[]   ],
-   *   "run_data": { ...RunData } | null,
-   *   "run_team": [ ...RunTeamSlot[] ]
+   *   "pkmn_version":  "1.0.0",
+   *   "pokedex":       [ ...PokedexRow[] ],
+   *   "evs":           [ ...EvRow[]      ],
+   *   "mts":           [ ...MtRow[]      ],
+   *   "badges":        [ ...BadgeRow[]   ],
+   *   "items":         [ ...ItemRow[]    ],
+   *   "bf_max_floor":  40,
+   *   "run_data":      { ...RunData } | null,
+   *   "run_team":      [ ...RunTeamSlot[] ]
    * }
    *
-   * @returns {Promise<{ pokedex, evs, mts, badges, run }>} Resumen de lo cargado
+   * @returns {Promise<{ pokedex, evs, mts, badges, items, bfMaxFloor, run }>} Resumen de lo cargado
    */
   async function loadAll() {
     const data = await _get('/sync');
 
-    const pokedex = _parsePokedexRows(data.pokedex);
-    const evs     = _parseEvRows(data.evs);
-    const mts     = _parseMtRows(data.mts);
-    const badges  = _parseBadgeRows(data.badges);
-    const items   = _parseItemRows(data.items);
-    const run     = _parseRunPayload(data.run_data, data.run_team);
+    const pokedex    = _parsePokedexRows(data.pokedex);
+    const evs        = _parseEvRows(data.evs);
+    const mts        = _parseMtRows(data.mts);
+    const badges     = _parseBadgeRows(data.badges);
+    const items      = _parseItemRows(data.items);
+    const bfMaxFloor = data.bf_max_floor != null
+      ? (typeof data.bf_max_floor === 'number' ? data.bf_max_floor : 0)
+      : null;
+    const run        = _parseRunPayload(data.run_data, data.run_team);
 
     Storage._set('pokedex', pokedex);
     Storage._set('evs',     evs);
     Storage._set('mts',     mts);
     Storage._set('badges',  badges);
     Storage._set('items',   items);
+    if (bfMaxFloor != null) Storage._set('bf_max_floor', bfMaxFloor);
 
     if (run) {
       Storage.saveRun(run);
@@ -853,17 +897,18 @@ var ApiSync = (() => {
       ` mts:${data.mts?.length ?? 0}` +
       ` medallas:${data.badges?.length ?? 0}` +
       ` objetos:${data.items?.length ?? 0}` +
+      ` bf_max_floor:${bfMaxFloor ?? '(no presente)'}` +
       ` run:${run ? `ruta ${run.routeIndex}` : 'ninguna'}`
     );
 
-    return { pokedex, evs, mts, badges, items, run };
+    return { pokedex, evs, mts, badges, items, bfMaxFloor, run };
   }
 
   return {
     // Envío
-    syncPokedex, syncEvs, syncMts, syncBadges, syncItems, syncRun, syncAll,
+    syncPokedex, syncEvs, syncMts, syncBadges, syncItems, syncRun, syncBfFloor, syncAll,
     // Carga
-    loadPokedex, loadEvs, loadMts, loadBadges, loadItems, loadRun, loadAll,
+    loadPokedex, loadEvs, loadMts, loadBadges, loadItems, loadRun, loadBfFloor, loadAll,
   };
 
 })();

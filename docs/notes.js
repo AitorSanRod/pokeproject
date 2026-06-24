@@ -1,9 +1,10 @@
 const NOTES_DATA = {
-  "title": "GEN 1 COMPLETA",
+  "title": "Resolución de errores y balance de movimientos",
   "lines": [
-    "Todos los gimnasios y alto mando disponibles.",
-    "Guardado local mejorado con exportación e importación.",
-    "Bug en objetos corregido: Objetos que restaban vida al usuario no llegaban a derrotarlo.",
-    "Todos los pokémons son obtenibles.",
+    "Nuevos efectos en los movimientos, cambios en nombres y mts añadidas.",
+    "Nuevo objeto añadido: Mineral Evolutivo. Se añaden evoluciones a aquellos pokémon que no evolucionaban en la primera generación.",
+    "Se han modificado los premios de final de ruta para que sean mas aleatorios (Si es que eso es posible)",
+    "Error que bloqueaba el juego cuando se abría la pokedex después de capturar a un pokémon si ya había 6 en el equipo solucionado.",
+    "Error en la descripción de la llamasfera corregido.",
   ]
 };

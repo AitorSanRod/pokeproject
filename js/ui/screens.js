@@ -178,7 +178,7 @@ const Screens = {
     document.getElementById('viewport').innerHTML = `
       <div class="screen screen--title">
         <div class="title-logo">
-          <span class="title-logo__main">POKEMON</span>
+          <span class="title-logo__main">POKE<br>PROJECT</span>
           <span class="title-logo__sub">${GameState.version}</span>
         </div>
         <div class="title-pokeball">
@@ -190,7 +190,7 @@ const Screens = {
         <div class="title-actions">
           ${hasSave ? `<button class="btn btn--primary btn--wide" id="btn-continue">CONTINUAR</button>` : ''}
           <button class="btn ${hasSave ? 'btn--wide' : 'btn--primary btn--wide'}" id="btn-adventure">
-            ${hasSave ? 'NUEVA PARTIDA' : 'AVENTURA'}
+            JUGAR
           </button>
           <button class="btn btn--wide" id="btn-dex-title">
             POKÉDEX
@@ -217,11 +217,14 @@ const Screens = {
         GameState.starter          = save.starterName ? { name: save.starterName } : null;
         GameState.starterName      = save.starterName ?? null;
         // Re-sincronizar MTs desde Storage:
-        // 1. Eliminar movimientos MT que ya no están en Storage (p.ej. pokédex reseteada).
-        // 2. Re-añadir movimientos que Storage tenga pero que falten en p.moves (edge case
-        //    donde el JSON del run perdió el move pero Storage.mts sí lo tiene).
+        // 1. Eliminar movimientos MT que ya no están en ninguna fuente válida.
+        // 2. Re-añadir movimientos de Storage o del run JSON que falten en p.moves.
+        //    Unión de ambas fuentes: sobrevive a importaciones de archivos más antiguos
+        //    que puedan haber sobreescrito pkmn_mts con un objeto vacío.
         GameState.team.forEach(p => {
-          const validMTs = Storage.getLearnedMTs(p.name);
+          const storageMTs = Storage.getLearnedMTs(p.name);
+          const runMTs     = p.learnedMTs ?? [];
+          const validMTs   = [...new Set([...storageMTs, ...runMTs])];
           p.moves = (p.moves ?? []).filter(m => !MOVE_BY_ID[m.id]?.mt || validMTs.includes(m.id));
           for (const mtId of validMTs) {
             const m = MOVE_BY_ID[mtId];
@@ -235,14 +238,7 @@ const Screens = {
       });
     }
     document.getElementById('btn-adventure')
-      .addEventListener('click', () => {
-        if (hasSave) {
-          const ok = confirm('¿Iniciar una nueva partida?\n\nSe perderá el progreso guardado.');
-          if (!ok) return;
-          Storage.clearRun();
-        }
-        Screens.show(Screens.regionSelect);
-      });
+      .addEventListener('click', () => GameModesScreen.show());
     document.getElementById('btn-dex-title')
       .addEventListener('click', () => PokedexScreen.show(() => Screens.show(Screens.title)));
     document.getElementById('btn-compendium-title')
@@ -319,7 +315,7 @@ const Screens = {
       </div>`;
 
     document.getElementById('btn-back')
-      .addEventListener('click', () => Screens.show(Screens.title));
+      .addEventListener('click', () => GameModesScreen.show());
     document.getElementById('region-kanto')
       .addEventListener('click', () => {
         Screens._region = SCREENS_CONFIG.REGIONS.find(r => r.id === 'kanto');
@@ -380,7 +376,7 @@ const Screens = {
                 class="starter-card${unlocked ? '' : ' starter-card--locked'}"
                 style="${unlocked ? '' : 'opacity:0.45;cursor:not-allowed'}">
                 <div class="starter-card__sprite-wrap">
-                  <span style="font-size:28px;line-height:1">${unlocked ? '✨' : '🔒'}</span>
+                  <span style="font-family:var(--font-pixel);font-size:32px;color:var(--grey-dark);text-shadow:3px 3px 0 rgba(0,0,0,.35);line-height:1">?</span>
                 </div>
                 <div class="starter-card__info">
                   <div class="starter-card__name">OTRO...</div>
@@ -399,7 +395,7 @@ const Screens = {
 
     starters.forEach(async (s) => {
       try {
-        const isShiny = Math.random() < (typeof SHINY_RATE !== 'undefined' ? SHINY_RATE : 0);
+        const isShiny = Math.random() < (typeof getActiveShinyRate !== 'undefined' ? getActiveShinyRate() : 0);
         const p = await createPokemon(s.name, SCREENS_CONFIG.STARTER_LEVEL, true, null, null, isShiny);
 
         const spriteEl = document.getElementById(`sprite-${s.name}`);
@@ -949,7 +945,7 @@ const Screens = {
     } else {
       // Salvaje — combate automático + captura automática
       const entry   = pickWildEncounter(data.wild);
-      const isShiny = entry.shiny === true || Math.random() < (typeof SHINY_RATE !== 'undefined' ? SHINY_RATE : 0);
+      const isShiny = entry.shiny === true || Math.random() < (typeof getActiveShinyRate !== 'undefined' ? getActiveShinyRate() : 0);
       const foePoke = await createPokemon(entry.name, rollLevel(entry), false, entry.moveId ?? null, entry.overrides ?? null, isShiny);
       if (entry.img) foePoke.spriteUrl = entry.img;
       if (entry.heldItem) equipHeldItem(foePoke, entry.heldItem);
@@ -1260,6 +1256,7 @@ const Screens = {
     if (data.rewardPokemon?.length) {
       const rewardName = data.rewardPokemon[Math.floor(Math.random() * data.rewardPokemon.length)];
       rewardPoke = await createPokemon(rewardName, maxLevel, true);
+      const pokeAlreadyCaught = Storage.isCaught(rewardPoke.name);
       Storage.markCaught(rewardPoke.name);
       pokemonPrize = {
         id: 'pokemon',
@@ -1267,13 +1264,18 @@ const Screens = {
         name: rewardPoke.displayName,
         desc: `Nv.${rewardPoke.level} · ${rewardPoke.types.join('/')}`,
         type: 'pokemon',
+        alreadyCaught: pokeAlreadyCaught,
       };
     }
 
-    // ── Slot fijo: Objeto equipable (1 elegido al azar de rewardExtras) ───────
+    // ── Slot fijo: Objeto equipable ───────────────────────────────────────────
+    // Pool = todos los items del juego. Los items en rewardExtras de esta ruta
+    // cuentan doble (mayor probabilidad de salir).
     let itemPrize = null;
-    if (data.rewardExtras?.length) {
-      const itemId = data.rewardExtras[Math.floor(Math.random() * data.rewardExtras.length)];
+    {
+      const extras = data.rewardExtras ?? [];
+      const pool = [...Object.keys(HELD_ITEMS), ...extras];
+      const itemId = pool[Math.floor(Math.random() * pool.length)];
       const item = HELD_ITEMS[itemId];
       if (item) {
         itemPrize = {
@@ -1401,6 +1403,7 @@ const Screens = {
               <div class="item-card" data-prize="${p.id}" data-desc="${p.desc}">
                 <div class="item-card__icon">${p.icon}</div>
                 <div class="item-card__name">${p.name}</div>
+                ${p.alreadyCaught ? `<div style="font-family:var(--font-pixel);font-size:6px;color:var(--yellow);letter-spacing:1px;margin-top:2px">CAPTURADO</div>` : ''}
               </div>`).join('')}
           </div>
           <button id="reward-skip" class="btn btn--wide"
@@ -1508,6 +1511,35 @@ const Screens = {
       overlay.remove();
       onCancel?.();
     });
+
+    // Rewire Pokédex/Compendium buttons so volviendo de ellos se restaura este modal.
+    // PokedexScreen.show() hace viewport.innerHTML=... destruyendo el overlay, así que
+    // capturamos el click, eliminamos el overlay, abrimos la pokédex y al cerrar la
+    // volvemos a mostrar el selector con los mismos parámetros.
+    const _rewire = (btnId, openFn) => {
+      const btn = document.getElementById(btnId);
+      if (!btn) return;
+      const clone = btn.cloneNode(true);
+      btn.replaceWith(clone);
+      clone.addEventListener('click', () => {
+        overlay.remove();
+        openFn(() => Screens._showPokemonSwapSelector(newPoke, onDone, onCancel));
+      });
+      clone.addEventListener('mouseenter', () => clone.style.background = 'rgba(0,0,0,.6)');
+      clone.addEventListener('mouseleave', () => clone.style.background = 'rgba(0,0,0,.35)');
+    };
+    _rewire('btn-dex-combat', restore => {
+      GameState.paused = true;
+      PokedexScreen.show(() => { GameState.paused = false; restore(); });
+    });
+    _rewire('btn-compendium-combat', restore => {
+      GameState.paused = true;
+      CompendiumScreen.show(() => { GameState.paused = false; restore(); });
+    });
+    _rewire('btn-dex-reward',             restore => PokedexScreen.show(restore));
+    _rewire('btn-compendium-reward',      restore => CompendiumScreen.show(restore));
+    _rewire('btn-dex-route-float',        restore => PokedexScreen.show(restore));
+    _rewire('btn-compendium-route-float', restore => CompendiumScreen.show(restore));
   },
 
   // Selector de pokemon para vitaminas (premios de EV).
@@ -1670,12 +1702,12 @@ const Screens = {
   // COMBAT
   // ═══════════════════════════════════════════════════════════════════════
   combat(options) {
-    const { foeTeam, isWild = false, isTrainer = false, isGym = false, gymLeaderName, trainerName, onWin, onLoss } = options;
+    const { foeTeam, isWild = false, isTrainer = false, isGym = false, gymLeaderName, trainerName, noExp = false, onWin, onLoss } = options;
 
     GameState.combat = {
       foeTeam,
       foeIndex:    0,
-      isWild, isTrainer, isGym, gymLeaderName, trainerName,
+      isWild, isTrainer, isGym, gymLeaderName, trainerName, noExp,
       onWin, onLoss,
       chosenMove:  null,
       lastFoeObj:  null,
@@ -1821,10 +1853,17 @@ const Screens = {
         if (hudFoe)  { hudFoe.style.opacity  = '1'; hudFoe.classList.add('combat-hud--foe-enter');  }
         if (foeWrap) { foeWrap.style.opacity = '1'; foeWrap.querySelector('img')?.classList.add('combat-sprite--foe-enter'); }
         // Iniciar el turno tras la animación de entrada del foe (~500ms más)
-        setTimeout(() => Screens._combatStartTurn(), 600);
+        setTimeout(() => {
+          if (!GameState.combat?._turnRunning && !GameState.combat?._ending) {
+            Screens._combatStartTurn();
+          }
+        }, 600);
       }, introDelay);
     } else {
-      Screens._combatStartTurn();
+      // Solo iniciar turno si no hay uno ya en curso (p.ej. vuelta de Pokédex mid-turn)
+      if (!ctx._turnRunning && !ctx._ending) {
+        Screens._combatStartTurn();
+      }
     }
   },
 
@@ -1859,24 +1898,18 @@ const Screens = {
     document.getElementById('btn-dex-combat').addEventListener('click', () => {
       GameState.paused = true;
       PokedexScreen.show(() => {
-        Screens._renderCombatScreen();
         GameState.paused = false;
-        const ctx = GameState.combat;
-        if (!ctx._turnRunning && !ctx._ending) {
-          Screens._combatStartTurn();
-        }
+        Screens._renderCombatScreen();
+        // _renderCombatScreen llama _combatStartTurn solo si no hay turno en curso
       });
     });
 
     document.getElementById('btn-compendium-combat').addEventListener('click', () => {
       GameState.paused = true;
       CompendiumScreen.show(() => {
-        Screens._renderCombatScreen();
         GameState.paused = false;
-        const ctx = GameState.combat;
-        if (!ctx._turnRunning && !ctx._ending) {
-          Screens._combatStartTurn();
-        }
+        Screens._renderCombatScreen();
+        // _renderCombatScreen llama _combatStartTurn solo si no hay turno en curso
       });
     });
 
@@ -1936,12 +1969,12 @@ const Screens = {
         return;
       }
       Screens._updateCombatLog(`${ctx.activePlayer.displayName} no puede mas! Vamos, ${next.displayName}!`);
-      ctx.activePlayer = next;
-      ctx.chosenMove   = null;
-      // Re-render pantalla para mostrar el nuevo sprite del jugador
+      ctx.activePlayer  = next;
+      ctx.chosenMove    = null;
+      ctx.introPlayed   = true;
+      // _renderCombatScreen llama a _combatStartTurn internamente (introPlayed=true → else branch)
       setTimeout(() => {
         Screens._renderCombatScreen();
-        Screens._combatStartTurn();
       }, 1200);
       return;
     }
@@ -1967,18 +2000,24 @@ const Screens = {
         </div>`;
     }
 
+    // Marcar turno en curso desde el momento del scheduling para que ningún
+    // re-render (vuelta de Pokédex, etc.) pueda agendar un segundo turno durante
+    // los 900ms de espera. _executeCombatTurn no necesita volver a setearlo.
+    ctx._turnRunning = true;
     setTimeout(() => Screens._executeCombatTurn(active, foe), 900);
   },
 
   async _executeCombatTurn(player, foe) {
     const ctx = GameState.combat;
 
-    // Guardia: si el combate ya terminó o hay un turno en curso, ignorar
-    if (ctx._ending || ctx._turnRunning) {
-      console.warn('[COMBAT] _executeCombatTurn ignorado — combate terminando o turno ya en curso');
+    // Guardia: si el combate ya terminó, ignorar. _turnRunning ya está en true
+    // desde _combatStartTurn (que es el único que agenda este método), por lo
+    // que no hace falta volver a setearlo aquí.
+    if (ctx._ending) {
+      console.warn('[COMBAT] _executeCombatTurn ignorado — combate ya terminado');
+      ctx._turnRunning = false;
       return;
     }
-    ctx._turnRunning = true;
 
     const logFn = (txt) => Screens._updateCombatLog(txt);
 
@@ -2320,42 +2359,44 @@ const Screens = {
       await Screens._showFaintAnimation('foe');
       await Screens._wait(200);
 
-      // EXP
-      const battleType = ctx.isGym ? 'gym' : ctx.isTrainer ? 'trainer' : 'wild';
-      for (const member of GameState.team) {
-        if (member.currentHp <= 0) continue;
-        const { gained, levelsGained } = gainExp(member, foe.name, battleType, foe.level);
-        console.log(`[COMBAT] ${member.displayName} gano ${gained} exp`);
-        if (levelsGained > 0) {
-          Screens._updateCombatLog(`${member.displayName} subio al nivel ${member.level}!`);
-          console.log(`[COMBAT] ${member.displayName} subio al nivel ${member.level}!`);
-          Screens._updateCombatTeamBar();
-          Screens._showLevelUpPip(member, levelsGained);
-          await Screens._wait(950);
-        }
-        // Evolución pendiente
-        if (member._pendingEvolution) {
-          const intoName = member._pendingEvolution;
-          delete member._pendingEvolution;
-          Screens._updateCombatLog(`Que? ${member.displayName} esta evolucionando!`);
-          // Animación ¡EVOLUCIONA! en el pip — se muestra sobre el pip del pokemon actual
-          Screens._showEvolutionPip(member);
-          await Screens._wait(1000);
-          try {
-            const evolved = await evolve(member, intoName);
-            const idx = GameState.team.indexOf(member);
-            if (idx !== -1) GameState.team[idx] = evolved;
-            if (member === GameState.starter) GameState.starter = evolved;
-            // Si el pokemon que evolucionó era el activo en combate, actualizar la referencia
-            if (ctx.activePlayer === member) ctx.activePlayer = evolved;
-            // Marcar la evolución como capturada en la pokédex
-            Storage.markCaught(evolved.name);
-            Screens._updateCombatLog(`Felicidades! Tu ${member.displayName} a evolucionado a ${evolved.displayName}!`);
-            console.log(`[EVOLUCION] ${member.displayName} → ${evolved.displayName}`);
+      // EXP (omitido en Frente Batalla cuando ctx.noExp === true)
+      if (!ctx.noExp) {
+        const battleType = ctx.isGym ? 'gym' : ctx.isTrainer ? 'trainer' : 'wild';
+        for (const member of GameState.team) {
+          if (member.currentHp <= 0) continue;
+          const { gained, levelsGained } = gainExp(member, foe.name, battleType, foe.level);
+          console.log(`[COMBAT] ${member.displayName} gano ${gained} exp`);
+          if (levelsGained > 0) {
+            Screens._updateCombatLog(`${member.displayName} subio al nivel ${member.level}!`);
+            console.log(`[COMBAT] ${member.displayName} subio al nivel ${member.level}!`);
             Screens._updateCombatTeamBar();
-            await Screens._wait(800);
-          } catch (e) {
-            console.error('[EVOLUCION] Error:', e.message);
+            Screens._showLevelUpPip(member, levelsGained);
+            await Screens._wait(950);
+          }
+          // Evolución pendiente
+          if (member._pendingEvolution) {
+            const intoName = member._pendingEvolution;
+            delete member._pendingEvolution;
+            Screens._updateCombatLog(`Que? ${member.displayName} esta evolucionando!`);
+            // Animación ¡EVOLUCIONA! en el pip — se muestra sobre el pip del pokemon actual
+            Screens._showEvolutionPip(member);
+            await Screens._wait(1000);
+            try {
+              const evolved = await evolve(member, intoName);
+              const idx = GameState.team.indexOf(member);
+              if (idx !== -1) GameState.team[idx] = evolved;
+              if (member === GameState.starter) GameState.starter = evolved;
+              // Si el pokemon que evolucionó era el activo en combate, actualizar la referencia
+              if (ctx.activePlayer === member) ctx.activePlayer = evolved;
+              // Marcar la evolución como capturada en la pokédex
+              Storage.markCaught(evolved.name);
+              Screens._updateCombatLog(`Felicidades! Tu ${member.displayName} a evolucionado a ${evolved.displayName}!`);
+              console.log(`[EVOLUCION] ${member.displayName} → ${evolved.displayName}`);
+              Screens._updateCombatTeamBar();
+              await Screens._wait(800);
+            } catch (e) {
+              console.error('[EVOLUCION] Error:', e.message);
+            }
           }
         }
       }

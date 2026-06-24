@@ -155,6 +155,31 @@ var HELD_ITEMS = {
     },
   },
 
+  'eviolite': {
+    name: 'Mineral Evolutivo',
+    desc: 'Aumenta DEF y DEF.ESP un 50% si el portador puede evolucionar.',
+    img: 'assets/sprites/items/eviolite.png',
+    fallbackIcon: '💎',
+    canChange: true,
+    trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+    fn(ctx) {
+      const { user } = ctx;
+      const dbEntry = typeof POKEMON_DB !== 'undefined' ? POKEMON_DB[user.name] : null;
+      if (!dbEntry || !('evolvesInto' in dbEntry)) return;
+      if (!user.combatMods) user.combatMods = {};
+      user.combatMods.def = (user.combatMods.def ?? 0) + 0.5;
+      user.combatMods.spd = (user.combatMods.spd ?? 0) + 0.5;
+    },
+    revert(ctx) {
+      const { user } = ctx;
+      const dbEntry = typeof POKEMON_DB !== 'undefined' ? POKEMON_DB[user.name] : null;
+      if (!dbEntry || !('evolvesInto' in dbEntry)) return;
+      if (!user.combatMods) return;
+      user.combatMods.def = (user.combatMods.def ?? 0) - 0.5;
+      user.combatMods.spd = (user.combatMods.spd ?? 0) - 0.5;
+    },
+  },
+
   // ── POTENCIADORES DE DAÑO ────────────────────────────────────────────────────
 
   'carbon': {
@@ -228,7 +253,7 @@ var HELD_ITEMS = {
 
   'flame-orb': {
     name: 'Llamasfera',
-    desc: 'Quema al portador al inicio del combate y le resta el 5% de HP al final de cada turno.',
+    desc: 'Quema al portador y le resta el 5% de HP al final de cada turno.',
     img: 'assets/sprites/items/flame-orb.png',
     fallbackIcon: '🔥',
     canChange: true,
@@ -569,4 +594,5 @@ var ITEM = {
   fire_stone: 'fire-stone',
   water_stone: 'water-stone',
   moon_stone: 'moon-stone',
+  eviolite: 'eviolite',
 };

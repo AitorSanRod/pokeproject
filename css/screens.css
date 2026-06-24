@@ -251,6 +251,153 @@
   padding-right: var(--sp-xs);
 }
 
+/* ── Mode cards (pantalla de selección de modo de juego) ── */
+.mode-card {
+  background: var(--white);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+  padding: var(--sp-md);
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.mode-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 5px;
+  background: var(--mode-accent, var(--red));
+}
+.mode-card:hover  { transform: translate(-2px,-2px); box-shadow: var(--shadow-md); }
+.mode-card:active { transform: translate(1px,1px);   box-shadow: 2px 2px 0 var(--black); }
+
+.mode-card__info  { flex: 1; min-width: 0; }
+
+.mode-card__name {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: var(--black);
+  margin-bottom: var(--sp-xs);
+}
+.mode-card__desc {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--grey-dark);
+  line-height: 1.5;
+}
+.mode-card__arrow {
+  font-family: var(--font-pixel);
+  font-size: 14px;
+  color: var(--grey);
+  flex-shrink: 0;
+  padding-right: var(--sp-xs);
+}
+
+/* ── Battle Frontier — slots de equipo ── */
+.bf-slot {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  border: 2px dashed var(--grey-light);
+  border-radius: var(--radius-sm);
+  padding: 8px 4px 6px;
+}
+.bf-slot--filled {
+  border-style: solid;
+  border-color: var(--grey-light);
+  cursor: pointer;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.bf-slot--filled:hover { border-color: var(--grey); }
+.bf-slot--active {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px rgba(59,130,246,.2);
+}
+.bf-slot__sprite {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+.bf-slot__name {
+  font-family: var(--font-pixel);
+  font-size: 5px;
+  color: var(--black);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.bf-slot__hint {
+  font-family: var(--font-pixel);
+  font-size: 5px;
+}
+.bf-slot__num {
+  font-family: var(--font-pixel);
+  font-size: 18px;
+  color: var(--grey-light);
+  line-height: 1;
+  margin: auto 0;
+}
+
+/* ── Battle Frontier — item cards ── */
+.bf-item-card {
+  background: var(--white);
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: var(--sp-sm);
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.bf-item-card:hover  { transform: translate(-2px,-2px); box-shadow: var(--shadow-md); }
+.bf-item-card:active { transform: translate(1px,1px);   box-shadow: 2px 2px 0 var(--black); }
+.bf-item-card__img {
+  width: 40px;
+  height: 40px;
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+.bf-item-card__name {
+  font-family: var(--font-pixel);
+  font-size: 5px;
+  color: var(--black);
+  text-align: center;
+  line-height: 1.4;
+}
+.bf-item-card--selected {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 2px rgba(26,111,191,.25);
+  background: rgba(26,111,191,.06);
+}
+.bf-item-card--disabled {
+  opacity: 0.35;
+  filter: grayscale(1);
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Fila de equipo en modo "eligiendo pokémon para objeto" */
+.bf-row--selectable {
+  border-color: var(--blue);
+}
+.bf-row--selectable:hover {
+  background: rgba(26,111,191,.06);
+}
+
 /* Loading state */
 .loading-sprite {
   width: 64px; height: 64px;
@@ -1216,6 +1363,18 @@
 
 .path-encounter-cell:hover .path-tooltip { display: block; }
 
+/* BF path — tooltip hacia abajo (el header no deja espacio arriba) */
+.bf-path .path-tooltip {
+  bottom: auto;
+  top: calc(100% + 6px);
+}
+.bf-path .path-tooltip::after {
+  top: auto;
+  bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: var(--black);
+}
+
 .combat-team-pip__hp-bar { height: 10px; }
 
 /* ── STATUS BADGES — estado y modificadores persistentes en el HUD ─────────── */
@@ -1570,6 +1729,7 @@ div:hover > .move-effect-tooltip { display: block; }
   font-size: 7px;
   padding: 3px 7px;
   flex-shrink: 0;
+  align-self: center;
 }
 
 @media (hover: none) {
@@ -1632,9 +1792,22 @@ div:hover > .move-effect-tooltip { display: block; }
     min-width: 14px;
     padding: 0;
     font-size: 0;
+    line-height: 0;
     border-radius: 50%;
     overflow: hidden;
     flex-shrink: 0;
+    align-self: center;
+  }
+
+  /* Cards de preparación BF — barra de vida acortada para que la bola quede al lado */
+  .bf-prep-hp-wrap {
+    flex: 0 0 45% !important;
+  }
+
+  /* Cards de preparación BF — padding más ajustado */
+  .bf-reorg-card {
+    padding: 7px 10px !important;
+    gap: 8px !important;
   }
 }
 

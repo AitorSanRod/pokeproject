@@ -21,17 +21,24 @@ const GameState = {
   version:            GAME_VERSION,
 
   init(starter) {
-    this.starter          = starter;
-    this.starterName      = starter.name;
-    this.team             = [starter];
-    this.balls            = 999;
-    this.badges           = [];
-    this.items            = [];
-    this.autoMode         = true;
-    this.routeIndex       = 0;
-    this.currentEncounter = 0;
-    this.currentPath      = null;
-    this.currentPaths     = null;
+    this.starter             = starter;
+    this.starterName         = starter.name;
+    this.team                = [starter];
+    this.balls               = 999;
+    this.badges              = [];
+    this.items               = [];
+    this.autoMode            = true;
+    this.routeIndex          = 0;
+    this.currentEncounter    = 0;
+    this.currentPath         = null;
+    this.currentPaths        = null;
+    this.paused              = false;
+    this.specialTrainerUsed  = false;
+    this._pathRunning        = false;
+    this.welcomeShown        = {};
+    this.combat              = null;
+    this._optionalArea       = null;
+    this.currentArea         = null;
     // Marcar starter como capturado y aplicar EVs guardados
     Storage.markCaught(starter.name);
     Storage.applyStoredEvs(starter);

@@ -212,6 +212,21 @@ var Storage = {
     return this.getCollectedItems()[itemId] === true;
   },
 
+  // ── Frente Batalla ───────────────────────────────────────────────────────
+  // Guarda el piso máximo alcanzado (1-20). No se reinicia con la run de aventura.
+  // Se usará para desbloquear puntos de entrada en pisos 20, 40, 60, 80 y 100.
+
+  getBfMaxFloor() {
+    return this._get('bf_max_floor') ?? 0;
+  },
+
+  setBfMaxFloor(floor) {
+    const current = this.getBfMaxFloor();
+    if (floor <= current) return;
+    this._set('bf_max_floor', floor);
+    console.log(`[Storage] Frente Batalla: nuevo piso máximo → ${floor}`);
+  },
+
   // ── Final de Kanto ────────────────────────────────────────────────────────
   // Se activa al llegar a info-final-kanto por primera vez. No se borra nunca
   // (ni con reset de run): es un logro permanente del jugador.

@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // SAVE DATA — exportar e importar datos persistentes del jugador
 //
-// Incluye: pokédex, EVs, MTs, medallas, objetos recogidos.
+// Incluye: pokédex, EVs, MTs, medallas, objetos recogidos, piso máximo del Frente Batalla.
 // Excluye: run activa (pkmn_run) — el progreso de la partida en curso no viaja.
 //
 // Formato del archivo: .txt con JSON interno.
@@ -19,14 +19,15 @@ const SaveData = {
   // ── Exportar ──────────────────────────────────────────────────────────────
   exportar() {
     const payload = {
-      schema:     SAVE_DATA_SCHEMA,
-      version:    typeof GAME_VERSION !== 'undefined' ? GAME_VERSION : null,
-      pokedex:    Storage.getPokedex(),
-      evs:        Storage.getAllEvs(),
-      badges:     Storage.getAllBadges(),
-      items:      Storage.getCollectedItems(),
-      mts:        Storage._get('mts') ?? {},
-      kantoDone:  Storage.isKantoCompleted(),
+      schema:       SAVE_DATA_SCHEMA,
+      version:      typeof GAME_VERSION !== 'undefined' ? GAME_VERSION : null,
+      pokedex:      Storage.getPokedex(),
+      evs:          Storage.getAllEvs(),
+      badges:       Storage.getAllBadges(),
+      items:        Storage.getCollectedItems(),
+      mts:          Storage._get('mts') ?? {},
+      kantoDone:    Storage.isKantoCompleted(),
+      bfMaxFloor:   Storage.getBfMaxFloor(),
     };
 
     const json = JSON.stringify(payload, null, 2);
@@ -86,20 +87,33 @@ const SaveData = {
     if (typeof data !== 'object' || data === null) {
       throw new Error('El archivo no contiene un JSON válido.');
     }
-    const hasAny = ['pokedex', 'evs', 'badges', 'items', 'mts', 'kantoDone'].some(k => k in data);
+    const hasAny = ['pokedex', 'evs', 'badges', 'items', 'mts', 'kantoDone', 'bfMaxFloor'].some(k => k in data);
     if (!hasAny) {
       throw new Error('El archivo no parece un fichero de datos de este juego.');
     }
   },
 
-  // ── Privado: escribir en Storage (reemplaza, no fusiona) ──────────────────
+  // ── Privado: escribir en Storage ─────────────────────────────────────────
+  // pokedex/evs/badges/items se reemplazan por completo.
+  // mts se fusiona (unión): nunca se pierden MTs aprendidas que no estén en el archivo.
   _apply(data) {
     if (data.pokedex   && typeof data.pokedex === 'object') Storage._set('pokedex',    data.pokedex);
     if (data.evs       && typeof data.evs     === 'object') Storage._set('evs',        data.evs);
     if (data.badges    && typeof data.badges  === 'object') Storage._set('badges',     data.badges);
     if (data.items     && typeof data.items   === 'object') Storage._set('items',      data.items);
-    if (data.mts       && typeof data.mts     === 'object') Storage._set('mts',        data.mts);
+    if (data.mts       && typeof data.mts     === 'object') {
+      const existing = Storage._get('mts') ?? {};
+      const merged   = { ...existing };
+      for (const [root, moves] of Object.entries(data.mts)) {
+        if (!merged[root]) merged[root] = [];
+        for (const id of (moves ?? [])) {
+          if (!merged[root].includes(id)) merged[root].push(id);
+        }
+      }
+      Storage._set('mts', merged);
+    }
     if (data.kantoDone === true)                            Storage._set('kanto_done', true);
+    if (typeof data.bfMaxFloor === 'number' && data.bfMaxFloor > 0) Storage.setBfMaxFloor(data.bfMaxFloor);
   },
 
   // ── Privado: fecha de hoy en formato YYYY-MM-DD ───────────────────────────

@@ -1295,7 +1295,7 @@ var ROUTE_DATA = {
     bg: BG.ciudadVerde,
     combatBg: COMBAT_BG.interior,
     welcome: {
-      title: 'Isla Canela',
+      title: 'Ciudad Verde',
       subtitle: 'Gimnasio Pokemon de tipo Tierra',
       img: BG.ciudadVerde,
     },
@@ -1534,7 +1534,7 @@ var ROUTE_DATA = {
           name: POKEMON.dragonair, level: 68, moveId: MOVES.dragon.physical.dragon_tail
         },
         {
-          name: POKEMON.aerodactyl, level: 68, moveId: MOVES.rock.physical.stone_edge
+          name: POKEMON.aerodactyl, level: 68, moveId: [MOVES.rock.physical.stone_edge, MOVES.ice.physical.ice_fang]
         },
         {
           name: POKEMON.dragonite, level: 70, moveId: MOVES.dragon.physical.outrage
