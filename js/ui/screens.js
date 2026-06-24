@@ -1286,6 +1286,7 @@ const Screens = {
           desc: item.desc,
           type: 'held-item',
           itemId,
+          alreadyCollected: Storage.isItemCollected(itemId),
         };
       }
     }
@@ -1404,6 +1405,7 @@ const Screens = {
                 <div class="item-card__icon">${p.icon}</div>
                 <div class="item-card__name">${p.name}</div>
                 ${p.alreadyCaught ? `<div style="font-family:var(--font-pixel);font-size:6px;color:var(--yellow);letter-spacing:1px;margin-top:2px">CAPTURADO</div>` : ''}
+                ${p.alreadyCollected ? `<div style="font-family:var(--font-pixel);font-size:6px;color:var(--grey);letter-spacing:1px;margin-top:2px">DESBLOQUEADO</div>` : ''}
               </div>`).join('')}
           </div>
           <button id="reward-skip" class="btn btn--wide"
@@ -1454,6 +1456,7 @@ const Screens = {
                   GameState.team[i] = evolved;
                   if (p === GameState.starter) GameState.starter = evolved;
                   Storage.markCaught(evolved.name);
+                  if (evolved.shiny) Storage.propagateShinyLine(evolved.name);
                 } catch (e) {
                   console.error('[EVOLUCION] Error en caramelo:', e.message);
                 }
@@ -1551,16 +1554,18 @@ const Screens = {
       </p>
       <div style="display:flex;flex-direction:column;gap:6px">
         ${GameState.team.map((p, i) => {
-          const evs = Storage.getEvs(p.name);
-          return Screens._teamBtn(p, i,
-            `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--blue)">${item.stat.toUpperCase()}: ${p.stats[item.stat]} (+${evs[item.stat] ?? 0} EV)</span>`
-          );
+          const evs   = Storage.getEvs(p.name);
+          const atMax = (evs[item.stat] ?? 0) >= Storage.EV_MAX_PER_STAT;
+          const extra = atMax
+            ? `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">MÁX EV</span>`
+            : `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--blue)">${item.stat.toUpperCase()}: ${p.stats[item.stat]} (+${evs[item.stat] ?? 0} EV)</span>`;
+          return Screens._teamBtn(p, i, extra, atMax);
         }).join('')}
       </div>
       <button class="btn btn--ghost btn--wide" id="ev-cancel">Cancelar</button>
     `);
 
-    overlay.querySelectorAll('[data-idx]').forEach(btn => {
+    overlay.querySelectorAll('[data-idx]:not([disabled])').forEach(btn => {
       btn.addEventListener('click', () => {
         const p = GameState.team[+btn.dataset.idx];
         // Guardar EV en Storage y aplicar al pokemon
@@ -1764,6 +1769,20 @@ const Screens = {
     // Marcar el foe como visto la primera vez que aparece
     if (isFirstRender) Storage.markSeen(foe.name);
 
+    // Card del movimiento activo — se pre-renderiza aquí para que el área nunca esté
+    // vacía y la lista de pokemon no suba/baje cuando aparece o desaparece el card.
+    const _activeMove = player.moves.find(mv => mv.id === player.autoMove) ?? player.moves[0];
+    const _moveCardHtml = _activeMove ? `
+      <div style="padding:6px var(--sp-md)">
+        <div class="move-btn move-btn--display" data-type="${_activeMove.type}" style="cursor:default;opacity:.9">
+          <span class="move-btn__name">${_activeMove.name}</span>
+          <span class="move-btn__meta">
+            <span class="type-badge" data-type="${_activeMove.type}" style="font-size:5px;padding:2px 4px">${_activeMove.type}</span>
+            <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey-dark)">POD: ${_activeMove.power ?? '—'}</span>
+          </span>
+        </div>
+      </div>` : '';
+
     document.getElementById('viewport').innerHTML = `
       <div class="screen screen--combat">
 
@@ -1828,7 +1847,7 @@ const Screens = {
         ${Screens._renderPathProgress()}
 
         <!-- Accion activa -->
-        <div id="combat-actions-area"></div>
+        <div id="combat-actions-area">${_moveCardHtml}</div>
 
         <!-- Mini equipo -->
         <div class="combat-team-bar" id="combat-team-bar">
@@ -2406,6 +2425,7 @@ const Screens = {
               if (ctx.activePlayer === member) ctx.activePlayer = evolved;
               // Marcar la evolución como capturada en la pokédex
               Storage.markCaught(evolved.name);
+              if (evolved.shiny) Storage.propagateShinyLine(evolved.name);
               Screens._updateCombatLog(`Felicidades! Tu ${member.displayName} a evolucionado a ${evolved.displayName}!`);
               console.log(`[EVOLUCION] ${member.displayName} → ${evolved.displayName}`);
               Screens._updateCombatTeamBar();
@@ -2424,7 +2444,7 @@ const Screens = {
             Screens._updateCombatLog(`Gotcha! ${foe.displayName} fue capturado!`);
             console.log(`[COMBAT] Capturado: ${foe.displayName}`);
             Storage.markCaught(foe.name);
-            if (foe.shiny) Storage.markShiny(foe.name);
+            if (foe.shiny) { Storage.markShiny(foe.name); Storage.propagateShinyLine(foe.name); }
             // Convertir en pokemon del jugador y cargar MTs aprendidas por la cadena evolutiva
             foe.isPlayer = true;
             const capturedMTs = Storage.getLearnedMTs(foe.name);
@@ -2557,7 +2577,7 @@ const Screens = {
       Screens._updateCombatLog(`Gotcha! ${foe.displayName} fue capturado!`);
       console.log(`[COMBAT] Capturado: ${foe.displayName}`);
       Storage.markCaught(foe.name);
-      if (foe.shiny) Storage.markShiny(foe.name);
+      if (foe.shiny) { Storage.markShiny(foe.name); Storage.propagateShinyLine(foe.name); }
       foe.isPlayer = true;
       const capturedMTs = Storage.getLearnedMTs(foe.name);
       foe.learnedMTs = capturedMTs;

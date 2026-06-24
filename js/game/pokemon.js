@@ -95,11 +95,11 @@ async function createPokemon(nameOrId, level, isPlayer = false, moveId = null, o
                       const valid = moveId.filter(id => moves.find(m => m.id === id));
                       return valid.length > 0
                         ? valid[Math.floor(Math.random() * valid.length)]
-                        : moves[0]?.id ?? null;
+                        : moves[moves.length - 1]?.id ?? null;
                     }
                     return moveId && moves.find(m => m.id === moveId)
                       ? moveId
-                      : moves[0]?.id ?? null;
+                      : moves[moves.length - 1]?.id ?? null;
                   })(),
     isPlayer,
     shiny,
@@ -240,10 +240,21 @@ async function evolve(pokemon, intoName) {
   newPoke.expToNext = EXP_TABLE.expToNext(pokemon.level);
 
   // moves y learnedMTs ya vienen correctos de createPokemon (stage + Storage MTs).
-  // Mantener el autoMove previo solo si existe en el nuevo moveset; si no, primer move.
-  newPoke.autoMove = (pokemon.autoMove && newPoke.moves.find(m => m.id === pokemon.autoMove))
-    ? pokemon.autoMove
-    : newPoke.moves[0]?.id ?? null;
+  // Regla de autoMove tras evolución:
+  // - Si el jugador tenía el movimiento "por defecto" (el último/más fuerte de su forma base),
+  //   se actualiza al último movimiento de la forma evolucionada (nueva habilidad).
+  // - Si el jugador lo había cambiado manualmente a otro movimiento y ese existe en el nuevo
+  //   moveset, se respeta la elección manual.
+  // - En cualquier otro caso, se usa el último movimiento de la forma evolucionada.
+  const baseLast    = pokemon.moves[pokemon.moves.length - 1]?.id;
+  const evolvedLast = newPoke.moves[newPoke.moves.length - 1]?.id;
+  if (pokemon.autoMove === baseLast) {
+    newPoke.autoMove = evolvedLast ?? null;
+  } else if (pokemon.autoMove && newPoke.moves.find(m => m.id === pokemon.autoMove)) {
+    newPoke.autoMove = pokemon.autoMove;
+  } else {
+    newPoke.autoMove = evolvedLast ?? null;
+  }
 
   // Recalcular stats con los nuevos IVs/EVs/naturaleza
   newPoke.stats     = computeStats(newPoke);

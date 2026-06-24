@@ -558,7 +558,7 @@ const BattleFrontierScreen = {
       const isSpecial  = floor.specialTrainer?.battleNumber === num;
       const trainer    = isSpecial
         ? floor.specialTrainer
-        : BattleFrontierScreen._pickTrainer(floor.trainerLevelRange);
+        : floor.trainers[BattleFrontierScreen._trainerIdxForBattle(floor, num)];
       const isFloorEnd = num === floor.battleRange[1];
 
       bf._pendingBattles.push({ num, trainer });
@@ -575,17 +575,15 @@ const BattleFrontierScreen = {
     return steps;
   },
 
-  _pickTrainer(levelRange) {
-    const [minLv, maxLv] = levelRange;
-    const pool = BF_TRAINER_POOL.filter(t => t.level >= minLv && t.level <= maxLv);
-    if (pool.length === 0) return BF_TRAINER_POOL[0];
-    const total = pool.reduce((s, t) => s + (t.rate ?? 1), 0);
-    let rand = Math.random() * total;
-    for (const trainer of pool) {
-      rand -= (trainer.rate ?? 1);
-      if (rand <= 0) return trainer;
+  // Dado un floor y un número de combate absoluto, devuelve el índice en floor.trainers
+  // que corresponde a ese combate (saltando el slot del specialTrainer si existe).
+  _trainerIdxForBattle(floor, num) {
+    const specialNum = floor.specialTrainer?.battleNumber;
+    let idx = 0;
+    for (let b = floor.battleRange[0]; b < num; b++) {
+      if (b !== specialNum) idx++;
     }
-    return pool[pool.length - 1];
+    return idx;
   },
 
   async _nextBattle() {
@@ -615,11 +613,15 @@ const BattleFrontierScreen = {
 
     // Determinar entrenador: usar el pre-sorteado si existe, si no sortear ahora
     const pending = BattleFrontierScreen._pendingBattles;
-    const trainer = (pending.length > 0 && pending[0].num === count)
-      ? pending.shift().trainer
-      : (floor.specialTrainer?.battleNumber === count
-          ? floor.specialTrainer
-          : BattleFrontierScreen._pickTrainer(floor.trainerLevelRange));
+    let trainer;
+    if (pending.length > 0 && pending[0].num === count) {
+      trainer = pending.shift().trainer;
+    } else if (floor.specialTrainer?.battleNumber === count) {
+      trainer = floor.specialTrainer;
+    } else {
+      const idx = BattleFrontierScreen._trainerIdxForBattle(floor, count);
+      trainer = floor.trainers[idx] ?? floor.trainers[0];
+    }
 
     const foeTeamRaw = await Promise.all(
       trainer.pokemon.map(p => createPokemon(p.name, p.level, false, p.moveId ?? null))
@@ -752,11 +754,10 @@ const BattleFrontierScreen = {
             <!-- Objeto (clic para continuar) -->
             <div class="item-card" id="bf-item-card" role="button" tabindex="0"
               style="cursor:pointer;position:relative">
-              ${itemIsNew ? `
-                <div style="position:absolute;top:4px;right:4px;background:var(--yellow);color:var(--black);
-                  font-family:var(--font-pixel);font-size:5px;padding:2px 5px;border-radius:2px;line-height:1.4">
-                  NUEVO
-                </div>` : ''}
+              ${itemIsNew
+                ? `<div style="position:absolute;top:4px;right:4px;background:var(--yellow);color:var(--black);font-family:var(--font-pixel);font-size:5px;padding:2px 5px;border-radius:2px;line-height:1.4">NUEVO</div>`
+                : `<div style="position:absolute;top:4px;right:4px;background:rgba(128,128,128,.25);color:var(--grey);font-family:var(--font-pixel);font-size:5px;padding:2px 5px;border-radius:2px;line-height:1.4">DESBLOQUEADO</div>`
+              }
               <div class="item-card__icon">
                 <img src="${item?.img ?? ''}"
                   style="width:40px;height:40px;image-rendering:pixelated;object-fit:contain"

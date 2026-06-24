@@ -83,6 +83,39 @@ var Storage = {
     return this.getPokedex()[pokemonName]?.shiny === true;
   },
 
+  // Marca como shiny todos los miembros capturados de la línea evolutiva de pokemonName.
+  propagateShinyLine(pokemonName) {
+    if (typeof POKEMON_DB === 'undefined') return;
+    const root = this.getEvolutionRoot(pokemonName);
+    const dex  = this.getPokedex();
+    let changed = false;
+    let cur = root;
+    while (cur) {
+      if (dex[cur]?.caught && !dex[cur].shiny) {
+        dex[cur].shiny = true;
+        changed = true;
+        console.log(`[Storage] Pokedex: ${cur} marcado shiny (propagación de línea)`);
+      }
+      const next = POKEMON_DB[cur]?.evolvesInto;
+      cur = (next && next !== '') ? next : null;
+    }
+    if (changed) this._set('pokedex', dex);
+  },
+
+  // Al cargar la app: propaga shiny a toda la línea de cada pokemon shiny ya registrado.
+  propagateShinyLineAll() {
+    if (typeof POKEMON_DB === 'undefined') return;
+    const dex  = this.getPokedex();
+    const seen = new Set();
+    for (const [name, entry] of Object.entries(dex)) {
+      if (!entry.shiny) continue;
+      const root = this.getEvolutionRoot(name);
+      if (seen.has(root)) continue;
+      seen.add(root);
+      this.propagateShinyLine(root);
+    }
+  },
+
   EV_MAX_PER_STAT: 32,
 
   // ── Líneas evolutivas ─────────────────────────────────────────────────────

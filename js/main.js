@@ -71,6 +71,7 @@ const GameState = {
 window.addEventListener('DOMContentLoaded', () => {
   console.log('[GAME] Pokemon Adventure — version web');
   console.log('[GAME] Abre las DevTools (F12) para ver el log de combate');
+  Storage.propagateShinyLineAll();
 
   // Contenedor compartido para todos los botones globales flotantes
   const globalControls = document.createElement('div');
