@@ -175,8 +175,21 @@ const Screens = {
     }
     const hasSave = Storage.hasRun(GameState.version);
 
+    const _dex          = Storage.getPokedex();
+    const _kantoEntries = typeof DEX_GENERATIONS !== 'undefined'
+      ? (DEX_GENERATIONS.find(g => g.gen === 1)?.entries ?? KANTO_DEX)
+      : KANTO_DEX;
+    const _kantoComplete = _kantoEntries.length > 0 && _kantoEntries.every(e => _dex[e.name]?.caught);
+
     document.getElementById('viewport').innerHTML = `
       <div class="screen screen--title">
+        ${_kantoComplete ? `
+          <div class="kanto-expert-badge">
+            <img src="assets/sprites/others/kanto-expert.png"
+              style="width:64px;height:auto;image-rendering:pixelated;display:block"
+              alt="Kanto Expert">
+            <div class="kanto-expert-badge__tooltip">Experto de Kanto. Aumenta un 10% la probabilidad de encontrar pokémon shiny.</div>
+          </div>` : ''}
         <div class="title-logo">
           <span class="title-logo__main">POKE<br>PROJECT</span>
           <span class="title-logo__sub">${GameState.version}</span>
@@ -247,6 +260,15 @@ const Screens = {
     document.getElementById('btn-datos-title').addEventListener('click', () => {
       Screens._showDatosMenu();
     });
+
+    if (_kantoComplete) {
+      const badge = document.querySelector('.kanto-expert-badge');
+      badge?.addEventListener('click', e => {
+        e.stopPropagation();
+        badge.classList.toggle('kanto-expert-badge--open');
+      });
+      document.addEventListener('click', () => badge?.classList.remove('kanto-expert-badge--open'), { once: true });
+    }
 
     document.getElementById('btn-notes-global')?.style.removeProperty('display');
     console.log('[UI] Pantalla: Titulo');

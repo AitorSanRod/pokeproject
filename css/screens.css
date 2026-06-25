@@ -1,11 +1,50 @@
 /* ── TITLE SCREEN ──────────────────────────────────────────────────────────── */
 .screen--title {
+  position: relative;
   background: linear-gradient(160deg, var(--red) 0%, var(--red-dark) 100%);
   align-items: center;
   justify-content: center;
   gap: var(--sp-xl);
   padding: var(--sp-xl) var(--sp-lg);
 }
+
+.kanto-expert-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+  cursor: default;
+}
+
+.kanto-expert-badge__tooltip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 130px;
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-pixel);
+  font-size: 6px;
+  line-height: 1.7;
+  padding: 5px 7px;
+  border-radius: var(--radius-sm);
+  z-index: 50;
+  pointer-events: none;
+  white-space: normal;
+}
+
+.kanto-expert-badge__tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 14px;
+  border: 4px solid transparent;
+  border-bottom-color: var(--black);
+}
+
+.kanto-expert-badge:hover .kanto-expert-badge__tooltip,
+.kanto-expert-badge--open .kanto-expert-badge__tooltip { display: block; }
 
 .title-logo {
   text-align: center;
