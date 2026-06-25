@@ -60,7 +60,7 @@ const PokedexScreen = {
                         </div>
 
                         <div class="dex-entry__info">
-                          <span class="dex-entry__name">${isCaught || isSeen ? entry.name.toUpperCase() : '???'}</span>
+                          <span class="dex-entry__name">${isCaught || isSeen ? (entry.label ?? entry.name).toUpperCase() : '???'}</span>
                           <div class="dex-entry__types">
                             ${isCaught || isSeen ? entry.types.map(t => `<span class="type-badge" data-type="${t}">${t}</span>`).join('') : ''}
                           </div>
@@ -95,12 +95,16 @@ const PokedexScreen = {
   async showDetail(name, id) {
     const vp = document.getElementById('viewport');
 
+    const _allDexEntries = typeof DEX_GENERATIONS !== 'undefined' ? DEX_GENERATIONS.flatMap(g => g.entries) : KANTO_DEX;
+    const _dexMeta    = _allDexEntries.find(e => e.name === name);
+    const displayName = (_dexMeta?.label ?? name).toUpperCase();
+
     // Skeleton mientras carga
     vp.innerHTML = `
       <div class="screen" style="background:var(--off-white);display:flex;flex-direction:column;">
         <div class="screen-header" style="background:var(--red)">
           <button class="btn btn--ghost screen-header__back" id="dex-detail-back">${BACK_ARROW_SVG}</button>
-          <span class="screen-header__title">${name.toUpperCase()}</span>
+          <span class="screen-header__title">${displayName}</span>
         </div>
         <div style="flex:1;display:flex;align-items:center;justify-content:center">
           <div class="loading-sprite" style="width:96px;height:96px"></div>
@@ -111,8 +115,7 @@ const PokedexScreen = {
 
     const isCaught      = Storage.isCaught(name);
     const isShinyPokemon = Storage.isShiny(name);
-    const _allDexEntries = typeof DEX_GENERATIONS !== 'undefined' ? DEX_GENERATIONS.flatMap(g => g.entries) : KANTO_DEX;
-    const entry = await getDexEntry({ id, name, types: _allDexEntries.find(e => e.name === name)?.types ?? [] });
+    const entry = await getDexEntry({ id, name, types: _dexMeta?.types ?? [] });
     const shinySpriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${id}.png`;
     const evs    = Storage.getEvs(name);
     const badges = Storage.getBadges(name);
@@ -179,7 +182,7 @@ const PokedexScreen = {
         <div class="screen-header" style="background:var(--red)">
           <button class="btn btn--ghost screen-header__back" id="dex-detail-back">${BACK_ARROW_SVG}</button>
           <span class="screen-header__title">
-            #${String(id).padStart(3,'0')} ${name.toUpperCase()}
+            #${String(id).padStart(3,'0')} ${displayName}
           </span>
         </div>
 

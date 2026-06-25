@@ -88,7 +88,7 @@ const KANTO_DEX = [
   { id: 80, name: 'slowbro', types: ['water', 'psychic'] },
   { id: 81, name: 'magnemite', types: ['electric', 'steel'] },
   { id: 82, name: 'magneton', types: ['electric', 'steel'] },
-  { id: 83, name: "farfetch'd", types: ['normal', 'flying'] },
+  { id: 83, name: 'farfetchd', label: "Farfetch'd", types: ['normal', 'flying'] },
   { id: 84, name: 'doduo', types: ['normal', 'flying'] },
   { id: 85, name: 'dodrio', types: ['normal', 'flying'] },
   { id: 86, name: 'seel', types: ['water'] },

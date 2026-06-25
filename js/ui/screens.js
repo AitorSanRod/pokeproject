@@ -1735,12 +1735,12 @@ const Screens = {
   // COMBAT
   // ═══════════════════════════════════════════════════════════════════════
   combat(options) {
-    const { foeTeam, isWild = false, isTrainer = false, isGym = false, gymLeaderName, trainerName, noExp = false, onWin, onLoss } = options;
+    const { foeTeam, isWild = false, isTrainer = false, isGym = false, gymLeaderName, trainerName, noExp = false, autoCapture = false, onWin, onLoss } = options;
 
     GameState.combat = {
       foeTeam,
       foeIndex:    0,
-      isWild, isTrainer, isGym, gymLeaderName, trainerName, noExp,
+      isWild, isTrainer, isGym, gymLeaderName, trainerName, noExp, autoCapture,
       onWin, onLoss,
       chosenMove:  null,
       lastFoeObj:  null,
@@ -2491,84 +2491,8 @@ const Screens = {
           }
         }
       }
-      // Captura: auto si autoCapture, manual si no
       if (ctx.isWild) {
-        if (ctx.autoCapture) {
-          if (Math.random() < COMBAT_CONFIG.CATCH_RATE) {
-            fullHeal(foe);
-            Screens._updateCombatLog(`Gotcha! ${foe.displayName} fue capturado!`);
-            console.log(`[COMBAT] Capturado: ${foe.displayName}`);
-            Storage.markCaught(foe.name);
-            if (foe.shiny) { Storage.markShiny(foe.name); Storage.propagateShinyLine(foe.name); }
-            // Convertir en pokemon del jugador y cargar MTs aprendidas por la cadena evolutiva
-            foe.isPlayer = true;
-            const capturedMTs = Storage.getLearnedMTs(foe.name);
-            foe.learnedMTs = capturedMTs;
-            for (const mtId of capturedMTs) {
-              const mtMove = MOVE_BY_ID[mtId];
-              if (mtMove && !foe.moves.find(mv => mv.id === mtId))
-                foe.moves.push({ ...mtMove, maxPp: mtMove.pp });
-            }
-            if (GameState.team.length < 6) {
-              GameState.team.push(foe);
-              await Screens._wait(800);
-              Screens._advanceFoeOrEnd();
-            } else {
-              await Screens._wait(800);
-              Screens._showPokemonSwapSelector(foe, () => Screens._advanceFoeOrEnd());
-            }
-          } else {
-            Screens._updateCombatLog(`${foe.displayName} escapo!`);
-            await Screens._wait(800);
-            Screens._advanceFoeOrEnd();
-          }
-        } else {
-          const renderCatchChoice = () => {
-            const catchArea = document.getElementById('combat-actions-area');
-            if (!catchArea) return;
-            catchArea.innerHTML = `
-              <div style="display:flex;gap:8px;padding:8px 16px;align-items:center">
-                <button class="btn btn--primary pokeball-btn" style="flex:1" id="btn-catch" title="Capturar">
-                  <svg class="pokeball-spin" viewBox="0 0 16 16" width="22" height="22">
-                    <!-- circulo exterior negro (borde) -->
-                    <circle cx="8" cy="8" r="7.5" fill="#1A1A1A"/>
-                    <!-- mitad superior roja (recortada al circulo, ligeramente mas pequeña para dejar borde) -->
-                    <path d="M 1 8 A 7 7 0 0 1 15 8 Z" fill="#E74C3C"/>
-                    <!-- mitad inferior blanca -->
-                    <path d="M 1 8 A 7 7 0 0 0 15 8 Z" fill="#FFFFFF"/>
-                    <!-- banda central negra -->
-                    <rect x="1" y="7" width="14" height="2" fill="#1A1A1A"/>
-                    <!-- boton central: anillo negro + nucleo blanco, ambos circulares -->
-                    <circle cx="8" cy="8" r="3"   fill="#1A1A1A"/>
-                    <circle cx="8" cy="8" r="1.7" fill="#FFFFFF"/>
-                  </svg>
-                </button>
-                <button class="btn" style="flex:1" id="btn-no-catch">CONTINUAR</button>
-              </div>`;
-            document.getElementById('btn-catch').addEventListener('click', () => Screens._attemptCatch(foe));
-            document.getElementById('btn-no-catch').addEventListener('click', () => Screens._advanceFoeOrEnd());
-            // Recablear pokédex/compendio para restaurar esta vista al cerrar
-            [['btn-dex-combat', PokedexScreen], ['btn-compendium-combat', CompendiumScreen]].forEach(([id, screen]) => {
-              const b = document.getElementById(id);
-              if (!b) return;
-              const clone = b.cloneNode(true);
-              b.replaceWith(clone);
-              clone.addEventListener('click', () => {
-                GameState.paused = true;
-                screen.show(() => {
-                  GameState.paused = false;
-                  // La pokédex reemplaza viewport.innerHTML completo; hay que reconstruir
-                  // la pantalla de combate antes de poder rellenar combat-actions-area.
-                  Screens._renderCombatScreen();
-                  renderCatchChoice();
-                });
-              });
-              clone.addEventListener('mouseenter', () => clone.style.background = 'rgba(0,0,0,.6)');
-              clone.addEventListener('mouseleave', () => clone.style.background = 'rgba(0,0,0,.35)');
-            });
-          };
-          renderCatchChoice();
-        }
+        Screens._showCaptureChoice(foe);
         return;
       }
 
@@ -2605,34 +2529,8 @@ const Screens = {
         ctx._turnRunning  = false;
         ctx.introPlayed   = true;
         await Screens._wait(600);
-        // En combates salvajes el rival también debe pasar por la captura
-        // aunque el pokemon activo haya caído en el mismo turno.
-        if (ctx.isWild && ctx.autoCapture) {
-          if (Math.random() < COMBAT_CONFIG.CATCH_RATE) {
-            fullHeal(foe);
-            Screens._updateCombatLog(`Gotcha! ${foe.displayName} fue capturado!`);
-            Storage.markCaught(foe.name);
-            if (foe.shiny) { Storage.markShiny(foe.name); Storage.propagateShinyLine(foe.name); }
-            foe.isPlayer = true;
-            const capturedMTs2 = Storage.getLearnedMTs(foe.name);
-            foe.learnedMTs = capturedMTs2;
-            for (const mtId of capturedMTs2) {
-              const mtMove = MOVE_BY_ID[mtId];
-              if (mtMove && !foe.moves.find(mv => mv.id === mtId))
-                foe.moves.push({ ...mtMove, maxPp: mtMove.pp });
-            }
-            await Screens._wait(800);
-            if (GameState.team.length < 6) {
-              GameState.team.push(foe);
-              Screens._advanceFoeOrEnd();
-            } else {
-              Screens._showPokemonSwapSelector(foe, () => Screens._advanceFoeOrEnd());
-            }
-          } else {
-            Screens._updateCombatLog(`${foe.displayName} escapo!`);
-            await Screens._wait(800);
-            Screens._advanceFoeOrEnd();
-          }
+        if (ctx.isWild) {
+          Screens._showCaptureChoice(foe);
         } else {
           Screens._advanceFoeOrEnd();
         }
@@ -2692,6 +2590,43 @@ const Screens = {
       await Screens._wait(800);
       Screens._advanceFoeOrEnd();
     }
+  },
+
+  _showCaptureChoice(foe) {
+    const area = document.getElementById('combat-actions-area');
+    if (!area) return;
+    area.innerHTML = `
+      <div style="display:flex;gap:8px;padding:8px 16px;align-items:center">
+        <button class="btn btn--primary pokeball-btn" style="flex:1" id="btn-catch" title="Capturar">
+          <svg class="pokeball-spin" viewBox="0 0 16 16" width="22" height="22">
+            <circle cx="8" cy="8" r="7.5" fill="#1A1A1A"/>
+            <path d="M 1 8 A 7 7 0 0 1 15 8 Z" fill="#E74C3C"/>
+            <path d="M 1 8 A 7 7 0 0 0 15 8 Z" fill="#FFFFFF"/>
+            <rect x="1" y="7" width="14" height="2" fill="#1A1A1A"/>
+            <circle cx="8" cy="8" r="3"   fill="#1A1A1A"/>
+            <circle cx="8" cy="8" r="1.7" fill="#FFFFFF"/>
+          </svg>
+        </button>
+        <button class="btn" style="flex:1" id="btn-no-catch">CONTINUAR</button>
+      </div>`;
+    document.getElementById('btn-catch').addEventListener('click', () => Screens._attemptCatch(foe));
+    document.getElementById('btn-no-catch').addEventListener('click', () => Screens._advanceFoeOrEnd());
+    [['btn-dex-combat', PokedexScreen], ['btn-compendium-combat', CompendiumScreen]].forEach(([id, screen]) => {
+      const b = document.getElementById(id);
+      if (!b) return;
+      const clone = b.cloneNode(true);
+      b.replaceWith(clone);
+      clone.addEventListener('click', () => {
+        GameState.paused = true;
+        screen.show(() => {
+          GameState.paused = false;
+          Screens._renderCombatScreen();
+          Screens._showCaptureChoice(foe);
+        });
+      });
+      clone.addEventListener('mouseenter', () => clone.style.background = 'rgba(0,0,0,.6)');
+      clone.addEventListener('mouseleave', () => clone.style.background = 'rgba(0,0,0,.35)');
+    });
   },
 
   _advanceFoeOrEnd() {
