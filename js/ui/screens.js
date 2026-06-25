@@ -2483,6 +2483,10 @@ const Screens = {
             console.log(`[COMBAT] ${member.displayName} subio al nivel ${member.level}!`);
             Screens._updateCombatTeamBar();
             Screens._showLevelUpPip(member, levelsGained);
+            if (member === ctx.activePlayer) {
+              const levelEl = document.querySelector('#hud-player .combat-hud__level');
+              if (levelEl) levelEl.textContent = `Nv.${member.level}`;
+            }
             await Screens._wait(950);
           }
           // Evolución pendiente
@@ -2542,6 +2546,10 @@ const Screens = {
             Screens._updateCombatLog(`${member.displayName} subio al nivel ${member.level}!`);
             Screens._updateCombatTeamBar();
             Screens._showLevelUpPip(member, levelsGained);
+            if (member === ctx.activePlayer) {
+              const levelEl = document.querySelector('#hud-player .combat-hud__level');
+              if (levelEl) levelEl.textContent = `Nv.${member.level}`;
+            }
             await Screens._wait(950);
           }
         }
@@ -2563,8 +2571,8 @@ const Screens = {
         ctx._ending       = false;
         ctx._turnRunning  = false;
         ctx.introPlayed   = true;
-        await Screens._wait(800);
         Screens._updatePlayerSide();
+        await Screens._wait(800);
         if (!ctx._turnRunning && !ctx._ending) {
           Screens._combatStartTurn();
         }
@@ -2777,7 +2785,12 @@ const Screens = {
       const levelEl = hudPlayer.querySelector('.combat-hud__level');
       if (nameEl)  nameEl.textContent  = next.displayName.toUpperCase();
       if (levelEl) levelEl.textContent = `Nv.${next.level}`;
+      // Desactivar la transición para que la barra salte directamente al HP del
+      // nuevo pokémon sin animar desde 0 (lo que parecía "menos vida").
+      const fill = hudPlayer.querySelector('.hp-bar-fill');
+      if (fill) fill.style.transition = 'none';
       Render.updateHpBar(hudPlayer, next.currentHp, next.stats.hp);
+      if (fill) { fill.offsetWidth; fill.style.transition = ''; }
       const hpNums = document.getElementById('hp-nums-player');
       if (hpNums) hpNums.textContent = `${next.currentHp}/${next.stats.hp}`;
     }

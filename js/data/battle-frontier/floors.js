@@ -122,8 +122,17 @@ const BF_FLOORS = [
 
   {
     battleRange: [21, 25],
-    trainers: BFHelpers.getEntrenador(5, 3, 4),
+    trainers: BFHelpers.getEntrenador(4, 3, 4),
     combatBg: COMBAT_BG.rocket,
+    specialTrainer: {
+      battleNumber: 25,
+      name: 'Brock', img: TRAINER_IMG.brock,
+      pokemon: [
+        { name: POKEMON.onix, level: 50, moveId: MOVES.ground.physical.bulldoze },
+        { name: POKEMON.geodude, level: 50, moveId: MOVES.rock.physical.rock_throw },
+        { name: POKEMON.aerodactyl, level: 50, moveId: [MOVES.rock.physical.rock_slide, MOVES.dark.physical.crunch] },
+      ]
+    },
   },
   {
     battleRange: [26, 30],
@@ -151,8 +160,17 @@ const BF_FLOORS = [
 
   {
     battleRange: [31, 35],
-    trainers: BFHelpers.getEntrenador(5, 4, 5),
+    trainers: BFHelpers.getEntrenador(4, 4, 5),
     combatBg: COMBAT_BG.rocket,
+    specialTrainer: {
+      battleNumber: 35,
+      name: 'Lt. Surge', img: TRAINER_IMG.surge,
+      pokemon: [
+        { name: POKEMON.pikachu, level: 50, moveId: MOVES.electric.special.thunderbolt },
+        { name: POKEMON.raichu, level: 50, moveId: MOVES.electric.special.thunder },
+        { name: POKEMON.electrode, level: 50, moveId: MOVES.electric.special.thunder },
+      ]
+    },
   },
   {
     battleRange: [36, 40],
@@ -160,11 +178,11 @@ const BF_FLOORS = [
     combatBg: COMBAT_BG.rocket,
     specialTrainer: {
       battleNumber: 40,
-      name: 'Lt. Surge', img: TRAINER_IMG.surge,
+      name: 'Erika', img: TRAINER_IMG.erika,
       pokemon: [
-        { name: POKEMON.pikachu, level: 50, moveId: MOVES.electric.special.thunderbolt },
-        { name: POKEMON.raichu, level: 50, moveId: MOVES.electric.special.thunder },
-        { name: POKEMON.electrode, level: 50, moveId: MOVES.electric.special.thunder },
+        { name: POKEMON.tangela, level: 50, moveId: MOVES.grass.special.giga_drain },
+        { name: POKEMON.weepinbell, level: 50, moveId: MOVES.poison.special.sludge_bomb },
+        { name: POKEMON.vileplume, level: 50, moveId: [MOVES.grass.special.giga_drain, MOVES.poison.special.sludge_bomb] },
       ]
     },
     reward: {
@@ -180,8 +198,17 @@ const BF_FLOORS = [
 
   {
     battleRange: [41, 45],
-    trainers: BFHelpers.getEntrenador(5, 5, 6),
+    trainers: BFHelpers.getEntrenador(4, 5, 6),
     combatBg: COMBAT_BG.rocket,
+    specialTrainer: {
+      battleNumber: 45,
+      name: 'Koga', img: TRAINER_IMG.koga,
+      pokemon: [
+        { name: POKEMON.koffing, level: 50, moveId: MOVES.poison.special.sludge_wave },
+        { name: POKEMON.muk, level: 50, moveId: MOVES.dark.special.dark_pulse },
+        { name: POKEMON.weezing, level: 50, moveId: MOVES.poison.special.sludge_wave },
+      ]
+    },
   },
   {
     battleRange: [46, 50],
@@ -189,11 +216,11 @@ const BF_FLOORS = [
     combatBg: COMBAT_BG.rocket,
     specialTrainer: {
       battleNumber: 50,
-      name: 'Erika', img: TRAINER_IMG.erika,
+      name: 'Sabrina', img: TRAINER_IMG.sabrina,
       pokemon: [
-        { name: POKEMON.tangela, level: 50, moveId: MOVES.grass.special.giga_drain },
-        { name: POKEMON.weepinbell, level: 50, moveId: MOVES.poison.special.sludge_bomb },
-        { name: POKEMON.vileplume, level: 50, moveId: [MOVES.grass.special.giga_drain, MOVES.poison.special.sludge_bomb] },
+        { name: POKEMON.abra, level: 50, moveId: MOVES.psychic.special.confusion },
+        { name: POKEMON.alakazam, level: 50, moveId: MOVES.psychic.special.psychic, heldItem: ITEM.choice_specs },
+        { name: POKEMON.hypno, level: 50, moveId: MOVES.psychic.special.psychic },
       ]
     },
     reward: {
@@ -209,20 +236,29 @@ const BF_FLOORS = [
 
   {
     battleRange: [51, 55],
-    trainers: BFHelpers.getEntrenador(5, 6, 7),
+    trainers: BFHelpers.getEntrenador(4, 6, 7),
     combatBg: COMBAT_BG.rocket,
+    specialTrainer: {
+      battleNumber: 55,
+      name: 'Blaine', img: TRAINER_IMG.blaine,
+      pokemon: [
+        { name: POKEMON.growlithe, level: 50, moveId: MOVES.fire.physical.fire_fang },
+        { name: POKEMON.arcanine, level: 50, moveId: MOVES.normal.physical.extreme_speed, heldItem: ITEM.lifeorb },
+        { name: POKEMON.magmar, level: 50, moveId: MOVES.fire.special.flamethrower, heldItem: ITEM.choice_scarf },
+      ]
+    },
   },
   {
     battleRange: [56, 60],
     trainers: BFHelpers.getEntrenador(4, 6, 7),
     combatBg: COMBAT_BG.rocket,
-    specialTrainer: {
+     specialTrainer: {
       battleNumber: 60,
-      name: 'Koga', img: TRAINER_IMG.koga,
+      name: 'Giovanni', img: TRAINER_IMG.giovanni,
       pokemon: [
-        { name: POKEMON.koffing, level: 50, moveId: MOVES.poison.special.sludge_wave },
-        { name: POKEMON.muk, level: 50, moveId: MOVES.dark.special.dark_pulse },
-        { name: POKEMON.weezing, level: 50, moveId: MOVES.poison.special.sludge_wave },
+        { name: POKEMON.growlithe, level: 50, moveId: MOVES.fire.physical.fire_fang },
+        { name: POKEMON.arcanine, level: 50, moveId: MOVES.normal.physical.extreme_speed, heldItem: ITEM.lifeorb },
+        { name: POKEMON.magmar, level: 50, moveId: MOVES.fire.special.flamethrower, heldItem: ITEM.choice_scarf },
       ]
     },
     reward: {
@@ -243,17 +279,8 @@ const BF_FLOORS = [
   },
   {
     battleRange: [66, 70],
-    trainers: BFHelpers.getEntrenador(4, 7, 8),
+    trainers: BFHelpers.getEntrenador(5, 7, 8),
     combatBg: COMBAT_BG.rocket,
-    specialTrainer: {
-      battleNumber: 70,
-      name: 'Sabrina', img: TRAINER_IMG.sabrina,
-      pokemon: [
-        { name: POKEMON.abra, level: 50, moveId: MOVES.psychic.special.confusion },
-        { name: POKEMON.alakazam, level: 50, moveId: MOVES.psychic.special.psychic, heldItem: ITEM.choice_specs },
-        { name: POKEMON.hypno, level: 50, moveId: MOVES.psychic.special.psychic },
-      ]
-    },
     reward: {
       pokemon: [POKEMON.alakazam, POKEMON.hypno, POKEMON.starmie],
       tm: [TM_LIST['tm-tri-attack'], TM_LIST['tm-metal-claw'], TM_LIST['tm-thunderbolt']],
@@ -272,17 +299,9 @@ const BF_FLOORS = [
   },
   {
     battleRange: [76, 80],
-    trainers: BFHelpers.getEntrenador(4, 8, 9),
+    trainers: BFHelpers.getEntrenador(5, 8, 9),
     combatBg: COMBAT_BG.rocket,
-    specialTrainer: {
-      battleNumber: 80,
-      name: 'Blaine', img: TRAINER_IMG.blaine,
-      pokemon: [
-        { name: POKEMON.growlithe, level: 50, moveId: MOVES.fire.physical.fire_fang },
-        { name: POKEMON.arcanine, level: 50, moveId: MOVES.normal.physical.extreme_speed, heldItem: ITEM.lifeorb },
-        { name: POKEMON.magmar, level: 50, moveId: MOVES.fire.special.flamethrower, heldItem: ITEM.choice_scarf },
-      ]
-    },
+    
     reward: {
       pokemon: [POKEMON.magmar, POKEMON.jynx, POKEMON.electabuzz],
       tm: [TM_LIST['tm-ice-beam'], TM_LIST['tm-icy-wind'], TM_LIST['tm-ice-fang']],
@@ -301,17 +320,17 @@ const BF_FLOORS = [
   },
   {
     battleRange: [86, 90],
-    trainers: BFHelpers.getEntrenador(4, 9, 10),
+    trainers: BFHelpers.getEntrenador(5, 9, 10),
     combatBg: COMBAT_BG.rocket,
-    specialTrainer: {
-      battleNumber: 90,
-      name: 'Lorelei', img: TRAINER_IMG.lorelei,
-      pokemon: [
-        { name: POKEMON.lapras, level: 50, moveId: MOVES.ice.special.ice_beam, heldItem: ITEM.leftovers },
-        { name: POKEMON.jynx, level: 50, moveId: [MOVES.ice.special.ice_beam, MOVES.psychic.special.psychic] },
-        { name: POKEMON.starmie, level: 50, moveId: MOVES.water.special.surf, heldItem: ITEM.choice_scarf },
-      ]
-    },
+    // specialTrainer: {
+    //   battleNumber: 90,
+    //   name: 'Lorelei', img: TRAINER_IMG.lorelei,
+    //   pokemon: [
+    //     { name: POKEMON.lapras, level: 50, moveId: MOVES.ice.special.ice_beam, heldItem: ITEM.leftovers },
+    //     { name: POKEMON.jynx, level: 50, moveId: [MOVES.ice.special.ice_beam, MOVES.psychic.special.psychic] },
+    //     { name: POKEMON.starmie, level: 50, moveId: MOVES.water.special.surf, heldItem: ITEM.choice_scarf },
+    //   ]
+    // },
     reward: {
       pokemon: [POKEMON.articuno, POKEMON.zapdos, POKEMON.moltres],
       tm: [TM_LIST['tm-surf'], TM_LIST['tm-thunderbolt'], TM_LIST['tm-earth-power']],

@@ -429,14 +429,14 @@ const BF_TRAINER_TYPES = [
   // ── Nivel 7 — Finales de evolución, EVs altos (pisos 61-70) ──────────────
   {
     level: 7,
-    name: ENTRENADORES.Mecanico.name,
-    img: ENTRENADORES.Mecanico.img,
+    name: ENTRENADORES.Rocket.name,
+    img: ENTRENADORES.Rocket.img,
     pokemonPool: [
-      { name: POKEMON.electabuzz, moveId: MOVES.electric.special.thunder, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.magmar, moveId: MOVES.fire.special.flamethrower, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.crobat, moveId: MOVES.poison.physical.poison_jab, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.sudowoodo, moveId: MOVES.rock.physical.rock_slide, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.jynx, moveId: MOVES.ice.special.ice_beam, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.electrode, moveId: MOVES.electric.special.thunder, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.magneton, moveId: MOVES.electric.special.thunder, overrides: { evs: { spa: 32, spe: 16, hp: 16 } } },
+      { name: POKEMON.wobbuffet, moveId: MOVES.psychic.special.psychic, overrides: { evs: { spa: 32, spe: 16, hp: 16 } } },
     ],
   },
   {
@@ -444,11 +444,11 @@ const BF_TRAINER_TYPES = [
     name: ENTRENADORES.Cientifico.name,
     img: ENTRENADORES.Cientifico.img,
     pokemonPool: [
-      { name: POKEMON.haunter, moveId: MOVES.ghost.special.shadow_ball, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.hypno, moveId: MOVES.psychic.special.psychic, overrides: { evs: { spa: 32, hp: 32, spd: 4 } } },
+      { name: POKEMON.qwilfish, moveId: MOVES.water.special.scald, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.sneasel, moveId: MOVES.ice.physical.icicle_crash, overrides: { evs: { spa: 32, hp: 32, spd: 4 } } },
       { name: POKEMON.kadabra, moveId: MOVES.psychic.special.psychic, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.slowbro, moveId: [MOVES.water.special.surf, MOVES.psychic.special.psychic], overrides: { evs: { spa: 32, hp: 32, spd: 4 } } },
-      { name: POKEMON.drowzee, moveId: MOVES.psychic.special.psychic, overrides: { evs: { hp: 32, spa: 16, spd: 16 } } },
+      { name: POKEMON.porygon2, moveId: MOVES.normal.special.hyper_voice, overrides: { evs: { hp: 32, spa: 16, spd: 16 } } },
     ],
   },
   {
@@ -456,8 +456,8 @@ const BF_TRAINER_TYPES = [
     name: ENTRENADORES.ChicoGuay.name,
     img: ENTRENADORES.ChicoGuay.img,
     pokemonPool: [
-      { name: POKEMON.scyther, moveId: MOVES.bug.physical.x_scissor, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.pinsir, moveId: MOVES.bug.physical.x_scissor, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.ursaring, moveId: MOVES.normal.physical.extreme_speed, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.miltank, moveId: MOVES.normal.physical.hyper_fang, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.tauros, moveId: MOVES.normal.physical.hyper_fang, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.snorlax, moveId: MOVES.normal.physical.hyper_fang, overrides: { evs: { hp: 32, atk: 32, def: 4 } } },
       { name: POKEMON.kangaskhan, moveId: MOVES.normal.physical.extreme_speed, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
@@ -469,9 +469,9 @@ const BF_TRAINER_TYPES = [
     img: ENTRENADORES.Pokemaniaco.img,
     pokemonPool: [
       { name: POKEMON.slowbro, moveId: [MOVES.water.special.surf, MOVES.psychic.special.psychic], overrides: { evs: { spa: 32, hp: 32 } } },
-      { name: POKEMON.hypno, moveId: MOVES.psychic.special.psychic, overrides: { evs: { spa: 32, hp: 32 } } },
+      { name: POKEMON.aipom, moveId: MOVES.normal.physical.take_down, overrides: { evs: { spa: 32, hp: 32 } } },
       { name: POKEMON.jynx, moveId: MOVES.ice.special.ice_beam, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.starmie, moveId: [MOVES.water.special.surf, MOVES.psychic.special.psychic], overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.wooper, moveId: [MOVES.water.special.surf, MOVES.psychic.special.psychic], overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.arcanine, moveId: MOVES.normal.physical.extreme_speed, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
     ],
   },
@@ -481,10 +481,10 @@ const BF_TRAINER_TYPES = [
     img: ENTRENADORES.Caballero.img,
     pokemonPool: [
       { name: POKEMON.machamp, moveId: MOVES.fighting.physical.brick_break, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.rhydon, moveId: MOVES.ground.physical.earthquake, overrides: { evs: { atk: 32, hp: 32, def: 4 } } },
+      { name: POKEMON.stantler, moveId: MOVES.normal.physical.extreme_speed, overrides: { evs: { atk: 32, hp: 32, def: 4 } } },
       { name: POKEMON.golem, moveId: MOVES.ground.physical.earthquake, overrides: { evs: { atk: 32, hp: 32, def: 4 } } },
       { name: POKEMON.nidoking, moveId: MOVES.ground.physical.earthquake, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.nidoqueen, moveId: MOVES.poison.physical.gunk_shot, overrides: { evs: { atk: 32, hp: 32, def: 4 } } },
+      { name: POKEMON.ledian, moveId: MOVES.flying.physical.wing_attack, overrides: { evs: { atk: 32, hp: 32, def: 4 } } },
     ],
   },
 
@@ -509,8 +509,8 @@ const BF_TRAINER_TYPES = [
       { name: POKEMON.vaporeon, moveId: MOVES.water.special.surf, overrides: { evs: { hp: 32, spa: 32, spd: 4 } } },
       { name: POKEMON.jolteon, moveId: MOVES.electric.special.thunder, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.flareon, moveId: MOVES.fire.special.flamethrower, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.arcanine, moveId: MOVES.normal.physical.extreme_speed, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.ninetales, moveId: MOVES.fire.special.flamethrower, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.umbreon, moveId: MOVES.dark.special.feint_attack, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.espeon, moveId: MOVES.psychic.special.psystrike, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
     ],
   },
   {
@@ -520,7 +520,7 @@ const BF_TRAINER_TYPES = [
     pokemonPool: [
       { name: POKEMON.alakazam, moveId: MOVES.psychic.special.psychic, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.gengar, moveId: MOVES.ghost.special.shadow_ball, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.starmie, moveId: [MOVES.water.special.surf, MOVES.psychic.special.psychic], overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.houndoom, moveId: [MOVES.fire.physical.flame_wheel, MOVES.dark.physical.crunch], overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.haunter, moveId: MOVES.ghost.special.shadow_ball, overrides: { evs: { spa: 32, spe: 16, hp: 16 } } },
       { name: POKEMON.hypno, moveId: MOVES.psychic.special.psychic, overrides: { evs: { spa: 32, hp: 32, spd: 4 } } },
       { name: POKEMON.kadabra, moveId: MOVES.psychic.special.psychic, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
@@ -532,9 +532,9 @@ const BF_TRAINER_TYPES = [
     img: ENTRENADORES.Pokemaniaco.img,
     pokemonPool: [
       { name: POKEMON.lapras, moveId: [MOVES.water.special.surf, MOVES.ice.special.ice_beam], overrides: { evs: { hp: 32, spa: 32, spd: 4 } } },
-      { name: POKEMON.snorlax, moveId: MOVES.normal.physical.hyper_fang, overrides: { evs: { hp: 32, atk: 32, def: 4 } } },
+      { name: POKEMON.blissey, moveId: MOVES.normal.physical.hyper_fang, overrides: { evs: { hp: 32, atk: 32, def: 4 } } },
       { name: POKEMON.tauros, moveId: MOVES.normal.physical.hyper_fang, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.arcanine, moveId: MOVES.normal.physical.extreme_speed, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.larvitar, moveId: MOVES.rock.physical.rock_throw, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.kangaskhan, moveId: MOVES.normal.physical.extreme_speed, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
     ],
   },
@@ -568,10 +568,10 @@ const BF_TRAINER_TYPES = [
     name: ENTRENADORES.Cientifico.name,
     img: ENTRENADORES.Cientifico.img,
     pokemonPool: [
-      { name: POKEMON.alakazam, moveId: MOVES.psychic.special.psychic, heldItem: ITEM.choice_specs, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.gligar, moveId: [MOVES.poison.physical.poison_jab, MOVES.ground.physical.earthquake], heldItem: ITEM.choice_specs, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.gengar, moveId: MOVES.ghost.special.shadow_ball, heldItem: ITEM.lifeorb, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.dragonair, moveId: MOVES.dragon.physical.dragon_claw, heldItem: ITEM.choice_scarf, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.starmie, moveId: [MOVES.water.special.surf, MOVES.psychic.special.psychic], heldItem: ITEM.lifeorb, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.politoed, moveId: MOVES.water.special.hydro_pump, heldItem: ITEM.lifeorb, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
     ],
   },
   {
@@ -579,8 +579,8 @@ const BF_TRAINER_TYPES = [
     name: ENTRENADORES.ChicoGuay.name,
     img: ENTRENADORES.ChicoGuay.img,
     pokemonPool: [
-      { name: POKEMON.charizard, moveId: MOVES.fire.special.flamethrower, heldItem: ITEM.lifeorb, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.blastoise, moveId: [MOVES.water.special.surf, MOVES.ice.special.ice_beam], heldItem: ITEM.leftovers, overrides: { evs: { hp: 32, spa: 32, spd: 4 } } },
+      { name: POKEMON.charizard, moveId: MOVES.fire.special.fire_blast, heldItem: ITEM.lifeorb, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.blastoise, moveId: [MOVES.water.special.hydro_pump, MOVES.ice.special.blizzard], heldItem: ITEM.leftovers, overrides: { evs: { hp: 32, spa: 32, spd: 4 } } },
       { name: POKEMON.venusaur, moveId: MOVES.grass.special.giga_drain, heldItem: ITEM.assault_vest, overrides: { evs: { hp: 32, spa: 32, spd: 4 } } },
     ],
   },
@@ -602,7 +602,7 @@ const BF_TRAINER_TYPES = [
     img: ENTRENADORES.Mecanico.img,
     pokemonPool: [
       { name: POKEMON.electabuzz, moveId: MOVES.electric.special.thunder, heldItem: ITEM.choice_specs, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.magmar, moveId: MOVES.fire.special.flamethrower, heldItem: ITEM.lifeorb, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.granbull, moveId: MOVES.fairy.physical.play_rough, heldItem: ITEM.lifeorb, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.electrode, moveId: MOVES.electric.special.thunder, heldItem: ITEM.lifeorb, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.jynx, moveId: MOVES.ice.special.ice_beam, heldItem: ITEM.choice_specs, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
     ],
