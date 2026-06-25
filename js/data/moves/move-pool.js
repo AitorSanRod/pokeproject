@@ -55,7 +55,7 @@ var MOVE_POOL = {
       { stage: 1, mt: true, id: 'facade', name: 'Fachada', power: 60, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'guts', effectData: { dmgMult: 2.5 } },
       { id: 'self-destruct', name: 'Autodestruccion', power: 800, pp: 5, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'self-destruct', boss: true },
       { id: 'false-swipe', name: 'Sonambulo', power: 30, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['recoil-10', 'shield-25', 'sleep-self', 'sleep-attack', 'raise-atk-5'], boss: true },
-      { stage: 1, id: 'natural-gift', name: 'Don Natural', power: 5, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['raise-don-natural', 'versatil'], pokemon: ['eevee'] },
+      { stage: 1, id: 'natural-gift', name: 'Don Natural', power: 15, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['raise-don-natural', 'versatil'], pokemon: ['eevee'] },
     ],
     special: [
       { stage: 1, id: 'swift', name: 'Velocidad', power: 40, pp: 20, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: 'shield-10' },
@@ -84,8 +84,8 @@ var MOVE_POOL = {
       { stage: 3, id: 'wave-crash', name: 'Envite acuatico', power: 100, pp: 10, type: T.WATER, damageClass: DC.PHYSICAL, effectId: ['self-hurt', 'guts'] },
     ],
     special: [
-      { stage: 1, id: 'water-gun', name: 'Pistola Agua', power: 40, pp: 25, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'lower-atk-50' },
-      { stage: 2, id: 'surf', name: 'Surf', power: 75, pp: 15, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'lower-atk-50' },
+      { stage: 1, id: 'water-gun', name: 'Pistola Agua', power: 40, pp: 25, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'lower-atk-10' },
+      { stage: 2, id: 'surf', name: 'Surf', power: 75, pp: 15, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'lower-atk-20' },
       { stage: 3, id: 'hydro-pump', name: 'Hidrobomba', power: 90, pp: 99, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'conf-20' },
       { stage: 1, mt: true, id: 'bubble-beam', name: 'Rayo Burbuja', power: 65, pp: 99, type: T.WATER, damageClass: DC.SPECIAL, effectId: ['clear', 'conf-20'] },
       { stage: 1, mt: true, id: 'scald', name: 'Escaldar', power: 60, pp: 99, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'burn-25' },

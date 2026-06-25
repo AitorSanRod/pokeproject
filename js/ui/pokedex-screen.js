@@ -143,6 +143,35 @@ const PokedexScreen = {
       .map(id => (typeof MOVE_BY_ID !== 'undefined' ? MOVE_BY_ID[id] : null))
       .filter(Boolean);
 
+    // Rutas donde aparece en estado salvaje
+    const wildLocations = (() => {
+      if (typeof ROUTE_DATA === 'undefined') return [];
+      const routeNameMap = {};
+      if (typeof KANTO_ROUTES !== 'undefined') {
+        for (const r of KANTO_ROUTES) routeNameMap[r.area] = r.name;
+      }
+      const locations = [];
+      const EXCLUDED_AREAS = new Set(['zona-safari']);
+      for (const [area, data] of Object.entries(ROUTE_DATA)) {
+        if (EXCLUDED_AREAS.has(area)) continue;
+        if (!data?.wild) continue;
+        for (const w of data.wild) {
+          if (w.name !== name) continue;
+          const displayName = routeNameMap[area] ?? area;
+          const minLv = w.minLv ?? w.level ?? 1;
+          const maxLv = w.maxLv ?? w.level ?? 1;
+          const existing = locations.find(l => l.routeName === displayName);
+          if (existing) {
+            existing.minLv = Math.min(existing.minLv, minLv);
+            existing.maxLv = Math.max(existing.maxLv, maxLv);
+          } else {
+            locations.push({ routeName: displayName, minLv, maxLv });
+          }
+        }
+      }
+      return locations;
+    })();
+
     vp.innerHTML = `
       <div class="screen" style="background:var(--off-white);display:flex;flex-direction:column;">
 
@@ -231,6 +260,28 @@ const PokedexScreen = {
           </div>
           `;
           })()}
+
+          <!-- Dónde encontrar en la naturaleza -->
+          <div style="background:var(--white);border:var(--border);border-radius:var(--radius-md);
+            padding:var(--sp-md);box-shadow:var(--shadow-sm)">
+            <div style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);margin-bottom:var(--sp-sm)">
+              ENCONTRAR EN
+            </div>
+            ${wildLocations.length > 0 ? `
+              <div style="display:flex;flex-direction:column;gap:4px">
+                ${wildLocations.map(l => `
+                  <div style="display:flex;justify-content:space-between;align-items:center;
+                    padding:4px 8px;background:var(--off-white);border-radius:var(--radius-sm)">
+                    <span style="font-family:var(--font-pixel);font-size:7px">${l.routeName}</span>
+                    <span style="font-family:var(--font-pixel);font-size:7px;color:var(--grey)">
+                      Nv.${l.minLv === l.maxLv ? l.minLv : `${l.minLv}–${l.maxLv}`}
+                    </span>
+                  </div>`).join('')}
+              </div>
+            ` : `
+              <span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey)">No aparece en la naturaleza</span>
+            `}
+          </div>
 
           <!-- Movimientos -->
           <div style="background:var(--white);border:var(--border);border-radius:var(--radius-md);

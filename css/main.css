@@ -151,6 +151,11 @@ img { display: block; image-rendering: pixelated; }
     var(--grey-dark);
 }
 
+@keyframes viewportFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
 /* Game viewport — fixed phone-like frame on desktop, full screen on mobile */
 .game-viewport {
   width: 100%;

@@ -1184,7 +1184,7 @@ var ROUTE_DATA = {
     bg: BG.ruta20,
     combatBg: COMBAT_BG.agua,
     wild: [
-      { name: POKEMON.slowbro, rate: 10, minLv: 42, maxLv: 47, moveId: MOVES.water.special.scald },
+      { name: POKEMON.slowpoke, rate: 10, minLv: 42, maxLv: 47, moveId: MOVES.water.special.scald },
       { name: POKEMON.tentacool, rate: 10, minLv: 42, maxLv: 47, moveId: MOVES.poison.special.sludge_wave },
       { name: POKEMON.horsea, rate: 10, minLv: 42, maxLv: 47, moveId: MOVES.water.special.surf },
       { name: POKEMON.psyduck, rate: 10, minLv: 42, maxLv: 47, moveId: MOVES.psychic.special.confusion },
@@ -1223,6 +1223,7 @@ var ROUTE_DATA = {
       { name: POKEMON.koffing, rate: 15, minLv: 45, maxLv: 50, moveId: MOVES.poison.special.sludge_bomb },
       { name: POKEMON.ditto, rate: 15, minLv: 45, maxLv: 50, moveId: MOVES.normal.special.boomburst },
       { name: POKEMON.doduo, rate: 10, minLv: 45, maxLv: 50, moveId: MOVES.flying.physical.wing_attack },
+      { name: POKEMON.chansey, rate: 10, minLv: 45, maxLv: 50, moveId: MOVES.normal.special.boomburst },
     ],
     trainer: [
       {
@@ -1871,6 +1872,7 @@ var KANTO_ROUTES = [
   { name: 'Ruta 3', area: 'ruta-3' },
   { name: 'Mt. Moon', area: 'mt-moon' },
   { name: 'Ruta 4', area: 'ruta-4' },
+  { name: 'Ruta 5', area: 'ruta-5' },
   { name: 'Ciudad Celeste', area: 'ciudad-celeste' },
   { name: 'Ruta 24 (Entrada)', area: 'ruta-24-1' },
   { name: 'Ruta 24 (Puente)', area: 'ruta-24-2' },

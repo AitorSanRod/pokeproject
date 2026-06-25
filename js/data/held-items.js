@@ -349,6 +349,10 @@ var HELD_ITEMS = {
         }
         Storage.markCaught(evolved.name);
         console.log(`[PIEDRA] ${user.displayName} → ${evolved.displayName}`);
+        if (typeof Screens !== 'undefined') {
+          Screens._renderTeamBar();
+          Screens._saveRun();
+        }
       }).catch(e => {
         console.error(`[PIEDRA] Error evolucionando ${user.displayName}:`, e.message);
       });
@@ -385,6 +389,10 @@ var HELD_ITEMS = {
         }
         Storage.markCaught(evolved.name);
         console.log(`[PIEDRA] ${user.displayName} → ${evolved.displayName}`);
+        if (typeof Screens !== 'undefined') {
+          Screens._renderTeamBar();
+          Screens._saveRun();
+        }
       }).catch(e => {
         console.error(`[PIEDRA] Error evolucionando ${user.displayName}:`, e.message);
       });
@@ -422,6 +430,10 @@ var HELD_ITEMS = {
         }
         Storage.markCaught(evolved.name);
         console.log(`[PIEDRA] ${user.displayName} → ${evolved.displayName}`);
+        if (typeof Screens !== 'undefined') {
+          Screens._renderTeamBar();
+          Screens._saveRun();
+        }
       }).catch(e => {
         console.error(`[PIEDRA] Error evolucionando ${user.displayName}:`, e.message);
       });
@@ -459,10 +471,57 @@ var HELD_ITEMS = {
         }
         Storage.markCaught(evolved.name);
         console.log(`[PIEDRA] ${user.displayName} → ${evolved.displayName}`);
+        if (typeof Screens !== 'undefined') {
+          Screens._renderTeamBar();
+          Screens._saveRun();
+        }
       }).catch(e => {
         console.error(`[PIEDRA] Error evolucionando ${user.displayName}:`, e.message);
       });
     },
+    revert(ctx) { },
+  },
+
+  // ── MOVIMIENTO ALEATORIO ─────────────────────────────────────────────────────
+
+  'metronome': {
+    name: 'Metrónomo',
+    desc: 'Cada turno lanza un movimiento aleatorio.',
+    img: 'assets/sprites/items/metronome.png',
+    fallbackIcon: '🎵',
+    canChange: true,
+    trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+    metronome: true,
+    fn(ctx) { },
+    revert(ctx) { },
+  },
+
+  // ── CURACIÓN AL ATACAR ──────────────────────────────────────────────────────
+
+  'shell-bell': {
+    name: 'Cascabel Concha',
+    desc: 'El portador se cura un 20% del daño infligido.',
+    img: 'assets/sprites/items/shell-bell.png',
+    fallbackIcon: '🔔',
+    canChange: true,
+    trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+    shellBell: true,
+    fn(ctx) { },
+    revert(ctx) { },
+  },
+
+  // ── SUPERVIVENCIA ────────────────────────────────────────────────────────────
+
+  'focus-sash': {
+    name: 'Banda Aguante',
+    desc: 'Si el Pokémon está al 100% de HP, sobrevive con 1 HP a un golpe letal. Solo una vez por ruta.',
+    img: 'assets/sprites/items/focus-sash.png',
+    fallbackIcon: '🎽',
+    canChange: true,
+    trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+    surviveKO: true,
+    onceFlag: 'focus-sash-used',
+    fn(ctx) { },
     revert(ctx) { },
   },
 };
@@ -558,6 +617,39 @@ function applyHeldItemTurnEnd(pokemon, ctx) {
   return executed;
 }
 
+// Devuelve un movimiento aleatorio de toda la pool (ignora mt y boss).
+// Usado por el Metrónomo en _executeCombatTurn.
+function getMetronomeMove() {
+  const allMoves = [];
+  for (const typeData of Object.values(MOVE_POOL)) {
+    allMoves.push(...typeData.physical, ...typeData.special);
+  }
+  const move = allMoves[Math.floor(Math.random() * allMoves.length)];
+  console.log(`[METRONOMO] Movimiento elegido: ${move.name}`);
+  return { ...move, maxPp: move.pp };
+}
+
+// Evalúa el efecto de supervivencia ante KO del objeto equipado de un pokemon.
+// Llamar ANTES de aplicar el daño, después de ajustes por efectos on-hitted.
+// Si el objeto actúa (pokemon al 100% HP y golpe letal), devuelve el daño
+// ajustado para que el pokemon quede a 1 HP. Si no aplica, devuelve null.
+function applyHeldItemSurvive(pokemon, incomingDmg, log) {
+  const itemId = pokemon?.heldItem;
+  if (!itemId) return null;
+  const item = HELD_ITEMS[itemId];
+  if (!item?.surviveKO) return null;
+
+  pokemon._heldItemFlags = pokemon._heldItemFlags ?? {};
+  if (item.onceFlag && pokemon._heldItemFlags[item.onceFlag]) return null;
+
+  if (pokemon.currentHp < pokemon.stats.hp) return null;
+  if (incomingDmg < pokemon.currentHp) return null;
+
+  if (item.onceFlag) pokemon._heldItemFlags[item.onceFlag] = true;
+  if (log) log(`${pokemon.displayName} aguantó gracias a la ${item.name}!`);
+  return pokemon.currentHp - 1;
+}
+
 // Resetea los flags "una vez por ruta" de todo el equipo — llamar en
 // adventure() junto al reset de combatMods.
 function resetHeldItemFlags(team) {
@@ -595,4 +687,7 @@ var ITEM = {
   water_stone: 'water-stone',
   moon_stone: 'moon-stone',
   eviolite: 'eviolite',
+  focus_sash: 'focus-sash',
+  metronome: 'metronome',
+  shell_bell: 'shell-bell',
 };

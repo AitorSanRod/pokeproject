@@ -805,6 +805,8 @@
 .move-btn[data-type="dark"]::before     { background: var(--type-dark); }
 .move-btn[data-type="steel"]::before    { background: var(--type-steel); }
 .move-btn[data-type="fairy"]::before    { background: var(--type-fairy); }
+.move-btn[data-type="ground"]::before   { background: var(--type-ground); }
+.move-btn[data-type="flying"]::before   { background: var(--type-flying); }
 
 .move-btn:hover  { transform: translate(-1px,-1px); box-shadow: var(--shadow-md); }
 .move-btn:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--black); }
@@ -997,7 +999,13 @@
 .item-card:hover  { transform: translate(-2px,-2px); box-shadow: var(--shadow-md); }
 .item-card:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--black); }
 
-.item-card__icon { font-size: 28px; }
+.item-card__icon {
+  font-size: 28px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .item-card__name { font-family: var(--font-pixel); font-size: 6px; color: var(--black); line-height: 1.6; }
 .item-card__desc { font-family: var(--font-body); font-size: 9px; color: var(--grey); }
 
@@ -1402,8 +1410,34 @@
   border-radius: 3px;
   white-space: nowrap;
 }
-.stat-mod-badge--up   { color: var(--green-dark); background: #d4f5d4; border: 1px solid var(--green); }
-.stat-mod-badge--down { color: var(--red-dark);   background: #fde0dc; border: 1px solid var(--red);   }
+.stat-mod-badge--up         { color: var(--green-dark); background: #d4f5d4; border: 1px solid var(--green); }
+.stat-mod-badge--down       { color: var(--red-dark);   background: #fde0dc; border: 1px solid var(--red);   }
+.stat-mod-badge--collapsed  {
+  color: var(--grey-dark);
+  background: #f0f0f0;
+  border: 1px solid var(--grey);
+  position: relative;
+  cursor: default;
+}
+.combat-hud:hover                    { z-index: 9999; }
+.combat-hud:hover .stat-mod-tooltip  { display: block; }
+.combat-hud--foe .stat-mod-tooltip   { bottom: auto; top: calc(100% + 4px); }
+.stat-mod-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  z-index: 200;
+  pointer-events: none;
+  line-height: 2;
+}
 
 /* ── MOVE EFFECT TOOLTIP ────────────────────────────────────────────────────── */
 .move-effect-tooltip {
@@ -1463,6 +1497,41 @@ div:hover > .move-effect-tooltip { display: block; }
   0%   { transform: translateY(0);   opacity: 1; filter: grayscale(0) brightness(1); }
   30%  { transform: translateY(0);   opacity: 1; filter: grayscale(1) brightness(.4); }
   100% { transform: translateY(40px);opacity: 0; filter: grayscale(1) brightness(.4); }
+}
+
+/* ── COMBAT TRANSITION CURTAIN ──────────────────────────────────────────────── */
+/* Cubre el viewport durante el reemplazo de DOM entre encuentros para evitar   */
+/* el frame en blanco. Se añade a #app (fuera de #viewport) y se desvanece.     */
+.combat-curtain {
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+  background: var(--black);
+  pointer-events: none;
+}
+.combat-curtain--fade-out {
+  animation: combatCurtainOut 0.22s ease-out forwards;
+}
+@keyframes combatCurtainOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ── SHINY BATTLE ANIMATION ─────────────────────────────────────────────────── */
+.shiny-battle-anim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  z-index: 20;
+  animation: shinyBattleFadeOut var(--shiny-anim-duration, 2s) ease-out forwards;
+}
+@keyframes shinyBattleFadeOut {
+  0%   { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 /* ── LEVEL UP PIP ANIMATION ─────────────────────────────────────────────────── */

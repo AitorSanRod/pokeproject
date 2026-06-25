@@ -104,6 +104,7 @@ const TRAINER_IMG = {
   medium: 'assets/sprites/trainers/medium.png',
   malabarista: 'assets/sprites/trainers/malabarista.png',
   ladron: 'assets/sprites/trainers/ladron.png',
+  Ornitologo: 'assets/sprites/trainers/ornitologo.png',
   // Líderes de gimnasio
   brock: 'assets/sprites/trainers/brock.png',
   misty: 'assets/sprites/trainers/misty.png',
@@ -191,4 +192,5 @@ const ENTRENADORES = {
   Medium: { name: 'Medium', img: TRAINER_IMG.medium },
   Malabarista: { name: 'Malabarista', img: TRAINER_IMG.malabarista },
   Ladron: { name: 'Ladrón', img: TRAINER_IMG.ladron },
+  Ornitologo: { name: 'Ornitologo', img: TRAINER_IMG.Ornitologo },
 };

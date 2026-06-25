@@ -958,7 +958,7 @@ const BattleFrontierScreen = {
       <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);text-align:center;line-height:1.8;margin-bottom:8px">
         Elige el movimiento preferido
       </p>
-      <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:55vh">
         ${poke.moves.map(m => `
           <button class="btn ${poke.autoMove === m.id ? 'btn--primary' : ''} btn--wide"
             data-moveid="${m.id}" style="justify-content:space-between">

@@ -75,8 +75,8 @@ const BF_FLOORS = [
       battleNumber: 10,
       name: ENTRENADORES.Rival.name, img: ENTRENADORES.Rival.img,
       pokemon: [
-        { name: POKEMON.nidorino, level: 50, moveId: MOVES.poison.physical.poison_jab },
-        { name: POKEMON.pidgeotto, level: 50, moveId: MOVES.flying.physical.wing_attack },
+        { name: POKEMON.nidorino, level: 50, moveId: [MOVES.poison.physical.poison_jab, MOVES.fighting.physical.karate_chop] },
+        { name: POKEMON.pidgeotto, level: 50, moveId: [MOVES.flying.physical.wing_attack, MOVES.normal.physical.extreme_speed] },
         { name: POKEMON.wartortle, level: 50, moveId: [MOVES.water.special.water_gun, MOVES.ice.physical.ice_punch], heldItem: ITEM.eviolite },
       ]
     },

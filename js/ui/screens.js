@@ -393,10 +393,44 @@ const Screens = {
     document.getElementById('btn-back')
       .addEventListener('click', () => Screens.show(Screens.regionSelect));
 
+    const _loadedStarters = {};
+
+    const _confirmAndChoose = (p) => {
+      const anyOtherShiny = Object.values(_loadedStarters).some(lp => lp !== p && lp.shiny);
+      if (!p.shiny && anyOtherShiny) {
+        const modal = Screens._makeModal(`
+          <p style="font-family:var(--font-pixel);font-size:8px;line-height:2;text-align:center;margin-bottom:16px">
+            ✨ Hay una opción mejor...<br>¿Estás seguro de que deseas elegir a ${p.displayName}?
+          </p>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn--ghost" id="starter-confirm-cancel" style="flex:1">Volver</button>
+            <button class="btn" id="starter-confirm-ok" style="flex:1">Elegir</button>
+          </div>
+        `, { id: 'starter-confirm-modal', closeOnBackdrop: true });
+        document.getElementById('starter-confirm-cancel').addEventListener('click', () => modal.remove());
+        document.getElementById('starter-confirm-ok').addEventListener('click', () => {
+          modal.remove();
+          _doChooseStarter(p);
+        });
+      } else {
+        _doChooseStarter(p);
+      }
+    };
+
+    const _doChooseStarter = (p) => {
+      console.log(`[UI] Starter elegido: ${p.name}${p.shiny ? ' (shiny)' : ''}`);
+      GameState.init(p);
+      if (p.shiny) Storage.markShiny(p.name);
+      GameState.autoMode = true;
+      Screens._saveRun();
+      Screens.show(Screens.adventure);
+    };
+
     starters.forEach(async (s) => {
       try {
         const isShiny = Math.random() < (typeof getActiveShinyRate !== 'undefined' ? getActiveShinyRate() : 0);
         const p = await createPokemon(s.name, SCREENS_CONFIG.STARTER_LEVEL, true, null, null, isShiny);
+        _loadedStarters[s.name] = p;
 
         const spriteEl = document.getElementById(`sprite-${s.name}`);
         spriteEl.outerHTML = `<img src="${p.spriteUrl}" alt="${s.label}"
@@ -418,14 +452,7 @@ const Screens = {
         const dmgEl    = document.getElementById(`dmg-${s.name}`);
 
         document.getElementById(`card-${s.name}`)
-          .addEventListener('click', () => {
-            console.log(`[UI] Starter elegido: ${s.name}${p.shiny ? ' (shiny)' : ''}`);
-            GameState.init(p);
-            if (p.shiny) Storage.markShiny(p.name);
-            GameState.autoMode = true;
-            Screens._saveRun();
-            Screens.show(Screens.adventure);
-          });
+          .addEventListener('click', () => _confirmAndChoose(p));
 
         console.log(`[UI] Starter cargado: ${s.name} Nv.${p.level}`);
       } catch (err) {
@@ -839,8 +866,10 @@ const Screens = {
     }
     GameState._pathRunning = true;
 
-    // Limpiar botón pokédex flotante al entrar en combate
+    // Limpiar elementos flotantes al entrar en combate
     document.querySelectorAll('.global-dex-btn').forEach(e => e.remove());
+    document.querySelectorAll('.held-item-tooltip--floating').forEach(e => e.remove());
+    document.getElementById('btn-notes-global')?.style.setProperty('display', 'none');
     const path = GameState.currentPath;
     const idx  = GameState.currentEncounter;
 
@@ -881,7 +910,7 @@ const Screens = {
         if (p.heldItem) equipHeldItem(foe, p.heldItem);
         foeTeam.push(foe);
       }
-      Screens.show(Screens.combat, {
+      Screens._startCombatInPath({
         foeTeam,
         isGym: true,
         gymLeaderName: data.gymLeader ?? route.name,
@@ -893,7 +922,6 @@ const Screens = {
             for (const p of GameState.team) Storage.addBadge(p.name, data.badgeId);
           }
           GameState._pathRunning = false;
-          Screens._renderAdventureShell(route);
           Screens._runNextInPath();
         },
         onLoss: () => { GameState._pathRunning = false; Screens.show(Screens.defeat); },
@@ -935,11 +963,11 @@ const Screens = {
         if (p.heldItem) equipHeldItem(foe, p.heldItem);
         foeTeam.push(foe);
       }
-      Screens.show(Screens.combat, {
+      Screens._startCombatInPath({
         foeTeam,
         isTrainer: true,
         trainerName: trainer.name,
-        onWin:  () => { GameState._pathRunning = false; Screens._renderAdventureShell(route); Screens._runNextInPath(); },
+        onWin:  () => { GameState._pathRunning = false; Screens._runNextInPath(); },
         onLoss: () => { GameState._pathRunning = false; Screens.show(Screens.defeat); },
       });
     } else {
@@ -949,11 +977,11 @@ const Screens = {
       const foePoke = await createPokemon(entry.name, rollLevel(entry), false, entry.moveId ?? null, entry.overrides ?? null, isShiny);
       if (entry.img) foePoke.spriteUrl = entry.img;
       if (entry.heldItem) equipHeldItem(foePoke, entry.heldItem);
-      Screens.show(Screens.combat, {
+      Screens._startCombatInPath({
         foeTeam:    [foePoke],
         isWild:     true,
         autoCapture: true,   // captura automática post-KO
-        onWin:  () => { GameState._pathRunning = false; Screens._renderAdventureShell(route); Screens._runNextInPath(); },
+        onWin:  () => { GameState._pathRunning = false; Screens._runNextInPath(); },
         onLoss: () => { GameState._pathRunning = false; Screens.show(Screens.defeat); },
       });
     }
@@ -1871,6 +1899,7 @@ const Screens = {
         const foeWrap = document.getElementById('combat-foe-wrap');
         if (hudFoe)  { hudFoe.style.opacity  = '1'; hudFoe.classList.add('combat-hud--foe-enter');  }
         if (foeWrap) { foeWrap.style.opacity = '1'; foeWrap.querySelector('img')?.classList.add('combat-sprite--foe-enter'); }
+        if (foe.shiny) Screens._showShinyAnimation(foeWrap);
         // Iniciar el turno tras la animación de entrada del foe (~500ms más)
         setTimeout(() => {
           if (!GameState.combat?._turnRunning && !GameState.combat?._ending) {
@@ -2007,9 +2036,11 @@ const Screens = {
       ctx.activePlayer  = next;
       ctx.chosenMove    = null;
       ctx.introPlayed   = true;
-      // _renderCombatScreen llama a _combatStartTurn internamente (introPlayed=true → else branch)
       setTimeout(() => {
-        Screens._renderCombatScreen();
+        Screens._updatePlayerSide();
+        if (!GameState.combat?._turnRunning && !GameState.combat?._ending) {
+          Screens._combatStartTurn();
+        }
       }, 1200);
       return;
     }
@@ -2089,16 +2120,20 @@ const Screens = {
     foe._flinched     = false;
     foe._ventaja      = false;
 
+    // Metrónomo — sobreescribe el movimiento con uno aleatorio de toda la pool
+    const playerFinalMove = HELD_ITEMS[player.heldItem]?.metronome ? getMetronomeMove() : playerMove;
+    const foeFinalMove    = HELD_ITEMS[foe.heldItem]?.metronome    ? getMetronomeMove() : foeMove;
+
     // before-attack: se evalúa para AMBOS movimientos antes de decidir el orden
     // de turno, ya que efectos como 'priority' (ataca primero) deben poder
     // afectar a cualquiera de los dos combatientes, no solo al jugador.
-    if (playerMove?.effectId) {
-      applyEffect(playerMove, 'before-attack', {
+    if (playerFinalMove?.effectId) {
+      applyEffect(playerFinalMove, 'before-attack', {
         user: player, target: foe, dmg: 0, team: GameState.team, log: logFn,
       });
     }
-    if (foeMove?.effectId) {
-      applyEffect(foeMove, 'before-attack', {
+    if (foeFinalMove?.effectId) {
+      applyEffect(foeFinalMove, 'before-attack', {
         user: foe, target: player, dmg: 0, team: GameState.team, log: logFn,
       });
     }
@@ -2116,10 +2151,10 @@ const Screens = {
     const [first, second] = playerGoesFirst ? [player, foe] : [foe, player];
 
     // moveOf: cada pokemon solo puede usar SU movimiento
-    const moveOf = (poke) => poke === player ? playerMove : foeMove;
+    const moveOf = (poke) => poke === player ? playerFinalMove : foeFinalMove;
 
     // ctx.chosenMove sincronizado con el movimiento validado
-    ctx.chosenMove = playerMove;
+    ctx.chosenMove = playerFinalMove;
 
     // ── Primer atacante ────────────────────────────────────────────────────
     const firstCheck = StatusEffects.checkBeforeAttack(first);
@@ -2295,8 +2330,14 @@ const Screens = {
       onHittedHadEffect = applyEffect(defenderMove, 'on-hitted', effectCtx);
     }
 
-    // Aplicar el daño (ya ajustado por shield-25 si corresponde)
+    // ── Banda Aguante y similares: supervivencia ante KO ─────────────────────
+    const survivedDmg = applyHeldItemSurvive(defender, dmg, logFn);
+    if (survivedDmg !== null) dmg = survivedDmg;
+
+    // Aplicar el daño (ya ajustado por shield-25 y supervivencia si corresponde)
+    const _hpBeforeDmg = defender.currentHp;
     defender.currentHp = Math.max(0, defender.currentHp - dmg);
+    const _actualDmg   = _hpBeforeDmg - defender.currentHp;
 
     // Log de resumen — justo tras aplicar el daño, antes de efectos (Baya Zidra, etc.)
     console.log(`[COMBAT] ${attacker.displayName} uso ${move?.name} -> ${dmg} dmg${isCrit?' (CRIT)':''}${eff>=2?' (EFICAZ!)':eff<1&&eff>0?' (poco eficaz)':eff===0?' (inmune)':''}`);
@@ -2340,6 +2381,20 @@ const Screens = {
       updatePlayerHud();
       updateFoeHud();
       await Screens._wait(400);
+    }
+
+    // ── Shell Bell — curación del atacante proporcional al daño real infligido
+    if (_actualDmg > 0 && HELD_ITEMS[attacker.heldItem]?.shellBell) {
+      const shellHeal  = Math.max(1, Math.floor(_actualDmg * 0.20));
+      const beforeHeal = attacker.currentHp;
+      attacker.currentHp = Math.min(attacker.stats.hp, attacker.currentHp + shellHeal);
+      const healed = attacker.currentHp - beforeHeal;
+      if (healed > 0) {
+        logFn(`${attacker.displayName} se curó ${healed} PS gracias a la Cascabel Concha!`);
+        Screens._showFloater(isPlayerAtk ? 'player' : 'foe', `+${healed}`, 'heal');
+        isPlayerAtk ? updatePlayerHud() : updateFoeHud();
+        await Screens._wait(400);
+      }
     }
 
     // ── after-attack (del ATACANTE) ─────────────────────────────────────────
@@ -2551,10 +2606,12 @@ const Screens = {
         ctx.chosenMove    = null;
         ctx._ending       = false;
         ctx._turnRunning  = false;
-        ctx.introPlayed   = true;  // evitar que _renderCombatScreen relance la intro
+        ctx.introPlayed   = true;
         await Screens._wait(800);
-        Screens._renderCombatScreen();
-        // _combatStartTurn lo llama _renderCombatScreen internamente
+        Screens._updatePlayerSide();
+        if (!ctx._turnRunning && !ctx._ending) {
+          Screens._combatStartTurn();
+        }
       }
     }
   },
@@ -2611,20 +2668,129 @@ const Screens = {
       ctx.chosenMove   = null;
       ctx._ending      = false;
       ctx._turnRunning = false;
-      ctx.introPlayed  = false;  // mostrar animación de entrada del nuevo foe
       setTimeout(() => {
-        Screens._renderCombatScreen();
-        // _renderCombatScreen llama a _combatStartTurn internamente tras la intro
+        Screens._updateFoeSide();
       }, 800);
     } else {
       Screens._clearPauseBtn(); ctx.onWin();
     }
   },
 
+  // Lanza un nuevo combate dentro de un path sin pasar por Screens.show().
+  // Coloca un telón negro en #app que cubre el frame de reemplazo de DOM,
+  // luego lo desvanece para revelar el nuevo combate con su animación de entrada.
+  _startCombatInPath(options) {
+    const appEl = document.getElementById('app');
+    const curtain = document.createElement('div');
+    curtain.className = 'combat-curtain';
+    appEl.appendChild(curtain);
+    Screens.combat(options);
+    // Dos rAF: el primero confirma que el browser procesó el nuevo DOM,
+    // el segundo que ya está en la cola de pintado — entonces soltamos el telón.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      curtain.classList.add('combat-curtain--fade-out');
+      curtain.addEventListener('animationend', () => curtain.remove(), { once: true });
+    }));
+  },
+
   _clearPauseBtn() {
     document.querySelectorAll('.global-pause-btn').forEach(e => e.remove());
     document.querySelectorAll('.global-dex-btn').forEach(e => e.remove());
     GameState.paused = false;
+  },
+
+  _updateFoeSide() {
+    const ctx    = GameState.combat;
+    const foe    = ctx.foeTeam[ctx.foeIndex];
+    const player = ctx.activePlayer;
+
+    Storage.markSeen(foe.name);
+
+    // Trainer ball bar
+    if (ctx.isTrainer || ctx.isGym) {
+      const ballsEl = document.querySelector('#trainer-bar .trainer-bar__balls');
+      if (ballsEl) {
+        ballsEl.innerHTML = ctx.foeTeam.map(p => {
+          const cls = p.currentHp <= 0 ? 'fainted' : 'alive';
+          return `<span class="trainer-ball trainer-ball--${cls}">⬤</span>`;
+        }).join('');
+      }
+    }
+
+    // Foe HUD — rebuilding content, hide for entrance animation
+    const hudFoe = document.getElementById('hud-foe');
+    if (hudFoe) {
+      hudFoe.innerHTML = `
+        <div class="combat-hud__name" style="position:relative">
+          <span>${foe.displayName.toUpperCase()}</span>
+          <span class="combat-hud__level">Nv.${foe.level}</span>
+        </div>
+        <div class="combat-hud__hp-label">HP</div>
+        <div style="display:flex;align-items:center;gap:5px">
+          <div style="flex:1">${Render.hpBar(foe.currentHp, foe.stats.hp)}</div>
+          ${Storage.isCaught(foe.name) ? '<span class="combat-hud__caught-dot" title="Ya capturado"></span>' : ''}
+        </div>`;
+      hudFoe.style.opacity = '0';
+      hudFoe.classList.remove('combat-hud--foe-enter');
+    }
+
+    // Foe sprite — update src, hide for entrance animation
+    const foeWrap  = document.getElementById('combat-foe-wrap');
+    const spriteEl = document.getElementById('sprite-foe');
+    if (foeWrap) foeWrap.style.opacity = '0';
+    if (spriteEl) {
+      spriteEl.classList.remove('combat-sprite--foe-enter', 'combat-sprite--fainting');
+      spriteEl.style.transition = '';
+      spriteEl.style.filter     = '';
+      spriteEl.src = foe.spriteUrl ?? '';
+      spriteEl.alt = foe.displayName;
+    }
+
+    Screens._updateStatusBadges(player, foe);
+
+    // Entrance animation — same timing as _renderCombatScreen with introDelay=200
+    ctx.introPlayed = true;
+    setTimeout(() => {
+      if (hudFoe)  { hudFoe.style.opacity  = '1'; hudFoe.classList.add('combat-hud--foe-enter'); }
+      if (foeWrap) { foeWrap.style.opacity = '1'; spriteEl?.classList.add('combat-sprite--foe-enter'); }
+      if (foe.shiny) Screens._showShinyAnimation(foeWrap);
+      setTimeout(() => {
+        if (!GameState.combat?._turnRunning && !GameState.combat?._ending) {
+          Screens._combatStartTurn();
+        }
+      }, 600);
+    }, 200);
+  },
+
+  _updatePlayerSide() {
+    const ctx    = GameState.combat;
+    const next   = ctx.activePlayer;
+    const foe    = ctx.foeTeam[ctx.foeIndex];
+
+    const spriteEl = document.getElementById('sprite-player');
+    if (spriteEl) {
+      spriteEl.classList.remove('combat-sprite--fainting');
+      spriteEl.style.transition = '';
+      spriteEl.style.filter     = '';
+      spriteEl.style.opacity    = '0';
+      spriteEl.onload = () => { spriteEl.style.opacity = ''; };
+      spriteEl.src = next.backSpriteUrl ?? next.spriteUrl ?? '';
+      spriteEl.alt = next.displayName;
+    }
+
+    const hudPlayer = document.getElementById('hud-player');
+    if (hudPlayer) {
+      const nameEl  = hudPlayer.querySelector('.combat-hud__name > span:first-child');
+      const levelEl = hudPlayer.querySelector('.combat-hud__level');
+      if (nameEl)  nameEl.textContent  = next.displayName.toUpperCase();
+      if (levelEl) levelEl.textContent = `Nv.${next.level}`;
+      Render.updateHpBar(hudPlayer, next.currentHp, next.stats.hp);
+      const hpNums = document.getElementById('hp-nums-player');
+      if (hpNums) hpNums.textContent = `${next.currentHp}/${next.stats.hp}`;
+    }
+
+    Screens._updateCombatTeamBar();
+    Screens._updateStatusBadges(next, foe);
   },
 
   _updateCombatTeamBar() {
@@ -2661,11 +2827,14 @@ const Screens = {
       const mods = poke.combatMods ?? {};
       const STAT_LABEL = { atk:'ATK', def:'DEF', spa:'SPA', spd:'SPD', spe:'VEL' };
       const activeMods = Object.entries(mods).filter(([k, v]) => !k.startsWith('_') && v !== 0);
-      if (activeMods.length >= 3 && activeMods.every(([, v]) => v === activeMods[0][1])) {
-        const val = activeMods[0][1];
-        const pct = Math.round(Math.abs(val) * 100);
-        const up  = val > 0;
-        parts.push(`<span class="stat-mod-badge stat-mod-badge--${up ? 'up' : 'down'}">... ${up ? '+' : '-'}${pct}%</span>`);
+      if (activeMods.length > 3) {
+        const tooltipLines = Object.entries(STAT_LABEL).map(([key, label]) => {
+          const val = mods[key] ?? 0;
+          if (val === 0) return `${label} -`;
+          const pct = Math.round(Math.abs(val) * 100);
+          return `${label} ${val > 0 ? '+' : '-'}${pct}%`;
+        }).join('<br>');
+        parts.push(`<span class="stat-mod-badge stat-mod-badge--collapsed">...<span class="stat-mod-tooltip">${tooltipLines}</span></span>`);
       } else {
         for (const [key, val] of activeMods) {
           const label = STAT_LABEL[key] ?? key.toUpperCase();
@@ -2677,6 +2846,18 @@ const Screens = {
 
       statusEl.innerHTML = parts.join('');
     });
+  },
+
+  // Superpone el gif de shiny sobre el wrap del sprite rival.
+  // Se auto-elimina al terminar la animación CSS (una sola vez).
+  _showShinyAnimation(wrapEl) {
+    if (!wrapEl) return;
+    const img = document.createElement('img');
+    img.src = 'assets/animations/shiny-animation.gif';
+    img.className = 'shiny-battle-anim';
+    img.setAttribute('aria-hidden', 'true');
+    wrapEl.appendChild(img);
+    img.addEventListener('animationend', () => img.remove(), { once: true });
   },
 
   // Muestra un número flotante sobre un sprite de combate
