@@ -138,7 +138,7 @@ var POKEMON_DB = {
   magneton: { stage: 3, types: ['electric', 'steel'], evolvesInto: '', damageClass: 'special', moveLines: [{ type: 'electric', damageClass: 'special' }] },
 
   // ── Normal / Flying ───────────────────────────────────────────────────────
-  "farfetch-d": { stage: 2, types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
+  farfetchd: { stage: 2, types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
   doduo: { stage: 1, types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }], evolvesAt: 31, evolvesInto: 'dodrio' },
   dodrio: { stage: 2, types: ['normal', 'flying'], damageClass: 'physical', moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }] },
 
@@ -593,7 +593,7 @@ var POKEMON_LIST = {
   magnemite: 'magnemite',
   magneton: 'magneton',
   // Normal / Flying
-  farfetch_d: 'farfetch-d',
+  farfetch_d: 'farfetchd',
   doduo: 'doduo',
   dodrio: 'dodrio',
   // Water / Ice

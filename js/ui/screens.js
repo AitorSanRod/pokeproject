@@ -2555,7 +2555,13 @@ const Screens = {
               b.replaceWith(clone);
               clone.addEventListener('click', () => {
                 GameState.paused = true;
-                screen.show(() => { GameState.paused = false; renderCatchChoice(); });
+                screen.show(() => {
+                  GameState.paused = false;
+                  // La pokédex reemplaza viewport.innerHTML completo; hay que reconstruir
+                  // la pantalla de combate antes de poder rellenar combat-actions-area.
+                  Screens._renderCombatScreen();
+                  renderCatchChoice();
+                });
               });
               clone.addEventListener('mouseenter', () => clone.style.background = 'rgba(0,0,0,.6)');
               clone.addEventListener('mouseleave', () => clone.style.background = 'rgba(0,0,0,.35)');
@@ -2599,7 +2605,37 @@ const Screens = {
         ctx._turnRunning  = false;
         ctx.introPlayed   = true;
         await Screens._wait(600);
-        Screens._advanceFoeOrEnd();
+        // En combates salvajes el rival también debe pasar por la captura
+        // aunque el pokemon activo haya caído en el mismo turno.
+        if (ctx.isWild && ctx.autoCapture) {
+          if (Math.random() < COMBAT_CONFIG.CATCH_RATE) {
+            fullHeal(foe);
+            Screens._updateCombatLog(`Gotcha! ${foe.displayName} fue capturado!`);
+            Storage.markCaught(foe.name);
+            if (foe.shiny) { Storage.markShiny(foe.name); Storage.propagateShinyLine(foe.name); }
+            foe.isPlayer = true;
+            const capturedMTs2 = Storage.getLearnedMTs(foe.name);
+            foe.learnedMTs = capturedMTs2;
+            for (const mtId of capturedMTs2) {
+              const mtMove = MOVE_BY_ID[mtId];
+              if (mtMove && !foe.moves.find(mv => mv.id === mtId))
+                foe.moves.push({ ...mtMove, maxPp: mtMove.pp });
+            }
+            await Screens._wait(800);
+            if (GameState.team.length < 6) {
+              GameState.team.push(foe);
+              Screens._advanceFoeOrEnd();
+            } else {
+              Screens._showPokemonSwapSelector(foe, () => Screens._advanceFoeOrEnd());
+            }
+          } else {
+            Screens._updateCombatLog(`${foe.displayName} escapo!`);
+            await Screens._wait(800);
+            Screens._advanceFoeOrEnd();
+          }
+        } else {
+          Screens._advanceFoeOrEnd();
+        }
       } else {
         Screens._updateCombatLog(`${ctx.activePlayer.displayName} no puede mas! Vamos, ${next.displayName}!`);
         ctx.activePlayer  = next;

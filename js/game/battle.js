@@ -4,6 +4,12 @@
 function calcDamage(attacker, defender, move) {
   if (!move || !move.power) return { dmg: 0, isCrit: false, modifiers: [] };
 
+  // Daño fijo igual al nivel del atacante — ignora poder, stats y efectividad
+  const _earlyIds = Array.isArray(move.effectId) ? move.effectId : [move.effectId ?? ''];
+  if (_earlyIds.includes('seismic-toss-damage')) {
+    return { dmg: Math.max(1, attacker.level), isCrit: false, eff: 1, modifiers: [] };
+  }
+
   const isSpecial = move.damageClass === 'special';
 
   // Modificadores aditivos sobre la base: mod=0 → ×1.0, mod=0.4 → ×1.4, mod=-0.4 → ×0.6

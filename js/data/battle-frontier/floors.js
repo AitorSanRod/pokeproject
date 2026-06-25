@@ -83,7 +83,7 @@ const BF_FLOORS = [
     reward: {
       pokemon: [POKEMON.eevee, POKEMON.scyther, POKEMON.pinsir],
       tm: [TM_LIST['tm-thunderbolt'], TM_LIST['tm-ice-beam'], TM_LIST['tm-surf']],
-      item: [ITEM.sitrus_berry, ITEM.eviolite, ITEM.choice_scarf],
+      item: [ITEM.metronome, ITEM.eviolite, ITEM.choice_scarf],
     },
   },
 
@@ -102,16 +102,17 @@ const BF_FLOORS = [
     combatBg: COMBAT_BG.rocket,
     specialTrainer: {
       battleNumber: 20,
-      name: 'Brock', img: TRAINER_IMG.brock,
+      name: 'Campeón Moraleda', img: TRAINER_IMG.chicoGuay,
       pokemon: [
-        { name: POKEMON.geodude, level: 50, moveId: MOVES.rock.physical.rock_slide },
-        { name: POKEMON.onix, level: 50, moveId: MOVES.ground.physical.earthquake },
+        { name: POKEMON.charizard, level: 50, moveId: [MOVES.fire.physical.flame_wheel, MOVES.fighting.physical.seismic_toss] }, //Movimiento sismico
+        { name: POKEMON.vileplume, level: 50, moveId: MOVES.grass.special.solar_beam }, //Rayo solar
+        { name: POKEMON.jynx, level: 50, moveId: [MOVES.fairy.physical.play_rough, MOVES.fairy.special.moonblast, MOVES.ice.special.ice_beam] }, //Beso dulce
       ]
     },
     reward: {
       pokemon: [POKEMON.hitmonlee, POKEMON.hitmonchan, POKEMON.chansey],
       tm: [TM_LIST['tm-earth-power'], TM_LIST['tm-stomping-tantrum'], TM_LIST['tm-facade']],
-      item: [ITEM.leftovers, ITEM.assault_vest, ITEM.choice_band],
+      item: [ITEM.shell_bell, ITEM.assault_vest, ITEM.choice_band],
     },
   },
 
@@ -133,6 +134,7 @@ const BF_FLOORS = [
       name: 'Misty', img: TRAINER_IMG.misty,
       pokemon: [
         { name: POKEMON.staryu, level: 50, moveId: MOVES.water.special.surf },
+        { name: POKEMON.blastoise, level: 50, moveId: MOVES.water.special.hydro_pump },
         { name: POKEMON.starmie, level: 50, moveId: [MOVES.water.special.surf, MOVES.psychic.special.psychic] },
       ]
     },
@@ -284,7 +286,7 @@ const BF_FLOORS = [
     reward: {
       pokemon: [POKEMON.magmar, POKEMON.jynx, POKEMON.electabuzz],
       tm: [TM_LIST['tm-ice-beam'], TM_LIST['tm-icy-wind'], TM_LIST['tm-ice-fang']],
-      item: [ITEM.choice_scarf, ITEM.choice_band, ITEM.lifeorb],
+      item: [ITEM.choice_scarf, ITEM.focus_sash, ITEM.lifeorb],
     },
   },
 

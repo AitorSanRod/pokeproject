@@ -135,6 +135,7 @@ var MOVE_POOL = {
       { stage: 1, id: 'karate-chop', name: 'Golpe Karate', power: 45, pp: 25, type: T.FIGHTING, damageClass: DC.PHYSICAL, effectId: 'raise-atk-20' },
       { stage: 2, id: 'brick-break', name: 'Romperrocas', power: 75, pp: 15, type: T.FIGHTING, damageClass: DC.PHYSICAL, effectId: 'crit-75' },
       { stage: 3, id: 'close-combat', name: 'A Bocajarro', power: 120, pp: 99, type: T.FIGHTING, damageClass: DC.PHYSICAL, effectId: 'lower-self-def-spd-50' },
+      { stage: 1, id: 'seismic-toss', name: 'Movimiento Sismico', power: 45, pp: 25, type: T.FIGHTING, damageClass: DC.PHYSICAL, effectId: 'seismic-toss-damage', boss: true },
     ],
     special: [
       { stage: 1, id: 'vacuum-wave', name: 'Onda Vacio', power: 40, pp: 30, type: T.FIGHTING, damageClass: DC.SPECIAL },

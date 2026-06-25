@@ -513,6 +513,13 @@ var MOVE_EFFECTS = {
 
   // ── ON_HITTED — Rebote ─────────────────────────────────────────────────────
 
+  // ── DAMAGE OVERRIDE ───────────────────────────────────────────────────────
+
+  'seismic-toss-damage': {
+    trigger: null,
+    desc: 'El daño siempre es igual al nivel del atacante.',
+  },
+
   'recoil-10': {
     trigger: TRIGGERS.ON_HITTED,
     desc: 'Devuelve el 10% del daño recibido al atacante.',
