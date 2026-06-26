@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // SAVE DATA — exportar e importar datos persistentes del jugador
 //
-// Incluye: pokédex, EVs, MTs, medallas, objetos recogidos, piso máximo del Frente Batalla.
+// Incluye: pokédex, EVs, MTs, medallas, objetos recogidos, piso máximo del Frente Batalla, logros.
 // Excluye: run activa (pkmn_run) — el progreso de la partida en curso no viaja.
 //
 // Formato del archivo: .txt con JSON interno.
@@ -113,7 +113,7 @@ const SaveData = {
       Storage._set('mts', merged);
     }
     if (data.kantoDone === true)                            Storage._set('kanto_done', true);
-    if (typeof data.bfMaxFloor === 'number' && data.bfMaxFloor > 0) Storage.setBfMaxFloor(data.bfMaxFloor);
+    if (typeof data.bfMaxFloor === 'number')               Storage._set('bf_max_floor', data.bfMaxFloor);
   },
 
   // ── Privado: fecha de hoy en formato YYYY-MM-DD ───────────────────────────

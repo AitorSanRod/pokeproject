@@ -614,7 +614,7 @@ const BF_TRAINER_TYPES = [
     name: ENTRENADORES.Pokemaniaco.name,
     img: ENTRENADORES.Pokemaniaco.img,
     pokemonPool: [
-      { name: POKEMON.dragonite, moveId: MOVES.dragon.physical.dragon_claw, heldItem: ITEM.choice_scarf, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.skarmory, moveId: MOVES.steel.physical.iron_head, heldItem: ITEM.choice_scarf, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.snorlax, moveId: MOVES.normal.physical.hyper_fang, heldItem: ITEM.leftovers, overrides: { evs: { hp: 32, atk: 32, def: 4 } } },
       { name: POKEMON.tauros, moveId: MOVES.normal.physical.hyper_fang, heldItem: ITEM.choice_band, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.arcanine, moveId: MOVES.normal.physical.extreme_speed, heldItem: ITEM.choice_band, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
@@ -625,9 +625,10 @@ const BF_TRAINER_TYPES = [
     name: ENTRENADORES.Cientifico.name,
     img: ENTRENADORES.Cientifico.img,
     pokemonPool: [
-      { name: POKEMON.mewtwo, moveId: MOVES.psychic.special.psychic, heldItem: ITEM.choice_specs, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.mewtwo, moveId: MOVES.psychic.special.psystrike, heldItem: ITEM.choice_specs, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.alakazam, moveId: MOVES.psychic.special.psychic, heldItem: ITEM.lifeorb, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.gengar, moveId: MOVES.ghost.special.shadow_ball, heldItem: ITEM.lifeorb, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.gengar, moveId: MOVES.ghost.special.astral_barrage, heldItem: ITEM.lifeorb, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.espeon, moveId: MOVES.psychic.special.psystrike, heldItem: ITEM.lifeorb, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
     ],
   },
   {
@@ -648,18 +649,17 @@ const BF_TRAINER_TYPES = [
       { name: POKEMON.machamp, moveId: MOVES.fighting.physical.brick_break, heldItem: ITEM.choice_band, overrides: { evs: { atk: 32, hp: 32, def: 4 } } },
       { name: POKEMON.hitmonlee, moveId: MOVES.fighting.physical.brick_break, heldItem: ITEM.lifeorb, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
       { name: POKEMON.hitmonchan, moveId: [MOVES.fighting.physical.brick_break, MOVES.electric.physical.thunder_punch], heldItem: ITEM.lifeorb, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.nidoking, moveId: MOVES.ground.physical.earthquake, heldItem: ITEM.lifeorb, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.tyranitar, moveId: MOVES.dark.physical.crunch, heldItem: ITEM.lifeorb, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
     ],
   },
   {
     level: 10,
-    name: ENTRENADORES.Mecanico.name,
-    img: ENTRENADORES.Mecanico.img,
+    name: ENTRENADORES.Pokemaniaco.name,
+    img: ENTRENADORES.Pokemaniaco.img,
     pokemonPool: [
-      { name: POKEMON.electabuzz, moveId: MOVES.electric.special.thunder, heldItem: ITEM.choice_specs, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.magmar, moveId: MOVES.fire.special.flamethrower, heldItem: ITEM.lifeorb, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.electrode, moveId: MOVES.electric.special.thunder, heldItem: ITEM.lifeorb, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
-      { name: POKEMON.jynx, moveId: MOVES.ice.special.ice_beam, heldItem: ITEM.choice_specs, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.meganium, moveId: MOVES.grass.special.solar_beam, heldItem: ITEM.choice_specs, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.scizor, moveId: MOVES.bug.physical.x_scissor, heldItem: ITEM.lifeorb, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+      { name: POKEMON.tauros, moveId: MOVES.normal.physical.extreme_speed, heldItem: ITEM.lifeorb, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
     ],
   },
 

@@ -5,11 +5,12 @@
 // Usa localStorage con claves prefijadas para no colisionar con otros datos.
 //
 // Claves usadas:
-//   pkmn_pokedex   → { [name]: { caught: bool } }
-//   pkmn_evs       → { [root]: { hp, atk, def, spa, spd, spe } }
-//   pkmn_mts       → { [root]: ['move-id-1', 'move-id-2'] }  ← se borra con pokédex
-//   pkmn_items     → { [itemId]: true }  ← objetos equipables recogidos alguna vez
+//   pkmn_pokedex    → { [name]: { caught: bool } }
+//   pkmn_evs        → { [root]: { hp, atk, def, spa, spd, spe } }
+//   pkmn_mts        → { [root]: ['move-id-1', 'move-id-2'] }  ← se borra con pokédex
+//   pkmn_items      → { [itemId]: true }  ← objetos equipables recogidos alguna vez
 //   pkmn_kanto_done → true  ← se ha visto la pantalla info-final-kanto al menos una vez
+//   pkmn_logros     → { [logroId]: true }  ← logros desbloqueados (permanentes)
 // ─────────────────────────────────────────────────────────────────────────────
 
 var Storage = {
@@ -272,6 +273,27 @@ var Storage = {
     if (this.isKantoCompleted()) return;
     this._set('kanto_done', true);
     console.log('[Storage] ¡Liga Kanto completada!');
+  },
+
+  // ── Logros ────────────────────────────────────────────────────────────────
+  // { [logroId]: true }  — booleano por logro desbloqueado.
+  // No se borran con clearRun() ni con el reset de run; son permanentes.
+
+  getLogros() {
+    return this._get('logros') ?? {};
+  },
+
+  unlockLogro(id) {
+    const current = this.getLogros();
+    if (current[id]) return false;
+    current[id] = true;
+    this._set('logros', current);
+    console.log(`[Storage] Logro desbloqueado: ${id}`);
+    return true;
+  },
+
+  isLogroUnlocked(id) {
+    return this.getLogros()[id] === true;
   },
 
   // ── Run State ────────────────────────────────────────────────────────────

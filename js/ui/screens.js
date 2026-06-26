@@ -13,10 +13,23 @@ const SCREENS_CONFIG = {
       gen: 'GEN I',
       name: 'KANTO',
       routesGlobal: 'KANTO_ROUTES',
+      available: true,
       starters: [
         { name: 'bulbasaur',  label: 'Bulbasaur' },
         { name: 'charmander', label: 'Charmander' },
         { name: 'squirtle',   label: 'Squirtle' },
+      ],
+    },
+    {
+      id: 'johto',
+      gen: 'GEN II',
+      name: 'JOHTO',
+      routesGlobal: 'JOHTO_ROUTES',
+      available: false,
+      starters: [
+        { name: 'chikorita', label: 'Chikorita' },
+        { name: 'cyndaquil', label: 'Cyndaquil' },
+        { name: 'totodile',  label: 'Totodile'  },
       ],
     },
   ],
@@ -318,31 +331,35 @@ const Screens = {
   // REGION SELECT
   // ═══════════════════════════════════════════════════════════════════════
   regionSelect() {
+    const cards = SCREENS_CONFIG.REGIONS.map(r => `
+      <div class="region-card${r.available ? '' : ' region-card--locked'}" id="region-${r.id}">
+        <span class="region-card__gen">${r.gen}</span>
+        <span class="region-card__name">${r.name}</span>
+        <span class="region-card__badge ${r.available ? 'region-card__badge--available' : 'region-card__badge--soon'}">
+          ${r.available ? 'DISPONIBLE' : 'PRONTO'}
+        </span>
+      </div>`).join('');
+
     document.getElementById('viewport').innerHTML = `
       <div class="screen screen--region">
         <div class="screen-header">
           <button class="btn btn--ghost screen-header__back" id="btn-back">${BACK_ARROW_SVG}</button>
           <span class="screen-header__title">ELIGE REGION</span>
         </div>
-        <div class="region-grid">
-          <div class="region-card" id="region-kanto">
-            <span class="region-card__name">KANTO</span>
-            <span class="region-card__badge region-card__badge--available">DISPONIBLE</span>
-          </div>
-          <div class="region-card region-card--locked">
-            <span class="region-card__name">JOHTO</span>
-            <span class="region-card__badge region-card__badge--soon">PRONTO</span>
-          </div>
-        </div>
+        <div class="region-grid">${cards}</div>
       </div>`;
 
     document.getElementById('btn-back')
       .addEventListener('click', () => GameModesScreen.show());
-    document.getElementById('region-kanto')
-      .addEventListener('click', () => {
-        Screens._region = SCREENS_CONFIG.REGIONS.find(r => r.id === 'kanto');
-        Screens.show(Screens.starterSelect);
-      });
+
+    SCREENS_CONFIG.REGIONS.filter(r => r.available).forEach(r => {
+      document.getElementById(`region-${r.id}`)
+        ?.addEventListener('click', () => {
+          Screens._region = r;
+          Screens.show(Screens.starterSelect);
+        });
+    });
+
     console.log('[UI] Pantalla: Seleccion de region');
   },
 
@@ -604,6 +621,8 @@ const Screens = {
     // Fondo de combate independiente — si la ruta no define combatBg,
     // se reutiliza el fondo de ruta como fallback
     GameState.currentCombatBg = data?.combatBg ?? data?.bg ?? null;
+    // Fondo exclusivo para entrenadores/specialTrainer — cae en cascada a combatBg
+    GameState.currentTrainerCombatBg = data?.trainerBg ?? data?.combatBg ?? data?.bg ?? null;
 
     // Resetear modificadores de combate al empezar ruta nueva
     for (const p of GameState.team) p.combatMods = {};
@@ -1787,7 +1806,11 @@ const Screens = {
     console.log(`[COMBAT] ${introText.replace('\n',' ')}`);
 
     const routeData = ROUTE_DATA[GameState.currentArea];
-    const bg      = GameState.currentCombatBg;
+    // Entrenadores (trainer/specialTrainer) usan trainerBg si está definido;
+    // los gimnasios y salvajes siguen usando combatBg
+    const bg      = ctx.isTrainer
+      ? GameState.currentTrainerCombatBg
+      : GameState.currentCombatBg;
     const bgPos   = routeData?.combatBgPosition ?? 'center';
     const bgSize  = routeData?.combatBgSize ?? 'cover'; // p.ej. '130%' para zoom y poder mover
     const fieldBg = bg
@@ -2749,11 +2772,11 @@ const Screens = {
     const spriteEl = document.getElementById('sprite-foe');
     if (foeWrap) foeWrap.style.opacity = '0';
     if (spriteEl) {
+      spriteEl.style.opacity    = '0';   // ocultar antes de limpiar para evitar flash al vaciar fill-mode
       spriteEl.classList.remove('combat-sprite--foe-enter', 'combat-sprite--fainting');
       spriteEl.style.transition = '';
       spriteEl.style.filter     = '';
-      spriteEl.style.opacity    = '';   // limpia opacidad inline (ej: onerror del sprite anterior)
-      void spriteEl.offsetWidth;       // fuerza reflow para vaciar el estado de la animación fainting
+      void spriteEl.offsetWidth;         // fuerza reflow para vaciar el estado de la animación fainting
       spriteEl.src = foe.spriteUrl ?? '';
       spriteEl.alt = foe.displayName;
     }
@@ -2796,11 +2819,11 @@ const Screens = {
     const spriteEl   = document.getElementById('sprite-player');
     if (playerWrap) playerWrap.style.opacity = '0';
     if (spriteEl) {
+      spriteEl.style.opacity    = '0';   // ocultar antes de limpiar para evitar flash al vaciar fill-mode
       spriteEl.classList.remove('combat-sprite--fainting');
       spriteEl.style.transition = '';
       spriteEl.style.filter     = '';
-      spriteEl.style.opacity    = '';   // limpia opacidad inline (onerror anterior)
-      void spriteEl.offsetWidth;       // fuerza reflow para vaciar estado de animación
+      void spriteEl.offsetWidth;         // fuerza reflow para vaciar estado de animación
       spriteEl.src = next.backSpriteUrl ?? next.spriteUrl ?? '';
       spriteEl.alt = next.displayName;
     }

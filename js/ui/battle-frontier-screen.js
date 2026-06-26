@@ -3,8 +3,19 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Cambia a false para desactivar el botón en la pantalla de modos sin eliminar el código.
-const BF_ENABLED = false;
+const BF_ENABLED = true;
 const BF_LEVEL = 50;
+
+const BF_RULES = [
+  'Elige 3 Pokémon de tu Pokédex.',
+  'Todos los Pokémon combaten al nivel 50.',
+  'Los combates no otorgan experiencia ni EVs.',
+  'El objetivo es superar los 100 combates sin perder.',
+  'Recibirás curación completa cada 20 pisos superados.',
+  'Ganarás recompensas al superar cada bloque de 10 combates.',
+  'Puedes reorganizar tu equipo entre bloques de 5 combates.',
+  'Cada 20 plantas tienes un checkpoint desde el que empezar.'
+];
 const BattleFrontierScreen = {
   _team:           [],   // [{ name, id, shiny }, ...] — máximo 3 (pantalla de selección)
   _replaceIdx:     null, // índice de slot en modo sustitución, o null
@@ -93,7 +104,7 @@ const BattleFrontierScreen = {
     const replaceIdx = BattleFrontierScreen._replaceIdx;
     if (el) el.textContent = replaceIdx !== null
       ? `SUSTITUIR A ${team[replaceIdx]?.name?.toUpperCase()}`
-      : `POKÉMON CAPTURADOS — ${team.length}/3`;
+      : `Pokémon seleccionados — ${team.length}/3`;
   },
 
   _patchEntry(name, inTeam) {
@@ -125,7 +136,7 @@ const BattleFrontierScreen = {
     document.getElementById('viewport').innerHTML = `
       <div class="screen" style="background:var(--off-white);display:flex;flex-direction:column;overflow:hidden">
 
-        <div class="screen-header" style="background:var(--blue)">
+        <div class="screen-header" style="background:var(--green)">
           <button class="btn btn--ghost screen-header__back" id="bf-back">${BACK_ARROW_SVG}</button>
           <span class="screen-header__title">FRENTE BATALLA</span>
         </div>
@@ -133,6 +144,25 @@ const BattleFrontierScreen = {
         <!-- Slots de equipo -->
         <div id="bf-slots" style="display:flex;gap:var(--sp-sm);padding:var(--sp-md);background:var(--white);border-bottom:var(--border)">
           ${[0, 1, 2].map(i => BattleFrontierScreen._slotHtml(i)).join('')}
+        </div>
+
+        <!-- Reglas del modo -->
+        <div style="padding:var(--sp-sm) var(--sp-md);border-bottom:var(--border)">
+          <details class="bf-rules" style="background:var(--white);border:var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-sm)">
+            <summary style="display:flex;align-items:center;justify-content:space-between;
+              padding:var(--sp-md);cursor:pointer;list-style:none;border-radius:var(--radius-md)">
+              <span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-dark);letter-spacing:1px">REGLAS</span>
+              <span class="bf-rules__arrow" style="font-family:var(--font-pixel);font-size:8px;color:var(--grey);flex-shrink:0">▶</span>
+            </summary>
+            <div style="padding:0 var(--sp-md) var(--sp-md)">
+              <div style="border-radius:var(--radius-sm);border:1px solid #38BF4B22;background:#38BF4B0d;padding:10px 12px">
+                <ul style="margin:0;padding-left:14px">
+                  ${BF_RULES.map(r => `
+                    <li style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-dark);line-height:2.2;margin-bottom:1px">${r}</li>`).join('')}
+                </ul>
+              </div>
+            </div>
+          </details>
         </div>
 
         <!-- Cabecera lista -->
@@ -418,7 +448,7 @@ const BattleFrontierScreen = {
     document.getElementById('viewport').innerHTML = `
       <div class="screen" style="background:var(--off-white);display:flex;flex-direction:column;overflow:hidden">
 
-        <div class="screen-header" style="background:var(--blue)">
+        <div class="screen-header" style="background:var(--green)">
           <button class="btn btn--ghost screen-header__back" id="bf-prep-back">${BACK_ARROW_SVG}</button>
           <span class="screen-header__title">FRENTE BATALLA</span>
         </div>
@@ -528,7 +558,7 @@ const BattleFrontierScreen = {
     for (const p of BattleFrontierScreen._battleTeam) fullHeal(p);
 
     GameState.team = BattleFrontierScreen._battleTeam;
-    GameState.currentCombatBg = BF_FLOORS[0].combatBg ?? null;
+    GameState.currentTrainerCombatBg = BF_FLOORS[0].trainerBg ?? null;
 
     BattleFrontierScreen._nextBattle();
   },
@@ -632,7 +662,7 @@ const BattleFrontierScreen = {
       return foe;
     });
 
-    GameState.currentCombatBg = floor.combatBg ?? null;
+    GameState.currentTrainerCombatBg = floor.trainerBg ?? null;
 
     Screens.show(Screens.combat, {
       foeTeam,
@@ -797,7 +827,7 @@ const BattleFrontierScreen = {
 
       document.getElementById('viewport').innerHTML = `
         <div class="screen" style="background:var(--off-white);display:flex;flex-direction:column;overflow:hidden">
-          <div class="screen-header" style="background:var(--blue)">
+          <div class="screen-header" style="background:var(--green)">
             <button class="btn btn--ghost screen-header__back" id="bf-reorg-quit">
               <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round">
                 <path d="M18 6 L6 18"/><path d="M6 6 L18 18"/>

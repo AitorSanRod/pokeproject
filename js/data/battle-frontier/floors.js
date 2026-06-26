@@ -65,12 +65,12 @@ const BF_FLOORS = [
   {
     battleRange: [1, 5],
     trainers: BFHelpers.getEntrenador(5, 1, 2),
-    combatBg: COMBAT_BG.rocket,
+    trainerBg: COMBAT_BG.rocket,
   },
   {
     battleRange: [6, 10],
     trainers: BFHelpers.getEntrenador(4, 1, 2),
-    combatBg: COMBAT_BG.rocket,
+    trainerBg: COMBAT_BG.rocket,
     specialTrainer: {
       battleNumber: 10,
       name: ENTRENADORES.Rival.name, img: ENTRENADORES.Rival.img,
@@ -94,12 +94,12 @@ const BF_FLOORS = [
   {
     battleRange: [11, 15],
     trainers: BFHelpers.getEntrenador(5, 2, 3),
-    combatBg: COMBAT_BG.rocket,
+    trainerBg: COMBAT_BG.rocket,
   },
   {
     battleRange: [16, 20],
     trainers: BFHelpers.getEntrenador(4, 2, 3),
-    combatBg: COMBAT_BG.rocket,
+    trainerBg: COMBAT_BG.rocket,
     specialTrainer: {
       battleNumber: 20,
       name: 'Campeón Moraleda', img: TRAINER_IMG.chicoGuay,
@@ -123,7 +123,7 @@ const BF_FLOORS = [
   {
     battleRange: [21, 25],
     trainers: BFHelpers.getEntrenador(4, 3, 4),
-    combatBg: COMBAT_BG.rocket,
+    trainerBg: COMBAT_BG.rocket,
     specialTrainer: {
       battleNumber: 25,
       name: 'Brock', img: TRAINER_IMG.brock,
@@ -137,7 +137,7 @@ const BF_FLOORS = [
   {
     battleRange: [26, 30],
     trainers: BFHelpers.getEntrenador(4, 3, 4),
-    combatBg: COMBAT_BG.rocket,
+    trainerBg: COMBAT_BG.rocket,
     specialTrainer: {
       battleNumber: 30,
       name: 'Misty', img: TRAINER_IMG.misty,
@@ -161,7 +161,7 @@ const BF_FLOORS = [
   {
     battleRange: [31, 35],
     trainers: BFHelpers.getEntrenador(4, 4, 5),
-    combatBg: COMBAT_BG.rocket,
+    trainerBg: COMBAT_BG.rocket,
     specialTrainer: {
       battleNumber: 35,
       name: 'Lt. Surge', img: TRAINER_IMG.surge,
@@ -175,7 +175,7 @@ const BF_FLOORS = [
   {
     battleRange: [36, 40],
     trainers: BFHelpers.getEntrenador(4, 4, 5),
-    combatBg: COMBAT_BG.rocket,
+    trainerBg: COMBAT_BG.rocket,
     specialTrainer: {
       battleNumber: 40,
       name: 'Erika', img: TRAINER_IMG.erika,
@@ -199,7 +199,7 @@ const BF_FLOORS = [
   {
     battleRange: [41, 45],
     trainers: BFHelpers.getEntrenador(4, 5, 6),
-    combatBg: COMBAT_BG.rocket,
+    trainerBg: COMBAT_BG.rocket,
     specialTrainer: {
       battleNumber: 45,
       name: 'Koga', img: TRAINER_IMG.koga,
@@ -213,7 +213,7 @@ const BF_FLOORS = [
   {
     battleRange: [46, 50],
     trainers: BFHelpers.getEntrenador(4, 5, 6),
-    combatBg: COMBAT_BG.rocket,
+    trainerBg: COMBAT_BG.rocket,
     specialTrainer: {
       battleNumber: 50,
       name: 'Sabrina', img: TRAINER_IMG.sabrina,
@@ -237,7 +237,7 @@ const BF_FLOORS = [
   {
     battleRange: [51, 55],
     trainers: BFHelpers.getEntrenador(4, 6, 7),
-    combatBg: COMBAT_BG.rocket,
+    trainerBg: COMBAT_BG.rocket,
     specialTrainer: {
       battleNumber: 55,
       name: 'Blaine', img: TRAINER_IMG.blaine,
@@ -251,8 +251,8 @@ const BF_FLOORS = [
   {
     battleRange: [56, 60],
     trainers: BFHelpers.getEntrenador(4, 6, 7),
-    combatBg: COMBAT_BG.rocket,
-     specialTrainer: {
+    trainerBg: COMBAT_BG.rocket,
+    specialTrainer: {
       battleNumber: 60,
       name: 'Giovanni', img: TRAINER_IMG.giovanni,
       pokemon: [
@@ -275,12 +275,21 @@ const BF_FLOORS = [
   {
     battleRange: [61, 65],
     trainers: BFHelpers.getEntrenador(5, 7, 8),
-    combatBg: COMBAT_BG.rocket,
+    trainerBg: COMBAT_BG.rocket,
   },
   {
     battleRange: [66, 70],
-    trainers: BFHelpers.getEntrenador(5, 7, 8),
-    combatBg: COMBAT_BG.rocket,
+    trainers: BFHelpers.getEntrenador(4, 7, 8),
+    trainerBg: COMBAT_BG.rocket,
+    specialTrainer: {
+      battleNumber: 70,
+      name: 'Rojo', img: TRAINER_IMG.rojo,
+      pokemon: [
+        { name: POKEMON.meganium, moveId: MOVES.grass.special.solar_beam, heldItem: ITEM.choice_specs, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+        { name: POKEMON.typhlosion, moveId: MOVES.fire.special.fire_blast, heldItem: ITEM.carbon, overrides: { evs: { spa: 32, spe: 32, hp: 4 } } },
+        { name: POKEMON.feraligatr, moveId: MOVES.water.physical.wave_crash, heldItem: ITEM.assault_vest, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
+      ]
+    },
     reward: {
       pokemon: [POKEMON.alakazam, POKEMON.hypno, POKEMON.starmie],
       tm: [TM_LIST['tm-tri-attack'], TM_LIST['tm-metal-claw'], TM_LIST['tm-thunderbolt']],
@@ -295,13 +304,21 @@ const BF_FLOORS = [
   {
     battleRange: [71, 75],
     trainers: BFHelpers.getEntrenador(5, 8, 9),
-    combatBg: COMBAT_BG.rocket,
+    trainerBg: COMBAT_BG.rocket,
   },
   {
     battleRange: [76, 80],
-    trainers: BFHelpers.getEntrenador(5, 8, 9),
-    combatBg: COMBAT_BG.rocket,
-    
+    trainers: BFHelpers.getEntrenador(4, 8, 9),
+    trainerBg: COMBAT_BG.rocket,
+    specialTrainer: {
+      battleNumber: 80,
+      name: 'Lorelei', img: TRAINER_IMG.lorelei,
+      pokemon: [
+        { name: POKEMON.lapras, level: 50, moveId: MOVES.ice.special.ice_beam, heldItem: ITEM.leftovers },
+        { name: POKEMON.jynx, level: 50, moveId: [MOVES.ice.special.ice_beam, MOVES.psychic.special.psychic] },
+        { name: POKEMON.starmie, level: 50, moveId: MOVES.water.special.surf, heldItem: ITEM.choice_scarf },
+      ]
+    },
     reward: {
       pokemon: [POKEMON.magmar, POKEMON.jynx, POKEMON.electabuzz],
       tm: [TM_LIST['tm-ice-beam'], TM_LIST['tm-icy-wind'], TM_LIST['tm-ice-fang']],
@@ -316,21 +333,21 @@ const BF_FLOORS = [
   {
     battleRange: [81, 85],
     trainers: BFHelpers.getEntrenador(5, 9, 10),
-    combatBg: COMBAT_BG.rocket,
+    trainerBg: COMBAT_BG.rocket,
   },
   {
     battleRange: [86, 90],
-    trainers: BFHelpers.getEntrenador(5, 9, 10),
-    combatBg: COMBAT_BG.rocket,
-    // specialTrainer: {
-    //   battleNumber: 90,
-    //   name: 'Lorelei', img: TRAINER_IMG.lorelei,
-    //   pokemon: [
-    //     { name: POKEMON.lapras, level: 50, moveId: MOVES.ice.special.ice_beam, heldItem: ITEM.leftovers },
-    //     { name: POKEMON.jynx, level: 50, moveId: [MOVES.ice.special.ice_beam, MOVES.psychic.special.psychic] },
-    //     { name: POKEMON.starmie, level: 50, moveId: MOVES.water.special.surf, heldItem: ITEM.choice_scarf },
-    //   ]
-    // },
+    trainers: BFHelpers.getEntrenador(4, 9, 10),
+    trainerBg: COMBAT_BG.rocket,
+    specialTrainer: {
+      battleNumber: 80,
+      name: 'Bruno', img: TRAINER_IMG.bruno,
+      pokemon: [
+        { name: POKEMON.heracross, moveId: [MOVES.fighting.physical.close_combat, MOVES.bug.physical.megahorn], heldItem: ITEM.choice_band, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
+        { name: POKEMON.hitmontop, moveId: MOVES.fighting.physical.close_combat, heldItem: ITEM.focus_sash, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
+        { name: POKEMON.primeape, moveId: MOVES.fighting.physical.karate_chop, heldItem: ITEM.leftovers, overrides: { evs: { atk: 32, spe: 32, hp: 4 } } },
+      ]
+    },
     reward: {
       pokemon: [POKEMON.articuno, POKEMON.zapdos, POKEMON.moltres],
       tm: [TM_LIST['tm-surf'], TM_LIST['tm-thunderbolt'], TM_LIST['tm-earth-power']],
@@ -344,20 +361,29 @@ const BF_FLOORS = [
 
   {
     battleRange: [91, 95],
-    trainers: BFHelpers.getEntrenador(5, 9, 10),
-    combatBg: COMBAT_BG.rocket,
+    trainers: BFHelpers.getEntrenador(4, 9, 10),
+    trainerBg: COMBAT_BG.rocket,
+    specialTrainer: {
+      battleNumber: 95,
+      name: 'Agatha', img: TRAINER_IMG.agatha,
+      pokemon: [
+        { name: POKEMON.crobat, level: 50, moveId: MOVES.poison.physical.poison_jab, heldItem: ITEM.focus_sash },
+        { name: POKEMON.misdreavus, level: 50, moveId: MOVES.ghost.special.astral_barrage, heldItem: ITEM.leftovers },
+        { name: POKEMON.gengar, level: 50, moveId: MOVES.ghost.special.astral_barrage, heldItem: ITEM.choice_specs },
+      ]
+    },
   },
   {
     battleRange: [96, 100],
     trainers: BFHelpers.getEntrenador(4, 9, 10),
-    combatBg: COMBAT_BG.rocket,
+    trainerBg: COMBAT_BG.rocket,
     specialTrainer: {
       battleNumber: 100,
-      name: ENTRENADORES.Rojo.name, img: TRAINER_IMG.rojo,
+      name: 'Lance', img: TRAINER_IMG.lance,
       pokemon: [
-        { name: POKEMON.pikachu, level: 50, moveId: MOVES.electric.special.thunder, heldItem: ITEM.light_ball },
-        { name: POKEMON.snorlax, level: 50, moveId: MOVES.normal.physical.hyper_fang, heldItem: ITEM.leftovers },
-        { name: POKEMON.mewtwo, level: 50, moveId: MOVES.psychic.special.psychic, heldItem: ITEM.choice_specs },
+        { name: POKEMON.dragonite, level: 50, moveId: [MOVES.dragon.special.draco_meteor, MOVES.dragon.physical.outrage], heldItem: ITEM.leftovers },
+        { name: POKEMON.kingdra, level: 50, moveId: [MOVES.dragon.special.draco_meteor, MOVES.water.special.scald], heldItem: ITEM.mystic_water },
+        { name: POKEMON.aerodactyl, level: 50, moveId: [MOVES.rock.physical.rock_throw, MOVES.flying.physical.brave_bird], heldItem: ITEM.choice_band },
       ]
     },
     reward: {

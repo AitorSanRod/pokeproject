@@ -26,7 +26,9 @@
 // ── RUTA DE COMBATE ────────────────────────────────────────────────────────
 //
 //   bg         (requerido) : imagen de fondo de la ruta
-//   combatBg   (requerido) : imagen de fondo del combate
+//   combatBg   (requerido) : imagen de fondo del combate (salvajes y gimnasios)
+//   trainerBg  (opcional)  : fondo exclusivo para combates de trainer/specialTrainer
+//                            Si se omite, cae en cascada a combatBg
 //   wild       (requerido) : array de entradas de pokemon salvaje (ver abajo)
 //   trainer    (requerido) : array de pools de entrenador (ver abajo)
 //
@@ -124,7 +126,8 @@ var ROUTE_DATA = {
 
   'ruta-1': {
     bg: BG.ruta1,
-    combatBg: COMBAT_BG.default,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.rattata, POKEMON.pidgey],
     wild: [
       { name: POKEMON.rattata, rate: 45, minLv: 2, maxLv: 4, moveId: MOVES.normal.physical.tackle },
@@ -164,7 +167,8 @@ var ROUTE_DATA = {
 
   'ruta-22': {
     bg: BG.ruta22,
-    combatBg: COMBAT_BG.default,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.mankey, POKEMON.nidoran_f, POKEMON.nidoran_m],
     wild: [
       { name: POKEMON.nidoran_m, rate: 30, minLv: 3, maxLv: 5, moveId: MOVES.poison.physical.poison_sting },
@@ -185,7 +189,8 @@ var ROUTE_DATA = {
 
   'ruta-2': {
     bg: BG.ruta2,
-    combatBg: COMBAT_BG.default,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.caterpie, POKEMON.weedle, POKEMON.pidgey, POKEMON.rattata],
     wild: [
       { name: POKEMON.rattata, rate: 35, minLv: 3, maxLv: 5, moveId: MOVES.normal.physical.tackle },
@@ -214,7 +219,8 @@ var ROUTE_DATA = {
 
   'bosque-verde': {
     bg: BG.bosqueVerde,
-    combatBg: COMBAT_BG.default,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.pikachu, POKEMON.jigglypuff, POKEMON.caterpie, POKEMON.weedle],
     wild: [
       { name: POKEMON.caterpie, rate: 30, minLv: 6, maxLv: 10, moveId: MOVES.bug.physical.bug_bite },
@@ -298,7 +304,8 @@ var ROUTE_DATA = {
 
   'ruta-3': {
     bg: BG.ruta3,
-    combatBg: COMBAT_BG.default,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.magikarp],
     wild: [
       { name: POKEMON.pidgey, rate: 20, minLv: 10, maxLv: 14, moveId: MOVES.flying.physical.peck },
@@ -360,7 +367,8 @@ var ROUTE_DATA = {
 
   'ruta-4': {
     bg: BG.ruta4,
-    combatBg: COMBAT_BG.default,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.spearow, POKEMON.pidgey],
     wild: [
       { name: POKEMON.pidgey, rate: 40, minLv: 10, maxLv: 14, moveId: MOVES.flying.physical.peck },
@@ -427,7 +435,8 @@ var ROUTE_DATA = {
 
   'ruta-24-1': {
     bg: BG.ruta24,
-    combatBg: COMBAT_BG.default,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.abra],
     wild: [],
     specialTrainer: {
@@ -445,7 +454,8 @@ var ROUTE_DATA = {
 
   'ruta-24-2': {
     bg: BG.ruta24,
-    combatBg: COMBAT_BG.default,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.oddish, POKEMON.onix, POKEMON.ivysaur, POKEMON.charmeleon, POKEMON.wartortle],
     wild: [
       { name: POKEMON.pidgey, rate: 40, minLv: 10, maxLv: 14, moveId: MOVES.flying.physical.peck },
@@ -519,7 +529,8 @@ var ROUTE_DATA = {
 
   'ruta-5': {
     bg: BG.ruta5,
-    combatBg: COMBAT_BG.default,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.bellsprout, POKEMON.meowth, POKEMON.poliwag],
     wild: [
       { name: POKEMON.bellsprout, rate: 25, minLv: 18, maxLv: 24, moveId: MOVES.grass.special.absorb },
@@ -539,7 +550,8 @@ var ROUTE_DATA = {
 
   'ruta-6': {
     bg: BG.ruta6,
-    combatBg: COMBAT_BG.default,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.magikarp, POKEMON.meowth],
     wild: [
       { name: POKEMON.magikarp, rate: 65, minLv: 18, maxLv: 24, moveId: MOVES.water.special.water_gun },
@@ -635,7 +647,8 @@ var ROUTE_DATA = {
 
   'ruta-9': {
     bg: BG.ruta9,
-    combatBg: COMBAT_BG.default,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.rattata, POKEMON.spearow, POKEMON.ekans, POKEMON.sandshrew],
     rewardExtras: [ITEM.miracle_seed],
     wild: [
@@ -681,7 +694,8 @@ var ROUTE_DATA = {
 
   'ruta-10': {
     bg: BG.ruta10,
-    combatBg: COMBAT_BG.default,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
     wild: [
       { name: POKEMON.voltorb, rate: 40, minLv: 22, maxLv: 26, moveId: MOVES.electric.special.thunderbolt },
       { name: POKEMON.spearow, rate: 20, minLv: 22, maxLv: 26, moveId: MOVES.flying.physical.wing_attack },
@@ -767,7 +781,8 @@ var ROUTE_DATA = {
 
   'ciudad-azulona': {
     bg: BG.ciudadAzulona,
-    combatBg: COMBAT_BG.default,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
     wild: [
       { name: POKEMON.eevee, rate: 5, minLv: 10, maxLv: 30, moveId: MOVES.normal.physical.tackle },
       { name: POKEMON.growlithe, rate: 5, minLv: 22, maxLv: 25, moveId: MOVES.fire.physical.fire_fang },
@@ -1678,7 +1693,8 @@ var ROUTE_DATA = {
 
   'pueblo-paleta-1': {
     bg: BG.puebloPaleta,
-    combatBg: COMBAT_BG.default,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
     title: 'Pueblo Paleta',
     get wild() {
       const [primerInicial, segundoInicial] = ObtenerSegundoInicial(GameState.starterName ?? POKEMON.bulbasaur);
@@ -1701,7 +1717,8 @@ var ROUTE_DATA = {
 
   'jardin-bill': {
     bg: BG.ruta25,
-    combatBg: COMBAT_BG.default,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
     title: 'Jardín de Bill',
     rewardPokemon: [POKEMON.pinsir],
     rewardExtras: [ITEM.flame_orb, ITEM.safety_goggles],
@@ -1811,7 +1828,8 @@ var ROUTE_DATA = {
 
   'zona-safari': {
     bg: BG.zonaSafari,
-    combatBg: COMBAT_BG.default,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
     title: 'Zona Safari',
     rewardExtras: [],
     wildExclude: [

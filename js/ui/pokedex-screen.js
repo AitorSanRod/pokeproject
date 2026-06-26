@@ -18,6 +18,25 @@ const PokedexScreen = {
     const gens    = typeof DEX_GENERATIONS !== 'undefined' ? DEX_GENERATIONS : [{ gen: 1, label: 'GEN I — KANTO', entries: KANTO_DEX }];
     const total   = gens.reduce((s, g) => s + g.entries.length, 0);
 
+    // ── Sección Logros ────────────────────────────────────────────────────────
+    const _logrosTotal  = typeof LOGROS !== 'undefined' ? LOGROS.length : 0;
+    const _logrosDone   = typeof LOGROS !== 'undefined'
+      ? LOGROS.filter(l => l.check()).length
+      : 0;
+    const _logrosHtml   = typeof LOGROS !== 'undefined'
+      ? LOGROS.map(l => {
+          const done = l.check();
+          return `
+            <div class="logro-entry ${done ? 'logro-entry--done' : 'logro-entry--locked'}">
+              <div class="logro-entry__info">
+                <span class="logro-entry__name">${l.name.toUpperCase()}</span>
+                <span class="logro-entry__desc">${l.desc}</span>
+              </div>
+              ${done ? '<span class="logro-entry__star">&#9733;</span>' : ''}
+            </div>`;
+        }).join('')
+      : '<span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey)">Sin logros definidos</span>';
+
     document.getElementById('viewport').innerHTML = `
       <div class="screen" style="background:var(--off-white);display:flex;flex-direction:column;">
 
@@ -31,6 +50,22 @@ const PokedexScreen = {
         <!-- Lista -->
         <div id="dex-list" style="overflow-y:auto;flex:1;padding:var(--sp-sm)">
           <div style="display:flex;flex-direction:column;gap:4px">
+
+            <!-- LOGROS -->
+            <details>
+              <summary style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-dark);
+                padding:6px 8px;cursor:pointer;list-style:none;display:flex;align-items:center;
+                justify-content:space-between;background:var(--grey-light);border:var(--border);
+                border-radius:var(--radius-sm);margin-bottom:4px;user-select:none">
+                <span>LOGROS</span>
+                <span>${_logrosDone}/${_logrosTotal}</span>
+              </summary>
+              <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:4px">
+                ${_logrosHtml}
+              </div>
+            </details>
+
+            <!-- GENERACIONES -->
             ${gens.map(gen => {
               const genCaught = gen.entries.filter(e => dex[e.name]?.caught).length;
               return `
