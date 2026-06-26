@@ -135,8 +135,13 @@ function gainExp(pokemon, foeName, battleType = 'wild', foeLevel = 5) {
     if (pokemon.exp < needed) break;
     pokemon.exp   -= needed;
     pokemon.level += 1;
+    const oldMaxHp = pokemon.stats.hp;
     pokemon.stats  = computeStats(pokemon);
-    const heal = Math.max(1, Math.floor(pokemon.stats.hp * COMBAT_CONFIG.HEAL_ON_LEVEL_UP_PCT));
+    // Curar al menos el aumento de HP máximo para que un pokemon a vida completa
+    // siga estándolo tras subir de nivel (HEAL_ON_LEVEL_UP_PCT puede ser insuficiente
+    // en niveles bajos donde el incremento de HP por nivel supera el 10%).
+    const hpIncrease = pokemon.stats.hp - oldMaxHp;
+    const heal = Math.max(hpIncrease, Math.max(1, Math.floor(pokemon.stats.hp * COMBAT_CONFIG.HEAL_ON_LEVEL_UP_PCT)));
     pokemon.currentHp = Math.min(pokemon.stats.hp, pokemon.currentHp + heal);
     levelsGained++;
 
@@ -158,8 +163,10 @@ function levelUpPokemon(pokemon, levels) {
   for (let i = 0; i < levels; i++) {
     if (pokemon.level >= 100) break;
     pokemon.level++;
+    const oldMaxHp = pokemon.stats.hp;
     pokemon.stats = computeStats(pokemon);
-    const heal = Math.max(1, Math.floor(pokemon.stats.hp * COMBAT_CONFIG.HEAL_ON_LEVEL_UP_PCT));
+    const hpIncrease = pokemon.stats.hp - oldMaxHp;
+    const heal = Math.max(hpIncrease, Math.max(1, Math.floor(pokemon.stats.hp * COMBAT_CONFIG.HEAL_ON_LEVEL_UP_PCT)));
     pokemon.currentHp = Math.min(pokemon.stats.hp, pokemon.currentHp + heal);
     gained++;
 

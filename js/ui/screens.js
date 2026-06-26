@@ -1870,7 +1870,7 @@ const Screens = {
           </div>
 
           <!-- Sprite player — siempre visible -->
-          <div class="combat-player">
+          <div class="combat-player" id="combat-player-wrap">
             <img src="${player.backSpriteUrl ?? player.spriteUrl ?? ''}" alt="${player.displayName}"
               class="combat-sprite combat-sprite--player" id="sprite-player"
               onerror="this.style.opacity=0.2">
@@ -2486,6 +2486,14 @@ const Screens = {
             if (member === ctx.activePlayer) {
               const levelEl = document.querySelector('#hud-player .combat-hud__level');
               if (levelEl) levelEl.textContent = `Nv.${member.level}`;
+              // Actualizar barra y números de HP del HUD (sin transición — el HP sube)
+              const hudPlayer = document.getElementById('hud-player');
+              const fill = hudPlayer?.querySelector('.hp-bar-fill');
+              if (fill) fill.style.transition = 'none';
+              Render.updateHpBar(hudPlayer, member.currentHp, member.stats.hp);
+              if (fill) { void fill.offsetWidth; fill.style.transition = ''; }
+              const nums = document.getElementById('hp-nums-player');
+              if (nums) nums.textContent = `${member.currentHp}/${member.stats.hp}`;
             }
             await Screens._wait(950);
           }
@@ -2558,6 +2566,7 @@ const Screens = {
         ctx._ending       = false;
         ctx._turnRunning  = false;
         ctx.introPlayed   = true;
+        Screens._updatePlayerSide();   // actualiza HUD y sprite del nuevo pokemon activo
         await Screens._wait(600);
         if (ctx.isWild) {
           Screens._showCaptureChoice(foe);
@@ -2743,6 +2752,8 @@ const Screens = {
       spriteEl.classList.remove('combat-sprite--foe-enter', 'combat-sprite--fainting');
       spriteEl.style.transition = '';
       spriteEl.style.filter     = '';
+      spriteEl.style.opacity    = '';   // limpia opacidad inline (ej: onerror del sprite anterior)
+      void spriteEl.offsetWidth;       // fuerza reflow para vaciar el estado de la animación fainting
       spriteEl.src = foe.spriteUrl ?? '';
       spriteEl.alt = foe.displayName;
     }
@@ -2752,9 +2763,21 @@ const Screens = {
     // Entrance animation — same timing as _renderCombatScreen with introDelay=200
     ctx.introPlayed = true;
     setTimeout(() => {
-      if (hudFoe)  { hudFoe.style.opacity  = '1'; hudFoe.classList.add('combat-hud--foe-enter'); }
-      if (foeWrap) { foeWrap.style.opacity = '1'; spriteEl?.classList.add('combat-sprite--foe-enter'); }
-      if (foe.shiny) Screens._showShinyAnimation(foeWrap);
+      // Re-query en el timeout por si _renderCombatScreen reconstruyó el DOM
+      const _hudFoe  = document.getElementById('hud-foe');
+      const _foeWrap = document.getElementById('combat-foe-wrap');
+      const _sprite  = document.getElementById('sprite-foe');
+      if (_hudFoe)  { _hudFoe.style.opacity  = '1'; _hudFoe.classList.add('combat-hud--foe-enter'); }
+      if (_foeWrap) {
+        _foeWrap.style.opacity = '1';
+        if (_sprite) {
+          // Forzar reflow para que el navegador aplique el estado base antes
+          // de añadir la clase de entrada — garantiza que la animación arranque
+          void _sprite.offsetWidth;
+          _sprite.classList.add('combat-sprite--foe-enter');
+        }
+      }
+      if (foe.shiny) Screens._showShinyAnimation(_foeWrap);
       setTimeout(() => {
         if (!GameState.combat?._turnRunning && !GameState.combat?._ending) {
           Screens._combatStartTurn();
@@ -2764,39 +2787,51 @@ const Screens = {
   },
 
   _updatePlayerSide() {
-    const ctx    = GameState.combat;
-    const next   = ctx.activePlayer;
-    const foe    = ctx.foeTeam[ctx.foeIndex];
+    const ctx  = GameState.combat;
+    const next = ctx.activePlayer;
+    const foe  = ctx.foeTeam[ctx.foeIndex];
 
-    const spriteEl = document.getElementById('sprite-player');
+    // Sprite — ocultar wrapper, limpiar estado de animación, actualizar src
+    const playerWrap = document.getElementById('combat-player-wrap');
+    const spriteEl   = document.getElementById('sprite-player');
+    if (playerWrap) playerWrap.style.opacity = '0';
     if (spriteEl) {
       spriteEl.classList.remove('combat-sprite--fainting');
       spriteEl.style.transition = '';
       spriteEl.style.filter     = '';
-      spriteEl.style.opacity    = '0';
-      spriteEl.onload = () => { spriteEl.style.opacity = ''; };
+      spriteEl.style.opacity    = '';   // limpia opacidad inline (onerror anterior)
+      void spriteEl.offsetWidth;       // fuerza reflow para vaciar estado de animación
       spriteEl.src = next.backSpriteUrl ?? next.spriteUrl ?? '';
       spriteEl.alt = next.displayName;
     }
 
+    // Limpiar el área de acciones mientras el nuevo pokemon entra
+    const area = document.getElementById('combat-actions-area');
+    if (area) area.innerHTML = '';
+
+    // HUD — reconstruir por completo para evitar selectores frágiles
     const hudPlayer = document.getElementById('hud-player');
     if (hudPlayer) {
-      const nameEl  = hudPlayer.querySelector('.combat-hud__name > span:first-child');
-      const levelEl = hudPlayer.querySelector('.combat-hud__level');
-      if (nameEl)  nameEl.textContent  = next.displayName.toUpperCase();
-      if (levelEl) levelEl.textContent = `Nv.${next.level}`;
-      // Desactivar la transición para que la barra salte directamente al HP del
-      // nuevo pokémon sin animar desde 0 (lo que parecía "menos vida").
-      const fill = hudPlayer.querySelector('.hp-bar-fill');
-      if (fill) fill.style.transition = 'none';
-      Render.updateHpBar(hudPlayer, next.currentHp, next.stats.hp);
-      if (fill) { fill.offsetWidth; fill.style.transition = ''; }
-      const hpNums = document.getElementById('hp-nums-player');
-      if (hpNums) hpNums.textContent = `${next.currentHp}/${next.stats.hp}`;
+      hudPlayer.innerHTML = `
+        <div class="combat-hud__name" style="position:relative">
+          <span>${next.displayName.toUpperCase()}</span>
+          <span class="combat-hud__level">Nv.${next.level}</span>
+        </div>
+        <div class="combat-hud__hp-label">HP</div>
+        ${Render.hpBar(next.currentHp, next.stats.hp)}
+        <div class="combat-hud__hp-nums" id="hp-nums-player">${next.currentHp}/${next.stats.hp}</div>`;
     }
 
     Screens._updateCombatTeamBar();
     Screens._updateStatusBadges(next, foe);
+
+    // Revelar sprite tras 200 ms (imagen ya cargada o en caché)
+    setTimeout(() => {
+      const _wrap   = document.getElementById('combat-player-wrap');
+      const _sprite = document.getElementById('sprite-player');
+      if (_wrap) _wrap.style.opacity = '1';
+      if (_sprite) _sprite.style.opacity = '';   // limpia cualquier onerror
+    }, 200);
   },
 
   _updateCombatTeamBar() {
@@ -2805,6 +2840,13 @@ const Screens = {
     const ctx    = GameState.combat;
     const active = ctx?.activePlayer ?? GameState.team[0];
     bar.innerHTML = GameState.team.map(p => Screens._pipHtml(p, active)).join('');
+    // Los elementos HP son nuevos — suprimir la transición CSS para que las barras
+    // aparezcan directamente en su ancho real sin animar desde 0%.
+    bar.querySelectorAll('.hp-bar-fill').forEach(fill => {
+      fill.style.transition = 'none';
+      void fill.offsetWidth;
+      fill.style.transition = '';
+    });
   },
 
   // Actualiza los badges de estado y modificadores de stat en los HUDs
