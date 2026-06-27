@@ -14,6 +14,7 @@ const SCREENS_CONFIG = {
       name: 'KANTO',
       routesGlobal: 'KANTO_ROUTES',
       available: true,
+      customStarter: true,
       starters: [
         { name: 'bulbasaur',  label: 'Bulbasaur' },
         { name: 'charmander', label: 'Charmander' },
@@ -25,7 +26,8 @@ const SCREENS_CONFIG = {
       gen: 'GEN II',
       name: 'JOHTO',
       routesGlobal: 'JOHTO_ROUTES',
-      available: false,
+      available: typeof JOHTO_ENABLED !== 'undefined' && JOHTO_ENABLED,
+      customStarter: false,
       starters: [
         { name: 'chikorita', label: 'Chikorita' },
         { name: 'cyndaquil', label: 'Cyndaquil' },
@@ -71,6 +73,12 @@ if (SCREENS_CONFIG.DEV_POKEDEX) {
 
 const Screens = {
 
+  // ── Devuelve el array de rutas de la región activa ───────────────────────
+  _routes() {
+    const reg = Screens._region ?? SCREENS_CONFIG.REGIONS[0];
+    return window[reg.routesGlobal] ?? [];
+  },
+
   // ── Guarda la run actual en localStorage ────────────────────────────────
   _saveRun() {
     // Re-sincronizar learnedMTs de cada pokemon al Storage antes de guardar.
@@ -83,6 +91,7 @@ const Screens = {
     }
     Storage.saveRun({
       version:     GameState.version,
+      region:      (Screens._region ?? SCREENS_CONFIG.REGIONS[0]).id,
       routeIndex:  GameState.routeIndex,
       starterName: GameState.starterName ?? GameState.starter?.name ?? null,
       team:        GameState.team,
@@ -235,6 +244,8 @@ const Screens = {
       document.getElementById('btn-continue').addEventListener('click', () => {
         const save = Storage.loadRun();
         if (!save) return;
+        Screens._region = SCREENS_CONFIG.REGIONS.find(r => r.id === (save.region ?? 'kanto'))
+                          ?? SCREENS_CONFIG.REGIONS[0];
         GameState.reset();
         GameState.routeIndex       = save.routeIndex ?? 0;
         GameState.badges           = save.badges     ?? [];
@@ -408,7 +419,7 @@ const Screens = {
               </div>
               <div class="starter-card__arrow">→</div>
             </div>`).join('')}
-          ${(() => {
+          ${region.customStarter ? (() => {
             const unlocked = Object.values(Storage.getAllBadges()).some(b => b.length >= 8);
             return `
               <div id="card-custom"
@@ -425,7 +436,7 @@ const Screens = {
                 </div>
                 <div class="starter-card__arrow">${unlocked ? '→' : ''}</div>
               </div>`;
-          })()}
+          })() : ''}
         </div>
       </div>`;
 
@@ -499,16 +510,16 @@ const Screens = {
       }
     });
 
-    if (Object.values(Storage.getAllBadges()).some(b => b.length >= 8)) {
+    if (region.customStarter && Object.values(Storage.getAllBadges()).some(b => b.length >= 8)) {
       document.getElementById('card-custom')
-        .addEventListener('click', () => Screens._showCustomStarterPicker());
+        .addEventListener('click', () => Screens._showCustomStarterPicker(_loadedStarters));
     }
 
     console.log('[UI] Pantalla: Seleccion de inicial');
   },
 
   // ── Selector de inicial libre (desbloqueado al conseguir las 8 medallas) ───
-  _showCustomStarterPicker() {
+  _showCustomStarterPicker(loadedStarters = {}) {
     const dex = Storage.getPokedex();
     const allEntries = typeof DEX_GENERATIONS !== 'undefined' ? DEX_GENERATIONS.flatMap(g => g.entries) : KANTO_DEX;
     const caught = allEntries.filter(e => dex[e.name]?.caught);
@@ -562,41 +573,60 @@ const Screens = {
       }
     };
 
+    const anyStarterShiny = Object.values(loadedStarters).some(lp => lp.shiny);
+
     document.querySelectorAll('.dex-entry--caught').forEach(el => {
       el.addEventListener('click', async () => {
         const name    = el.dataset.name;
         const isShiny = el.dataset.shiny === 'true';
 
-        if (!isShiny) { _startWith(name, false); return; }
+        const _proceed = () => {
+          if (!isShiny) { _startWith(name, false); return; }
 
-        // Pokémon capturado shiny — preguntar versión
-        const shinySpriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${el.dataset.id}.png`;
-        const normalSpriteUrl = getDexSpriteUrl(+el.dataset.id);
+          // Pokémon capturado shiny — preguntar versión
+          const shinySpriteUrl  = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${el.dataset.id}.png`;
+          const normalSpriteUrl = getDexSpriteUrl(+el.dataset.id);
 
-        const overlay = Screens._makeModal(`
-          <div class="modal-title">${name.toUpperCase()}</div>
-          <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);text-align:center;line-height:1.8;margin-bottom:12px">
-            ¡Tienes una versión shiny! ¿Con cuál quieres jugar?
-          </p>
-          <div style="display:flex;justify-content:center;gap:24px;margin-bottom:16px">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-              <img src="${normalSpriteUrl}" style="width:64px;height:64px;image-rendering:pixelated" onerror="this.style.opacity=0.3">
-              <span style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark)">NORMAL</span>
+          const overlay = Screens._makeModal(`
+            <div class="modal-title">${name.toUpperCase()}</div>
+            <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);text-align:center;line-height:1.8;margin-bottom:12px">
+              ¡Tienes una versión shiny! ¿Con cuál quieres jugar?
+            </p>
+            <div style="display:flex;justify-content:center;gap:24px;margin-bottom:16px">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                <img src="${normalSpriteUrl}" style="width:64px;height:64px;image-rendering:pixelated" onerror="this.style.opacity=0.3">
+                <span style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark)">NORMAL</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+                <img src="${shinySpriteUrl}" style="width:64px;height:64px;image-rendering:pixelated" onerror="this.style.opacity=0.3">
+                <span style="font-family:var(--font-pixel);font-size:7px;color:var(--yellow)">✨ SHINY</span>
+              </div>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-              <img src="${shinySpriteUrl}" style="width:64px;height:64px;image-rendering:pixelated" onerror="this.style.opacity=0.3">
-              <span style="font-family:var(--font-pixel);font-size:7px;color:var(--yellow)">✨ SHINY</span>
+            <button class="btn btn--wide" id="pick-normal" style="margin-bottom:6px">NORMAL</button>
+            <button class="btn btn--primary btn--wide" id="pick-shiny">✨ SHINY</button>
+            <button class="btn btn--ghost btn--wide" id="pick-cancel" style="margin-top:6px">Cancelar</button>
+          `, { id: 'shiny-pick-modal', closeOnBackdrop: true });
+
+          overlay.querySelector('#pick-normal').addEventListener('click', () => { overlay.remove(); _startWith(name, false); });
+          overlay.querySelector('#pick-shiny').addEventListener('click',  () => { overlay.remove(); _startWith(name, true);  });
+          overlay.querySelector('#pick-cancel').addEventListener('click', () => overlay.remove());
+        };
+
+        if (!isShiny && anyStarterShiny) {
+          const modal = Screens._makeModal(`
+            <p style="font-family:var(--font-pixel);font-size:8px;line-height:2;text-align:center;margin-bottom:16px">
+              ✨ Hay una opción mejor...<br>¿Estás seguro de que deseas elegir a ${name.toUpperCase()}?
+            </p>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn--ghost" id="starter-confirm-cancel" style="flex:1">Volver</button>
+              <button class="btn" id="starter-confirm-ok" style="flex:1">Elegir</button>
             </div>
-          </div>
-          <button class="btn btn--wide" id="pick-normal" style="margin-bottom:6px">NORMAL</button>
-          <button class="btn btn--primary btn--wide" id="pick-shiny">✨ SHINY</button>
-          <button class="btn btn--ghost btn--wide" id="pick-cancel" style="margin-top:6px">Cancelar</button>
-        `, { id: 'shiny-pick-modal', closeOnBackdrop: true });
-
-        overlay.querySelector('#pick-normal').addEventListener('click', () => { overlay.remove(); _startWith(name, false); });
-        overlay.querySelector('#pick-shiny').addEventListener('click',  () => { overlay.remove(); _startWith(name, true);  });
-        overlay.querySelector('#pick-cancel').addEventListener('click', () => overlay.remove());
-
+          `, { id: 'starter-confirm-modal', closeOnBackdrop: true });
+          document.getElementById('starter-confirm-cancel').addEventListener('click', () => modal.remove());
+          document.getElementById('starter-confirm-ok').addEventListener('click', () => { modal.remove(); _proceed(); });
+        } else {
+          _proceed();
+        }
       });
     });
   },
@@ -612,7 +642,18 @@ const Screens = {
       data  = ROUTE_DATA[area];
       route = { name: data?.title ?? 'Ruta Opcional', area };
     } else {
-      route = KANTO_ROUTES[GameState.routeIndex];
+      // Saltar rutas cuya condición no se cumple (condition retorna false).
+      // El índice avanza para no romper los saves existentes.
+      const routes = Screens._routes();
+      while (
+        GameState.routeIndex < routes.length &&
+        routes[GameState.routeIndex]?.condition &&
+        !routes[GameState.routeIndex].condition(GameState)
+      ) {
+        console.log(`[GAME] Ruta ${routes[GameState.routeIndex].area} omitida (condición no cumplida)`);
+        GameState.routeIndex++;
+      }
+      route = routes[GameState.routeIndex];
       data  = ROUTE_DATA[route.area];
     }
     GameState.currentArea  = route.area;
@@ -678,7 +719,7 @@ const Screens = {
 
     document.getElementById('btn-info-continue').addEventListener('click', () => {
       GameState.routeIndex++;
-      if (GameState.routeIndex >= KANTO_ROUTES.length) {
+      if (GameState.routeIndex >= Screens._routes().length) {
         const lastBadge = GameState.badges[GameState.badges.length - 1];
         Screens.show(Screens.victory, lastBadge);
       } else {
@@ -923,7 +964,7 @@ const Screens = {
     }
 
     const data  = ROUTE_DATA[GameState.currentArea];
-    const routeEntry = KANTO_ROUTES.find(r => r.area === GameState.currentArea);
+    const routeEntry = Screens._routes().find(r => r.area === GameState.currentArea);
     const route = { area: GameState.currentArea, name: routeEntry?.name ?? data?.title ?? GameState.currentArea };
     const enc   = path[idx];
 
@@ -977,15 +1018,16 @@ const Screens = {
         } else {
           // Resolver pokemon dinámicos: si pokemon[i].name === 'RIVAL_STARTER',
           // se sustituye por el contra-tipo del starter del jugador
+          const _regId = (Screens._region ?? SCREENS_CONFIG.REGIONS[0]).id;
+          const _rivalFns = _regId === 'johto'
+            ? { r1: johtoPickRival, r2: johtoPickRivalSecond, r3: johtoPickRivalThird }
+            : { r1: kantoPickRival, r2: kantoPickRivalSecond, r3: kantoPickRivalThird };
           trainer = {
             ...data.specialTrainer,
             pokemon: data.specialTrainer.pokemon.map(p => {
-              if (p.name === 'RIVAL_STARTER')
-                return { ...p, name: pickInitialPokemonRival(GameState.starterName) };
-              if (p.name === 'RIVAL_STARTER_2')
-                return { ...p, name: pickRivalSecondForm(GameState.starterName) };
-              if (p.name === 'RIVAL_STARTER_3')
-                return { ...p, name: pickRivalThirdForm(GameState.starterName) };
+              if (p.name === 'RIVAL_STARTER')   return { ...p, name: _rivalFns.r1(GameState.starterName) };
+              if (p.name === 'RIVAL_STARTER_2') return { ...p, name: _rivalFns.r2(GameState.starterName) };
+              if (p.name === 'RIVAL_STARTER_3') return { ...p, name: _rivalFns.r3(GameState.starterName) };
               return p;
             }),
           };
@@ -1297,7 +1339,7 @@ const Screens = {
   // objeto, MT, vitaminas o caramelo) y aplica el elegido al equipo.
   async _showItemReward() {
     const data  = ROUTE_DATA[GameState.currentArea];
-    const routeEntry = KANTO_ROUTES.find(r => r.area === GameState.currentArea);
+    const routeEntry = Screens._routes().find(r => r.area === GameState.currentArea);
     const route = { area: GameState.currentArea, name: routeEntry?.name ?? data?.title ?? GameState.currentArea };
     const REWARD_BG = "url('assets/bg/price.png') center/cover no-repeat";
 
@@ -1441,7 +1483,7 @@ const Screens = {
       if (_advanced) return;
       _advanced = true;
       GameState.routeIndex++;
-      if (GameState.routeIndex >= KANTO_ROUTES.length) {
+      if (GameState.routeIndex >= Screens._routes().length) {
         const lastBadge = GameState.badges[GameState.badges.length - 1];
         Screens.show(Screens.victory, lastBadge);
       } else {
@@ -3044,7 +3086,7 @@ const Screens = {
   // BETWEEN ROUTES
   // ═══════════════════════════════════════════════════════════════════════
   betweenRoutes() {
-    const route = KANTO_ROUTES[GameState.routeIndex];
+    const route = Screens._routes()[GameState.routeIndex];
     document.getElementById('viewport').innerHTML = `
       <div class="screen screen--between">
         <div class="screen-header" style="background:var(--green)">

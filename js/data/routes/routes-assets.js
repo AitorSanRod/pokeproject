@@ -60,6 +60,14 @@ const BG = {
   zonaSafari: 'assets/bg/zona-safari.png',
   mesetaAnil: 'assets/bg/meseta-anil.png',
   final: 'assets/bg/final.png',
+  JOTHO: {
+    ruta29: 'assets/bg/johto/ruta-29.png',
+    ciudadCerezo: 'assets/bg/johto/ciudad-cerezo.png',
+    puebloPrimavera: 'assets/bg/johto/pueblo-primavera.png',
+    ruta30: 'assets/bg/johto/ruta-30.png',
+    ciudadMalva: 'assets/bg/johto/ciudad-malva.png',
+    ciudadMalvaGym: 'assets/bg/johto/ciudad-malva-gym.png'
+  }
 };
 
 // ── Fondos de combate ─────────────────────────────────────────────────────────
@@ -117,7 +125,12 @@ const TRAINER_IMG = {
   lorelei: 'assets/sprites/trainers/lorelei.png',
   bruno: 'assets/sprites/trainers/bruno.png',
   agatha: 'assets/sprites/trainers/agatha.png',
-  lance: 'assets/sprites/trainers/lance.png'
+  lance: 'assets/sprites/trainers/lance.png',
+
+  //Johto
+  plata: 'assets/sprites/trainers/plata.png',
+  pensador: 'assets/sprites/trainers/pensador.png',
+  pegaso: 'assets/sprites/trainers/pegaso.png',
 };
 
 // ── Sprites y gifs misceláneos (escenas de historia) ─────────────────────────
@@ -193,4 +206,7 @@ const ENTRENADORES = {
   Malabarista: { name: 'Malabarista', img: TRAINER_IMG.malabarista },
   Ladron: { name: 'Ladrón', img: TRAINER_IMG.ladron },
   Ornitologo: { name: 'Ornitologo', img: TRAINER_IMG.Ornitologo },
+  Plata: { name: 'Ornitologo', img: TRAINER_IMG.plata },
+  Pensador: { name: 'Pensador', img: TRAINER_IMG.pensador },
+  Pegaso: { name: 'Pegaso', img: TRAINER_IMG.pegaso },
 };

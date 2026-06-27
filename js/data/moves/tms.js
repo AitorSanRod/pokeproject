@@ -52,7 +52,7 @@ var TM_LIST = {
     name: 'MT Surf',
     moveId: 'surf',
     types: [],
-    pokemons: [POKEMON.pikachu, POKEMON.rhydon, POKEMON.rhyhorn, POKEMON.mew],
+    pokemons: [POKEMON.pikachu, POKEMON.rhydon, POKEMON.rhyhorn, POKEMON.mew, POKEMON.sentret],
     desc: 'Enseña Surf.',
     sprite: MT_SPRITES.water,
     fallbackIcon: '💧',

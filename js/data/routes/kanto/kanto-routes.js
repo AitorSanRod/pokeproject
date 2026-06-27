@@ -1960,25 +1960,21 @@ function ObtenerSegundoInicial(playerPokemon) {
   return [POKEMON.eevee, POKEMON.pikachu];
 }
 
-function pickInitialPokemonRival(playerPokemon) {
+function kantoPickRival(playerPokemon) {
   if (playerPokemon === POKEMON.bulbasaur) return POKEMON.charmander;
   if (playerPokemon === POKEMON.charmander) return POKEMON.squirtle;
   if (playerPokemon === POKEMON.squirtle) return POKEMON.bulbasaur;
   return POKEMON.eevee;
 }
 
-// Segunda forma del contra-tipo del starter del jugador.
-// Usar con el marcador 'RIVAL_STARTER_2' en specialTrainer.pokemon.
-function pickRivalSecondForm(playerPokemon) {
+function kantoPickRivalSecond(playerPokemon) {
   if (playerPokemon === POKEMON.bulbasaur) return POKEMON.charmeleon;
   if (playerPokemon === POKEMON.charmander) return POKEMON.wartortle;
   if (playerPokemon === POKEMON.squirtle) return POKEMON.ivysaur;
   return POKEMON.eevee;
 }
 
-// Tercera forma (evolución final) del contra-tipo del starter del jugador.
-// Usar con el marcador 'RIVAL_STARTER_3' en specialTrainer.pokemon.
-function pickRivalThirdForm(playerPokemon) {
+function kantoPickRivalThird(playerPokemon) {
   if (playerPokemon === POKEMON.bulbasaur) return POKEMON.charizard;
   if (playerPokemon === POKEMON.charmander) return POKEMON.blastoise;
   if (playerPokemon === POKEMON.squirtle) return POKEMON.venusaur;
