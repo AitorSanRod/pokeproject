@@ -66,7 +66,7 @@ async function createPokemon(nameOrId, level, isPlayer = false, moveId = null, o
 
   // MTs aprendidas: solo para pokemon del jugador — cargadas desde Storage
   // (se reinician cuando el jugador borra los datos de pokédex)
-  const learnedMTs = (isPlayer && typeof Storage !== 'undefined')
+  const learnedMTs = (isPlayer && typeof Storage?.getLearnedMTs === 'function')
     ? Storage.getLearnedMTs(name)
     : [];
   for (const mtId of learnedMTs) {
@@ -110,6 +110,20 @@ async function createPokemon(nameOrId, level, isPlayer = false, moveId = null, o
   pokemon.stats     = computeStats(pokemon);
   pokemon.currentHp = pokemon.stats.hp;
   pokemon.combatMods = {};  // modificadores de combate: { atk, def, spa, spd, spe } como multiplicadores
+  pokemon.ability     = POKEMON_DB[name]?.ability     ?? null; // habilidad activa — ver move-effects.js ABILITIES
+  pokemon.hideAbility = POKEMON_DB[name]?.hideAbility ?? null; // habilidad oculta — intercambiable con cápsula
+
+  // Rivales: 10% de posibilidades de que el pokemon aparezca con su habilidad oculta.
+  // Solo si no tiene habilidad fijada a mano (overrides.ability) — ese campo se reserva
+  // para cuando las rutas definan explícitamente la habilidad de un pokemon concreto.
+  if (!isPlayer && pokemon.hideAbility && !overrides?.ability) {
+    if (Math.random() < 0.10) {
+      const temp          = pokemon.ability;
+      pokemon.ability     = pokemon.hideAbility;
+      pokemon.hideAbility = temp;
+    }
+  }
+
   pokemon.heldItem   = null; // id de HELD_ITEMS, o null — ver held-items.js
   pokemon._heldItemFlags = {}; // flags "una vez por ruta" de objetos equipados
   pokemon.learnedMTs = learnedMTs; // cache de MTs aprendidas (fuente: Storage)
@@ -213,13 +227,10 @@ function hasClearEffect(pokemon) {
   return active.effectId === 'clear';
 }
 
-// Comprueba si el pokemon tiene effectId:'guts' en su autoMove activo.
-// Guts ignora las penalizaciones de burn/freeze/paralysis y añade +120% daño físico.
+// Comprueba si el pokemon tiene la habilidad 'guts'.
+// Guts ignora las penalizaciones de burn/freeze/paralysis y añade daño físico.
 function hasGutsEffect(pokemon) {
-  const active = pokemon?.moves?.find(m => m.id === pokemon?.autoMove) ?? pokemon?.moves?.[0];
-  if (!active) return false;
-  if (Array.isArray(active.effectId)) return active.effectId.includes('guts');
-  return active.effectId === 'guts';
+  return pokemon?.ability === 'guts';
 }
 
 // ── Evoluciones ───────────────────────────────────────────────────────────────

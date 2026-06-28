@@ -77,13 +77,13 @@
   --combat-sprite-player-size: 220px;  /* sprite del jugador (más grande = más cerca) */
 
   /* HUD de combate (badge nombre/vida) */
-  --combat-hud-min-width:  180px;
-  --combat-hud-padding:    10px 16px;
+  --combat-hud-min-width:  150px;
+  --combat-hud-padding:    6px 10px;
   --combat-hud-name-size:  11px;   /* tamaño del nombre del pokemon */
   --combat-hud-level-size: 9px;    /* tamaño del texto "Nv.X" */
-  --combat-hud-label-size: 8px;    /* tamaño de la etiqueta "HP" */
+
   --combat-hud-nums-size:  9px;    /* tamaño de los números HP "X/MAX" */
-  --combat-hud-bar-height: 14px;   /* grosor de la barra de HP en el HUD */
+  --combat-hud-bar-height: 10px;   /* grosor de la barra de HP en el HUD */
 
   /* Barra de entrenador */
   --trainer-bar-height:    28px;
@@ -177,6 +177,11 @@ img { display: block; image-rendering: pixelated; }
     box-shadow: none;
     max-height: 100%;
   }
+
+  :root {
+    --combat-hud-name-size:  9px;
+    --combat-hud-level-size: 7px;
+  }
 }
 
 /* ── Screen transitions ────────────────────────────────────────────────────── */
@@ -230,6 +235,21 @@ img { display: block; image-rendering: pixelated; }
 .btn--wide { width: 100%; }
 .btn--sm   { font-size: 7px; padding: var(--sp-xs) var(--sp-sm); min-height: 36px; }
 
+/* ── Icon button (PNG como botón, con sombra al estilo sprite) ─────────────── */
+.icon-btn {
+  width: 20px;
+  height: 20px;
+  image-rendering: pixelated;
+  cursor: pointer;
+  display: block;
+  filter: drop-shadow(2px 2px 0 rgba(0,0,0,.7)) drop-shadow(-1px -1px 0 rgba(0,0,0,.25));
+  transition: transform .1s, filter .1s;
+  user-select: none;
+}
+.icon-btn:hover  { transform: translate(-1px,-1px); filter: drop-shadow(3px 3px 0 rgba(0,0,0,.7)) drop-shadow(-1px -1px 0 rgba(0,0,0,.25)); }
+.icon-btn:active { transform: translate(1px,1px);   filter: drop-shadow(1px 1px 0 rgba(0,0,0,.7)); }
+.icon-btn--disabled { opacity: .35; cursor: not-allowed; pointer-events: none; }
+
 /* ── Type badge ────────────────────────────────────────────────────────────── */
 .type-badge {
   display: inline-block;
@@ -269,13 +289,13 @@ img { display: block; image-rendering: pixelated; }
   height: var(--hp-bar-height-default);
   background: var(--grey-light);
   border: 2px solid var(--black);
-  border-radius: 2px;
+  border-radius: 99px;
   overflow: hidden;
 }
 
 .hp-bar-fill {
   height: 100%;
-  border-radius: 1px;
+  border-radius: 99px;
   transition: width 400ms ease, background 400ms ease;
 }
 

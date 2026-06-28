@@ -1,0 +1,466 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   COMBAT V2 — Estilos del playground
+   Solo lo que no está cubierto por screens.css / main.css.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Contenedor del playground ────────────────────────────────────────────── */
+
+.cv2-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* centra el wrap cuando no llena toda la pantalla */
+  height: 100%;
+  background: var(--off-white);
+  padding: var(--sp-md);
+  font-family: var(--font-body);
+}
+
+.cv2-wrap {
+  width: 100%;
+  max-width: 480px;
+  flex: 1;
+  min-height: 0;
+  /* En pantallas más altas que 1080p el wrap no crece más allá de la altura FHD */
+  max-height: calc(1080px - 2 * var(--sp-md));
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  background: var(--white);
+  position: relative;
+}
+
+/* Lista de Pokémon móvil: pips al tamaño natural del contenido, scroll si hace falta */
+.game-viewport > .combat-team-bar,
+.cv2-wrap > .combat-team-bar {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* PC: siempre 6 filas iguales — cada pip ocupa exactamente 1/6 */
+@media (min-width: 501px) {
+  .game-viewport > .combat-team-bar,
+  .cv2-wrap > .combat-team-bar {
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: repeat(6, 1fr);
+  }
+
+  /* Sprite escala con el alto del pip */
+  .game-viewport > .combat-team-bar .combat-team-pip__sprite,
+  .cv2-wrap > .combat-team-bar .combat-team-pip__sprite {
+    height: 85%;
+    width: auto;
+    max-width: 52px;
+    object-fit: contain;
+    flex-shrink: 1;
+  }
+}
+
+/* ── Móvil: sin marco, pantalla completa (igual que .game-viewport) ───────── */
+
+@media (max-width: 500px) {
+  .cv2-root {
+    padding: 0;
+    background: var(--white);
+  }
+
+  .cv2-wrap {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    max-width: 100%;
+  }
+}
+
+/* ── Sprites sin src: invisibles hasta que resetSprite asigne la imagen ──── */
+/* :not([src]) cubre el estado inicial; [src=""] cubre el fallback vacío     */
+.combat-sprite:not([src]),
+.combat-sprite[src=""] {
+  opacity: 0;
+}
+
+/* ── Animaciones de sprite ────────────────────────────────────────────────── */
+
+@keyframes cv2-sprite-enter-foe {
+  from { transform: translateX(60px) scale(0.8); opacity: 0; }
+  to   { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+@keyframes cv2-sprite-enter-player {
+  from { transform: translateX(-60px) scale(0.8); opacity: 0; }
+  to   { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+@keyframes cv2-faint {
+  0%   { transform: translateY(0);    filter: brightness(1); opacity: 1; }
+  30%  { transform: translateY(0);    filter: brightness(0); opacity: 1; }
+  100% { transform: translateY(80px); filter: brightness(0); opacity: 0; }
+}
+
+@keyframes cv2-hit-flash {
+  0%, 100% { opacity: 1; }
+  25%, 75%  { opacity: 0.15; }
+  50%       { opacity: 0.8; }
+}
+
+/* Las animaciones de sprite (entrada, golpe, derrota) se aplican vía
+   el.style.animation en cv2-ui.js para evitar conflictos de cascada CSS.
+   Solo se conservan aquí los @keyframes que el JS referencia por nombre. */
+
+/* ── Animación del log ────────────────────────────────────────────────────── */
+
+@keyframes cv2-log-appear {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.cv2-log-appear {
+  animation: cv2-log-appear 0.18s ease-out forwards;
+}
+
+/* ── Overlay de clima ─────────────────────────────────────────────────────── */
+
+/* isolation: isolate crea un stacking context en el campo, garantizando
+   que z-index: -1 en el overlay quede entre el fondo y el contenido,
+   sin afectar sprites ni HUDs. */
+#cv2-field {
+  isolation: isolate;
+}
+
+.cv2-weather-overlay {
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  pointer-events: none;
+  z-index: -1;
+  background: transparent;
+  transition: background 0.6s ease;
+}
+
+.cv2-weather-overlay.weather--sun  { background: rgba(255, 120,   0, 0.22); }
+.cv2-weather-overlay.weather--rain { background: rgba( 20,  70, 210, 0.22); }
+.cv2-weather-overlay.weather--sand { background: rgba(160, 100,  20, 0.22); }
+.cv2-weather-overlay.weather--hail { background: rgba(200, 225, 255, 0.25); }
+
+/* ── Indicador de clima ───────────────────────────────────────────────────── */
+
+.cv2-weather-badge {
+  position: absolute;
+  top: 30px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  cursor: default;
+  user-select: none;
+}
+
+.cv2-weather-badge img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+/* ── Badge de estado alterado ─────────────────────────────────────────────── */
+
+.status-badge {
+  display: inline-block;
+  font-family: var(--font-pixel);
+  font-size: 5px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  border: 1px solid;
+}
+
+/* ── Números flotantes de daño ────────────────────────────────────────────── */
+
+@keyframes cv2-float-up {
+  0%   { transform: translateY(0);     opacity: 1; }
+  70%  { transform: translateY(-36px); opacity: 1; }
+  100% { transform: translateY(-50px); opacity: 0; }
+}
+
+.cv2-damage-float {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--red);
+  pointer-events: none;
+  z-index: 10;
+  animation: cv2-float-up 1.1s ease-out forwards;
+  text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff;
+}
+
+.cv2-damage-float--heal { color: var(--green); }
+
+/* ── Cambios de stat (PNG dentro de silueta) ──────────────────────────────── */
+
+/* Wrapper fijo con máscara de silueta del pokémon — no anima */
+.cv2-stat-wrap {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  overflow: hidden;
+  opacity: 0.65;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+}
+
+/* Imagen de stat que se mueve dentro del wrapper enmascarado */
+.cv2-stat-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+@keyframes cv2-stat-img-rise {
+  0%   { transform: translateY(0);     opacity: 1; }
+  55%  { opacity: 1; }
+  100% { transform: translateY(-100%); opacity: 0; }
+}
+
+@keyframes cv2-stat-img-fall {
+  0%   { transform: translateY(0);    opacity: 1; }
+  55%  { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+.cv2-stat-img--rise { animation: cv2-stat-img-rise 1.2s ease-in-out forwards; }
+.cv2-stat-img--fall { animation: cv2-stat-img-fall 1.2s ease-in-out forwards; }
+
+/* ── Botones del playground ───────────────────────────────────────────────── */
+
+.cv2-btn {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  padding: 5px 10px;
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  cursor: pointer;
+  color: var(--black);
+  transition: var(--transition);
+  box-shadow: 2px 2px 0 var(--black);
+}
+
+.cv2-btn:hover   { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--black); }
+.cv2-btn:active  { transform: translate(1px, 1px);   box-shadow: 1px 1px 0 var(--black); }
+.cv2-btn--accent { background: var(--yellow); }
+
+.cv2-btn--paused {
+  background: var(--yellow);
+  border-color: var(--yellow-dark);
+  box-shadow: 2px 2px 0 var(--yellow-dark);
+}
+
+/* ── Controles de prueba (fuera del combate) ──────────────────────────────── */
+
+.cv2-pg-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: var(--sp-sm);
+}
+
+.cv2-pg-label {
+  font-family: var(--font-pixel);
+  font-size: 6px;
+  color: var(--grey);
+}
+
+.cv2-btn--start {
+  background: var(--green);
+  color: #fff;
+  border-color: var(--green-dark);
+  box-shadow: 2px 2px 0 var(--green-dark);
+}
+
+.cv2-btn--start:hover:not(:disabled) { background: var(--green-dark); }
+
+.cv2-btn--start:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  background: var(--grey);
+  border-color: var(--grey);
+  box-shadow: 2px 2px 0 var(--grey-dark);
+}
+
+/* ── Header del playground ────────────────────────────────────────────────── */
+
+.cv2-playground-header {
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  color: var(--grey);
+  margin-bottom: var(--sp-sm);
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+/* ── Spinner dentro de la card de movimiento ──────────────────────────────── */
+
+.cv2-move-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.cv2-move-loading[hidden] { display: none; }
+
+.cv2-move-loading__spin {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--grey-light);
+  border-top-color: var(--grey-dark);
+  border-radius: 50%;
+  animation: cv2-spin 0.65s linear infinite;
+}
+
+/* ── Overlay de carga ─────────────────────────────────────────────────────── */
+
+.cv2-loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--off-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+}
+
+@keyframes cv2-spin {
+  to { transform: rotate(360deg); }
+}
+
+.cv2-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--grey-light);
+  border-top-color: var(--black);
+  border-radius: 50%;
+  animation: cv2-spin 0.65s linear infinite;
+}
+
+/* ── Línea de HP del rival: pokeball a la izquierda, porcentaje a la derecha ─ */
+
+#cv2-foe-hp-nums {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ── Anuncio de inicio de combate ─────────────────────────────────────────── */
+/* Texto que se descorre de derecha a izquierda al iniciar cada nodo de ruta. */
+/* Duración controlada por CV2_DELAY.INTRO en cv2-config.js (JS la sobreescribe */
+/* vía el.style.animationDuration, el valor aquí es solo el fallback estático). */
+
+.cv2-intro-overlay {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--black);
+  text-align: center;
+  padding: var(--sp-sm) var(--sp-md);
+  background: rgba(255,255,255,.85);
+  border-top: 3px solid var(--black);
+  border-bottom: 3px solid var(--black);
+  z-index: 20;
+  pointer-events: none;
+  animation: cv2-intro-slide 1800ms cubic-bezier(.4,0,.2,1) forwards;
+}
+
+@keyframes cv2-intro-slide {
+  0%   { clip-path: inset(0 100% 0 0); }
+  25%  { clip-path: inset(0 0% 0 0);   }
+  70%  { clip-path: inset(0 0% 0 0);   }
+  100% { clip-path: inset(0 0 0 100%); }
+}
+
+/* ── Overlay de ajustes ───────────────────────────────────────────────────── */
+
+.cv2-settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.cv2-settings-panel {
+  background: var(--white);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(80vw, 384px); /* 80% del viewport de juego (max 480px) */
+  min-height: 220px;
+  box-shadow: var(--shadow-md);
+}
+
+.cv2-settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.cv2-settings-title {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+}
+
+.cv2-settings-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--off-white);
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-pixel);
+  font-size: 7px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  flex: 1;
+  transition: var(--transition);
+}
+
+.cv2-settings-option:hover {
+  background: #e8f4ff;
+  border-color: var(--blue);
+}

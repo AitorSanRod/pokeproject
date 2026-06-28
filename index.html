@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css">
   <link rel="stylesheet" href="css/screens.css">
+  <link rel="stylesheet" href="css/combat-v2.css">
   <link rel="icon" type="image/x-icon" href="./assets/sprites/others/poke.ico">
   <script>
     if ('serviceWorker' in navigator) {
@@ -29,10 +30,11 @@
   <script src="js/data/config/natures.js"></script>
   <script src="js/data/config/exp-table.js"></script>
   <script src="js/data/moves/move-pool.js"></script>
-  <script src="js/data/pokemon-db.js"></script>
   <script src="js/data/moves/move-effects.js"></script>
+  <script src="js/data/pokemon-db.js"></script>
   <script src="js/data/status-effects.js"></script>
   <script src="js/data/held-items.js"></script>
+  <script src="js/data/battle-conditions.js"></script>
   <script src="js/data/moves/tms.js"></script>
   <script src="js/data/routes/routes-assets.js"></script>
   <script src="js/data/routes/routes-constants.js"></script>
@@ -54,6 +56,12 @@
   <!-- Game logic -->
   <script src="js/game/pokemon.js"></script>
   <script src="js/game/battle.js"></script>
+
+  <!-- Combat V2 (nuevo motor de combate) -->
+  <script src="js/combat-v2/cv2-config.js"></script>
+  <script src="js/combat-v2/cv2-ui.js"></script>
+  <script src="js/combat-v2/cv2-engine.js"></script>
+  <script src="js/combat-v2/cv2-screen.js"></script>
 
   <!-- UI layer -->
   <script src="js/ui/render.js"></script>

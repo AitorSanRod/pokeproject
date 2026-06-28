@@ -8,7 +8,7 @@
 // CARGA  → ApiSync.load*()  ·  GET del servidor y escritura en storage
 //
 // Endpoints cubiertos:
-//   /pokedex  · /evs  · /mts  · /badges  · /items  · /run  · /sync (todo en uno)
+//   /pokedex  · /evs  · /mts  · /badges  · /items  · /run  · /furthest-routes  · /sync (todo en uno)
 //
 // Uso rápido:
 //   await ApiSync.syncAll();   // sube todo el storage al servidor
@@ -232,6 +232,38 @@ var ApiSync = (() => {
   }
 
   /**
+   * Construye las filas de la tabla `furthest_routes`.
+   * Fuente: Storage.getFurthestRoute() → localStorage clave `pkmn_furthest_routes`
+   *
+   * Una fila por región con el area (string) de la ruta más lejana alcanzada
+   * en la run activa. Se resetea al iniciar una nueva run.
+   *
+   * Tabla SQL destino:
+   *   furthest_routes (user_id PK, region_id PK, area)
+   *
+   * @returns {Array<{ region_id: string, area: string }>}
+   */
+  function _buildFurthestRoutesRows() {
+    const all = Storage._get('furthest_routes') ?? {};
+    return Object.entries(all)
+      .filter(([, area]) => area != null)
+      .map(([region_id, area]) => ({ region_id, area }));
+  }
+
+  /**
+   * Convierte el array de filas de furthest_routes al formato de localStorage.
+   * @param {Array<{ region_id: string, area: string }>} rows
+   * @returns {{ [region_id: string]: string }}
+   */
+  function _parseFurthestRoutesRows(rows) {
+    const result = {};
+    for (const row of (rows ?? [])) {
+      if (row.region_id && row.area) result[row.region_id] = row.area;
+    }
+    return result;
+  }
+
+  /**
    * Construye el payload de la run activa (cabecera + equipo).
    * Fuente: Storage.loadRun() → localStorage clave `pkmn_run`
    *
@@ -293,12 +325,17 @@ var ApiSync = (() => {
     const run = Storage.loadRun();
     if (!run) return null;
 
+    const region            = run.region ?? 'kanto';
+    const furthest_route_area = Storage.getFurthestRoute(region) ?? null;
+
     const run_data = {
-      version:      run.version,
-      route_index:  run.routeIndex,
-      starter_name: run.starterName,
-      badges:       run.badges  ?? [],
-      items:        run.items   ?? [],
+      version:             run.version,
+      region,
+      route_index:         run.routeIndex,
+      furthest_route_area,
+      starter_name:        run.starterName,
+      badges:              run.badges  ?? [],
+      items:               run.items   ?? [],
     };
 
     const run_team = (run.team ?? []).map((pokemon, slot) => ({
@@ -312,6 +349,8 @@ var ApiSync = (() => {
       exp:           pokemon.exp,
       shiny:         pokemon.shiny        ?? false,
       held_item:     pokemon.heldItem     ?? null,
+      ability:       pokemon.ability      ?? null,
+      hide_ability:  pokemon.hideAbility  ?? null,
       auto_move:     pokemon.autoMove     ?? null,
       status_effect: pokemon.statusEffect ?? null,
       evs: {
@@ -457,6 +496,8 @@ var ApiSync = (() => {
         exp:          slot.exp,
         shiny:        slot.shiny        ?? false,
         heldItem:     slot.held_item    ?? null,
+        ability:      slot.ability      ?? null,
+        hideAbility:  slot.hide_ability ?? null,
         autoMove:     slot.auto_move    ?? null,
         statusEffect: slot.status_effect ?? null,
         evs:          slot.evs  ?? { hp:0, atk:0, def:0, spa:0, spd:0, spe:0 },
@@ -473,13 +514,20 @@ var ApiSync = (() => {
         _heldItemFlags: {},
       }));
 
+    // Restaurar el progreso de ruta más lejana en Storage si viene del servidor
+    if (run_data.region && run_data.furthest_route_area) {
+      Storage.setFurthestRoute(run_data.region, run_data.furthest_route_area, Infinity, []);
+    }
+
     return {
-      version:     run_data.version,
-      routeIndex:  run_data.route_index,
-      starterName: run_data.starter_name,
+      version:            run_data.version,
+      region:             run_data.region ?? 'kanto',
+      routeIndex:         run_data.route_index,
+      furthestRouteIndex: run_data.furthest_route_area ? null : 0, // se recalcula en screens.js desde Storage
+      starterName:        run_data.starter_name,
       team,
-      badges:      run_data.badges ?? [],
-      items:       run_data.items  ?? [],
+      badges:             run_data.badges ?? [],
+      items:              run_data.items  ?? [],
     };
   }
 
@@ -558,6 +606,17 @@ var ApiSync = (() => {
   }
 
   /**
+   * Envía el progreso de ruta más lejana por región (SmartRotom).
+   * POST /furthest-routes → { user_id, furthest_routes: FurthestRouteRow[] }
+   */
+  async function syncFurthestRoutes() {
+    const user_id         = _getUserId();
+    const furthest_routes = _buildFurthestRoutesRows();
+    console.log(`[ApiSync] Enviando furthest_routes — ${furthest_routes.length} regiones`);
+    return _post('/furthest-routes', { user_id, furthest_routes });
+  }
+
+  /**
    * Envía la planta más alta alcanzada en el Frente Batalla.
    * POST /bf-floor → { user_id, bf_max_floor: number }
    */
@@ -575,14 +634,15 @@ var ApiSync = (() => {
    * POST /sync → {
    *   user_id:       string,          // ID de dispositivo (UUID)
    *   pkmn_version:  string|null,     // versión de juego del guard de storage ('pkmn_version')
-   *   pokedex:       PokedexRow[],    // filas de la tabla pokedex
-   *   evs:           EvRow[],         // filas de la tabla evs
-   *   mts:           MtRow[],         // filas de la tabla mts
-   *   badges:        BadgeRow[],      // filas de la tabla badges
-   *   items:         ItemRow[],       // filas de la tabla items
-   *   bf_max_floor:  number,          // planta más alta alcanzada en Frente Batalla
-   *   run_data:      RunData|null,    // cabecera de la run activa (null si no hay run)
-   *   run_team:      RunTeamSlot[],   // equipo de la run activa ([] si no hay run)
+   *   pokedex:          PokedexRow[],           // filas de la tabla pokedex
+   *   evs:              EvRow[],               // filas de la tabla evs
+   *   mts:              MtRow[],               // filas de la tabla mts
+   *   badges:           BadgeRow[],            // filas de la tabla badges
+   *   items:            ItemRow[],             // filas de la tabla items
+   *   furthest_routes:  FurthestRouteRow[],   // ruta más lejana alcanzada por región
+   *   bf_max_floor:     number,               // planta más alta alcanzada en Frente Batalla
+   *   run_data:         RunData|null,          // cabecera de la run activa (null si no hay run)
+   *   run_team:         RunTeamSlot[],         // equipo de la run activa ([] si no hay run)
    * }
    */
   async function syncAll() {
@@ -594,22 +654,26 @@ var ApiSync = (() => {
     const items      = _buildItemRows();
     const runPayload = _buildRunPayload();
 
+    const furthest_routes = _buildFurthestRoutesRows();
+
     const body = {
       user_id,
-      pkmn_version:  localStorage.getItem('pkmn_version') ?? null,
+      pkmn_version:    localStorage.getItem('pkmn_version') ?? null,
       pokedex,
       evs,
       mts,
       badges,
       items,
-      bf_max_floor:  Storage.getBfMaxFloor(),
-      run_data: runPayload?.run_data ?? null,
-      run_team: runPayload?.run_team ?? [],
+      furthest_routes,
+      bf_max_floor:    Storage.getBfMaxFloor(),
+      run_data:        runPayload?.run_data ?? null,
+      run_team:        runPayload?.run_team ?? [],
     };
 
     console.log(
       `[ApiSync] syncAll — pokédex:${pokedex.length} evs:${evs.length}` +
       ` mts:${mts.length} medallas:${badges.length} objetos:${items.length}` +
+      ` furthest_routes:${furthest_routes.length}` +
       ` bf_max_floor:${body.bf_max_floor}` +
       ` run:${runPayload ? `ruta ${body.run_data.route_index}` : 'ninguna'}`
     );
@@ -818,6 +882,25 @@ var ApiSync = (() => {
   }
 
   /**
+   * Descarga el progreso de ruta más lejana por región y lo escribe en localStorage.
+   * El valor del servidor sobreescribe el local (la nube es autoritativa para este dato).
+   *
+   * GET /furthest-routes?user_id=...
+   *
+   * Respuesta esperada del backend:
+   * { "furthest_routes": [{ "region_id": "kanto", "area": "guarida-rocket" }] }
+   *
+   * @returns {Promise<object>} El objeto escrito en storage
+   */
+  async function loadFurthestRoutes() {
+    const data   = await _get('/furthest-routes');
+    const parsed = _parseFurthestRoutesRows(data.furthest_routes);
+    Storage._set('furthest_routes', parsed);
+    console.log(`[ApiSync] furthest_routes cargadas — ${Object.keys(parsed).length} regiones`);
+    return parsed;
+  }
+
+  /**
    * Descarga la planta más alta del Frente Batalla y la escribe en localStorage.
    * El valor del servidor siempre sobreescribe el local (la nube es autoritativa).
    *
@@ -864,21 +947,23 @@ var ApiSync = (() => {
   async function loadAll() {
     const data = await _get('/sync');
 
-    const pokedex    = _parsePokedexRows(data.pokedex);
-    const evs        = _parseEvRows(data.evs);
-    const mts        = _parseMtRows(data.mts);
-    const badges     = _parseBadgeRows(data.badges);
-    const items      = _parseItemRows(data.items);
-    const bfMaxFloor = data.bf_max_floor != null
+    const pokedex        = _parsePokedexRows(data.pokedex);
+    const evs            = _parseEvRows(data.evs);
+    const mts            = _parseMtRows(data.mts);
+    const badges         = _parseBadgeRows(data.badges);
+    const items          = _parseItemRows(data.items);
+    const furthestRoutes = _parseFurthestRoutesRows(data.furthest_routes);
+    const bfMaxFloor     = data.bf_max_floor != null
       ? (typeof data.bf_max_floor === 'number' ? data.bf_max_floor : 0)
       : null;
-    const run        = _parseRunPayload(data.run_data, data.run_team);
+    const run            = _parseRunPayload(data.run_data, data.run_team);
 
-    Storage._set('pokedex', pokedex);
-    Storage._set('evs',     evs);
-    Storage._set('mts',     mts);
-    Storage._set('badges',  badges);
-    Storage._set('items',   items);
+    Storage._set('pokedex',          pokedex);
+    Storage._set('evs',              evs);
+    Storage._set('mts',              mts);
+    Storage._set('badges',           badges);
+    Storage._set('items',            items);
+    Storage._set('furthest_routes',  furthestRoutes);
     if (bfMaxFloor != null) Storage._set('bf_max_floor', bfMaxFloor);
 
     if (run) {
@@ -897,18 +982,19 @@ var ApiSync = (() => {
       ` mts:${data.mts?.length ?? 0}` +
       ` medallas:${data.badges?.length ?? 0}` +
       ` objetos:${data.items?.length ?? 0}` +
+      ` furthest_routes:${Object.keys(furthestRoutes).length}` +
       ` bf_max_floor:${bfMaxFloor ?? '(no presente)'}` +
       ` run:${run ? `ruta ${run.routeIndex}` : 'ninguna'}`
     );
 
-    return { pokedex, evs, mts, badges, items, bfMaxFloor, run };
+    return { pokedex, evs, mts, badges, items, furthestRoutes, bfMaxFloor, run };
   }
 
   return {
     // Envío
-    syncPokedex, syncEvs, syncMts, syncBadges, syncItems, syncRun, syncBfFloor, syncAll,
+    syncPokedex, syncEvs, syncMts, syncBadges, syncItems, syncRun, syncFurthestRoutes, syncBfFloor, syncAll,
     // Carga
-    loadPokedex, loadEvs, loadMts, loadBadges, loadItems, loadRun, loadBfFloor, loadAll,
+    loadPokedex, loadEvs, loadMts, loadBadges, loadItems, loadRun, loadFurthestRoutes, loadBfFloor, loadAll,
   };
 
 })();

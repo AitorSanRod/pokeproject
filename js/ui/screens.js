@@ -13,6 +13,7 @@ const SCREENS_CONFIG = {
       gen: 'GEN I',
       name: 'KANTO',
       routesGlobal: 'KANTO_ROUTES',
+      badges: ['boulder-badge','cascade-badge','thunder-badge','rainbow-badge','soul-badge','marsh-badge','volcano-badge','earth-badge'],
       available: true,
       customStarter: true,
       starters: [
@@ -26,6 +27,7 @@ const SCREENS_CONFIG = {
       gen: 'GEN II',
       name: 'JOHTO',
       routesGlobal: 'JOHTO_ROUTES',
+      badges: ['zephyr-badge','hive-badge','plain-badge','fog-badge','storm-badge','mineral-badge','glacier-badge','rising-badge'],
       available: typeof JOHTO_ENABLED !== 'undefined' && JOHTO_ENABLED,
       customStarter: false,
       starters: [
@@ -79,6 +81,15 @@ const Screens = {
     return window[reg.routesGlobal] ?? [];
   },
 
+  // ── Comprueba si algún pokemon ha obtenido todas las medallas de la región ─
+  _hasAllRegionBadges() {
+    const reg      = Screens._region ?? SCREENS_CONFIG.REGIONS[0];
+    const required = reg.badges ?? [];
+    if (required.length === 0) return false;
+    const all = Storage.getAllBadges();
+    return Object.values(all).some(list => required.every(b => list.includes(b)));
+  },
+
   // ── Guarda la run actual en localStorage ────────────────────────────────
   _saveRun() {
     // Re-sincronizar learnedMTs de cada pokemon al Storage antes de guardar.
@@ -90,13 +101,14 @@ const Screens = {
       }
     }
     Storage.saveRun({
-      version:     GameState.version,
-      region:      (Screens._region ?? SCREENS_CONFIG.REGIONS[0]).id,
-      routeIndex:  GameState.routeIndex,
-      starterName: GameState.starterName ?? GameState.starter?.name ?? null,
-      team:        GameState.team,
-      badges:      GameState.badges,
-      items:       GameState.items,
+      version:            GameState.version,
+      region:             (Screens._region ?? SCREENS_CONFIG.REGIONS[0]).id,
+      routeIndex:         GameState.routeIndex,
+      furthestRouteIndex: GameState.furthestRouteIndex,
+      starterName:        GameState.starterName ?? GameState.starter?.name ?? null,
+      team:               GameState.team,
+      badges:             GameState.badges,
+      items:              GameState.items,
     });
   },
 
@@ -247,8 +259,13 @@ const Screens = {
         Screens._region = SCREENS_CONFIG.REGIONS.find(r => r.id === (save.region ?? 'kanto'))
                           ?? SCREENS_CONFIG.REGIONS[0];
         GameState.reset();
-        GameState.routeIndex       = save.routeIndex ?? 0;
-        GameState.badges           = save.badges     ?? [];
+        GameState.routeIndex = save.routeIndex ?? 0;
+        const _regId      = (Screens._region ?? SCREENS_CONFIG.REGIONS[0]).id;
+        const _savedArea  = Storage.getFurthestRoute(_regId);
+        const _allRoutes  = window[(Screens._region ?? SCREENS_CONFIG.REGIONS[0]).routesGlobal] ?? [];
+        const _savedIdx   = _savedArea ? _allRoutes.findIndex(r => r.area === _savedArea) : -1;
+        GameState.furthestRouteIndex = Math.max(GameState.routeIndex, _savedIdx);
+        GameState.badges            = save.badges ?? [];
         GameState.items            = save.items      ?? [];
         GameState.team             = save.team       ?? [];
         GameState.starter          = save.starterName ? { name: save.starterName } : null;
@@ -259,6 +276,15 @@ const Screens = {
         //    Unión de ambas fuentes: sobrevive a importaciones de archivos más antiguos
         //    que puedan haber sobreescrito pkmn_mts con un objeto vacío.
         GameState.team.forEach(p => {
+          const dbAbility     = POKEMON_DB[p.name]?.ability     ?? null;
+          const dbHideAbility = POKEMON_DB[p.name]?.hideAbility ?? null;
+          const savedAbility  = p.ability ?? null;
+          // Conserva la habilidad guardada si es la normal o la oculta (cápsula usada).
+          // Si la DB cambió y ya no coincide con ninguna, re-sincroniza.
+          p.ability     = (savedAbility === dbAbility || savedAbility === dbHideAbility)
+                          ? savedAbility : dbAbility;
+          p.hideAbility = dbHideAbility;
+
           const storageMTs = Storage.getLearnedMTs(p.name);
           const runMTs     = p.learnedMTs ?? [];
           const validMTs   = [...new Set([...storageMTs, ...runMTs])];
@@ -469,6 +495,8 @@ const Screens = {
 
     const _doChooseStarter = (p) => {
       console.log(`[UI] Starter elegido: ${p.name}${p.shiny ? ' (shiny)' : ''}`);
+      const _regId = (Screens._region ?? SCREENS_CONFIG.REGIONS[0]).id;
+      Storage.clearFurthestRoute(_regId);
       GameState.init(p);
       if (p.shiny) Storage.markShiny(p.name);
       GameState.autoMode = true;
@@ -564,6 +592,8 @@ const Screens = {
         const p = await createPokemon(name, SCREENS_CONFIG.STARTER_LEVEL, true, null, null, useShiny);
         if (useShiny) Storage.markShiny(p.name);
         console.log(`[UI] Starter personalizado elegido: ${name}${useShiny ? ' (shiny)' : ''}`);
+        const _regId2 = (Screens._region ?? SCREENS_CONFIG.REGIONS[0]).id;
+        Storage.clearFurthestRoute(_regId2);
         GameState.init(p);
         GameState.autoMode = true;
         Screens._saveRun();
@@ -655,6 +685,11 @@ const Screens = {
       }
       route = routes[GameState.routeIndex];
       data  = ROUTE_DATA[route.area];
+      if (GameState.routeIndex > GameState.furthestRouteIndex) {
+        GameState.furthestRouteIndex = GameState.routeIndex;
+        const regId = (Screens._region ?? SCREENS_CONFIG.REGIONS[0]).id;
+        Storage.setFurthestRoute(regId, route.area, GameState.routeIndex, routes);
+      }
     }
     GameState.currentArea  = route.area;
     GameState.autoMode     = true;
@@ -762,23 +797,13 @@ const Screens = {
     const bg = GameState.currentBg;
     const bgLayer = Screens._bgLayer(bg);
 
-    // Botones flotantes arriba-derecha (pokédex + compendio)
-    document.getElementById('app').querySelectorAll('.global-dex-btn').forEach(e => e.remove());
-    const dexWrap = document.createElement('div');
-    dexWrap.className = 'global-dex-btn';
-    dexWrap.style.cssText = 'position:fixed;top:12px;right:12px;z-index:1000;display:flex;gap:4px';
-    const floatBtnStyle = 'min-height:32px;padding:4px 10px;font-size:10px;background:rgba(255,255,255,.92);border-color:var(--black);box-shadow:var(--shadow-sm)';
-    dexWrap.innerHTML = `
-      <button class="btn btn--sm" id="btn-dex-route-float"        style="${floatBtnStyle}" title="Pokédex">📖</button>
-      <button class="btn btn--sm" id="btn-compendium-route-float" style="${floatBtnStyle}" title="Compendio">📋</button>`;
-    document.getElementById('app').appendChild(dexWrap);
-
     document.getElementById('viewport').innerHTML = `
       <div class="screen screen--adventure">
         ${bgLayer}
         <div class="encounter-area" id="encounter-area">
           <div class="encounter-prompt">Preparando ruta...</div>
         </div>
+        <div id="route-footer-bar" style="display:none;align-items:center;padding:6px 14px;background:var(--off-white);border-top:var(--border);flex-shrink:0;z-index:2;position:relative"></div>
       </div>`;
   },
 
@@ -832,17 +857,18 @@ const Screens = {
 
   _initPauseBtn() {},  // no-op — pause solo en combate
 
-  _showPathSelection(route) {
+  _showPathSelection(route, { keepPaths = false } = {}) {
     const data  = ROUTE_DATA[route.area];
     const area  = document.getElementById('encounter-area');
     if (!area || !data) return;
 
-    const paths = generatePaths(route.area);
+    // keepPaths: true → reutiliza las rutas ya generadas (no hace shuffle)
+    const paths = (keepPaths && GameState.currentPaths) ? GameState.currentPaths : generatePaths(route.area);
     GameState.currentPaths = paths;
 
     // Para cada camino, resolver qué entrenador se usaría (para el tooltip)
     // Usamos pickTrainer para simular cuál aparecería pero sin consumir la semilla real
-    const resolvedPaths = paths.map(path =>
+    const resolvedPaths = (keepPaths && GameState._selectionResolvedPaths) ? GameState._selectionResolvedPaths : paths.map(path =>
       path.map(enc => {
         if (enc.type === 'heal') {
           return { type:'heal', name:'Punto de curación', img:'assets/sprites/items/potion.png' };
@@ -861,6 +887,7 @@ const Screens = {
         return { type:'wild', name:'Pokemon Salvaje', img:'assets/sprites/others/grass.png' };
       })
     );
+    GameState._selectionResolvedPaths = resolvedPaths;
 
     const iconFor = (enc) => {
       if (enc.type === 'heal') {
@@ -910,6 +937,17 @@ const Screens = {
 
     Screens._renderTeamBar();
 
+    // Activa el footer ya incluido en el shell y mete el botón de ajustes
+    const footerBar = document.getElementById('route-footer-bar');
+    if (footerBar) {
+      const rotomEnabled = Screens._hasAllRegionBadges();
+      footerBar.style.display = 'flex';
+      footerBar.style.justifyContent = 'space-between';
+      footerBar.innerHTML = `
+        <img class="icon-btn" id="route-settings-btn" src="assets/sprites/others/config.png" title="Ajustes" alt="Ajustes">
+        <img class="icon-btn${rotomEnabled ? '' : ' icon-btn--disabled'}" id="route-smart-rotom-btn" src="assets/sprites/others/smartrotom.png" title="${rotomEnabled ? 'SmartRotom' : 'Completa todas las medallas para desbloquear'}" alt="SmartRotom">`;
+    }
+
     paths.forEach((path, pi) => {
       document.getElementById(`path-${pi}`).addEventListener('click', () => {
         if (GameState.paused) return;
@@ -922,21 +960,125 @@ const Screens = {
       });
     });
 
-    document.getElementById('btn-dex-route-float')?.addEventListener('click', () => {
-      PokedexScreen.show(() => {
-        document.getElementById('app').querySelectorAll('.global-dex-btn').forEach(e => e.remove());
-        Screens._renderAdventureShell(route);
-        Screens._showPathSelection(route);
-      });
+    // Botón de ajustes del footer — restaura sin regenerar rutas
+    document.getElementById('route-settings-btn')?.addEventListener('click', () => {
+      Screens._openRouteSettings(route);
     });
 
-    document.getElementById('btn-compendium-route-float')?.addEventListener('click', () => {
-      CompendiumScreen.show(() => {
-        document.getElementById('app').querySelectorAll('.global-dex-btn').forEach(e => e.remove());
-        Screens._renderAdventureShell(route);
-        Screens._showPathSelection(route);
-      });
+    document.getElementById('route-smart-rotom-btn')?.addEventListener('click', () => {
+      Screens._openSmartRotom();
     });
+
+  },
+
+  // Panel de ajustes de la pantalla de selección de ruta.
+  // A diferencia del panel de combate, no pausa ni reanuda nada.
+  // El callback de restauración usa keepPaths:true para no regenerar las rutas.
+  _openRouteSettings(route) {
+    this._showRouteSettingsPanel(route);
+  },
+
+  _showRouteSettingsPanel(route) {
+    const restore = () => {
+      Screens._renderAdventureShell(route);
+      Screens._showPathSelection(route, { keepPaths: true });
+    };
+
+    const panel = document.createElement('div');
+    panel.className = 'cv2-settings-overlay';
+    panel.innerHTML = `
+      <div class="cv2-settings-panel">
+        <div class="cv2-settings-header">
+          <span class="cv2-settings-title">Ajustes</span>
+          <button class="cv2-btn cv2-settings-close">✕</button>
+        </div>
+        <button class="cv2-settings-option" id="rsopt-dex">Pokédex</button>
+        <button class="cv2-settings-option" id="rsopt-comp">Compendio</button>
+        <button class="cv2-settings-option" id="rsopt-exit" style="background:var(--red);color:var(--white)">Salir</button>
+      </div>`;
+    document.body.appendChild(panel);
+
+    const back  = () => { panel.remove(); restore(); Screens._showRouteSettingsPanel(route); };
+    const close = () => { panel.remove(); restore(); };
+
+    panel.addEventListener('click', e => { if (e.target === panel) close(); });
+
+    panel.querySelector('.cv2-settings-close').addEventListener('click', close);
+
+    panel.querySelector('#rsopt-dex').addEventListener('click', () => {
+      panel.remove();
+      if (typeof PokedexScreen === 'undefined') { restore(); return; }
+      PokedexScreen.show(back);
+    });
+
+    panel.querySelector('#rsopt-comp').addEventListener('click', () => {
+      panel.remove();
+      if (typeof CompendiumScreen === 'undefined') { restore(); return; }
+      CompendiumScreen.show(back);
+    });
+
+    panel.querySelector('#rsopt-exit').addEventListener('click', () => {
+      panel.remove();
+      GameState.reset();
+      Screens.show(Screens.title);
+    });
+  },
+
+  _openSmartRotom() {
+    const routes     = Screens._routes();
+    const reg        = Screens._region ?? SCREENS_CONFIG.REGIONS[0];
+    const regionName = reg.name;
+    const savedArea  = Storage.getFurthestRoute(reg.id);
+    const maxIdx     = savedArea
+      ? routes.findIndex(r => r.area === savedArea)
+      : (GameState.furthestRouteIndex ?? -1);
+
+    const currentArea = GameState.currentArea;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'cv2-settings-overlay';
+    overlay.innerHTML = `
+      <div class="cv2-settings-panel" style="max-height:50vh;display:flex;flex-direction:column">
+        <div class="cv2-settings-header" style="flex-shrink:0">
+          <span class="cv2-settings-title">SmartRotom</span>
+          <button class="cv2-btn cv2-settings-close">✕</button>
+        </div>
+        <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding-bottom:8px">
+          <img src="assets/sprites/others/smartrotom.png" style="width:36px;height:36px;image-rendering:pixelated;display:block">
+          <div style="font-family:var(--font-pixel);font-size:7px;color:var(--black)">Vuelos disponibles</div>
+          <div style="font-family:var(--font-pixel);font-size:5px;color:var(--grey)">${regionName}</div>
+        </div>
+        <div id="smart-rotom-list" style="overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding-top:4px"></div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    const list = overlay.querySelector('#smart-rotom-list');
+    routes.forEach((r, i) => {
+      const isCurrent = r.area === currentArea;
+      const unlocked  = i <= maxIdx;
+      const btn = document.createElement('button');
+      btn.className = 'cv2-settings-option';
+      btn.textContent = r.name;
+      if (isCurrent) {
+        btn.disabled = true;
+        btn.style.cssText = 'background:var(--blue);color:var(--white);border-color:var(--blue);cursor:not-allowed;opacity:1;padding-top:12px;padding-bottom:12px';
+      } else if (unlocked) {
+        btn.style.cssText = 'opacity:1;color:var(--black);padding-top:12px;padding-bottom:12px';
+        btn.addEventListener('click', () => {
+          overlay.remove();
+          GameState.routeIndex = i;
+          Screens._saveRun();
+          Screens.show(Screens.adventure);
+        });
+      } else {
+        btn.disabled = true;
+        btn.style.cssText = 'opacity:.4;cursor:not-allowed;padding-top:12px;padding-bottom:12px';
+      }
+      list.appendChild(btn);
+    });
+
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    overlay.querySelector('.cv2-settings-close').addEventListener('click', () => overlay.remove());
   },
 
   // Ejecuta el siguiente encuentro del camino elegido
@@ -986,11 +1128,17 @@ const Screens = {
         GameState._pathRunning = false; Screens._runNextInPath(); return;
       }
       const foeTeam = [];
-      for (const p of gym.leader) {
-        const foe = await createPokemon(p.name, rollLevel(p), false, p.moveId ?? null, p.overrides ?? null, p.shiny ?? false);
-        if (p.img) foe.spriteUrl = p.img;
-        if (p.heldItem) equipHeldItem(foe, p.heldItem);
-        foeTeam.push(foe);
+      try {
+        for (const p of gym.leader) {
+          const foe = await createPokemon(p.name, rollLevel(p), false, p.moveId ?? null, p.overrides ?? null, p.shiny ?? false);
+          if (p.img) foe.spriteUrl = p.img;
+          if (p.heldItem) equipHeldItem(foe, p.heldItem);
+          foeTeam.push(foe);
+        }
+      } catch (e) {
+        console.error('[ADVENTURE] Error creando equipo del líder de gimnasio:', e);
+        GameState._pathRunning = false;
+        return;
       }
       Screens._startCombatInPath({
         foeTeam,
@@ -1040,11 +1188,17 @@ const Screens = {
       }
       if (!trainer) { GameState._pathRunning = false; Screens._runNextInPath(); return; }
       const foeTeam = [];
-      for (const p of trainer.pokemon) {
-        const foe = await createPokemon(p.name, rollLevel(p), false, p.moveId ?? null, p.overrides ?? null, p.shiny ?? false);
-        if (p.img) foe.spriteUrl = p.img;
-        if (p.heldItem) equipHeldItem(foe, p.heldItem);
-        foeTeam.push(foe);
+      try {
+        for (const p of trainer.pokemon) {
+          const foe = await createPokemon(p.name, rollLevel(p), false, p.moveId ?? null, p.overrides ?? null, p.shiny ?? false);
+          if (p.img) foe.spriteUrl = p.img;
+          if (p.heldItem) equipHeldItem(foe, p.heldItem);
+          foeTeam.push(foe);
+        }
+      } catch (e) {
+        console.error('[ADVENTURE] Error creando equipo del entrenador:', e);
+        GameState._pathRunning = false;
+        return;
       }
       Screens._startCombatInPath({
         foeTeam,
@@ -1057,7 +1211,14 @@ const Screens = {
       // Salvaje — combate automático + captura automática
       const entry   = pickWildEncounter(data.wild);
       const isShiny = entry.shiny === true || Math.random() < (typeof getActiveShinyRate !== 'undefined' ? getActiveShinyRate() : 0);
-      const foePoke = await createPokemon(entry.name, rollLevel(entry), false, entry.moveId ?? null, entry.overrides ?? null, isShiny);
+      let foePoke;
+      try {
+        foePoke = await createPokemon(entry.name, rollLevel(entry), false, entry.moveId ?? null, entry.overrides ?? null, isShiny);
+      } catch (e) {
+        console.error('[ADVENTURE] Error creando pokemon salvaje:', e);
+        GameState._pathRunning = false;
+        return;
+      }
       if (entry.img) foePoke.spriteUrl = entry.img;
       if (entry.heldItem) equipHeldItem(foePoke, entry.heldItem);
       Screens._startCombatInPath({
@@ -1196,6 +1357,13 @@ const Screens = {
       ? `<span class="nature-up">+${labels[nature.boost]}</span> / <span class="nature-down">-${labels[nature.lower]}</span>`
       : `<span style="color:var(--grey)">Naturaleza neutra</span>`;
 
+    const abilityData = poke.ability ? (ABILITY_DATA?.[poke.ability] ?? ABILITIES?.[poke.ability]) : null;
+    const abilityLine = abilityData
+      ? `<div style="text-align:center;font-family:var(--font-pixel);font-size:7px;margin-bottom:4px">
+           ${abilityData.name}<span style="color:var(--grey)">: ${abilityData.desc}</span>
+         </div>`
+      : '';
+
     const moveChangeBlocked = heldItemBlocksMoveChange(poke);
     const blockedItem = moveChangeBlocked ? HELD_ITEMS[poke.heldItem] : null;
 
@@ -1206,6 +1374,7 @@ const Screens = {
           style="width:72px;height:72px;image-rendering:pixelated;object-fit:contain"
           onerror="this.style.opacity=0.2">
       </div>
+      ${abilityLine}
       <div style="text-align:center;font-family:var(--font-pixel);font-size:7px;margin-bottom:8px">${natureLine}</div>
       ${moveChangeBlocked ? `
         <div style="background:var(--off-white);border-radius:var(--radius-sm);padding:8px 10px;
@@ -1449,6 +1618,18 @@ const Screens = {
       },
     ];
 
+    // Cápsula Habilidad — solo entra al pool si hay algún pokemon con habilidad oculta
+    const hasAbilityTarget = GameState.team.some(p => p.ability && p.hideAbility);
+    if (hasAbilityTarget) {
+      randomPool.push({
+        id:   'capsula-habilidad',
+        icon: '<img src="assets/sprites/items/capsula-habilidad.png" style="width:40px;height:40px;image-rendering:pixelated;object-fit:contain">',
+        name: 'Cápsula Habilidad',
+        desc: 'Intercambia la habilidad del pokémon por su habilidad oculta.',
+        type: 'ability-capsule',
+      });
+    }
+
     // Añadir 1 MT del pool global (excluyendo la MT fija de ruta si ya hay una)
     const usedTmId = routeTmPrize?.tmId;
     const globalEligible = Object.keys(TM_LIST)
@@ -1579,6 +1760,8 @@ const Screens = {
             Screens._showHeldItemSelector(chosen, advance);
           } else if (chosen.type === 'tm') {
             Screens._showTMSelector(chosen, advance);
+          } else if (chosen.type === 'ability-capsule') {
+            Screens._showAbilityCapsuleSelector(advance);
           }
         });
       });
@@ -1736,6 +1919,51 @@ const Screens = {
     });
   },
 
+  // Selector de pokemon para usar la Cápsula Habilidad.
+  // Solo son seleccionables los pokemon que tengan ability Y hideAbility.
+  // Intercambia las dos habilidades; el cambio persiste en el objeto pokemon (guardado en run).
+  _showAbilityCapsuleSelector(onDone) {
+    const ABILITIES_DATA = typeof ABILITIES !== 'undefined' ? ABILITIES : {};
+    const abilityName = id => ABILITIES_DATA[id]?.name ?? id ?? '—';
+
+    const overlay = Screens._makeModal(`
+      <div class="modal-title">
+        <img src="assets/sprites/items/capsula-habilidad.png"
+          style="width:20px;height:20px;image-rendering:pixelated;vertical-align:middle;margin-right:6px">
+        Cápsula Habilidad
+      </div>
+      <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
+        Elige un pokémon para intercambiar su habilidad
+      </p>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${GameState.team.map((p, i) => {
+          const canUse = !!(p.ability && p.hideAbility);
+          const extra  = canUse
+            ? `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--blue)">${abilityName(p.ability)} → ${abilityName(p.hideAbility)}</span>`
+            : `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">Sin habilidad oculta</span>`;
+          return Screens._teamBtn(p, i, extra, !canUse);
+        }).join('')}
+      </div>
+      <button class="btn btn--ghost btn--wide" id="capsule-cancel">Cancelar</button>
+    `);
+
+    overlay.querySelectorAll('[data-idx]:not([disabled])').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = GameState.team[+btn.dataset.idx];
+        const prev      = p.ability;
+        p.ability       = p.hideAbility;
+        p.hideAbility   = prev;
+        console.log(`[CÁPSULA] ${p.displayName}: ${prev} → ${p.ability}`);
+        overlay.remove();
+        onDone();
+      });
+    });
+
+    document.getElementById('capsule-cancel').addEventListener('click', () => {
+      overlay.remove();
+    });
+  },
+
   // Selector de pokemon para enseñar una MT. Los pokemon incompatibles o que ya
   // conocen el movimiento aparecen deshabilitados. Cancelar no avanza la ruta.
   _showTMSelector(item, onDone) {
@@ -1818,20 +2046,53 @@ const Screens = {
   // COMBAT
   // ═══════════════════════════════════════════════════════════════════════
   combat(options) {
-    const { foeTeam, isWild = false, isTrainer = false, isGym = false, gymLeaderName, trainerName, noExp = false, autoCapture = false, onWin, onLoss } = options;
+    const {
+      foeTeam, isWild = false, isTrainer = false, isGym = false,
+      gymLeaderName, trainerName, noExp = false, onWin, onLoss,
+    } = options;
 
-    GameState.combat = {
-      foeTeam,
-      foeIndex:    0,
-      isWild, isTrainer, isGym, gymLeaderName, trainerName, noExp, autoCapture,
-      onWin, onLoss,
-      chosenMove:  null,
-      lastFoeObj:  null,
-      animating:   false,
-      introPlayed: false,  // si ya mostramos la animación de intro
-    };
+    const vp = document.getElementById('viewport');
+    const bg = (isTrainer || isGym)
+      ? GameState.currentTrainerCombatBg
+      : GameState.currentCombatBg;
 
-    Screens._renderCombatScreen();
+    // Guardar antes de tocar el DOM: si ya hay CV2 activo, es un combate de continuación
+    const isFirstCombat = !document.getElementById('cv2-field');
+
+    // Solo reconstruir el DOM en el primer combate; los siguientes reusan
+    // la misma pantalla para evitar el flash entre nodos del camino.
+    if (isFirstCombat) {
+      vp.innerHTML = cv2Screen.html();
+      cv2Screen.applyBackground(bg);
+      cv2Screen.initButtons();
+    } else {
+      cv2Screen.applyBackground(bg);
+    }
+
+    // Path progress: puede cambiar entre nodos (busca el placeholder o el div ya colocado)
+    const pathEl = document.getElementById('cv2-path-progress')
+      || document.querySelector('.path-progress');
+    if (pathEl) {
+      const pathHtml = this._renderPathProgress();
+      if (pathHtml) pathEl.outerHTML = pathHtml;
+      else pathEl.remove();
+    }
+
+    // Batallas salvajes: mostrar selección de captura antes de avanzar ruta
+    const handleWin = isWild
+      ? () => Screens._showCv2CaptureChoice(foeTeam[0], onWin)
+      : onWin;
+
+    cv2Screen.start(GameState.team, foeTeam, {
+      isWild,
+      isTrainer,
+      isGym,
+      trainerName:     gymLeaderName ?? trainerName,
+      noExp,
+      skipPlayerEntry: !isFirstCombat,
+      onWin:           handleWin,
+      onLoss:          onLoss,
+    });
   },
 
   _renderCombatScreen() {
@@ -1918,7 +2179,7 @@ const Screens = {
               <span>${foe.displayName.toUpperCase()}</span>
               <span class="combat-hud__level">Nv.${foe.level}</span>
             </div>
-            <div class="combat-hud__hp-label">HP</div>
+
             <div style="display:flex;align-items:center;gap:5px">
               <div style="flex:1">${Render.hpBar(foe.currentHp, foe.stats.hp)}</div>
               ${Storage.isCaught(foe.name) ? `
@@ -1947,7 +2208,7 @@ const Screens = {
               <span>${player.displayName.toUpperCase()}</span>
               <span class="combat-hud__level">Nv.${player.level}</span>
             </div>
-            <div class="combat-hud__hp-label">HP</div>
+
             ${Render.hpBar(player.currentHp, player.stats.hp)}
             <div class="combat-hud__hp-nums" id="hp-nums-player">${player.currentHp}/${player.stats.hp}</div>
           </div>
@@ -2733,6 +2994,79 @@ const Screens = {
     });
   },
 
+  // ── Captura post-combate para CV2 ─────────────────────────────────────────
+
+  _showCv2CaptureChoice(foe, onDone) {
+    // Almacenar función de restauración para que _restoreDom() pueda re-mostrar
+    // estos botones si el usuario abre el compendio/pokédex durante la captura.
+    if (typeof cv2Screen !== 'undefined') {
+      cv2Screen._restoreMoveArea = () => Screens._showCv2CaptureChoice(foe, onDone);
+    }
+
+    const done = () => {
+      if (typeof cv2Screen !== 'undefined') cv2Screen._restoreMoveArea = null;
+      onDone?.();
+    };
+
+    const area = document.getElementById('cv2-move-area');
+    if (!area) { done(); return; }
+    area.innerHTML = `
+      <div style="display:flex;gap:8px;padding:8px 16px;align-items:center">
+        <button class="btn btn--primary pokeball-btn" style="flex:1" id="cv2-btn-catch" title="Capturar">
+          <svg class="pokeball-spin" viewBox="0 0 16 16" width="22" height="22">
+            <circle cx="8" cy="8" r="7.5" fill="#1A1A1A"/>
+            <path d="M 1 8 A 7 7 0 0 1 15 8 Z" fill="#E74C3C"/>
+            <path d="M 1 8 A 7 7 0 0 0 15 8 Z" fill="#FFFFFF"/>
+            <rect x="1" y="7" width="14" height="2" fill="#1A1A1A"/>
+            <circle cx="8" cy="8" r="3"   fill="#1A1A1A"/>
+            <circle cx="8" cy="8" r="1.7" fill="#FFFFFF"/>
+          </svg>
+        </button>
+        <button class="btn" style="flex:1" id="cv2-btn-no-catch">CONTINUAR</button>
+      </div>`;
+    document.getElementById('cv2-btn-catch').addEventListener('click', () => Screens._cv2AttemptCatch(foe, done));
+    document.getElementById('cv2-btn-no-catch').addEventListener('click', done);
+  },
+
+  async _cv2AttemptCatch(foe, onDone) {
+    const area = document.getElementById('cv2-move-area');
+    if (area) area.innerHTML = `<div style="text-align:center;padding:16px;font-family:var(--font-pixel);font-size:9px">Lanzas una Poke Ball...</div>`;
+
+    cv2UI.log('1...');
+    await cv2UI.wait(500);
+    cv2UI.log('2...');
+    await cv2UI.wait(500);
+    cv2UI.log('3...');
+    await cv2UI.wait(600);
+
+    if (Math.random() < COMBAT_CONFIG.CATCH_RATE) {
+      fullHeal(foe);
+      cv2UI.log(`¡Gotcha! ¡${foe.displayName} fue capturado!`);
+      Storage.markCaught(foe.name);
+      if (foe.shiny) { Storage.markShiny(foe.name); Storage.propagateShinyLine(foe.name); }
+      foe.isPlayer = true;
+      const capturedMTs = Storage.getLearnedMTs(foe.name);
+      foe.learnedMTs = capturedMTs;
+      for (const mtId of capturedMTs) {
+        const mtMove = MOVE_BY_ID[mtId];
+        if (mtMove && !foe.moves.find(mv => mv.id === mtId))
+          foe.moves.push({ ...mtMove, maxPp: mtMove.pp });
+      }
+      if (GameState.team.length < 6) {
+        GameState.team.push(foe);
+        await cv2UI.wait(1000);
+        onDone?.();
+      } else {
+        await cv2UI.wait(1000);
+        Screens._showPokemonSwapSelector(foe, onDone);
+      }
+    } else {
+      cv2UI.log(`Casi... ¡${foe.displayName} se escapó!`);
+      await cv2UI.wait(800);
+      onDone?.();
+    }
+  },
+
   _advanceFoeOrEnd() {
     const ctx = GameState.combat;
     ctx.foeIndex++;
@@ -2755,13 +3089,17 @@ const Screens = {
   // Coloca un telón negro en #app que cubre el frame de reemplazo de DOM,
   // luego lo desvanece para revelar el nuevo combate con su animación de entrada.
   _startCombatInPath(options) {
+    // CV2 no reconstruye el DOM entre nodos, así que el telón no hace falta
+    if (document.getElementById('cv2-field')) {
+      Screens.combat(options);
+      return;
+    }
+    // Primer combate del path: telón para tapar el swap de DOM
     const appEl = document.getElementById('app');
     const curtain = document.createElement('div');
     curtain.className = 'combat-curtain';
     appEl.appendChild(curtain);
     Screens.combat(options);
-    // Dos rAF: el primero confirma que el browser procesó el nuevo DOM,
-    // el segundo que ya está en la cola de pintado — entonces soltamos el telón.
     requestAnimationFrame(() => requestAnimationFrame(() => {
       curtain.classList.add('combat-curtain--fade-out');
       curtain.addEventListener('animationend', () => curtain.remove(), { once: true });
