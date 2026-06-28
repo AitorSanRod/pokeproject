@@ -584,18 +584,9 @@ const CombatV2 = {
     for (const { side, pokemon } of entries) {
       if (pokemon.currentHp <= 0) continue;
 
-      // Daño por estado
-      const dmg = StatusEffects.applyEndOfTurn(pokemon, msg => {
-        cv2UI.log(msg);
-      });
-      if (dmg > 0) {
-        cv2UI.updateHp(side, pokemon);
-        cv2UI.updateStatus(side, pokemon);
-        await cv2UI.wait(CV2_DELAY.END_OF_TURN_STATUS);
-        if (pokemon.currentHp <= 0) break; // uno murió → resolver antes de continuar
-      }
-
-      // Objetos de fin de turno (Restos, Vidasfera, etc.)
+      // Objetos de fin de turno (Restos, Vidasfera, Llamasfera, etc.)
+      // Se procesan ANTES que el daño de estado para que la Llamasfera
+      // aplique QUEMADO y el estado drene en el mismo turno.
       if (HELD_ITEMS?.[pokemon.heldItem]?.trigger === 'on-turn-end') {
         const hpBefore = pokemon.currentHp;
         const triggered = applyHeldItemTurnEnd(pokemon, {
@@ -607,8 +598,21 @@ const CombatV2 = {
           if (diff > 0) cv2UI.showHealFloat(side, diff);
           else if (diff < 0) cv2UI.showDamageFloat(side, -diff);
           cv2UI.updateHp(side, pokemon);
+          cv2UI.updateStatus(side, pokemon);
           await cv2UI.wait(CV2_DELAY.LOG_SHORT);
         }
+        if (pokemon.currentHp <= 0) break;
+      }
+
+      // Daño por estado (veneno, quemadura, congelación)
+      const dmg = StatusEffects.applyEndOfTurn(pokemon, msg => {
+        cv2UI.log(msg);
+      });
+      if (dmg > 0) {
+        cv2UI.updateHp(side, pokemon);
+        cv2UI.updateStatus(side, pokemon);
+        await cv2UI.wait(CV2_DELAY.END_OF_TURN_STATUS);
+        if (pokemon.currentHp <= 0) break;
       }
 
       // Habilidad de fin de turno

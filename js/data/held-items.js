@@ -257,19 +257,12 @@ var HELD_ITEMS = {
     img: 'assets/sprites/items/flame-orb.png',
     fallbackIcon: '🔥',
     canChange: true,
-    trigger: HELD_ITEM_TRIGGERS.ON_TURN_START,
+    trigger: HELD_ITEM_TRIGGERS.ON_TURN_END,
     fn(ctx) {
-      const { user, log, updateHud } = ctx;
+      const { user, log } = ctx;
       if (user.currentHp <= 0) return false;
-
-      if (user.statusEffect?.id !== StatusEffect.BURN) {
-        StatusEffects.apply(user, StatusEffect.BURN, log);
-      }
-
-      const drain = Math.max(1, Math.floor(user.stats.hp * 0.05));
-      user.currentHp = Math.max(0, user.currentHp - drain);
-      log(`${user.displayName} pierde ${drain} HP por la Llama Orbe!`);
-      if (updateHud) updateHud();
+      if (user.statusEffect?.id === StatusEffect.BURN) return false;
+      StatusEffects.apply(user, StatusEffect.BURN, log);
       return true;
     },
   },
