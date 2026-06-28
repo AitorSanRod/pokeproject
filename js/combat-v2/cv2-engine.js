@@ -254,6 +254,33 @@ const CombatV2 = {
       pk._ventaja   = false;
     }
 
+    // Objetos de inicio de turno (Baya Zidra, Llamasfera, etc.)
+    for (const [pk, side] of [[p, 'player'], [f, 'foe']]) {
+      if (pk.currentHp <= 0) continue;
+      const hpBefore = pk.currentHp;
+      const triggered = applyHeldItemTurnStart(pk, {
+        log:       msg => cv2UI.log(msg),
+        updateHud: () => cv2UI.updateHp(side, pk),
+      });
+      if (triggered) {
+        const diff = pk.currentHp - hpBefore;
+        if (diff > 0) cv2UI.showHealFloat(side, diff);
+        else if (diff < 0) cv2UI.showDamageFloat(side, -diff);
+        cv2UI.updateHp(side, pk);
+        cv2UI.updateStatus(side, pk);
+        await cv2UI.wait(CV2_DELAY.LOG_SHORT);
+      }
+    }
+
+    // Si algún pokemon murió por efecto de objeto (Llamasfera), resolver el KO antes del turno
+    if (f.currentHp <= 0 && p.currentHp <= 0) {
+      this.queue.enqueue(() => this._stepHandleBothFaint(p, f)); return;
+    } else if (f.currentHp <= 0) {
+      this.queue.enqueue(() => this._stepHandleFaint(f, 'foe')); return;
+    } else if (p.currentHp <= 0) {
+      this.queue.enqueue(() => this._stepHandleFaint(p, 'player')); return;
+    }
+
     // Elegir movimientos
     const playerMove = p.moves.find(m => m.id === p.autoMove) ?? p.moves[0];
     const foeMove    = enemyChooseMove(f, p);  // función del engine v1 reutilizada
@@ -343,9 +370,12 @@ const CombatV2 = {
     if (this.state.ended || action._skip) return;
     const { pokemon, move, side } = action;
 
-    const effectiveMove = action._confusionSelfHit ? CONFUSION_SELF_HIT : move;
-    const target        = action._confusionSelfHit ? pokemon             : opponent;
-    const targetSide    = action._confusionSelfHit ? side : this._getOpponentSide(side);
+    let effectiveMove = action._confusionSelfHit ? CONFUSION_SELF_HIT : move;
+    if (!action._confusionSelfHit && HELD_ITEMS?.[pokemon.heldItem]?.metronome) {
+      effectiveMove = getMetronomeMove();
+    }
+    const target     = action._confusionSelfHit ? pokemon             : opponent;
+    const targetSide = action._confusionSelfHit ? side : this._getOpponentSide(side);
 
     // Anunciar movimiento
     cv2UI.log(`${pokemon.displayName} usó ${effectiveMove.name}!`);
@@ -427,19 +457,20 @@ const CombatV2 = {
       finalDmg = Math.floor(finalDmg * 2);
     }
 
-    // Banda Aguante: no puede quedar a 0 si estaba a >1 HP
-    if (defender.currentHp > 1 && finalDmg >= defender.currentHp) {
-      const aguante = HELD_ITEMS?.['focus-sash'];
-      if (aguante && defender.heldItem === 'focus-sash') {
-        finalDmg = defender.currentHp - 1;
-        cv2UI.log(`¡${defender.displayName} aguantó gracias a su objeto!`);
+    // Supervivencia (Banda Aguante): solo a HP completo, solo una vez por ruta
+    if (finalDmg >= defender.currentHp) {
+      const adj = applyHeldItemSurvive(defender, finalDmg, msg => cv2UI.log(msg));
+      if (adj !== null) {
+        finalDmg = adj;
         await cv2UI.wait(CV2_DELAY.LOG_SHORT);
       }
     }
 
     // Aplicar daño
+    const _prevHp = defender.currentHp;
     defender.currentHp = Math.max(0, defender.currentHp - finalDmg);
     action._lastDmg = finalDmg;
+    const _actualDmg = _prevHp - defender.currentHp;
 
     // Animaciones (en paralelo donde tiene sentido)
     cv2UI.flashSprite(defenderSide);
@@ -498,6 +529,20 @@ const CombatV2 = {
         await cv2UI.wait(CV2_DELAY.LOG_SHORT);
       }
     }
+
+    // Cascabel Concha — curación del atacante proporcional al daño real infligido
+    if (_actualDmg > 0 && HELD_ITEMS?.[attacker.heldItem]?.shellBell) {
+      const shellHeal = Math.max(1, Math.floor(_actualDmg * 0.20));
+      const beforeHeal = attacker.currentHp;
+      attacker.currentHp = Math.min(attacker.stats.hp, attacker.currentHp + shellHeal);
+      const healed = attacker.currentHp - beforeHeal;
+      if (healed > 0) {
+        cv2UI.log(`${attacker.displayName} se curó gracias a la Cascabel Concha!`);
+        cv2UI.showHealFloat(attackerSide, healed);
+        cv2UI.updateHp(attackerSide, attacker);
+        await cv2UI.wait(CV2_DELAY.LOG_SHORT);
+      }
+    }
   },
 
   // ── Comprobar derrota tras ataque ─────────────────────────────────────────
@@ -550,16 +595,20 @@ const CombatV2 = {
         if (pokemon.currentHp <= 0) break; // uno murió → resolver antes de continuar
       }
 
-      // Objetos de fin de turno
-      const item = HELD_ITEMS?.[pokemon.heldItem];
-      if (item?.trigger === 'on-turn-end' && item.fn) {
-        item.fn({
-          user: pokemon,
-          log:  msg => cv2UI.log(msg),
-          updatePlayerHud: () => cv2UI.updateHp(side, pokemon),
+      // Objetos de fin de turno (Restos, Vidasfera, etc.)
+      if (HELD_ITEMS?.[pokemon.heldItem]?.trigger === 'on-turn-end') {
+        const hpBefore = pokemon.currentHp;
+        const triggered = applyHeldItemTurnEnd(pokemon, {
+          log:       msg => cv2UI.log(msg),
+          updateHud: () => cv2UI.updateHp(side, pokemon),
         });
-        cv2UI.updateHp(side, pokemon);
-        await cv2UI.wait(CV2_DELAY.LOG_SHORT);
+        if (triggered) {
+          const diff = pokemon.currentHp - hpBefore;
+          if (diff > 0) cv2UI.showHealFloat(side, diff);
+          else if (diff < 0) cv2UI.showDamageFloat(side, -diff);
+          cv2UI.updateHp(side, pokemon);
+          await cv2UI.wait(CV2_DELAY.LOG_SHORT);
+        }
       }
 
       // Habilidad de fin de turno
@@ -985,11 +1034,15 @@ function _calcDamage(attacker, defender, move) {
   const fieldMult = _getFieldMult(CombatV2.state?.field?.id, move.type, attacker);
   if (fieldMult !== 1) dmg = Math.floor(dmg * fieldMult);
 
-  // Objeto equipado: bonus de daño por tipo/clase
+  // Objeto equipado: bonus de daño por tipo/clase/especie
   const heldItem = HELD_ITEMS?.[attacker.heldItem];
   if (heldItem?.dmgBoost) {
-    const { mult, type, class: cls } = heldItem.dmgBoost;
-    if ((!type || move.type === type) && (!cls || move.damageClass === cls)) {
+    const { mult, type, class: cls, onlyFor } = heldItem.dmgBoost;
+    if (
+      (!onlyFor || attacker.name === onlyFor) &&
+      (!type    || move.type         === type) &&
+      (!cls     || move.damageClass  === cls)
+    ) {
       dmg = Math.floor(dmg * (1 + mult));
     }
   }

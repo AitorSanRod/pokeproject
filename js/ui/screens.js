@@ -2073,7 +2073,7 @@ const Screens = {
     const pathEl = document.getElementById('cv2-path-progress')
       || document.querySelector('.path-progress');
     if (pathEl) {
-      const pathHtml = this._renderPathProgress();
+      const pathHtml = Screens._renderPathProgress();
       if (pathHtml) pathEl.outerHTML = pathHtml;
       else pathEl.remove();
     }

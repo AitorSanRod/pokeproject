@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Cambia a false para desactivar el botón en la pantalla de modos sin eliminar el código.
-const BF_ENABLED = false;
+const BF_ENABLED = true;
 const BF_LEVEL = 50;
 
 const BF_RULES = [
@@ -17,25 +17,25 @@ const BF_RULES = [
   'Cada 20 plantas tienes un checkpoint desde el que empezar.'
 ];
 const BattleFrontierScreen = {
-  _team:           [],   // [{ name, id, shiny }, ...] — máximo 3 (pantalla de selección)
-  _replaceIdx:     null, // índice de slot en modo sustitución, o null
-  _battleTeam:     [],   // [Pokemon, ...] — objetos creados (pantalla de preparación)
+  _team: [],   // [{ name, id, shiny }, ...] — máximo 3 (pantalla de selección)
+  _replaceIdx: null, // índice de slot en modo sustitución, o null
+  _battleTeam: [],   // [Pokemon, ...] — objetos creados (pantalla de preparación)
   _selectedItemId: null, // id del objeto seleccionado en la pantalla de prep
-  _currentFloor:   0,    // último piso completado en esta run (1-20); 0 = ninguno
-  _battleCount:    0,    // número de combate actual en la run (1-100)
-  _floorIdx:       0,    // índice en BF_FLOORS del piso en curso
+  _currentFloor: 0,    // último piso completado en esta run (1-20); 0 = ninguno
+  _battleCount: 0,    // número de combate actual en la run (1-100)
+  _floorIdx: 0,    // índice en BF_FLOORS del piso en curso
   _pendingBattles: [],   // trainers pre-sorteados para los próximos combates (se llenan en el reorg screen)
 
   // ── Pantalla de selección de equipo ──────────────────────────────────────
 
   show() {
-    BattleFrontierScreen._team           = [];
-    BattleFrontierScreen._replaceIdx     = null;
-    BattleFrontierScreen._battleTeam     = [];
+    BattleFrontierScreen._team = [];
+    BattleFrontierScreen._replaceIdx = null;
+    BattleFrontierScreen._battleTeam = [];
     BattleFrontierScreen._selectedItemId = null;
-    BattleFrontierScreen._currentFloor   = 0;
-    BattleFrontierScreen._battleCount    = 0;
-    BattleFrontierScreen._floorIdx       = 0;
+    BattleFrontierScreen._currentFloor = 0;
+    BattleFrontierScreen._battleCount = 0;
+    BattleFrontierScreen._floorIdx = 0;
     BattleFrontierScreen._pendingBattles = [];
     BattleFrontierScreen._render();
   },
@@ -61,10 +61,10 @@ const BattleFrontierScreen = {
   // ── Helpers de renderizado parcial ───────────────────────────────────────
 
   _slotHtml(i) {
-    const team       = BattleFrontierScreen._team;
+    const team = BattleFrontierScreen._team;
     const replaceIdx = BattleFrontierScreen._replaceIdx;
-    const p          = team[i];
-    const isActive   = replaceIdx === i;
+    const p = team[i];
+    const isActive = replaceIdx === i;
     if (p) {
       return `
         <div class="bf-slot bf-slot--filled${isActive ? ' bf-slot--active' : ''}" data-idx="${i}" role="button" tabindex="0">
@@ -99,8 +99,8 @@ const BattleFrontierScreen = {
   },
 
   _patchHeader() {
-    const el         = document.getElementById('bf-list-header');
-    const team       = BattleFrontierScreen._team;
+    const el = document.getElementById('bf-list-header');
+    const team = BattleFrontierScreen._team;
     const replaceIdx = BattleFrontierScreen._replaceIdx;
     if (el) el.textContent = replaceIdx !== null
       ? `SUSTITUIR A ${team[replaceIdx]?.name?.toUpperCase()}`
@@ -111,26 +111,26 @@ const BattleFrontierScreen = {
     const el = document.querySelector(`#bf-poke-list [data-name="${name}"]`);
     if (!el) return;
     el.classList.toggle('dex-entry--caught', !inTeam);
-    el.classList.toggle('bf-entry--inteam',   inTeam);
-    el.style.cursor  = inTeam ? 'default' : 'pointer';
-    el.style.opacity = inTeam ? '0.45'    : '';
+    el.classList.toggle('bf-entry--inteam', inTeam);
+    el.style.cursor = inTeam ? 'default' : 'pointer';
+    el.style.opacity = inTeam ? '0.45' : '';
     const arrow = el.querySelector('.bf-arrow');
     if (arrow) {
-      arrow.textContent   = inTeam ? '✓' : '›';
-      arrow.style.color   = inTeam ? 'var(--blue)' : 'var(--grey)';
+      arrow.textContent = inTeam ? '✓' : '›';
+      arrow.style.color = inTeam ? 'var(--blue)' : 'var(--grey)';
     }
   },
 
   // ── Render inicial (solo la primera vez o al volver) ──────────────────────
 
   _render() {
-    const dex        = Storage.getPokedex();
+    const dex = Storage.getPokedex();
     const allEntries = typeof DEX_GENERATIONS !== 'undefined'
       ? DEX_GENERATIONS.flatMap(g => g.entries)
       : KANTO_DEX;
     const caught = allEntries.filter(e => dex[e.name]?.caught);
 
-    const team          = BattleFrontierScreen._team;
+    const team = BattleFrontierScreen._team;
     const selectedNames = new Set(team.map(t => t.name));
 
     document.getElementById('viewport').innerHTML = `
@@ -174,13 +174,13 @@ const BattleFrontierScreen = {
         <div id="bf-poke-scroll" style="overflow-y:auto;flex:1;min-height:0;padding:0 var(--sp-sm)">
           <div id="bf-poke-list" style="display:flex;flex-direction:column;gap:4px">
             ${caught.length === 0
-              ? `<p style="font-family:var(--font-pixel);font-size:8px;color:var(--grey);text-align:center;padding:32px 16px;line-height:1.8">
+        ? `<p style="font-family:var(--font-pixel);font-size:8px;color:var(--grey);text-align:center;padding:32px 16px;line-height:1.8">
                    No tienes pokémon capturados.
                  </p>`
-              : caught.map(entry => {
-                  const inTeam  = selectedNames.has(entry.name);
-                  const isShiny = Storage.isShiny(entry.name);
-                  return `
+        : caught.map(entry => {
+          const inTeam = selectedNames.has(entry.name);
+          const isShiny = Storage.isShiny(entry.name);
+          return `
                     <div class="dex-entry ${inTeam ? 'bf-entry--inteam' : 'dex-entry--caught'}"
                       data-name="${entry.name}" data-id="${entry.id}" data-shiny="${isShiny}"
                       style="cursor:${inTeam ? 'default' : 'pointer'}${inTeam ? ';opacity:0.45' : ''}">
@@ -200,7 +200,7 @@ const BattleFrontierScreen = {
                         ${inTeam ? '✓' : '›'}
                       </span>
                     </div>`;
-                }).join('')}
+        }).join('')}
           </div>
         </div>
 
@@ -239,10 +239,10 @@ const BattleFrontierScreen = {
   },
 
   _onPick(el) {
-    const name       = el.dataset.name;
-    const id         = +el.dataset.id;
-    const isShiny    = el.dataset.shiny === 'true';
-    const team       = BattleFrontierScreen._team;
+    const name = el.dataset.name;
+    const id = +el.dataset.id;
+    const isShiny = el.dataset.shiny === 'true';
+    const team = BattleFrontierScreen._team;
     const replaceIdx = BattleFrontierScreen._replaceIdx;
 
     if (replaceIdx === null && team.length >= 3) return;
@@ -252,7 +252,7 @@ const BattleFrontierScreen = {
       return;
     }
 
-    const shinySpriteUrl  = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${id}.png`;
+    const shinySpriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${id}.png`;
     const normalSpriteUrl = getDexSpriteUrl(id);
 
     const overlay = Screens._makeModal(`
@@ -276,14 +276,14 @@ const BattleFrontierScreen = {
     `, { id: 'bf-shiny-modal', closeOnBackdrop: true });
 
     overlay.querySelector('#bf-pick-normal').addEventListener('click', () => { overlay.remove(); BattleFrontierScreen._commit(name, id, false); });
-    overlay.querySelector('#bf-pick-shiny').addEventListener('click',  () => { overlay.remove(); BattleFrontierScreen._commit(name, id, true);  });
+    overlay.querySelector('#bf-pick-shiny').addEventListener('click', () => { overlay.remove(); BattleFrontierScreen._commit(name, id, true); });
     overlay.querySelector('#bf-pick-cancel').addEventListener('click', () => overlay.remove());
   },
 
   _commit(name, id, shiny) {
-    const team       = BattleFrontierScreen._team;
+    const team = BattleFrontierScreen._team;
     const replaceIdx = BattleFrontierScreen._replaceIdx;
-    let   oldName    = null;
+    let oldName = null;
 
     if (replaceIdx !== null) {
       oldName = team[replaceIdx]?.name ?? null;
@@ -316,7 +316,7 @@ const BattleFrontierScreen = {
       );
       for (const p of pokes) {
         Storage.applyStoredEvs(p);
-        p.stats     = computeStats(p);
+        p.stats = computeStats(p);
         p.currentHp = p.stats.hp;
       }
       BattleFrontierScreen._battleTeam = pokes;
@@ -333,7 +333,7 @@ const BattleFrontierScreen = {
   },
 
   _renderPrepScreen() {
-    const bf    = BattleFrontierScreen;
+    const bf = BattleFrontierScreen;
     const pokes = bf._battleTeam;
 
     const collectedIds = Object.keys(Storage.getCollectedItems());
@@ -343,7 +343,7 @@ const BattleFrontierScreen = {
 
     const _updateLabel = () => {
       const label = document.getElementById('bf-team-label');
-      const sel   = bf._selectedItemId;
+      const sel = bf._selectedItemId;
       if (label) {
         label.textContent = sel ? 'EQUIPAR A → ELIGE UN POKÉMON' : 'EQUIPO · ARRASTRA para ordenar · TOCA para cambiar ataque';
         label.style.color = sel ? 'var(--blue)' : 'var(--grey)';
@@ -421,7 +421,7 @@ const BattleFrontierScreen = {
         });
         card.addEventListener('click', () => {
           if (dragging) return;
-          const idx   = +card.dataset.idx;
+          const idx = +card.dataset.idx;
           const selId = bf._selectedItemId;
           if (selId) {
             const p = bf._battleTeam[idx];
@@ -459,10 +459,10 @@ const BattleFrontierScreen = {
             OBJETOS DESBLOQUEADOS
           </div>
           ${items.length === 0
-            ? `<p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-light);text-align:center;padding:8px 0;line-height:1.8">
+        ? `<p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-light);text-align:center;padding:8px 0;line-height:1.8">
                  Aún no has desbloqueado ningún objeto.
                </p>`
-            : `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-sm)">
+        : `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-sm)">
                  ${items.map(item => `
                    <div class="bf-item-card" data-item-id="${item.id}" role="button" tabindex="0">
                      <img src="${item.img}" class="bf-item-card__img" onerror="this.style.display='none'">
@@ -516,7 +516,7 @@ const BattleFrontierScreen = {
   // Muestra el modal de selección de punto de entrada (desde el principio o desde
   // un checkpoint de 20 en 20) y lanza la run al confirmar.
   _showFloorSelect() {
-    const maxFloor    = Storage.getBfMaxFloor();
+    const maxFloor = Storage.getBfMaxFloor();
     const checkpoints = [20, 40, 60, 80, 100];
 
     const overlay = Screens._makeModal(`
@@ -524,13 +524,13 @@ const BattleFrontierScreen = {
       <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
         <button class="btn btn--primary btn--wide" id="bf-floor-0">DESDE EL PRINCIPIO</button>
         ${checkpoints.map(f => {
-          const unlocked = maxFloor >= f;
-          return `<button class="btn btn--wide" id="bf-floor-${f}"
+      const unlocked = maxFloor >= f;
+      return `<button class="btn btn--wide" id="bf-floor-${f}"
             ${unlocked ? '' : 'disabled'}
             style="${unlocked ? '' : 'opacity:0.38;cursor:not-allowed'}">
             PLANTA ${f}${unlocked ? '' : ' (bloqueada)'}
           </button>`;
-        }).join('')}
+    }).join('')}
         <button class="btn btn--ghost btn--wide" id="bf-floor-cancel">CANCELAR</button>
       </div>`);
 
@@ -551,9 +551,9 @@ const BattleFrontierScreen = {
   },
 
   _startRunFromFloor(fromFloor = 0) {
-    BattleFrontierScreen._battleCount  = fromFloor;
+    BattleFrontierScreen._battleCount = fromFloor;
     BattleFrontierScreen._currentFloor = fromFloor;
-    BattleFrontierScreen._floorIdx     = 0;  // _nextBattle avanza con su while
+    BattleFrontierScreen._floorIdx = 0;  // _nextBattle avanza con su while
 
     for (const p of BattleFrontierScreen._battleTeam) fullHeal(p);
 
@@ -566,11 +566,11 @@ const BattleFrontierScreen = {
   // Pre-sortea los próximos 5 trainers, los guarda en _pendingBattles y
   // devuelve los datos de display (img, name, flags) ya usando esos trainers reales.
   _buildBfPath() {
-    const bf    = BattleFrontierScreen;
+    const bf = BattleFrontierScreen;
     const start = bf._battleCount;
     const steps = [];
     bf._pendingBattles = [];
-    let fi     = bf._floorIdx;
+    let fi = bf._floorIdx;
     let prevFi = fi;
 
     for (let n = 1; n <= 5; n++) {
@@ -579,14 +579,14 @@ const BattleFrontierScreen = {
 
       prevFi = fi;
       while (fi < BF_FLOORS.length - 1 &&
-             BF_FLOORS[fi].battleRange &&
-             num > (BF_FLOORS[fi].battleRange[1] ?? Infinity)) fi++;
+        BF_FLOORS[fi].battleRange &&
+        num > (BF_FLOORS[fi].battleRange[1] ?? Infinity)) fi++;
 
       const floor = BF_FLOORS[fi];
       if (!floor?.battleRange) break;
 
-      const isSpecial  = floor.specialTrainer?.battleNumber === num;
-      const trainer    = isSpecial
+      const isSpecial = floor.specialTrainer?.battleNumber === num;
+      const trainer = isSpecial
         ? floor.specialTrainer
         : floor.trainers[BattleFrontierScreen._trainerIdxForBattle(floor, num)];
       const isFloorEnd = num === floor.battleRange[1];
@@ -595,8 +595,8 @@ const BattleFrontierScreen = {
 
       steps.push({
         num,
-        img:       trainer.img,
-        name:      trainer.name,
+        img: trainer.img,
+        name: trainer.name,
         isSpecial,
         hasReward: isFloorEnd && !!floor.reward,
         isNewFloor: fi !== prevFi && n > 1,
@@ -663,15 +663,23 @@ const BattleFrontierScreen = {
     });
 
     GameState.currentTrainerCombatBg = floor.trainerBg ?? null;
+    GameState.currentPath = null;  // evitar que se muestre barra de progreso de ruta anterior
 
-    Screens.show(Screens.combat, {
+    const _opts = {
       foeTeam,
-      isTrainer:   true,
+      isTrainer: true,
       trainerName: `${trainer.name} · PISO ${BattleFrontierScreen._battleCount}`,
-      noExp:       true,
-      onWin:  () => BattleFrontierScreen._onBattleWin(floor),
+      noExp: true,
+      onWin: () => BattleFrontierScreen._onBattleWin(floor),
       onLoss: () => BattleFrontierScreen._onBattleLoss(),
-    });
+    };
+    // Si ya hay un cv2-field activo (entre batallas consecutivas), reutilizar el DOM
+    // como hacen las rutas en _startCombatInPath — evita el flash de pantalla blanca.
+    if (document.getElementById('cv2-field')) {
+      Screens.combat(_opts);
+    } else {
+      Screens.show(Screens.combat, _opts);
+    }
   },
 
   _onBattleWin(floor) {
@@ -685,9 +693,9 @@ const BattleFrontierScreen = {
     // Cada combate ganado es un piso
     BattleFrontierScreen._currentFloor = count;
     const currentFloor = count;
-    const isRunOver    = BF_FLOORS[BattleFrontierScreen._floorIdx + 1]?.type === 'victory'
-                      || BattleFrontierScreen._floorIdx >= BF_FLOORS.length - 1;
-    const needsReorg   = !isRunOver && currentFloor % 5 === 0;
+    const isRunOver = BF_FLOORS[BattleFrontierScreen._floorIdx + 1]?.type === 'victory'
+      || BattleFrontierScreen._floorIdx >= BF_FLOORS.length - 1;
+    const needsReorg = !isRunOver && currentFloor % 5 === 0;
 
     const afterReward = () => {
       // Curación completa cada 20 pisos (20, 40, 60, 80, 100)
@@ -718,10 +726,10 @@ const BattleFrontierScreen = {
 
   async _showBfReward(reward, onDone) {
     const pokeName = reward.pokemon[Math.floor(Math.random() * reward.pokemon.length)];
-    const tm       = reward.tm[Math.floor(Math.random() * reward.tm.length)];
-    const tmId     = tm?.id ?? null;
-    const itemId   = reward.item[Math.floor(Math.random() * reward.item.length)];
-    const isShiny  = Math.random() < BF_SHINY_RATE;
+    const tm = reward.tm[Math.floor(Math.random() * reward.tm.length)];
+    const tmId = tm?.id ?? null;
+    const itemId = reward.item[Math.floor(Math.random() * reward.item.length)];
+    const isShiny = Math.random() < BF_SHINY_RATE;
 
     // Solo para mostrar sprite/nombre — nunca se añade al equipo
     const rewardPoke = await createPokemon(pokeName, 50, false, null, null, isShiny);
@@ -785,9 +793,9 @@ const BattleFrontierScreen = {
             <div class="item-card" id="bf-item-card" role="button" tabindex="0"
               style="cursor:pointer;position:relative">
               ${itemIsNew
-                ? `<div style="position:absolute;top:4px;right:4px;background:var(--yellow);color:var(--black);font-family:var(--font-pixel);font-size:5px;padding:2px 5px;border-radius:2px;line-height:1.4">NUEVO</div>`
-                : `<div style="position:absolute;top:4px;right:4px;background:rgba(128,128,128,.25);color:var(--grey);font-family:var(--font-pixel);font-size:5px;padding:2px 5px;border-radius:2px;line-height:1.4">DESBLOQUEADO</div>`
-              }
+          ? `<div style="position:absolute;top:4px;right:4px;background:var(--yellow);color:var(--black);font-family:var(--font-pixel);font-size:5px;padding:2px 5px;border-radius:2px;line-height:1.4">NUEVO</div>`
+          : `<div style="position:absolute;top:4px;right:4px;background:rgba(128,128,128,.25);color:var(--grey);font-family:var(--font-pixel);font-size:5px;padding:2px 5px;border-radius:2px;line-height:1.4">DESBLOQUEADO</div>`
+        }
               <div class="item-card__icon">
                 <img src="${item?.img ?? ''}"
                   style="width:40px;height:40px;image-rendering:pixelated;object-fit:contain"
@@ -819,7 +827,7 @@ const BattleFrontierScreen = {
   },
 
   _showReorgScreen(onDone, onBack = null) {
-    const bf        = BattleFrontierScreen;
+    const bf = BattleFrontierScreen;
     const pathSteps = BattleFrontierScreen._buildBfPath(); // pre-sortea trainers una sola vez
 
     const _render = () => {
@@ -844,13 +852,13 @@ const BattleFrontierScreen = {
             </div>
             <div class="path-progress bf-path">
               ${pathSteps.map((s, i) => {
-                const icon = `<img src="${s.img}" style="width:20px;height:20px;image-rendering:pixelated;object-fit:contain"
+        const icon = `<img src="${s.img}" style="width:20px;height:20px;image-rendering:pixelated;object-fit:contain"
                   onerror="this.outerHTML='<span style=font-size:11px>👤</span>'">`;
-                const label = s.name + (s.hasReward ? ' ★' : '');
-                const sep = s.isNewFloor
-                  ? `<div style="width:2px;height:28px;background:var(--grey-light);border-radius:1px;flex-shrink:0;margin:0 2px"></div>`
-                  : '';
-                return `
+        const label = s.name + (s.hasReward ? ' ★' : '');
+        const sep = s.isNewFloor
+          ? `<div style="width:2px;height:28px;background:var(--grey-light);border-radius:1px;flex-shrink:0;margin:0 2px"></div>`
+          : '';
+        return `
                   ${sep}
                   <div class="path-progress__step path-encounter-cell"
                     style="${s.isSpecial ? 'border-color:var(--yellow);background:#fffbe6' : ''}">
@@ -859,7 +867,7 @@ const BattleFrontierScreen = {
                     ${s.hasReward ? `<span style="position:absolute;top:-5px;right:-5px;font-size:9px;line-height:1">★</span>` : ''}
                   </div>
                   ${i < pathSteps.length - 1 ? `<div class="path-progress__line"></div>` : ''}`;
-              }).join('')}
+      }).join('')}
             </div>
           </div>` : ''}
 
@@ -869,9 +877,9 @@ const BattleFrontierScreen = {
             </p>
             <div id="bf-reorg-team" style="display:flex;flex-direction:column;gap:10px;flex:1">
               ${pokes.map((p, i) => {
-                const heldItem = p.heldItem ? HELD_ITEMS[p.heldItem] : null;
-                const autoMove = p.moves.find(m => m.id === p.autoMove) ?? p.moves[0];
-                return `
+        const heldItem = p.heldItem ? HELD_ITEMS[p.heldItem] : null;
+        const autoMove = p.moves.find(m => m.id === p.autoMove) ?? p.moves[0];
+        return `
                   <div class="bf-reorg-card" draggable="true" data-idx="${i}"
                     style="background:var(--white);border:var(--border);border-radius:var(--radius-md);
                       box-shadow:var(--shadow-sm);padding:14px 12px;display:flex;align-items:center;
@@ -907,7 +915,7 @@ const BattleFrontierScreen = {
 
                     <span style="font-size:18px;color:var(--grey-light);cursor:grab;flex-shrink:0;padding:0 2px">⠿</span>
                   </div>`;
-              }).join('')}
+      }).join('')}
             </div>
           </div>
 
@@ -1015,7 +1023,7 @@ const BattleFrontierScreen = {
 
   _showBfDefeat() {
     const floor = BattleFrontierScreen._battleCount;
-    const msg   = floor > 0 ? `¡Has llegado hasta el piso ${floor}!` : 'Caiste en el primer piso';
+    const msg = floor > 0 ? `¡Has llegado hasta el piso ${floor}!` : 'Caiste en el primer piso';
 
     document.getElementById('viewport').innerHTML = `
       <div class="screen screen--defeat">
@@ -1031,7 +1039,7 @@ const BattleFrontierScreen = {
   },
 
   _showBfVictory() {
-    const data    = BF_FLOORS.find(f => f.type === 'victory') ?? {};
+    const data = BF_FLOORS.find(f => f.type === 'victory') ?? {};
     const bgLayer = Screens._bgLayer(data.bg, true);
 
     document.getElementById('viewport').innerHTML = `
