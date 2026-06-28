@@ -52,10 +52,10 @@ var MOVE_POOL = {
       { stage: 1, id: 'tackle', name: 'Placaje', power: 40, pp: 35, type: T.NORMAL, damageClass: DC.PHYSICAL },
       { stage: 2, id: 'extreme-speed', name: 'Velocidad Extrema', power: 60, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'priority' },
       { stage: 3, id: 'hyper-fang', name: 'Hiper Colmillo', power: 90, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'shield-10' },
-      { stage: 1, mt: true, id: 'facade', name: 'Fachada', power: 60, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'guts', effectData: { dmgMult: 2.5 } },
+      { stage: 1, mt: true, id: 'facade', name: 'Fachada', power: 60, pp: 15, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'ventaja' },
       { id: 'self-destruct', name: 'Autodestruccion', power: 800, pp: 5, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: 'self-destruct', boss: true },
       { id: 'false-swipe', name: 'Sonambulo', power: 30, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['recoil-10', 'shield-25', 'sleep-self', 'sleep-attack', 'raise-atk-5'], boss: true },
-      { stage: 1, id: 'natural-gift', name: 'Don Natural', power: 15, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['raise-don-natural', 'versatil'], pokemon: ['eevee'] },
+      { stage: 1, id: 'natural-gift', name: 'Don Natural', power: 12, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['raise-don-natural', 'versatil'], pokemon: ['eevee'] },
     ],
     special: [
       { stage: 1, id: 'swift', name: 'Velocidad', power: 40, pp: 20, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: 'shield-10' },
@@ -81,7 +81,8 @@ var MOVE_POOL = {
     physical: [
       { stage: 1, id: 'waterfall', name: 'Cascada', power: 30, pp: 15, type: T.WATER, damageClass: DC.PHYSICAL, effectId: 'raise-atk-20' },
       { stage: 2, id: 'crabhammer', name: 'Martillazo', power: 50, pp: 10, type: T.WATER, damageClass: DC.PHYSICAL },
-      { stage: 3, id: 'wave-crash', name: 'Envite acuatico', power: 100, pp: 10, type: T.WATER, damageClass: DC.PHYSICAL, effectId: ['self-hurt', 'guts'] },
+      { stage: 3, id: 'wave-crash', name: 'Envite acuatico', power: 100, pp: 10, type: T.WATER, damageClass: DC.PHYSICAL, effectId: 'self-hurt' },
+      { stage: 3, mt: true, id: 'aqua-jet', name: 'Acua Jet', power: 40, pp: 10, type: T.WATER, damageClass: DC.PHYSICAL, effectId: 'priority' },
     ],
     special: [
       { stage: 1, id: 'water-gun', name: 'Pistola Agua', power: 40, pp: 25, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'lower-atk-10' },
@@ -107,12 +108,12 @@ var MOVE_POOL = {
   },
   electric: {
     physical: [
-      { stage: 1, id: 'thunder-punch', name: 'Puño Trueno', power: 60, pp: 15, type: T.ELECTRIC, damageClass: DC.PHYSICAL, effectId: 'paralize-25' },
+      { stage: 1, id: 'thunder-punch', name: 'Puño Trueno', power: 60, pp: 15, type: T.ELECTRIC, damageClass: DC.PHYSICAL },
       { stage: 2, id: 'wild-charge', name: 'Voltiocruel', power: 90, pp: 15, type: T.ELECTRIC, damageClass: DC.PHYSICAL },
       { stage: 3, id: 'volt-tackle', name: 'Placaje Eléctrico', power: 150, pp: 15, type: T.ELECTRIC, damageClass: DC.PHYSICAL },
     ],
     special: [
-      { stage: 1, id: 'thunder-shock', name: 'Impactrueno', power: 35, pp: 30, type: T.ELECTRIC, damageClass: DC.SPECIAL, effectId: 'paralize-25' },
+      { stage: 1, id: 'thunder-shock', name: 'Impactrueno', power: 35, pp: 30, type: T.ELECTRIC, damageClass: DC.SPECIAL },
       { stage: 2, id: 'thunderbolt', name: 'Rayo', power: 70, pp: 15, type: T.ELECTRIC, damageClass: DC.SPECIAL, effectId: 'raise-spa-10-100' },
       { stage: 3, id: 'thunder', name: 'Trueno', power: 90, pp: 10, type: T.ELECTRIC, damageClass: DC.SPECIAL },
     ],
@@ -281,7 +282,17 @@ var MOVE_POOL = {
 };
 
 function getMoveProgression(type, damageClass) {
-  return MOVE_POOL[type]?.[damageClass] ?? [];
+  const pool = MOVE_POOL[type];
+  if (!pool) return [];
+  if (Array.isArray(damageClass)) {
+    const seen = new Set();
+    return damageClass.flatMap(dc => pool[dc] ?? []).filter(m => {
+      if (seen.has(m.id)) return false;
+      seen.add(m.id);
+      return true;
+    });
+  }
+  return pool[damageClass] ?? [];
 }
 
 // Calcula la stage evolutiva de un pokemon (0=base, 1=media, 2=final)

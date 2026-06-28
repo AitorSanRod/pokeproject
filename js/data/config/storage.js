@@ -5,12 +5,14 @@
 // Usa localStorage con claves prefijadas para no colisionar con otros datos.
 //
 // Claves usadas:
-//   pkmn_pokedex    → { [name]: { caught: bool } }
-//   pkmn_evs        → { [root]: { hp, atk, def, spa, spd, spe } }
-//   pkmn_mts        → { [root]: ['move-id-1', 'move-id-2'] }  ← se borra con pokédex
-//   pkmn_items      → { [itemId]: true }  ← objetos equipables recogidos alguna vez
-//   pkmn_kanto_done → true  ← se ha visto la pantalla info-final-kanto al menos una vez
-//   pkmn_logros     → { [logroId]: true }  ← logros desbloqueados (permanentes)
+//   pkmn_pokedex         → { [name]: { caught: bool } }
+//   pkmn_evs             → { [root]: { hp, atk, def, spa, spd, spe } }
+//   pkmn_mts             → { [root]: ['move-id-1', 'move-id-2'] }  ← se borra con pokédex
+//   pkmn_items           → { [itemId]: true }  ← objetos equipables recogidos alguna vez
+//   pkmn_kanto_done      → true  ← se ha visto la pantalla info-final-kanto al menos una vez
+//   pkmn_logros          → { [logroId]: true }  ← logros desbloqueados (permanentes)
+//   pkmn_furthest_routes → { [regionId]: areaString }  ← ruta más lejana alcanzada en la run activa por región
+//                          Se resetea al iniciar nueva run. Sobrevive a recargas de página mid-ruta.
 // ─────────────────────────────────────────────────────────────────────────────
 
 var Storage = {
@@ -323,6 +325,33 @@ var Storage = {
     } catch (e) {
       console.warn('[Storage] Error eliminando run', e);
     }
+  },
+
+  // ── Progreso máximo de ruta por región ───────────────────────────────────
+  // Guarda el area (string) de la ruta más lejana alcanzada, no el índice,
+  // para que sea estable aunque se añadan/reordenen rutas en el array.
+  // Se resetea explícitamente al iniciar una nueva run.
+
+  getFurthestRoute(regionId) {
+    const all = this._get('furthest_routes') ?? {};
+    return all[regionId] ?? null; // string area o null
+  },
+
+  setFurthestRoute(regionId, area, currentIndex, routes) {
+    const all      = this._get('furthest_routes') ?? {};
+    const prevArea = all[regionId];
+    if (prevArea) {
+      const prevIdx = routes.findIndex(r => r.area === prevArea);
+      if (prevIdx >= currentIndex) return; // ya tenemos uno más lejano
+    }
+    all[regionId] = area;
+    this._set('furthest_routes', all);
+  },
+
+  clearFurthestRoute(regionId) {
+    const all = this._get('furthest_routes') ?? {};
+    delete all[regionId];
+    this._set('furthest_routes', all);
   },
 
   clearAll() {

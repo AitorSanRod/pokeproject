@@ -128,7 +128,7 @@ Object.assign(ROUTE_DATA, {
     trainerBg: COMBAT_BG.default,
     rewardPokemon: [],
     get wild() {
-      const [primerInicial, segundoInicial] = ObtenerSegundoInicial(GameState.starterName ?? POKEMON.chikorita);
+      const [primerInicial, segundoInicial] = johtoObtenerSegundoInicial(GameState.starterName ?? POKEMON.chikorita);
       return [
         { name: primerInicial, rate: 50, minLv: 5, maxLv: 7 },
         { name: segundoInicial, rate: 50, minLv: 5, maxLv: 7 },
@@ -355,7 +355,7 @@ var JOHTO_ROUTES = [
 
 // ── Helpers específicos de Kanto ───────────────────────────────────────────
 
-function ObtenerSegundoInicial(playerPokemon) {
+function johtoObtenerSegundoInicial(playerPokemon) {
   if (playerPokemon === POKEMON.chikorita) return [POKEMON.cyndaquil, POKEMON.totodile];
   if (playerPokemon === POKEMON.totodile) return [POKEMON.chikorita, POKEMON.cyndaquil];
   if (playerPokemon === POKEMON.cyndaquil) return [POKEMON.chikorita, POKEMON.totodile];

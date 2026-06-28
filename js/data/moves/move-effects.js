@@ -32,9 +32,9 @@ var MOVE_EFFECTS = {
   // ── ESPECIALES — sin trigger (lógica en calcDamage) ───────────────────────
 
   'versatil': {
-    // No tiene trigger ni fn — la lógica vive en calcDamage (battle.js):
+    // No tiene trigger ni fn — la lógica vive en _calcDamage (cv2-engine.js):
     // si la efectividad de tipo sería ×0, se trata como ×1 en su lugar.
-    desc: 'Ignora las inmunidades de tipo: trata ×0 como ×1.',
+    desc: 'Ignora las inmunidades de tipo: trata x0 como x1.',
   },
 
   'crit-75': {
@@ -446,12 +446,18 @@ var MOVE_EFFECTS = {
     },
   },
 
-  // ── BEFORE_ATTACK — Modificadores de turno ────────────────────────────────
+  // ── BEFORE_ATTACK — Prioridad de turno ───────────────────────────────────
+  //
+  // Los efectos de prioridad no tienen trigger ni fn.
+  // El campo `priority` (entero) es leído por getMovePriority() en ambos engines.
+  // Niveles de referencia reales: +1 Quick Attack, +2 Extreme Speed, +3 Fake Out
+  //
+  // Para añadir un nivel nuevo: crea una entrada con un id único y el valor
+  // de `priority` deseado. Asígnalo como effectId en move-pool.js.
 
   'priority': {
-    trigger: TRIGGERS.BEFORE_ATTACK,
-    desc: 'Siempre ataca primero, independiente de la velocidad.',
-    fn(ctx) { ctx.user._priority = true; },
+    priority: 2,
+    desc: 'Alta prioridad (+2): ataca antes que cualquier movimiento normal.',
   },
 
   'double-hit': {
@@ -503,11 +509,14 @@ var MOVE_EFFECTS = {
     },
   },
 
-  'guts': {
-    trigger: TRIGGERS.BEFORE_ATTACK,
-    desc: 'Ignora las penalizaciones de quemado, paralizado y congelado.<br>Aumenta el daño físico.',
+
+  // ── CLIMA ──────────────────────────────────────────────────────────────────
+
+  'sunny-day': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Instaura Sol Intenso durante 5 turnos: fuego +50%, agua -50%.',
     fn(ctx) {
-      // No-op: battle.js lee effectData.dmgMult del movimiento activo para aplicar el bonus.
+      if (typeof CombatV2 !== 'undefined') CombatV2.setWeather('sun');
     },
   },
 
@@ -642,4 +651,239 @@ function getEffectDescriptions(move) {
   const ids = Array.isArray(move.effectId) ? move.effectId : [move.effectId];
   const descs = ids.map(id => MOVE_EFFECTS[id]?.desc).filter(Boolean);
   return descs.length > 0 ? descs.join('<br>') : null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HABILIDADES
+//
+// Cada Pokémon puede tener un atributo `ability` (string) que referencia
+// una entrada en ABILITIES. Las habilidades se asignan en pokemon-db.js.
+//
+// Triggers:
+//   on-enter        — al entrar al campo (después de la animación de entrada)
+//   on-hit          — al aterrizar un golpe (atacante, justo después de aplicar el daño)
+//   on-hit-received — al recibir daño (defensor, después de que el daño se aplica y el HUD actualiza)
+//   on-turn-end     — al final de cada turno, tras estados y objetos
+//   passive         — leído directamente en _calcDamage (cv2-engine.js)
+//
+// Contexto recibido en fn({ pokemon, side, ... }):
+//   on-enter:        { pokemon, side, opponent, opponentSide, log, showStatChange }
+//   on-hit:          { pokemon, side, target, targetSide, dmg, log, showStatChange, updateHud }
+//   on-hit-received: { pokemon, side, attacker, dmg, log, showStatChange, updateHud }
+//   on-turn-end:     { pokemon, side, log, showStatChange, updateHud }
+//   passive:         no llama a fn — lógica en _calcDamage
+// ─────────────────────────────────────────────────────────────────────────────
+
+var ABILITY_TRIGGERS = Object.freeze({
+  ON_ENTER:        'on-enter',
+  ON_HIT:          'on-hit',
+  ON_HIT_RECEIVED: 'on-hit-received',
+  ON_TURN_END:     'on-turn-end',
+  PASSIVE:         'passive',
+});
+
+var ABILITIES = {
+
+  // ── Entrada al campo ───────────────────────────────────────────────────────
+
+  'drought': {
+    trigger: ABILITY_TRIGGERS.ON_ENTER,
+    name: 'Sequía',
+    desc: 'Al entrar al campo instaura Sol Intenso.',
+    fn(ctx) {
+      if (typeof CombatV2 !== 'undefined') CombatV2.setWeather('sun');
+    },
+  },
+
+  'drizzle': {
+    trigger: ABILITY_TRIGGERS.ON_ENTER,
+    name: 'Llovizna',
+    desc: 'Al entrar al campo instaura Lluvia.',
+    fn(ctx) {
+      if (typeof CombatV2 !== 'undefined') CombatV2.setWeather('rain');
+    },
+  },
+
+  'cloud-nine': {
+    trigger: ABILITY_TRIGGERS.ON_ENTER,
+    name: 'Aclimatación',
+    desc: 'Al entrar al campo elimina el clima activo.',
+    fn(ctx) {
+      if (typeof CombatV2 === 'undefined' || !CombatV2.state?.weather) return;
+      CombatV2.state.weather = null;
+      cv2UI.updateWeather(null);
+      ctx.log(`¡${ctx.pokemon.displayName} disipó el clima!`);
+    },
+  },
+
+  'intimidate': {
+    trigger: ABILITY_TRIGGERS.ON_ENTER,
+    name: 'Intimidación',
+    desc: 'Al entrar al campo baja el ATK del rival un 30%.',
+    fn(ctx) {
+      if (!ctx.opponent || hasClearEffect(ctx.opponent)) return;
+      if (!ctx.opponent.combatMods) ctx.opponent.combatMods = {};
+      ctx.opponent.combatMods.atk = (ctx.opponent.combatMods.atk ?? 0) - 0.30;
+      ctx.log(`¡Intimidación bajo el ataque de ${ctx.opponent.displayName}!`);
+      ctx.showStatChange(ctx.opponentSide, 'ATK', 'down', 30);
+    },
+  },
+
+  // ── Al recibir un golpe ────────────────────────────────────────────────────
+
+  'static': {
+    trigger: ABILITY_TRIGGERS.ON_HIT_RECEIVED,
+    name: 'Estática',
+    desc: '30% de probabilidad de paralizar al atacante.',
+    statusChance: 0.30,
+    fn(ctx) {
+      if (!ctx.attacker || ctx.attacker.currentHp <= 0) return;
+      StatusEffects.apply(ctx.attacker, StatusEffect.PARALYSIS, ctx.log);
+    },
+  },
+
+  'flame-body': {
+    trigger: ABILITY_TRIGGERS.ON_HIT_RECEIVED,
+    name: 'Cuerpo Llama',
+    desc: '30% de probabilidad de quemar al atacante.',
+    statusChance: 0.30,
+    fn(ctx) {
+      if (!ctx.attacker || ctx.attacker.currentHp <= 0) return;
+      StatusEffects.apply(ctx.attacker, StatusEffect.BURN, ctx.log);
+    },
+  },
+
+  'poison-point': {
+    trigger: ABILITY_TRIGGERS.ON_HIT_RECEIVED,
+    name: 'Punto Tóxico',
+    desc: '30% de probabilidad de envenenar al atacante.',
+    statusChance: 0.30,
+    fn(ctx) {
+      if (!ctx.attacker || ctx.attacker.currentHp <= 0) return;
+      StatusEffects.apply(ctx.attacker, StatusEffect.POISON, ctx.log);
+    },
+  },
+
+  'rough-skin': {
+    trigger: ABILITY_TRIGGERS.ON_HIT_RECEIVED,
+    name: 'Piel Tosca',
+    desc: 'El atacante pierde el 12.5% de su HP máximo al golpear.',
+    fn(ctx) {
+      if (!ctx.attacker || ctx.attacker.currentHp <= 0) return;
+      const dmg = Math.max(1, Math.floor(ctx.attacker.stats.hp * 0.125));
+      ctx.attacker.currentHp = Math.max(0, ctx.attacker.currentHp - dmg);
+      ctx.log(`¡${ctx.attacker.displayName} fue lastimado por la piel tosca!`);
+    },
+  },
+
+  // ── Fin de turno ──────────────────────────────────────────────────────────
+
+  'speed-boost': {
+    trigger: ABILITY_TRIGGERS.ON_TURN_END,
+    name: 'Impulso',
+    desc: 'Sube la SPE un 10% al final de cada turno.',
+    fn(ctx) {
+      if (!ctx.pokemon.combatMods) ctx.pokemon.combatMods = {};
+      ctx.pokemon.combatMods.spe = (ctx.pokemon.combatMods.spe ?? 0) + 0.10;
+      ctx.log(`¡La SPE de ${ctx.pokemon.displayName} subió!`);
+      ctx.showStatChange(ctx.side, 'SPE', 'up', 10);
+    },
+  },
+
+  // ── Pasivas (leídas en _calcDamage de cv2-engine.js) ─────────────────────
+
+  'huge-power': {
+    trigger: ABILITY_TRIGGERS.PASSIVE,
+    name: 'Potencia',
+    desc: 'Duplica el ATK.',
+  },
+
+  'levitate': {
+    trigger: ABILITY_TRIGGERS.PASSIVE,
+    name: 'Levitación',
+    desc: 'Inmune a los movimientos de tipo Tierra.',
+  },
+
+  'guts': {
+    trigger: ABILITY_TRIGGERS.PASSIVE,
+    name: 'Agallas',
+    desc: 'Ignora las penalizaciones de estado. Aumenta el daño físico un 50%.',
+    dmgMult: 1.5,
+  },
+
+  // ── Habilidades ocultas (sin implementar — reservadas para futura mecánica de objetos) ──
+
+  'lightning-rod': {
+    trigger: ABILITY_TRIGGERS.PASSIVE,
+    name: 'Pararrayos',
+    desc: 'Inmune a ataques Eléctricos; los absorbe para subir su Ataque Especial.',
+  },
+
+  'rivalry': {
+    trigger: ABILITY_TRIGGERS.PASSIVE,
+    name: 'Rivalidad',
+    desc: 'Ataque sube si el rival es del mismo sexo; baja si es del opuesto.',
+  },
+
+  'justified': {
+    trigger: ABILITY_TRIGGERS.PASSIVE,
+    name: 'Justicia',
+    desc: 'Sube el Ataque al recibir un golpe de tipo Siniestro.',
+  },
+
+  'cursed-body': {
+    trigger: ABILITY_TRIGGERS.PASSIVE,
+    name: 'Cuerpo Maldito',
+    desc: 'Puede deshabilitar el movimiento que lo golpea.',
+  },
+
+  'vital-spirit': {
+    trigger: ABILITY_TRIGGERS.PASSIVE,
+    name: 'Espíritu Vital',
+    desc: 'Inmune al estado Dormido.',
+  },
+
+  'sap-sipper': {
+    trigger: ABILITY_TRIGGERS.PASSIVE,
+    name: 'Herbívoro',
+    desc: 'Inmune a ataques Planta; los absorbe para subir su Ataque.',
+  },
+
+  'frisk': {
+    trigger: ABILITY_TRIGGERS.PASSIVE,
+    name: 'Fisgón',
+    desc: 'Revela el objeto que porta el rival al entrar en combate.',
+  },
+
+};
+
+// Devuelve la prioridad numérica de un movimiento.
+// Orden de resolución:
+//   1. El effectId (o primer effectId en array) tiene un campo `priority` en MOVE_EFFECTS → usa ese valor.
+//   2. La propiedad `move.priority` directa (legacy / override manual).
+//   3. 0 por defecto (prioridad normal).
+function getMovePriority(move) {
+  if (!move) return 0;
+  const ids = Array.isArray(move.effectId) ? move.effectId : [move.effectId ?? ''];
+  for (const id of ids) {
+    const val = MOVE_EFFECTS[id]?.priority;
+    if (val != null) return val;
+  }
+  return move.priority ?? 0;
+}
+
+// Ejecuta la habilidad de un pokemon para un trigger dado.
+// Devuelve true si la habilidad se activó.
+async function applyAbility(pokemon, trigger, ctx) {
+  if (!pokemon?.ability) return false;
+  const ability = ABILITIES[pokemon.ability];
+  if (!ability || ability.trigger !== trigger) return false;
+  if (ability.statusChance !== undefined && Math.random() >= ability.statusChance) return false;
+  try {
+    await ability.fn({ pokemon, ...ctx });
+    return true;
+  } catch (e) {
+    console.error(`[ABILITY] Error en "${pokemon.ability}":`, e.message);
+    return false;
+  }
 }

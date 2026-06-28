@@ -64,6 +64,17 @@ const LOGROS = [
     },
   },
 
+  {
+    id:   'ocho-medallas',
+    icon: 'GYM', color: '#fa0e0e',
+    name: 'SmartRotom',
+    desc: 'Obtén las 8 medallas de los gimnasios de Kanto para desbloquear el vuelo.',
+    check() {
+      const u = _uniqueBadges();
+      return _KANTO_BADGE_IDS.every(id => u.has(id));
+    },
+  },
+
   // ── Liga ───────────────────────────────────────────────────────────────────
 
   {

@@ -10,6 +10,11 @@ function calcDamage(attacker, defender, move) {
     return { dmg: Math.max(1, attacker.level), isCrit: false, eff: 1, modifiers: [] };
   }
 
+  // Levitate: inmune a movimientos de tipo Tierra
+  if (defender.ability === 'levitate' && move.type === 'ground') {
+    return { dmg: 0, isCrit: false, eff: 0, modifiers: [] };
+  }
+
   const isSpecial = move.damageClass === 'special';
 
   // Modificadores aditivos sobre la base: mod=0 → ×1.0, mod=0.4 → ×1.4, mod=-0.4 → ×0.6
@@ -84,10 +89,15 @@ function calcDamage(attacker, defender, move) {
     }
   }
 
-  // ── Guts — daño físico bonus cuando el atacante lleva este efecto pasivo
+  // ── Huge Power: duplica el ATK físico
+  if (!isSpecial && attacker.ability === 'huge-power') {
+    dmg = Math.floor(dmg * 2);
+    modifiers.push({ label: `Potencia (${attacker.displayName}) ×2`, mult: 2 });
+  }
+
+  // ── Guts — +50% daño físico (habilidad pasiva)
   if (!isSpecial && hasGutsEffect(attacker)) {
-    const activeMove = attacker.moves.find(m => m.id === attacker.autoMove);
-    const gutsMult = activeMove?.effectData?.dmgMult ?? 2.2;
+    const gutsMult = (typeof ABILITIES !== 'undefined' && ABILITIES['guts']?.dmgMult) ?? 1.5;
     dmg = Math.floor(dmg * gutsMult);
     modifiers.push({ label: `Agallas (${attacker.displayName}) +${Math.round((gutsMult - 1) * 100)}%`, mult: gutsMult });
   }
@@ -201,17 +211,11 @@ async function runBattleSim(playerPokemon, foePokemon, options = {}) {
 
     const playerMove = options.chosenMove;
     const foeMove    = enemyChooseMove(foePokemon, activePlayer);
-    const hasPriority = (move) => {
-      const ef = move?.effectId;
-      return Array.isArray(ef) ? ef.includes('priority') : ef === 'priority';
-    };
-    const playerPriority = hasPriority(playerMove);
-    const foePriority    = hasPriority(foeMove);
-    const playerFirst = playerPriority && !foePriority
-      ? true
-      : !playerPriority && foePriority
-        ? false
-        : activePlayer.stats.spe >= foePokemon.stats.spe;
+    const playerPrio  = getMovePriority(playerMove);
+    const foePrio     = getMovePriority(foeMove);
+    const playerFirst = playerPrio !== foePrio
+      ? playerPrio > foePrio
+      : activePlayer.stats.spe >= foePokemon.stats.spe;
     const [first, second]         = playerFirst ? [activePlayer, foePokemon] : [foePokemon, activePlayer];
     const [firstMove, secondMove] = playerFirst ? [playerMove, foeMove]      : [foeMove, playerMove];
 

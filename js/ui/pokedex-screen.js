@@ -268,6 +268,39 @@ const PokedexScreen = {
             }).join('')}
           </div>` : ''}
 
+          <!-- Habilidades -->
+          ${(() => {
+            const ab     = dbEntry?.ability;
+            const hide   = dbEntry?.hideAbility;
+            if (!ab && !hide) return '';
+            const ABILITIES = typeof ABILITY_DATA !== 'undefined' ? ABILITY_DATA : {};
+            const renderAbility = (id, isHide) => {
+              const data = ABILITIES[id];
+              const label = data?.name ?? id;
+              const desc  = data?.desc ?? '';
+              return `
+                <div style="display:flex;gap:8px;align-items:flex-start;padding:5px 0">
+                  <span style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);flex-shrink:0;margin-top:1px">•</span>
+                  <div>
+                    <div style="display:flex;align-items:center;gap:6px">
+                      <span style="font-family:var(--font-pixel);font-size:8px;color:var(--black)">${label}</span>
+                      ${isHide ? `<span style="font-family:var(--font-pixel);font-size:5px;color:var(--white);background:var(--grey);border-radius:2px;padding:1px 4px">OCULTA</span>` : ''}
+                    </div>
+                    ${desc ? `<div style="font-family:var(--font-pixel);font-size:6px;color:var(--grey);margin-top:2px;line-height:1.6">${desc}</div>` : ''}
+                  </div>
+                </div>`;
+            };
+            return `
+              <div style="background:var(--white);border:var(--border);border-radius:var(--radius-md);
+                padding:var(--sp-md);box-shadow:var(--shadow-sm)">
+                <div style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);margin-bottom:var(--sp-sm)">
+                  HABILIDADES
+                </div>
+                ${ab   ? renderAbility(ab,   false) : ''}
+                ${hide ? renderAbility(hide, true)  : ''}
+              </div>`;
+          })()}
+
           <!-- Medallas obtenidas con este pokemon (o su línea evolutiva) en el equipo -->
           ${(() => {
             const kantoFinished = Storage.isKantoCompleted();

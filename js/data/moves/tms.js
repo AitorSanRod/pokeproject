@@ -57,6 +57,16 @@ var TM_LIST = {
     sprite: MT_SPRITES.water,
     fallbackIcon: '💧',
   },
+  'tm-aqua-jet': {
+    id: 'tm-aqua-jet',
+    name: 'MT Acua Jet',
+    moveId: 'aqua-jet',
+    types: [],
+    pokemons: [POKEMON.starmie, POKEMON.staryu, POKEMON.gyarados, POKEMON.kingler, POKEMON.krabby],
+    desc: 'Enseña Acua Jet.',
+    sprite: MT_SPRITES.water,
+    fallbackIcon: '💧',
+  },
   // ═══════════════════════════════════════════════════════════════════════
   // ELECTRIC
   // ═══════════════════════════════════════════════════════════════════════

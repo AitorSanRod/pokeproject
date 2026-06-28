@@ -76,25 +76,10 @@ const StatusEffects = {
     const meta = STATUS_META[statusId];
     if (log) log(`${pokemon.displayName} fue ${StatusEffects._appliedMsg(statusId)}!`);
 
-    // Burn reduce ATK base un 50% vía combatMods (guts lo ignora)
-    if (statusId === StatusEffect.BURN && !hasGutsEffect(pokemon)) {
-      if (!pokemon.combatMods) pokemon.combatMods = {};
-      pokemon.combatMods._burnAtk = true;
-      pokemon.combatMods.atk = (pokemon.combatMods.atk ?? 0) - 0.50;
-    }
-
-    // Freeze reduce SPA base un 50% vía combatMods (guts lo ignora)
-    if (statusId === StatusEffect.FREEZE && !hasGutsEffect(pokemon)) {
-      if (!pokemon.combatMods) pokemon.combatMods = {};
-      pokemon.combatMods._freezeSpa = true;
-      pokemon.combatMods.spa = (pokemon.combatMods.spa ?? 0) - 0.50;
-    }
-
-    // Paralysis reduce SPE un 50% — directamente en stats (guts lo ignora)
-    if (statusId === StatusEffect.PARALYSIS && !hasGutsEffect(pokemon)) {
-      pokemon._baseSpe = pokemon._baseSpe ?? pokemon.stats.spe;
-      pokemon.stats.spe = Math.max(1, Math.floor(pokemon.stats.spe * 0.50));
-    }
+    // Las penalizaciones de ATK (burn), SPA (freeze) y SPE (paralysis) se aplican
+    // de forma multiplicativa al final del cálculo en _calcDamage / _effectiveSpeed
+    // de cv2-engine.js, NO aquí. Esto garantiza que interactúan correctamente con
+    // los combatMods acumulados (raise/lower stats).
 
     console.log(`[STATUS] ${pokemon.displayName} → ${statusId}`);
     return true;
@@ -104,20 +89,6 @@ const StatusEffects = {
   cure(pokemon, log) {
     if (!pokemon.statusEffect) return;
     const id = pokemon.statusEffect.id;
-
-    // Revertir efectos de stat
-    if (id === StatusEffect.BURN && pokemon.combatMods?._burnAtk) {
-      pokemon.combatMods.atk = (pokemon.combatMods.atk ?? 0) + 0.50;
-      delete pokemon.combatMods._burnAtk;
-    }
-    if (id === StatusEffect.FREEZE && pokemon.combatMods?._freezeSpa) {
-      pokemon.combatMods.spa = (pokemon.combatMods.spa ?? 0) + 0.50;
-      delete pokemon.combatMods._freezeSpa;
-    }
-    if (id === StatusEffect.PARALYSIS && pokemon._baseSpe) {
-      pokemon.stats.spe = pokemon._baseSpe;
-      delete pokemon._baseSpe;
-    }
 
     if (log) log(`${pokemon.displayName} se recupero del estado alterado!`);
     pokemon.statusEffect = null;

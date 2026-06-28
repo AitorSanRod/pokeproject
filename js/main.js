@@ -6,7 +6,8 @@ const GameState = {
   badges:           [],
   items:            [],
   autoMode:         true,
-  routeIndex:       0,
+  routeIndex:          0,
+  furthestRouteIndex:  0,
   currentEncounter: 0,
   currentPath:      null,
   currentPaths:     null,
@@ -29,6 +30,7 @@ const GameState = {
     this.items               = [];
     this.autoMode            = true;
     this.routeIndex          = 0;
+    this.furthestRouteIndex  = 0;
     this.currentEncounter    = 0;
     this.currentPath         = null;
     this.currentPaths        = null;
@@ -53,10 +55,11 @@ const GameState = {
     this.badges           = [];
     this.items            = [];
     this.autoMode         = true;
-    this.routeIndex       = 0;
-    this.currentEncounter = 0;
-    this.currentPath      = null;
-    this.currentPaths     = null;
+    this.routeIndex         = 0;
+    this.furthestRouteIndex = 0;
+    this.currentEncounter   = 0;
+    this.currentPath        = null;
+    this.currentPaths       = null;
     this.paused             = false;
     this.specialTrainerUsed = false;
     this._pathRunning       = false;
@@ -95,7 +98,7 @@ window.addEventListener('DOMContentLoaded', () => {
   gearBtn.id = 'btn-gear-global';
   gearBtn.title = 'Opciones';
   gearBtn.textContent = '⚙️';
-  gearBtn.style.cssText = _btnBase;
+  gearBtn.style.cssText = _btnBase + ';display:none';
   gearBtn.addEventListener('mouseenter', () => gearBtn.style.background = 'rgba(0,0,0,.6)');
   gearBtn.addEventListener('mouseleave', () => gearBtn.style.background = 'rgba(0,0,0,.35)');
   globalControls.appendChild(gearBtn);
@@ -162,6 +165,34 @@ window.addEventListener('DOMContentLoaded', () => {
   notesBtn.addEventListener('mouseleave', () => notesBtn.style.background = 'rgba(0,0,0,.35)');
   notesBtn.addEventListener('click', () => NotesPopup.open());
   gearPanel.appendChild(notesBtn);
+
+  // ── Botón SmartRotom ──────────────────────────────────────────────────────
+  const smartRotomBtn = document.createElement('button');
+  smartRotomBtn.id = 'btn-smart-rotom';
+  smartRotomBtn.title = 'SmartRotom';
+  smartRotomBtn.textContent = 'SmartRotom';
+  smartRotomBtn.style.cssText = _btnBase;
+  smartRotomBtn.addEventListener('mouseenter', () => smartRotomBtn.style.background = 'rgba(0,0,0,.6)');
+  smartRotomBtn.addEventListener('mouseleave', () => smartRotomBtn.style.background = 'rgba(0,0,0,.35)');
+  smartRotomBtn.addEventListener('click', () => {
+    _closePanel();
+    const overlay = document.createElement('div');
+    overlay.className = 'cv2-settings-overlay';
+    overlay.innerHTML = `
+      <div class="cv2-settings-panel">
+        <div class="cv2-settings-header">
+          <span class="cv2-settings-title">SmartRotom</span>
+          <button class="cv2-btn cv2-settings-close">✕</button>
+        </div>
+        <p style="font-family:var(--font-pixel);font-size:6px;color:var(--grey);text-align:center;padding:8px 0">
+          Próximamente...
+        </p>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    overlay.querySelector('.cv2-settings-close').addEventListener('click', () => overlay.remove());
+  });
+  gearPanel.appendChild(smartRotomBtn);
 
   Screens.show(Screens.title);
 });
