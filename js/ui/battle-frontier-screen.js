@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Cambia a false para desactivar el botón en la pantalla de modos sin eliminar el código.
-const BF_ENABLED = true;
+const BF_ENABLED = false;
 const BF_LEVEL = 50;
 
 const BF_RULES = [
