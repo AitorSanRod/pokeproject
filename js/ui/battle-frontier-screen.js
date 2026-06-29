@@ -736,7 +736,7 @@ const BattleFrontierScreen = {
 
     // Pokédex: marcar capturado solo si no se tenía; shiny siempre que lo sea
     if (!Storage.isCaught(pokeName)) Storage.markCaught(pokeName);
-    if (isShiny) Storage.markShiny(pokeName);
+    if (isShiny) { Storage.markShiny(pokeName); Storage.propagateShinyLine(pokeName); }
 
     const itemIsNew = !Storage.isItemCollected(itemId);
     Storage.markItemCollected(itemId);

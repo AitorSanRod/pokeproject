@@ -191,6 +191,7 @@ const CombatV2 = {
     if (f.shiny) cv2UI.showShinyAnim('foe');
     cv2UI.initHud('foe', f);
     cv2UI.log(`¡${f.displayName} apareció!`);
+    Storage.markSeen(f.name);
     await cv2UI.wait(CV2_DELAY.ENTRY_SLIDE);
 
     if (!this.state.skipPlayerEntry) {
@@ -554,16 +555,12 @@ const CombatV2 = {
     const opponentDead = opponent.currentHp <= 0;
     const selfDead     = action.pokemon.currentHp <= 0;
 
-    if (opponentDead && selfDead) {
-      // Ambos caen a la vez (recoil + golpe de gracia, etc.)
-      const [playerPok, foePok] = action.side === 'player'
-        ? [action.pokemon, opponent]
-        : [opponent, action.pokemon];
-      this.queue.enqueue(() => this._stepHandleBothFaint(playerPok, foePok));
-    } else if (opponentDead) {
-      this.queue.enqueue(() => this._stepHandleFaint(opponent, opponentSide));
-    } else if (selfDead) {
-      this.queue.enqueue(() => this._stepHandleFaint(action.pokemon, action.side));
+    if (opponentDead || selfDead) {
+      // Uno o ambos cayeron — pasar por _stepEndOfTurn para que el superviviente
+      // pueda activar sus objetos de fin de turno (Restos, Vidasfera, etc.).
+      // _stepEndOfTurn ya omite a los pokemon con HP <= 0 y al final detecta
+      // la derrota y llama a _stepHandleFaint / _stepHandleBothFaint.
+      this.queue.enqueue(() => this._stepEndOfTurn());
     } else {
       this.queue.enqueue(() => this._stepNextAction(actions, idx + 1));
     }
@@ -797,6 +794,9 @@ const CombatV2 = {
     // Reemplazar en el equipo
     const idx = this.state.playerTeam.indexOf(pokemon);
     if (idx !== -1) this.state.playerTeam[idx] = evolved;
+    if (GameState.starter === pokemon) GameState.starter = evolved;
+    Storage.markCaught(evolved.name);
+    if (evolved.shiny) Storage.propagateShinyLine(evolved.name);
     if (this.state.playerIndex === idx) {
       cv2UI.resetSprite('player', evolved);
       cv2UI.initHud('player', evolved);
@@ -831,6 +831,7 @@ const CombatV2 = {
     cv2UI.resetSprite('foe', pokemon);
     cv2UI.initHud('foe', pokemon);
     cv2UI.updateTeamBar('foe', this.state.foeTeam);
+    Storage.markSeen(pokemon.name);
     await cv2UI.wait(CV2_DELAY.ENTRY_SLIDE);
 
     // Solo el nuevo foe ejecuta ON_ENTER — el jugador ya estaba en campo

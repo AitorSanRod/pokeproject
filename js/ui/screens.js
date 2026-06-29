@@ -39,6 +39,12 @@ const SCREENS_CONFIG = {
   ],
   STARTER_LEVEL: 5,
   DEV_POKEDEX: false,
+  // ── Modo Hardcore ─────────────────────────────────────────────────────────
+  // Cambia a true para que el modo aparezca en la pantalla de selección de modos.
+  // Reglas: pokemon debilitado = eliminado del equipo para siempre. Solo puedes
+  // usar el starter elegido (y sus evoluciones). No se pueden capturar ni recibir
+  // pokemon como premio de ruta.
+  HARDCORE_ENABLED: true,
 };
 
 if (SCREENS_CONFIG.DEV_POKEDEX) {
@@ -109,6 +115,7 @@ const Screens = {
       team:               GameState.team,
       badges:             GameState.badges,
       items:              GameState.items,
+      hardcoreMode:       GameState.hardcoreMode,
     });
   },
 
@@ -296,7 +303,8 @@ const Screens = {
           p.learnedMTs = validMTs;
         });
         GameState.autoMode         = true;
-        console.log(`[Storage] Run cargada — ruta ${GameState.routeIndex}, equipo: ${GameState.team.map(p => p.displayName).join(', ')}`);
+        GameState.hardcoreMode     = save.hardcoreMode ?? false;
+        console.log(`[Storage] Run cargada — ruta ${GameState.routeIndex}, equipo: ${GameState.team.map(p => p.displayName).join(', ')}${GameState.hardcoreMode ? ' [HARDCORE]' : ''}`);
         Screens.show(Screens.adventure);
       });
     }
@@ -446,7 +454,10 @@ const Screens = {
               <div class="starter-card__arrow">→</div>
             </div>`).join('')}
           ${region.customStarter ? (() => {
-            const unlocked = Object.values(Storage.getAllBadges()).some(b => b.length >= 8);
+            const unlocked = !GameState.hardcoreMode && Object.values(Storage.getAllBadges()).some(b => b.length >= 8);
+            const lockedMsg = GameState.hardcoreMode
+              ? 'No disponible en modo Hardcore'
+              : 'Consigue las 8 medallas con cualquier Pokémon';
             return `
               <div id="card-custom"
                 class="starter-card${unlocked ? '' : ' starter-card--locked'}"
@@ -457,7 +468,7 @@ const Screens = {
                 <div class="starter-card__info">
                   <div class="starter-card__name">OTRO...</div>
                   <div style="font-family:var(--font-pixel);font-size:6px;color:var(--grey);margin-top:4px;line-height:1.6">
-                    ${unlocked ? 'Elige cualquier Pokémon capturado' : 'Consigue las 8 medallas con cualquier Pokémon'}
+                    ${unlocked ? 'Elige cualquier Pokémon capturado' : lockedMsg}
                   </div>
                 </div>
                 <div class="starter-card__arrow">${unlocked ? '→' : ''}</div>
@@ -538,9 +549,28 @@ const Screens = {
       }
     });
 
-    if (region.customStarter && Object.values(Storage.getAllBadges()).some(b => b.length >= 8)) {
-      document.getElementById('card-custom')
-        .addEventListener('click', () => Screens._showCustomStarterPicker(_loadedStarters));
+    if (region.customStarter && !GameState.hardcoreMode && Object.values(Storage.getAllBadges()).some(b => b.length >= 8)) {
+      document.getElementById('card-custom').addEventListener('click', () => {
+        const anyShiny = Object.values(_loadedStarters).some(p => p.shiny);
+        if (anyShiny) {
+          const modal = Screens._makeModal(`
+            <p style="font-family:var(--font-pixel);font-size:8px;line-height:2;text-align:center;margin-bottom:16px">
+              ✨ Uno de los iniciales es shiny.<br>¿Seguro que quieres elegir otro pokémon?
+            </p>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn--ghost" id="custom-confirm-cancel" style="flex:1">Volver</button>
+              <button class="btn" id="custom-confirm-ok" style="flex:1">Elegir otro</button>
+            </div>
+          `, { id: 'custom-starter-confirm', closeOnBackdrop: true });
+          document.getElementById('custom-confirm-cancel').addEventListener('click', () => modal.remove());
+          document.getElementById('custom-confirm-ok').addEventListener('click', () => {
+            modal.remove();
+            Screens._showCustomStarterPicker(_loadedStarters);
+          });
+        } else {
+          Screens._showCustomStarterPicker(_loadedStarters);
+        }
+      });
     }
 
     console.log('[UI] Pantalla: Seleccion de inicial');
@@ -603,8 +633,6 @@ const Screens = {
       }
     };
 
-    const anyStarterShiny = Object.values(loadedStarters).some(lp => lp.shiny);
-
     document.querySelectorAll('.dex-entry--caught').forEach(el => {
       el.addEventListener('click', async () => {
         const name    = el.dataset.name;
@@ -642,21 +670,7 @@ const Screens = {
           overlay.querySelector('#pick-cancel').addEventListener('click', () => overlay.remove());
         };
 
-        if (!isShiny && anyStarterShiny) {
-          const modal = Screens._makeModal(`
-            <p style="font-family:var(--font-pixel);font-size:8px;line-height:2;text-align:center;margin-bottom:16px">
-              ✨ Hay una opción mejor...<br>¿Estás seguro de que deseas elegir a ${name.toUpperCase()}?
-            </p>
-            <div style="display:flex;gap:8px">
-              <button class="btn btn--ghost" id="starter-confirm-cancel" style="flex:1">Volver</button>
-              <button class="btn" id="starter-confirm-ok" style="flex:1">Elegir</button>
-            </div>
-          `, { id: 'starter-confirm-modal', closeOnBackdrop: true });
-          document.getElementById('starter-confirm-cancel').addEventListener('click', () => modal.remove());
-          document.getElementById('starter-confirm-ok').addEventListener('click', () => { modal.remove(); _proceed(); });
-        } else {
-          _proceed();
-        }
+        _proceed();
       });
     });
   },
@@ -857,7 +871,38 @@ const Screens = {
 
   _initPauseBtn() {},  // no-op — pause solo en combate
 
+  // Elimina del equipo todos los pokemon con HP ≤ 0. Sólo se usa en modo hardcore.
+  // Se llama DESPUÉS de que cv2 haya terminado (onWin) para no romper el estado interno
+  // del engine. Devuelve true si el equipo quedó vacío (game over).
+  _purgeDefeatedPokemon() {
+    const alive = GameState.team.filter(p => p.currentHp > 0);
+    const removed = GameState.team.length - alive.length;
+    if (removed === 0) return false;
+    GameState.team = alive;
+    if (GameState.starter && !GameState.team.includes(GameState.starter)) {
+      GameState.starter = GameState.team[0] ?? null;
+    }
+    console.log(`[HARDCORE] ${removed} pokemon eliminado(s) del equipo. Restantes: ${GameState.team.length}`);
+    return GameState.team.length === 0;
+  },
+
+  _syncTeamPokedex() {
+    for (const pokemon of GameState.team) {
+      if (!pokemon?.name) continue;
+      if (!Storage.isCaught(pokemon.name)) {
+        Storage.markCaught(pokemon.name);
+      }
+      if (pokemon.shiny) {
+        if (!Storage.isShiny(pokemon.name)) {
+          Storage.markShiny(pokemon.name);
+        }
+        Storage.propagateShinyLine(pokemon.name);
+      }
+    }
+  },
+
   _showPathSelection(route, { keepPaths = false } = {}) {
+    Screens._syncTeamPokedex();
     const data  = ROUTE_DATA[route.area];
     const area  = document.getElementById('encounter-area');
     if (!area || !data) return;
@@ -1100,6 +1145,7 @@ const Screens = {
     if (idx >= path.length) {
       // Camino completado — curar + recompensa
       GameState._pathRunning = false;
+      if (GameState.hardcoreMode) Screens._purgeDefeatedPokemon();
       GameState.team.forEach(p => fullHeal(p));
       await Screens._showItemReward();
       return;
@@ -1111,7 +1157,7 @@ const Screens = {
     const enc   = path[idx];
 
     GameState.currentEncounter++;
-    console.log(`[ADVENTURE] Encuentro ${GameState.currentEncounter}/3 — tipo: ${enc.type}`);
+    console.log(`[ADVENTURE] Encuentro ${GameState.currentEncounter}/${path.length} — tipo: ${enc.type}`);
 
     if (enc.type === 'heal') {
       // Punto de curación — elegir un pokemon, curar HP al 100% y eliminar
@@ -1152,6 +1198,9 @@ const Screens = {
             for (const p of GameState.team) Storage.addBadge(p.name, data.badgeId);
           }
           GameState._pathRunning = false;
+          if (GameState.hardcoreMode && Screens._purgeDefeatedPokemon()) {
+            Screens.show(Screens.defeat); return;
+          }
           Screens._runNextInPath();
         },
         onLoss: () => { GameState._pathRunning = false; Screens.show(Screens.defeat); },
@@ -1204,7 +1253,13 @@ const Screens = {
         foeTeam,
         isTrainer: true,
         trainerName: trainer.name,
-        onWin:  () => { GameState._pathRunning = false; Screens._runNextInPath(); },
+        onWin: () => {
+          GameState._pathRunning = false;
+          if (GameState.hardcoreMode && Screens._purgeDefeatedPokemon()) {
+            Screens.show(Screens.defeat); return;
+          }
+          Screens._runNextInPath();
+        },
         onLoss: () => { GameState._pathRunning = false; Screens.show(Screens.defeat); },
       });
     } else {
@@ -1224,8 +1279,13 @@ const Screens = {
       Screens._startCombatInPath({
         foeTeam:    [foePoke],
         isWild:     true,
-        autoCapture: true,   // captura automática post-KO
-        onWin:  () => { GameState._pathRunning = false; Screens._runNextInPath(); },
+        onWin: () => {
+          GameState._pathRunning = false;
+          if (GameState.hardcoreMode && Screens._purgeDefeatedPokemon()) {
+            Screens.show(Screens.defeat); return;
+          }
+          Screens._runNextInPath();
+        },
         onLoss: () => { GameState._pathRunning = false; Screens.show(Screens.defeat); },
       });
     }
@@ -1383,7 +1443,7 @@ const Screens = {
             ${blockedItem.fallbackIcon ?? ''} ${blockedItem.name} bloquea el cambio de movimiento
           </span>
         </div>` : ''}
-      <div style="display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:55vh">
+      <div style="display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:55vh;scrollbar-gutter:stable">
         ${poke.moves.map(m => {
           const effectDesc = getEffectDescriptions(m);
           return `
@@ -3626,12 +3686,15 @@ const Screens = {
   // DEFEAT
   // ═══════════════════════════════════════════════════════════════════════
   defeat() {
+    const wasHardcore = GameState.hardcoreMode;
     Storage.clearRun();
     document.getElementById('viewport').innerHTML = `
       <div class="screen screen--defeat">
         <div class="defeat-title">HAS SIDO<br>DERROTADO</div>
         <p style="font-family:var(--font-body);color:rgba(255,255,255,.6);font-size:13px">
-          Todos tus pokemon fueron debilitados.
+          ${wasHardcore
+            ? 'Tu equipo fue eliminado. La aventura ha terminado.'
+            : 'Todos tus pokemon fueron debilitados.'}
         </p>
         <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:220px">
           <button class="btn btn--primary btn--wide" id="btn-retry">INTENTAR DE NUEVO</button>
@@ -3643,12 +3706,13 @@ const Screens = {
       </div>`;
     document.getElementById('btn-retry').addEventListener('click', () => {
       GameState.reset();
+      GameState.hardcoreMode = wasHardcore;  // mantener el mismo modo al reintentar
       Screens.show(Screens.starterSelect);
     });
     document.getElementById('btn-title').addEventListener('click', () => {
       GameState.reset();
       Screens.show(Screens.title);
     });
-    console.log('[UI] DERROTA');
+    console.log(`[UI] DERROTA${wasHardcore ? ' (hardcore)' : ''}`);
   },
 };

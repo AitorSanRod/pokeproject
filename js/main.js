@@ -6,6 +6,7 @@ const GameState = {
   badges:           [],
   items:            [],
   autoMode:         true,
+  hardcoreMode:     false,  // modo hardcore: debilitados = eliminados, solo starter
   routeIndex:          0,
   furthestRouteIndex:  0,
   currentEncounter: 0,
@@ -55,6 +56,7 @@ const GameState = {
     this.badges           = [];
     this.items            = [];
     this.autoMode         = true;
+    this.hardcoreMode     = false;
     this.routeIndex         = 0;
     this.furthestRouteIndex = 0;
     this.currentEncounter   = 0;

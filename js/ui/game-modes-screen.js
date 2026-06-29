@@ -14,6 +14,13 @@ const GAME_MODES = [
     accentColor: 'var(--red)',
   },
   {
+    id: 'hardcore',
+    name: 'HARDCORE',
+    desc: 'Como la Aventura, pero si un pokémon se debilita es eliminado para siempre. ¿Llegarás al final?',
+    accentColor: '#1a1a2e',
+    get enabled() { return typeof SCREENS_CONFIG !== 'undefined' ? SCREENS_CONFIG.HARDCORE_ENABLED : false; },
+  },
+  {
     id: 'battle-frontier',
     name: 'FRENTE BATALLA',
     desc: 'Elige 3 pokémon de tu Pokédex y enfréntate a una serie de combates consecutivos. ¿Hasta dónde llegarás?',
@@ -70,6 +77,18 @@ const GameModesScreen = {
           if (!ok) return;
           Storage.clearRun();
         }
+        GameState.hardcoreMode = false;
+        Screens.show(Screens.regionSelect);
+        break;
+      }
+      case 'hardcore': {
+        const hasSave = Storage.hasRun(GameState.version);
+        if (hasSave) {
+          const ok = confirm('¿Iniciar una nueva partida HARDCORE?\n\nSe perderá el progreso guardado.');
+          if (!ok) return;
+          Storage.clearRun();
+        }
+        GameState.hardcoreMode = true;
         Screens.show(Screens.regionSelect);
         break;
       }

@@ -750,7 +750,6 @@ var POKEMON_DB = {
   eevee: {
     stage: 1, types: ['normal'], damageClass: 'physical', evolvesInto: '',
     moveLines: [{ type: 'normal', damageClass: 'physical' }],
-    ability: 'drizzle'
   },
   vaporeon: {
     stage: 2, types: ['water'], damageClass: 'special',
