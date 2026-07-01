@@ -62,11 +62,16 @@ const BG = {
   final: 'assets/bg/final.png',
   JOTHO: {
     ruta29: 'assets/bg/johto/ruta-29.png',
+    ruta30: 'assets/bg/johto/ruta-30.png',
+    ruta32: 'assets/bg/johto/ruta-32.png',
     ciudadCerezo: 'assets/bg/johto/ciudad-cerezo.png',
     puebloPrimavera: 'assets/bg/johto/pueblo-primavera.png',
-    ruta30: 'assets/bg/johto/ruta-30.png',
     ciudadMalva: 'assets/bg/johto/ciudad-malva.png',
-    ciudadMalvaGym: 'assets/bg/johto/ciudad-malva-gym.png'
+    ciudadMalvaGym: 'assets/bg/johto/ciudad-malva-gym.png',
+    ruinasAlfa: 'assets/bg/johto/ruinas-alfa.png',
+    puebloAzalea: 'assets/bg/johto/pueblo-azalea.png',
+    encinar: 'assets/bg/johto/encinar.png',
+    ciudadTrigal: 'assets/bg/johto/ciudad-trigal.png',
   }
 };
 
@@ -89,6 +94,7 @@ const COMBAT_BG = {
 
 const TRAINER_IMG = {
   // Entrenadores aleatorios
+  mewtwo: 'assets/sprites/trainers/mewtwo.png',
   rival: 'assets/sprites/trainers/rival_kanto.png',
   cazabichos: 'assets/sprites/trainers/cazabichos.png',
   entrenadorJoven: 'assets/sprites/trainers/entrenadorjoven.png',
@@ -131,6 +137,8 @@ const TRAINER_IMG = {
   plata: 'assets/sprites/trainers/plata.png',
   pensador: 'assets/sprites/trainers/pensador.png',
   pegaso: 'assets/sprites/trainers/pegaso.png',
+  anton: 'assets/sprites/trainers/anton.png',
+  blanca: 'assets/sprites/trainers/blanca.png',
 };
 
 // ── Sprites y gifs misceláneos (escenas de historia) ─────────────────────────
@@ -158,6 +166,7 @@ const POKEMON_SPRITE = {
   blastoiseClassic: 'assets/sprites/pokemon/blastoise-classic.png',
   laprasClassic: 'assets/sprites/pokemon/lapras-classic.png',
   pikachuClassic: 'assets/sprites/pokemon/pikachu-classic.png',
+  armoredMewtwo: 'assets/sprites/pokemon/mewtwo-armored.png',
 };
 
 // ── Sprites de medallas ───────────────────────────────────────────────────────
@@ -206,7 +215,10 @@ const ENTRENADORES = {
   Malabarista: { name: 'Malabarista', img: TRAINER_IMG.malabarista },
   Ladron: { name: 'Ladrón', img: TRAINER_IMG.ladron },
   Ornitologo: { name: 'Ornitologo', img: TRAINER_IMG.Ornitologo },
-  Plata: { name: 'Ornitologo', img: TRAINER_IMG.plata },
+  Plata: { name: 'Plata', img: TRAINER_IMG.plata },
   Pensador: { name: 'Pensador', img: TRAINER_IMG.pensador },
   Pegaso: { name: 'Pegaso', img: TRAINER_IMG.pegaso },
+  Blanca: { name: 'Blanca', img: TRAINER_IMG.blanca },
+  Anton: { name: 'Antón', img: TRAINER_IMG.anton},
+  Mewtwo: { name: 'Mewtwo', img: TRAINER_IMG.mewtwo }
 };

@@ -26,7 +26,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Cambia a false para mostrar Johto como "PRONTO" sin eliminar el código.
-var JOHTO_ENABLED = false;
+var JOHTO_ENABLED = true;
 
 Object.assign(ROUTE_DATA, {
 
@@ -87,15 +87,16 @@ Object.assign(ROUTE_DATA, {
     bg: BG.JOTHO.ruta29,
     combatBg: COMBAT_BG.hierbaAlta,
     trainerBg: COMBAT_BG.default,
-    rewardPokemon: [POKEMON.sentret, POKEMON.hoothoot],
+    rewardPokemon: [POKEMON.houndour, POKEMON.hoothoot],
     wild: [
-      { name: POKEMON.jigglypuff, rate: 33, minLv: 2, maxLv: 4, moveId: MOVES.fairy.special.disarming_voice },
-      { name: POKEMON.geodude, rate: 33, minLv: 2, maxLv: 4, moveId: MOVES.rock.physical.rock_throw },
-      { name: POKEMON.phanpy, rate: 35, minLv: 2, maxLv: 4, moveId: MOVES.ground.physical.bulldoze },
+      { name: POKEMON.jigglypuff, rate: 25, minLv: 2, maxLv: 4, moveId: MOVES.fairy.special.disarming_voice },
+      { name: POKEMON.geodude, rate: 25, minLv: 2, maxLv: 4, moveId: MOVES.rock.physical.rock_throw },
+      { name: POKEMON.phanpy, rate: 25, minLv: 2, maxLv: 4, moveId: MOVES.ground.physical.bulldoze },
+      { name: POKEMON.houndour, rate: 25, minLv: 2, maxLv: 4, moveId: [MOVES.fire.physical.fire_fang, MOVES.dark.physical.bite] },
     ],
     trainer: [],
     paths: [
-      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
     ],
   },
 
@@ -235,11 +236,181 @@ Object.assign(ROUTE_DATA, {
   // PUEBLO AZALEA — Gimnasio de Antón (Bicho)
   // ─────────────────────────────────────────────────────────────────────
 
-  //RUTA 32
+  'ruta-32': { //Ruta 32
+    bg: BG.JOTHO.ruta32,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
+    rewardPokemon: [POKEMON.wooper, POKEMON.qwilfish],
+    wild: [
+      { name: POKEMON.mareep, rate: 15, minLv: 12, maxLv: 14, moveId: [MOVES.electric.special.thunderbolt, MOVES.normal.physical.tackle] },
+      { name: POKEMON.hoppip, rate: 15, minLv: 12, maxLv: 14, moveId: [MOVES.grass.special.absorb, MOVES.fairy.special.disarming_voice] },
+      { name: POKEMON.bellsprout, rate: 15, minLv: 12, maxLv: 14, moveId: [MOVES.grass.special.absorb, MOVES.poison.special.poison_powder] },
+      { name: POKEMON.ekans, rate: 15, minLv: 12, maxLv: 14, moveId: MOVES.poison.physical.poison_sting },
+      { name: POKEMON.gastly, rate: 15, minLv: 12, maxLv: 14, moveId: [MOVES.poison.special.poison_powder, MOVES.ghost.special.hex] },
+      { name: POKEMON.wooper, rate: 15, minLv: 12, maxLv: 14, moveId: [MOVES.water.special.water_gun, MOVES.ground.special.mud_shot] },
+      { name: POKEMON.tentacool, rate: 10, minLv: 12, maxLv: 14, moveId: [MOVES.water.physical.waterfall, MOVES.poison.physical.poison_sting] },
+    ],
+    trainer: [
+      {
+        name: ENTRENADORES.Ornitologo.name, img: ENTRENADORES.Ornitologo.img, rate: 20, pokemon: [
+          { name: POKEMON.pidgey, minLv: 12, maxLv: 15, moveId: [MOVES.flying.physical.peck, MOVES.normal.physical.tackle] },
+          { name: POKEMON.pidgey, minLv: 12, maxLv: 15, moveId: [MOVES.flying.physical.peck, MOVES.normal.physical.tackle] },
+          { name: POKEMON.spearow, minLv: 12, maxLv: 15, moveId: [MOVES.flying.physical.peck, MOVES.normal.physical.tackle] },
+        ]
+      },
+      {
+        name: ENTRENADORES.Nadador.name, img: ENTRENADORES.Nadador.img, rate: 25, pokemon: [
+          { name: POKEMON.poliwag, minLv: 12, maxLv: 17, moveId: MOVES.water.special.water_gun },
+          { name: POKEMON.politoed, minLv: 12, maxLv: 17, moveId: MOVES.water.special.scald },
+        ]
+      },
+      {
+        name: ENTRENADORES.ChicaGuay.name, img: ENTRENADORES.ChicaGuay.img, rate: 25, pokemon: [
+          { name: POKEMON.nidoran_f, minLv: 12, maxLv: 18, moveId: MOVES.poison.physical.poison_sting },
+        ]
+      },
+      {
+        name: ENTRENADORES.Dominguera.name, img: ENTRENADORES.Dominguera.img, rate: 30, pokemon: [
+          { name: POKEMON.rattata, minLv: 12, maxLv: 17, moveId: MOVES.normal.physical.tackle },
+          { name: POKEMON.zubat, minLv: 12, maxLv: 17, moveId: MOVES.poison.physical.poison_sting },
+        ]
+      },
+    ],
+  },
+
+  'ruta-32-info-espera': { //Opcional ruta 32 noche
+    type: 'information',
+    bg: BG.JOTHO.ruta29,
+    title: 'Esperar...',
+    description: '¿Quieres esperar a la noche?<br>Puede que aparezcan otros pokémon',
+    optional: {
+      btnName: 'Esperar',
+      area: 'ruta-32-noche',
+    },
+  },
+
   //RUINAS ALFA
-  //OPCIONAL CUEVA UNION
-  //RUTA 33
-  //PUEBLO AZALEA
+  'ruinas-alfa': { //Ruinal alfa
+    bg: BG.JOTHO.ruinasAlfa,
+    combatBg: COMBAT_BG.cueva,
+    trainerBg: COMBAT_BG.noche,
+    rewardPokemon: [POKEMON.smeargle],
+    wild: [
+      { name: POKEMON.natu, rate: 30, minLv: 15, maxLv: 19, moveId: [MOVES.psychic.special.confusion, MOVES.flying.special.gust] },
+      { name: POKEMON.smeargle, rate: 30, minLv: 15, maxLv: 19, moveId: MOVES.normal.physical.tackle },
+      { name: POKEMON.wooper, rate: 30, minLv: 15, maxLv: 19, moveId: [MOVES.water.special.water_gun, MOVES.ground.special.mud_shot] },
+      { name: POKEMON.unown, rate: 10, minLv: 15, maxLv: 19, moveId: MOVES.psychic.special.confusion },
+    ],
+    trainer: [
+      {
+        name: ENTRENADORES.Caballero.name, img: ENTRENADORES.Caballero.img, rate: 70, pokemon: [
+          { name: POKEMON.geodude, minLv: 15, maxLv: 20, moveId: [MOVES.ground.physical.bulldoze, MOVES.rock.physical.rock_throw] },
+          { name: POKEMON.geodude, minLv: 15, maxLv: 20, moveId: [MOVES.ground.physical.bulldoze, MOVES.rock.physical.rock_throw] },
+        ]
+      },
+      {
+        name: ENTRENADORES.Caballero.name, img: ENTRENADORES.Caballero.img, rate: 30, pokemon: [
+          { name: POKEMON.girafarig, minLv: 17, maxLv: 21, moveId: [MOVES.normal.special.swift, MOVES.psychic.special.confusion] },
+        ]
+      },
+    ],
+  },
+
+  'pueblo-azalea-gym': {
+    bg: BG.JOTHO.puebloAzalea,
+    combatBg: COMBAT_BG.interior,
+    trainerBg: COMBAT_BG.interior,
+    gymLeader: 'Anton',
+    gymType: 'bug',
+    badgeId: 'hive-badge',
+    gymLeaderImg: TRAINER_IMG.anton,
+    welcome: { title: 'Pueblo Azalea', subtitle: 'Gimnasio de Tipo Bicho', img: BG.JOTHO.puebloAzalea },
+    wild: [],
+    trainer: [],
+    gym: {
+      leader: [
+        { name: POKEMON.metapod, level: 21, moveId: MOVES.bug.physical.bug_bite },
+        { name: POKEMON.kakuna, level: 21, moveId: MOVES.bug.physical.bug_bite },
+        { name: POKEMON.scyther, level: 23, moveId: [MOVES.bug.physical.x_scissor, MOVES.normal.physical.extreme_speed] },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Lider }],
+    ],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────
+  // CIUDAD TRIGAL — Gimnasio de Blanca (Normal)
+  // ─────────────────────────────────────────────────────────────────────
+
+  'camino-ciudad-trigal-info': {
+    type: 'information',
+    bg: BG.JOTHO.puebloAzalea,
+    title: 'Rival Plata',
+    description: 'Te han cortado el paso.<br>Gana el combate para continuar',
+  },
+
+  'camino-ciudad-trigal': {
+    bg: BG.ruta22,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
+    rewardPokemon: [],
+    wild: [],
+    trainer: [],
+    specialTrainer: {
+      name: ENTRENADORES.Plata.name, img: ENTRENADORES.Plata.img, pokemon: [
+        { name: POKEMON.gastly, level: 23, moveId: [MOVES.poison.special.sludge_bomb, MOVES.ghost.special.shadow_ball] },
+        { name: POKEMON.zubat, level: 22, moveId: [MOVES.bug.physical.bug_bite, MOVES.flying.physical.wing_attack] },
+        { name: 'RIVAL_STARTER_2', minLv: 23, maxLv: 25 },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Special }],
+    ],
+  },
+
+  'encinar': {
+    bg: BG.JOTHO.encinar,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.noche,
+    rewardPokemon: [],
+    wild: [
+      { name: POKEMON.drowzee, rate: 25, minLv: 20, maxLv: 25, moveId: MOVES.psychic.special.confusion },
+      { name: POKEMON.snubbull, rate: 25, minLv: 20, maxLv: 25, moveId: MOVES.fairy.physical.play_rough },
+      { name: POKEMON.abra, rate: 25, minLv: 20, maxLv: 25, moveId: MOVES.psychic.special.teleport },
+      { name: POKEMON.magikarp, rate: 25, minLv: 20, maxLv: 25, moveId: MOVES.water.special.scald },
+    ],
+    trainer: [
+      {
+        name: ENTRENADORES.Cazabichos.name, img: ENTRENADORES.Cazabichos.img, rate: 100, pokemon: [
+          { name: POKEMON.butterfree, minLv: 22, maxLv: 26, moveId: MOVES.bug.special.infestation },
+          { name: POKEMON.ariados, minLv: 22, maxLv: 26, moveId: MOVES.bug.physical.x_scissor },
+        ]
+      }
+    ],
+  },
+
+  'ciudad-trigal-gym': {
+    bg: BG.JOTHO.ciudadTrigal,
+    combatBg: COMBAT_BG.interior,
+    trainerBg: COMBAT_BG.interior,
+    gymLeader: 'Blanca',
+    gymType: 'normal',
+    badgeId: 'plain-badge',
+    gymLeaderImg: TRAINER_IMG.blanca,
+    welcome: { title: 'Ciudad Trigal', subtitle: 'Gimnasio de Tipo Normal', img: BG.JOTHO.ciudadTrigal },
+    wild: [],
+    trainer: [],
+    gym: {
+      leader: [
+        { name: POKEMON.clefairy, level: 25, moveId: MOVES.fairy.special.disarming_voice },
+        { name: POKEMON.miltank, level: 29, moveId: [MOVES.normal.physical.hyper_fang, MOVES.normal.special.hyper_voice, MOVES.dark.physical.crunch] },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Lider }],
+    ],
+  },
 
   // ─────────────────────────────────────────────────────────────────────
   // OPCIONALES
@@ -250,6 +421,7 @@ Object.assign(ROUTE_DATA, {
     combatBg: COMBAT_BG.hierbaAlta,
     trainerBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.sentret, POKEMON.hoothoot],
+    title: 'Ruta 29 (Noche)',
     wild: [
       { name: POKEMON.aipom, rate: 40, minLv: 3, maxLv: 5, moveId: MOVES.normal.physical.tackle },
       { name: POKEMON.spearow, rate: 30, minLv: 3, maxLv: 5, moveId: [MOVES.normal.physical.tackle, MOVES.flying.physical.peck] },
@@ -281,9 +453,10 @@ Object.assign(ROUTE_DATA, {
 
   'torre-bellsprout': {
     bg: BG.JOTHO.ruta29,
-    combatBg: COMBAT_BG.hierbaAlta,
+    combatBg: COMBAT_BG.interior,
     trainerBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.sentret, POKEMON.hoothoot],
+    title: 'Torre Bellsprout',
     wild: [
       { name: POKEMON.bellsprout, rate: 40, minLv: 6, maxLv: 9, moveId: [MOVES.grass.special.absorb, MOVES.poison.special.poison_powder] },
       { name: POKEMON.rattata, rate: 40, minLv: 6, maxLv: 9, moveId: MOVES.normal.physical.tackle },
@@ -309,9 +482,46 @@ Object.assign(ROUTE_DATA, {
     ],
   },
 
+  'ruta-32-noche': {
+    bg: BG.JOTHO.ruta32,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
+    rewardPokemon: [POKEMON.qwilfish],
+    title: 'Ruta 32 (Noche)',
+    wild: [
+      { name: POKEMON.mareep, rate: 25, minLv: 6, maxLv: 9, moveId: [MOVES.electric.special.thunderbolt, MOVES.normal.physical.tackle] },
+      { name: POKEMON.hoppip, rate: 25, minLv: 6, maxLv: 9, moveId: [MOVES.grass.special.absorb, MOVES.fairy.special.disarming_voice] },
+      { name: POKEMON.bellsprout, rate: 25, minLv: 6, maxLv: 9, moveId: [MOVES.grass.special.absorb, MOVES.poison.special.poison_powder] },
+      { name: POKEMON.qwilfish, rate: 25, minLv: 6, maxLv: 9, moveId: MOVES.poison.physical.poison_sting },],
+    trainer: [],
+    paths: [
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
+    ],
+  },
+
   // ─────────────────────────────────────────────────────────────────────
   // EXTRAS
   // ─────────────────────────────────────────────────────────────────────
+
+  'espacio-raro': {
+    bg: BG.espacioRaro,
+    combatBg: COMBAT_BG.espacioRaro,
+    rewardPokemon: [POKEMON.celebi],
+    wild: [],
+    trainer: [],
+    specialTrainer: {
+      name: ENTRENADORES.Mewtwo.name, img: ENTRENADORES.Mewtwo.img, pokemon: [
+        {
+          name: POKEMON.mewtwo, level: 45, moveId: [MOVES.psychic.special.trick, MOVES.grass.special.giga_drain],
+          heldItem: ITEM.assault_vest, img: POKEMON_SPRITE.armoredMewtwo,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
+        }
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Special }],
+    ],
+  },
 
 });
 
@@ -328,13 +538,14 @@ Object.assign(ROUTE_DATA, {
 
 // Condiciones reutilizables — uso: condition: JOHTO_COND.hasBadge('zephyr-badge')
 const JOHTO_COND = {
-  hasBadge: (id) => (state) => state.badges.includes(id),
-  hasBadges: (ids) => (state) => ids.every(id => state.badges.includes(id)),
+  // Comprueba si algún pokemon de la pokédex tiene la medalla (no la partida actual).
+  hasBadge: (id) => () => Object.values(Storage.getAllBadges()).some(list => list.includes(id)),
+  hasBadges: (ids) => () => Object.values(Storage.getAllBadges()).some(list => ids.every(b => list.includes(b))),
 };
 
 var JOHTO_ROUTES = [
   { name: 'Ruta 29', area: 'ruta-29' },
-  { name: 'Ruta 29', area: 'ruta-29-info-espera', condition: JOHTO_COND.hasBadges(['zephyr-badge', 'hive-badge']) },
+  { name: 'Ruta 29 (Descanso)', area: 'ruta-29-info-espera', condition: JOHTO_COND.hasBadges(['zephyr-badge', 'hive-badge']) },
   { name: 'Ruta 46', area: 'ruta-46' },
   { name: 'Ciudad Cerezo', area: 'ciudad-cerezo' },
   { name: 'Ciudad Cerezo', area: 'ciudad-cerezo-info' },
@@ -342,6 +553,16 @@ var JOHTO_ROUTES = [
   { name: 'Ruta 30', area: 'ruta-30' },
   { name: 'Ciudad Malva', area: 'ciudad-malva-info' },
   { name: 'Gimnasio Ciudad Malva', area: 'ciudad-malva-gym' },
+  { name: 'Ruta 32', area: 'ruta-32' },
+  { name: 'Ruta 32', area: 'ruta-32-info-espera', condition: JOHTO_COND.hasBadges(['zephyr-badge', 'hive-badge']) },
+  { name: 'Ruinas Alfa', area: 'ruinas-alfa' },
+  { name: 'Pueblo Azalea', area: 'pueblo-azalea-gym' },
+  { name: 'Camino a Ciudad Trigal', area: 'camino-ciudad-trigal-info' },
+  { name: 'Camino a Ciudad Trigal (Combate)', area: 'camino-ciudad-trigal' },
+  { name: 'Encinar', area: 'encinar' },
+  { name: 'Ciudad Trigal', area: 'ciudad-trigal-gym' },
+
+  //Hasta aquí todo esta funcionando.
 
 
   // Ejemplo — ruta solo disponible tras conseguir la Medalla Ascua:
@@ -351,6 +572,8 @@ var JOHTO_ROUTES = [
   //   Pueblo Nogal, Ruta 30/31, Ciudad Dorada, Ruta 33...
   //   Ciudad Incienso, Ciudad Nogal, Ciudad Olivina, Pueblo Caoba,
   //   Ciudad Amatista → Liga Johto
+
+  { name: '???', area: 'espacio-raro' }
 ];
 
 // ── Helpers específicos de Kanto ───────────────────────────────────────────

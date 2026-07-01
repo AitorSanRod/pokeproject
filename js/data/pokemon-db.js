@@ -650,6 +650,7 @@ var POKEMON_DB = {
   kangaskhan: {
     stage: 3, types: ['normal'], damageClass: 'physical',
     moveLines: [{ type: 'normal', damageClass: 'physical' }],
+    ability: 'versatil'
   },
 
   // ── Water ─────────────────────────────────────────────────────────────────
@@ -692,8 +693,9 @@ var POKEMON_DB = {
 
   // ── Bug / Flying ──────────────────────────────────────────────────────────
   scyther: {
-    stage: 2, types: ['bug', 'flying'], damageClass: 'physical', evolvesInto: '',
+    stage: 2, types: ['bug', 'flying'], damageClass: 'physical',
     moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'flying', damageClass: 'physical' }],
+    evolvesAt: 45, evolvesInto: 'scizor'
   },
 
   // ── Ice / Psychic ─────────────────────────────────────────────────────────
@@ -843,7 +845,11 @@ var POKEMON_DB = {
     moveLines: [{ type: 'psychic', damageClass: 'special' }],
   },
 
-  // ══ GEN II — JOHTO ═══════════════════════════════════════════════════════════
+  //══════════════════════════════════════════════════════════════════════════════
+  //══════════════════════════════════════════════════════════════════════════════
+  // GEN II — JOHTO 
+  //══════════════════════════════════════════════════════════════════════════════
+  //══════════════════════════════════════════════════════════════════════════════
 
   // ── Starters ─────────────────────────────────────────────────────────────────
   chikorita: {
@@ -916,10 +922,12 @@ var POKEMON_DB = {
     stage: 1, types: ['bug', 'flying'], damageClass: 'physical',
     moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'flying', damageClass: 'physical' }],
     evolvesAt: 18, evolvesInto: 'ledian',
+    ability: 'speed-boost'
   },
   ledian: {
     stage: 2, types: ['bug', 'flying'], damageClass: 'physical',
     moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'flying', damageClass: 'physical' }],
+    ability: 'speed-boost'
   },
 
   // ── Bug / Poison ─────────────────────────────────────────────────────────────
@@ -994,15 +1002,18 @@ var POKEMON_DB = {
     stage: 1, types: ['electric'], damageClass: 'special',
     moveLines: [{ type: 'electric', damageClass: 'special' }],
     evolvesAt: 15, evolvesInto: 'flaaffy',
+    ability: 'static'
   },
   flaaffy: {
     stage: 2, types: ['electric'], damageClass: 'special',
     moveLines: [{ type: 'electric', damageClass: 'special' }],
     evolvesAt: 30, evolvesInto: 'ampharos',
+    ability: 'static'
   },
   ampharos: {
     stage: 3, types: ['electric'], damageClass: 'special',
     moveLines: [{ type: 'electric', damageClass: 'special' }],
+    ability: 'static'
   },
 
   // ── Grass ─────────────────────────────────────────────────────────────────────
@@ -1111,6 +1122,7 @@ var POKEMON_DB = {
   misdreavus: {
     stage: 2, types: ['ghost'], damageClass: 'special',
     moveLines: [{ type: 'ghost', damageClass: 'special' }],
+    ability: 'cursed-body'
   },
 
   // ── Psychic ───────────────────────────────────────────────────────────────────
@@ -1121,6 +1133,7 @@ var POKEMON_DB = {
   wobbuffet: {
     stage: 2, types: ['psychic'], damageClass: 'physical',
     moveLines: [{ type: 'psychic', damageClass: 'physical' }],
+    ability: 'cursed-body'
   },
 
   // ── Normal / Psychic ─────────────────────────────────────────────────────────
@@ -1134,10 +1147,12 @@ var POKEMON_DB = {
     stage: 1, types: ['bug'], damageClass: 'physical',
     moveLines: [{ type: 'bug', damageClass: 'physical' }],
     evolvesAt: 31, evolvesInto: 'forretress',
+    ability: 'rough-skin'
   },
   forretress: {
     stage: 2, types: ['bug', 'steel'], damageClass: 'physical',
     moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'steel', damageClass: 'physical' }],
+    ability: 'rough-skin'
   },
 
   // ── Normal ────────────────────────────────────────────────────────────────────
@@ -1150,6 +1165,7 @@ var POKEMON_DB = {
   gligar: {
     stage: 2, types: ['ground', 'flying'], damageClass: 'physical',
     moveLines: [{ type: 'ground', damageClass: 'physical' }, { type: 'flying', damageClass: 'physical' }],
+    ability: 'poison-point'
   },
 
   // ── Steel / Ground ────────────────────────────────────────────────────────────
@@ -1163,21 +1179,24 @@ var POKEMON_DB = {
     stage: 1, types: ['fairy'], damageClass: 'physical',
     moveLines: [{ type: 'fairy', damageClass: 'physical' }],
     evolvesAt: 23, evolvesInto: 'granbull',
+    ability: 'intimidate'
   },
   granbull: {
     stage: 2, types: ['fairy'], damageClass: 'physical',
     moveLines: [{ type: 'fairy', damageClass: 'physical' }],
+    ability: 'intimidate'
   },
 
   // ── Water / Poison ────────────────────────────────────────────────────────────
   qwilfish: {
     stage: 2, types: ['water', 'poison'], damageClass: 'physical',
     moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'poison', damageClass: 'physical' }],
+    ability: 'poison-point'
   },
 
   // ── Bug / Steel ───────────────────────────────────────────────────────────────
   scizor: {
-    stage: 2, types: ['bug', 'steel'], damageClass: 'physical',
+    stage: 3, types: ['bug', 'steel'], damageClass: 'physical',
     moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'steel', damageClass: 'physical' }],
   },
 
@@ -1204,10 +1223,12 @@ var POKEMON_DB = {
     stage: 1, types: ['normal'], damageClass: 'physical',
     moveLines: [{ type: 'normal', damageClass: 'physical' }],
     evolvesAt: 30, evolvesInto: 'ursaring',
+    ability: 'guts'
   },
   ursaring: {
     stage: 2, types: ['normal'], damageClass: 'physical',
     moveLines: [{ type: 'normal', damageClass: 'physical' }],
+    ability: 'guts'
   },
   stantler: {
     stage: 2, types: ['normal'], damageClass: 'physical',
@@ -1231,10 +1252,12 @@ var POKEMON_DB = {
     stage: 1, types: ['fire'], damageClass: 'special',
     moveLines: [{ type: 'fire', damageClass: 'special' }],
     evolvesAt: 38, evolvesInto: 'magcargo',
+    ability: 'flame-body'
   },
   magcargo: {
     stage: 2, types: ['fire', 'rock'], damageClass: 'special',
     moveLines: [{ type: 'fire', damageClass: 'special' }, { type: 'rock', damageClass: 'physical' }],
+    ability: 'flame-body'
   },
 
   // ── Ice / Ground ─────────────────────────────────────────────────────────────
@@ -1252,6 +1275,7 @@ var POKEMON_DB = {
   corsola: {
     stage: 2, types: ['water', 'rock'], damageClass: 'special',
     moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'rock', damageClass: 'physical' }],
+    ability: 'cursed-body'
   },
 
   // ── Water ─────────────────────────────────────────────────────────────────────
@@ -1288,10 +1312,12 @@ var POKEMON_DB = {
     stage: 1, types: ['dark', 'fire'], damageClass: 'special',
     moveLines: [{ type: 'dark', damageClass: 'physical' }, { type: 'fire', damageClass: 'special' }],
     evolvesAt: 24, evolvesInto: 'houndoom',
+    ability: 'intimidate'
   },
   houndoom: {
     stage: 2, types: ['dark', 'fire'], damageClass: 'special',
     moveLines: [{ type: 'dark', damageClass: 'physical' }, { type: 'fire', damageClass: 'special' }],
+    ability: 'intimidate'
   },
 
   // ── Water / Dragon ────────────────────────────────────────────────────────────

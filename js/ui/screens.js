@@ -87,7 +87,7 @@ const Screens = {
     return window[reg.routesGlobal] ?? [];
   },
 
-  // ── Comprueba si algún pokemon ha obtenido todas las medallas de la región ─
+  // ── Comprueba si algún pokemon de la pokédex tiene las 8 medallas de la región ─
   _hasAllRegionBadges() {
     const reg      = Screens._region ?? SCREENS_CONFIG.REGIONS[0];
     const required = reg.badges ?? [];
@@ -788,14 +788,17 @@ const Screens = {
   // Se muestra una sola vez por ruta, antes de la selección de camino.
   _showWelcome(route, data) {
     const w = data.welcome;
+    const bgStyle = w.img
+      ? `background-image:url('${w.img}');background-size:cover;background-position:center;`
+      : `background:linear-gradient(160deg,var(--green-dark) 0%,var(--green) 100%);`;
     document.getElementById('viewport').innerHTML = `
-      <div class="screen" style="background:linear-gradient(160deg,var(--green-dark) 0%,var(--green) 100%);
-        align-items:center;justify-content:center;gap:18px;padding:32px 24px;text-align:center;display:flex;flex-direction:column;">
-        <span style="font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.7);letter-spacing:2px">LLEGADA A</span>
-        <span style="font-family:var(--font-pixel);font-size:18px;color:var(--white);text-shadow:3px 3px 0 rgba(0,0,0,.3);line-height:1.6">${(w.title ?? route.name).toUpperCase()}</span>
-        ${w.img ? `<img src="${w.img}" style="width:100%;max-width:280px;border:var(--border);border-radius:var(--radius-md);image-rendering:pixelated" onerror="this.style.display='none'">` : ''}
-        ${w.subtitle ? `<p style="font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">${w.subtitle}</p>` : ''}
-        <button class="btn btn--primary btn--wide" id="btn-welcome-continue" style="max-width:240px">CONTINUAR</button>
+      <div class="screen" style="${bgStyle}
+        align-items:center;justify-content:center;gap:18px;padding:32px 24px;text-align:center;display:flex;flex-direction:column;position:relative;">
+        ${w.img ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,.45)"></div>` : ''}
+        <span style="position:relative;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.7);letter-spacing:2px">LLEGADA A</span>
+        <span style="position:relative;font-family:var(--font-pixel);font-size:18px;color:var(--white);text-shadow:3px 3px 0 rgba(0,0,0,.5);line-height:1.6">${(w.title ?? route.name).toUpperCase()}</span>
+        ${w.subtitle ? `<p style="position:relative;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">${w.subtitle}</p>` : ''}
+        <button class="btn btn--primary btn--wide" id="btn-welcome-continue" style="position:relative;max-width:240px">CONTINUAR</button>
       </div>`;
 
     document.getElementById('btn-welcome-continue').addEventListener('click', () => {
@@ -990,6 +993,7 @@ const Screens = {
       footerBar.style.justifyContent = 'space-between';
       footerBar.innerHTML = `
         <img class="icon-btn" id="route-settings-btn" src="assets/sprites/others/config.png" title="Ajustes" alt="Ajustes">
+        <img class="icon-btn" id="route-bag-btn" src="assets/sprites/others/mochila.png" title="Mochila" alt="Mochila">
         <img class="icon-btn${rotomEnabled ? '' : ' icon-btn--disabled'}" id="route-smart-rotom-btn" src="assets/sprites/others/smartrotom.png" title="${rotomEnabled ? 'SmartRotom' : 'Completa todas las medallas para desbloquear'}" alt="SmartRotom">`;
     }
 
@@ -1008,6 +1012,10 @@ const Screens = {
     // Botón de ajustes del footer — restaura sin regenerar rutas
     document.getElementById('route-settings-btn')?.addEventListener('click', () => {
       Screens._openRouteSettings(route);
+    });
+
+    document.getElementById('route-bag-btn')?.addEventListener('click', () => {
+      Screens._showBagModal();
     });
 
     document.getElementById('route-smart-rotom-btn')?.addEventListener('click', () => {
@@ -1099,6 +1107,7 @@ const Screens = {
 
     const list = overlay.querySelector('#smart-rotom-list');
     routes.forEach((r, i) => {
+      if (r.condition && !r.condition(GameState)) return;
       const isCurrent = r.area === currentArea;
       const unlocked  = i <= maxIdx;
       const btn = document.createElement('button');
@@ -1443,19 +1452,17 @@ const Screens = {
             ${blockedItem.fallbackIcon ?? ''} ${blockedItem.name} bloquea el cambio de movimiento
           </span>
         </div>` : ''}
-      <div style="display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:55vh;scrollbar-gutter:stable">
+      <div class="moves-list-scroll">
         ${poke.moves.map(m => {
           const effectDesc = getEffectDescriptions(m);
           return `
-            <div style="position:relative">
-              <button class="btn ${poke.autoMove === m.id ? 'btn--primary' : ''} btn--wide"
-                data-moveid="${m.id}" style="justify-content:space-between"
-                ${moveChangeBlocked ? 'disabled' : ''}>
-                <span>${m.name}</span>
-                <span style="opacity:.6;font-size:6px">${m.type.toUpperCase()} · POD:${m.power ?? '—'}</span>
-              </button>
-              ${effectDesc ? `<div class="move-effect-tooltip">✦ ${effectDesc}</div>` : ''}
-            </div>`;
+            <button class="btn ${poke.autoMove === m.id ? 'btn--primary' : ''} btn--wide"
+              data-moveid="${m.id}" data-effect="${effectDesc ?? ''}"
+              style="justify-content:space-between"
+              ${moveChangeBlocked ? 'disabled' : ''}>
+              <span>${m.name}</span>
+              <span style="opacity:.6;font-size:6px">${m.type.toUpperCase()} · POD:${m.power ?? '—'}</span>
+            </button>`;
         }).join('')}
       </div>
       <button class="btn btn--ghost btn--wide" id="pip-modal-close">Cerrar</button>
@@ -1469,6 +1476,24 @@ const Screens = {
         overlay.remove();
         Screens._renderTeamBar();
       });
+      const effect = btn.dataset.effect;
+      if (effect) {
+        let _tip = null;
+        let _tipTimer = null;
+        const _removeTip = () => { _tip?.remove(); _tip = null; clearTimeout(_tipTimer); _tipTimer = null; };
+        btn.addEventListener('mouseenter', () => {
+          _removeTip();
+          _tip = document.createElement('div');
+          _tip.className = 'move-effect-tooltip';
+          _tip.textContent = '✦ ' + effect;
+          document.body.appendChild(_tip);
+          const r = btn.getBoundingClientRect();
+          _tip.style.left = (r.left + r.width / 2) + 'px';
+          _tip.style.top  = (r.top - _tip.offsetHeight - 8) + 'px';
+          _tipTimer = setTimeout(_removeTip, 5000);
+        });
+        btn.addEventListener('mouseleave', _removeTip);
+      }
     });
 
     document.getElementById('pip-modal-close').addEventListener('click', () => overlay.remove());
@@ -1492,7 +1517,8 @@ const Screens = {
         <span style="color:var(--red)">Quitar lo destruirá</span> para siempre.
       </p>
       <div style="display:flex;flex-direction:column;gap:8px">
-        ${item.canChange && GameState.team.length > 1 ? `<button class="btn btn--primary" id="unequip-swap">Cambiar de Pokémon</button>` : ''}
+        ${item.canChange && GameState.team.length > 1 ? `<button class="btn" id="unequip-swap">Cambiar de Pokémon</button>` : ''}
+        ${!heldItemDestroysOnSwap(poke.heldItem) ? `<button class="btn" id="unequip-to-bag">Guardar en mochila</button>` : ''}
         <button class="btn btn--primary" id="unequip-confirm" style="background:var(--red)">Quitar objeto</button>
         <button class="btn btn--ghost" id="unequip-cancel">Cancelar</button>
       </div>
@@ -1500,6 +1526,7 @@ const Screens = {
 
     document.getElementById('unequip-confirm').addEventListener('click', () => {
       unequipHeldItem(poke);
+      Screens._saveRun();
       overlay.remove();
       Screens._renderTeamBar();
     });
@@ -1507,6 +1534,24 @@ const Screens = {
     document.getElementById('unequip-swap')?.addEventListener('click', () => {
       overlay.remove();
       Screens._showSwapItemModal(poke);
+    });
+    document.getElementById('unequip-to-bag')?.addEventListener('click', () => {
+      if (GameState.items.includes(poke.heldItem)) {
+        const btn = document.getElementById('unequip-to-bag');
+        if (btn) {
+          const orig = btn.textContent;
+          btn.textContent = 'Ya está en la mochila';
+          btn.disabled = true;
+          setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 1500);
+        }
+        return;
+      }
+      const itemId = poke.heldItem;
+      unequipHeldItem(poke);                // 1. quitar del pokemon
+      GameState.items.push(itemId);         // 2. meter en mochila
+      Screens._saveRun();                   // 3. un único save con todo correcto
+      overlay.remove();
+      Screens._renderTeamBar();
     });
   },
 
@@ -1558,6 +1603,7 @@ const Screens = {
         equipHeldItem(target, sourceId);
         if (targetId) equipHeldItem(poke, targetId);
 
+        Screens._saveRun();
         overlay.remove();
         Screens._renderTeamBar();
       });
@@ -1608,15 +1654,17 @@ const Screens = {
       };
     }
 
-    // ── Slot fijo: Objeto equipable ───────────────────────────────────────────
-    // Pool = todos los items del juego. Los items en rewardExtras de esta ruta
-    // cuentan doble (mayor probabilidad de salir).
+    // ── Slot fijo: Objeto equipable / pasivo ─────────────────────────────────
+    // Pool = items equipables. Los extras de la ruta cuentan doble y también
+    // pueden incluir objetos pasivos (PASSIVE_ITEMS).
     let itemPrize = null;
     {
       const extras = data.rewardExtras ?? [];
       const pool = [...Object.keys(HELD_ITEMS), ...extras];
       const itemId = pool[Math.floor(Math.random() * pool.length)];
-      const item = HELD_ITEMS[itemId];
+      const heldDef   = HELD_ITEMS[itemId];
+      const passiveDef = typeof PASSIVE_ITEMS !== 'undefined' ? PASSIVE_ITEMS[itemId] : null;
+      const item = heldDef ?? passiveDef;
       if (item) {
         itemPrize = {
           id: `held-${itemId}`,
@@ -1624,9 +1672,9 @@ const Screens = {
             onerror="this.outerHTML='<span style=font-size:32px>${item.fallbackIcon ?? '❓'}</span>'">`,
           name: item.name,
           desc: item.desc,
-          type: 'held-item',
+          type: passiveDef ? 'passive-item' : 'held-item',
           itemId,
-          alreadyCollected: Storage.isItemCollected(itemId),
+          alreadyCollected: passiveDef ? false : Storage.isItemCollected(itemId),
         };
       }
     }
@@ -1776,7 +1824,7 @@ const Screens = {
           tipEl.textContent = el.dataset.desc;
           document.body.appendChild(tipEl);
           const rect = el.getBoundingClientRect();
-          tipEl.style.left = `${rect.left}px`;
+          tipEl.style.left = `${rect.left + rect.width / 2 - tipEl.offsetWidth / 2}px`;
           tipEl.style.top  = `${rect.top - tipEl.offsetHeight - 6}px`;
           if (parseFloat(tipEl.style.top) < 4) tipEl.style.top = `${rect.bottom + 6}px`;
         });
@@ -1797,7 +1845,8 @@ const Screens = {
           } else if (chosen.type === 'ev-stat') {
             Screens._showEvItemSelector(chosen, advance);
           } else if (chosen.type === 'candy') {
-            for (const p of GameState.team) levelUpPokemon(p, 1);
+            const candyLevels = GameState.items.includes('candy-jar') ? 2 : 1;
+            for (const p of GameState.team) levelUpPokemon(p, candyLevels);
             for (let i = 0; i < GameState.team.length; i++) {
               const p = GameState.team[i];
               if (p._pendingEvolution) {
@@ -1815,6 +1864,9 @@ const Screens = {
               }
             }
             GameState.team.forEach(p => fullHeal(p));
+            advance();
+          } else if (chosen.type === 'passive-item') {
+            Screens._addToBag(chosen.itemId);
             advance();
           } else if (chosen.type === 'held-item') {
             Screens._showHeldItemSelector(chosen, advance);
@@ -1857,7 +1909,12 @@ const Screens = {
     overlay.querySelectorAll('[data-idx]').forEach(btn => {
       btn.addEventListener('click', () => {
         const idx = +btn.dataset.idx;
-        console.log(`[ADVENTURE] Sustituido: ${GameState.team[idx].displayName} → ${newPoke.displayName}`);
+        const outgoing = GameState.team[idx];
+        if (outgoing.heldItem) {
+          const freedItem = unequipHeldItem(outgoing); // devuelve el itemId y borra heldItem
+          if (freedItem) Screens._pushToBag(freedItem);
+        }
+        console.log(`[ADVENTURE] Sustituido: ${outgoing.displayName} → ${newPoke.displayName}`);
         GameState.team[idx] = newPoke;
         overlay.remove();
         onDone();
@@ -1938,17 +1995,19 @@ const Screens = {
   },
 
   // Selector de pokemon para equipar un objeto (premio de fin de ruta).
-  // Si el pokemon elegido ya lleva un objeto, este se sustituye (el anterior
-  // se "pierde" — equipHeldItem revierte su efecto pasivo automáticamente).
+  // Si el pokemon ya lleva un objeto normal, este pasa a la mochila.
+  // Si lleva un Choice (blocksMoveChange), avisa de que se destruirá.
+  // El botón "Guardar" envía el nuevo objeto directamente a la mochila.
   _showHeldItemSelector(item, onDone) {
     const heldItem = HELD_ITEMS[item.itemId];
+
     const overlay = Screens._makeModal(`
       <div class="modal-title">${item.icon} ${item.name}</div>
       <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
         ${item.desc}
       </p>
       <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
-        Elige un pokemon para equipar este objeto
+        Elige un pokémon para equipar este objeto
       </p>
       <div style="display:flex;flex-direction:column;gap:6px">
         ${GameState.team.map((p, i) => {
@@ -1960,22 +2019,293 @@ const Screens = {
           return Screens._teamBtn(p, i, extra, !compatible);
         }).join('')}
       </div>
+      <button class="btn btn--wide" id="held-item-save">Guardar en mochila</button>
       <button class="btn btn--ghost btn--wide" id="held-item-cancel">Cancelar</button>
     `);
+
+    const _doEquip = (p) => {
+      const oldId = p.heldItem;
+      if (oldId) {
+        unequipHeldItem(p);                                         // 1. quitar del pokemon
+        if (!heldItemDestroysOnSwap(oldId)) Screens._pushToBag(oldId); // 2. mochila (sin save aún)
+      }
+      equipHeldItem(p, item.itemId);                               // 3. equipar nuevo (p.heldItem era null)
+      Storage.markItemCollected(item.itemId);
+      Screens._saveRun();                                          // 4. un solo save con todo correcto
+      console.log(`[ITEM] ${heldItem.name} → ${p.displayName}`);
+      overlay.remove();
+      onDone();
+    };
 
     overlay.querySelectorAll('[data-idx]:not([disabled])').forEach(btn => {
       btn.addEventListener('click', () => {
         const p = GameState.team[+btn.dataset.idx];
-        equipHeldItem(p, item.itemId);
-        Storage.markItemCollected(item.itemId);
-        console.log(`[ITEM] ${heldItem.name} → ${p.displayName}`);
-        overlay.remove();
-        onDone();
+        const oldId = p.heldItem;
+        if (oldId && heldItemDestroysOnSwap(oldId)) {
+          const warnMsg = HELD_ITEMS[oldId]?.blocksMoveChange
+            ? `⚠ ${HELD_ITEMS[oldId].name} bloquea el cambio<br>y será destruido al sustituirlo.`
+            : `⚠ ${HELD_ITEMS[oldId].name}<br>será destruido al sustituirlo.`;
+          const warn = Screens._makeModal(`
+            <p style="font-family:var(--font-pixel);font-size:8px;line-height:2;text-align:center;margin-bottom:16px">
+              ${warnMsg}
+            </p>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn--ghost" id="choice-swap-cancel" style="flex:1">Cancelar</button>
+              <button class="btn" id="choice-swap-ok" style="flex:1">Sustituir</button>
+            </div>
+          `, { closeOnBackdrop: true });
+          document.getElementById('choice-swap-cancel').addEventListener('click', () => warn.remove());
+          document.getElementById('choice-swap-ok').addEventListener('click', () => { warn.remove(); _doEquip(p); });
+        } else {
+          _doEquip(p);
+        }
       });
     });
 
-    document.getElementById('held-item-cancel').addEventListener('click', () => {
+    document.getElementById('held-item-save').addEventListener('click', () => {
+      const added = Screens._addToBag(item.itemId);
+      Storage.markItemCollected(item.itemId);
+      if (!added) {
+        const btn = document.getElementById('held-item-save');
+        if (btn) {
+          const orig = btn.textContent;
+          btn.textContent = 'Ya está en la mochila';
+          btn.disabled = true;
+          setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 1500);
+        }
+        return;
+      }
       overlay.remove();
+      onDone();
+    });
+
+    document.getElementById('held-item-cancel').addEventListener('click', () => overlay.remove());
+  },
+
+  // ── Mochila: acumula en GameState.items sin guardar (uso interno) ────────
+  // Usar cuando el save se hará después junto con otros cambios (ej. heldItem).
+  _pushToBag(itemId) {
+    if (GameState.items.includes(itemId)) return false;
+    GameState.items.push(itemId);
+    return true;
+  },
+
+  // ── Mochila: añade itemId y guarda inmediatamente ─────────────────────────
+  _addToBag(itemId) {
+    if (!Screens._pushToBag(itemId)) return false;
+    Screens._saveRun();
+    return true;
+  },
+
+  // ── Mochila: elimina itemId ──────────────────────────────────────────────
+  _removeFromBag(itemId) {
+    const idx = GameState.items.indexOf(itemId);
+    if (idx === -1) return;
+    GameState.items.splice(idx, 1);
+    Screens._saveRun();
+  },
+
+  // ── Selector de equipo para equipar un objeto (usado desde la mochila) ───
+  // onEquipped(pokemon): item equipado con éxito.
+  // onBack: usuario canceló, vuelve a quien llamó.
+  _selectPokemonToEquip(itemId, { onEquipped, onBack } = {}) {
+    const heldItem = HELD_ITEMS[itemId];
+    if (!heldItem) return;
+
+    const overlay = Screens._makeModal(`
+      <div class="modal-title">${heldItem.name}</div>
+      <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:1.8">
+        Elige un pokémon para equipar este objeto
+      </p>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${GameState.team.map((p, i) => {
+          const compatible = !heldItem.canEquip || heldItem.canEquip(p);
+          const current = p.heldItem ? HELD_ITEMS[p.heldItem] : null;
+          const extra = !compatible
+            ? `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">No compatible</span>`
+            : current ? `<span style="font-family:var(--font-pixel);font-size:6px;color:var(--red)">Sustituye: ${current.name}</span>` : '';
+          return Screens._teamBtn(p, i, extra, !compatible);
+        }).join('')}
+      </div>
+      <button class="btn btn--ghost btn--wide" id="bag-equip-cancel">Volver</button>
+    `);
+
+    const _doSwap = (p) => {
+      const oldId = p.heldItem;
+      if (oldId) {
+        unequipHeldItem(p);
+        if (!heldItemDestroysOnSwap(oldId)) Screens._pushToBag(oldId);
+      }
+      equipHeldItem(p, itemId);
+      Storage.markItemCollected(itemId);
+      Screens._saveRun();
+      overlay.remove();
+      if (onEquipped) onEquipped(p);
+    };
+
+    overlay.querySelectorAll('[data-idx]:not([disabled])').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const p = GameState.team[+btn.dataset.idx];
+        const oldId = p.heldItem;
+        if (oldId && heldItemDestroysOnSwap(oldId)) {
+          const warnMsg = HELD_ITEMS[oldId]?.blocksMoveChange
+            ? `⚠ ${HELD_ITEMS[oldId].name} bloquea el cambio<br>y será destruido al sustituirlo.`
+            : `⚠ ${HELD_ITEMS[oldId].name}<br>será destruido al sustituirlo.`;
+          const warn = Screens._makeModal(`
+            <p style="font-family:var(--font-pixel);font-size:8px;line-height:2;text-align:center;margin-bottom:16px">
+              ${warnMsg}
+            </p>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn--ghost" id="bag-choice-cancel" style="flex:1">Cancelar</button>
+              <button class="btn" id="bag-choice-ok" style="flex:1">Sustituir</button>
+            </div>
+          `, { closeOnBackdrop: true });
+          document.getElementById('bag-choice-cancel').addEventListener('click', () => warn.remove());
+          document.getElementById('bag-choice-ok').addEventListener('click', () => { warn.remove(); _doSwap(p); });
+        } else {
+          _doSwap(p);
+        }
+      });
+    });
+
+    document.getElementById('bag-equip-cancel').addEventListener('click', () => {
+      overlay.remove();
+      if (onBack) onBack();
+    });
+  },
+
+  // ── Modal de mochila ─────────────────────────────────────────────────────
+  _showBagModal() {
+    document.getElementById('bag-modal')?.remove();
+    const bag = GameState.items;
+
+    const heldIds    = bag.filter(id => !!HELD_ITEMS[id]);
+    const passiveIds = bag.filter(id => isPassiveItem(id));
+
+    const _itemRow = (itemId, def) => `
+      <button class="btn btn--wide" data-bagitem="${itemId}"
+        style="justify-content:flex-start;gap:10px;padding:8px 12px">
+        <img src="${def.img}" alt="${def.name}"
+          style="width:24px;height:24px;image-rendering:pixelated;flex-shrink:0"
+          onerror="this.style.opacity=0.3">
+        <span style="flex:1;text-align:left;font-family:var(--font-pixel);font-size:7px">${def.name}</span>
+        <span style="font-family:var(--font-pixel);font-size:6px;color:var(--grey)">›</span>
+      </button>`;
+
+    const _sectionHeader = (label) =>
+      `<div style="font-family:var(--font-pixel);font-size:6px;color:var(--grey);letter-spacing:1px;padding:4px 2px 2px">${label}</div>`;
+
+    let bodyHtml = '';
+    if (heldIds.length === 0 && passiveIds.length === 0) {
+      bodyHtml = `<p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:2;margin:12px 0">La mochila está vacía.</p>`;
+    } else {
+      bodyHtml = `<div class="moves-list-scroll">`;
+      if (heldIds.length > 0) {
+        bodyHtml += _sectionHeader('OBJETOS');
+        bodyHtml += heldIds.map(id => _itemRow(id, HELD_ITEMS[id])).join('');
+      }
+      if (passiveIds.length > 0) {
+        bodyHtml += _sectionHeader('OBJETOS PASIVOS');
+        bodyHtml += passiveIds.map(id => _itemRow(id, PASSIVE_ITEMS[id])).join('');
+      }
+      bodyHtml += `</div>`;
+    }
+
+    const overlay = Screens._makeModal(`
+      <div class="modal-title">Mochila</div>
+      ${bodyHtml}
+      <button class="btn btn--ghost btn--wide" id="bag-close">Cerrar</button>
+    `, { id: 'bag-modal', closeOnBackdrop: true });
+
+    document.getElementById('bag-close').addEventListener('click', () => overlay.remove());
+
+    const _openDiscard = (itemId, it, parentModal) => {
+      const confirmModal = Screens._makeModal(`
+        <p style="font-family:var(--font-pixel);font-size:8px;line-height:2;text-align:center;margin-bottom:16px">
+          ¿Tirar ${it.name}?<br>Esta acción no se puede deshacer.
+        </p>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn--ghost" id="discard-cancel" style="flex:1">Cancelar</button>
+          <button class="btn" id="discard-ok"
+            style="flex:1;background:var(--red);border-color:var(--red)">Tirar</button>
+        </div>
+      `, { closeOnBackdrop: true });
+      document.getElementById('discard-cancel').addEventListener('click', () => {
+        confirmModal.remove(); parentModal.remove(); Screens._showBagModal();
+      });
+      document.getElementById('discard-ok').addEventListener('click', () => {
+        Screens._removeFromBag(itemId);
+        confirmModal.remove(); parentModal.remove(); Screens._showBagModal();
+      });
+    };
+
+    overlay.querySelectorAll('[data-bagitem]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const itemId = btn.dataset.bagitem;
+        const passive = isPassiveItem(itemId);
+        const it = passive ? PASSIVE_ITEMS[itemId] : HELD_ITEMS[itemId];
+        overlay.remove();
+
+        if (passive) {
+          // Objetos pasivos: solo descripción + tirar
+          const actionModal = Screens._makeModal(`
+            <div style="display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:8px">
+              <img src="${it.img}" alt="${it.name}"
+                style="width:32px;height:32px;image-rendering:pixelated"
+                onerror="this.style.opacity=0.3">
+              <span class="modal-title" style="margin:0">${it.name}</span>
+            </div>
+            <p style="font-family:var(--font-pixel);font-size:6px;color:var(--grey);text-align:center;line-height:1.8;margin-bottom:10px">
+              ${it.desc}
+            </p>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <button class="btn btn--primary btn--wide" id="bag-action-discard">Tirar</button>
+              <button class="btn btn--ghost btn--wide" id="bag-action-back">Volver</button>
+            </div>
+          `, { id: 'bag-action-modal' });
+          document.getElementById('bag-action-back').addEventListener('click', () => {
+            actionModal.remove(); Screens._showBagModal();
+          });
+          document.getElementById('bag-action-discard').addEventListener('click', () => {
+            _openDiscard(itemId, it, actionModal);
+          });
+        } else {
+          // Objetos equipables: equipar o tirar
+          const actionModal = Screens._makeModal(`
+            <div style="display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:8px">
+              <img src="${it.img}" alt="${it.name}"
+                style="width:32px;height:32px;image-rendering:pixelated"
+                onerror="this.style.opacity=0.3">
+              <span class="modal-title" style="margin:0">${it.name}</span>
+            </div>
+            <p style="font-family:var(--font-pixel);font-size:6px;color:var(--grey);text-align:center;line-height:1.8;margin-bottom:10px">
+              ${it.desc}
+            </p>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <button class="btn btn--wide" id="bag-action-equip">Equipar</button>
+              <button class="btn btn--primary btn--wide" id="bag-action-discard">Tirar</button>
+              <button class="btn btn--ghost btn--wide" id="bag-action-back">Volver</button>
+            </div>
+          `, { id: 'bag-action-modal' });
+          document.getElementById('bag-action-back').addEventListener('click', () => {
+            actionModal.remove(); Screens._showBagModal();
+          });
+          document.getElementById('bag-action-discard').addEventListener('click', () => {
+            _openDiscard(itemId, it, actionModal);
+          });
+          document.getElementById('bag-action-equip').addEventListener('click', () => {
+            actionModal.remove();
+            Screens._selectPokemonToEquip(itemId, {
+              onEquipped: () => {
+                Screens._removeFromBag(itemId);
+                Screens._renderTeamBar();
+                Screens._saveRun();
+              },
+              onBack: () => Screens._showBagModal(),
+            });
+          });
+        }
+      });
     });
   },
 

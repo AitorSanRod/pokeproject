@@ -24,21 +24,21 @@
 
 // Lista cerrada de identificadores de estado válidos
 var STATUS = Object.freeze({
-  BURN:      'burn',
-  POISON:    'poison',
-  SLEEP:     'sleep',
+  BURN: 'burn',
+  POISON: 'poison',
+  SLEEP: 'sleep',
   PARALYSIS: 'paralysis',
-  FREEZE:    'freeze',
+  FREEZE: 'freeze',
   CONFUSION: 'confusion',
 });
 const StatusEffect = STATUS;
 
 const STATUS_META = {
-  poison:    { label: 'PSN', icon: '💜', color: '#9B59B6', bg: '#F5EEF8' },
+  poison: { label: 'PSN', icon: '💜', color: '#9B59B6', bg: '#F5EEF8' },
   paralysis: { label: 'PAR', icon: '⚡', color: '#F1C40F', bg: '#FEF9E7' },
-  burn:      { label: 'QEM', icon: '🔥', color: '#E74C3C', bg: '#FDEDEC' },
-  sleep:     { label: 'SLE', icon: '💤', color: '#7F8C8D', bg: '#F2F3F4' },
-  freeze:    { label: 'CON', icon: '🧊', color: '#5DADE2', bg: '#EBF5FB' },
+  burn: { label: 'QEM', icon: '🔥', color: '#E74C3C', bg: '#FDEDEC' },
+  sleep: { label: 'SLE', icon: '💤', color: '#7F8C8D', bg: '#F2F3F4' },
+  freeze: { label: 'CON', icon: '🧊', color: '#5DADE2', bg: '#EBF5FB' },
   confusion: { label: 'CNF', icon: '💫', color: '#7d22e6', bg: '#FEF5E7' },
 };
 
@@ -120,8 +120,8 @@ const StatusEffects = {
       // Turno 4+: siempre se despierta
       const wakeChance = s.turnsActive === 1 ? 0
         : s.turnsActive === 2 ? 0.33
-        : s.turnsActive === 3 ? 0.66
-        : 1.0;
+          : s.turnsActive === 3 ? 0.66
+            : 1.0;
 
       if (Math.random() < wakeChance) {
         StatusEffects.cure(pokemon, null);
@@ -198,11 +198,11 @@ const StatusEffects = {
   // ── Mensaje de aplicación ─────────────────────────────────────────────────
   _appliedMsg(id) {
     return {
-      poison:    'envenenado',
+      poison: 'envenenado',
       paralysis: 'paralizado',
-      burn:      'quemado',
-      sleep:     'dormido',
-      freeze:    'congelado',
+      burn: 'quemado',
+      sleep: 'dormido',
+      freeze: 'congelado',
       confusion: 'confundido',
     }[id] ?? 'afectado';
   },

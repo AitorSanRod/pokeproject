@@ -58,8 +58,8 @@ var MOVE_POOL = {
       { stage: 1, id: 'natural-gift', name: 'Don Natural', power: 12, pp: 100, type: T.NORMAL, damageClass: DC.PHYSICAL, effectId: ['raise-don-natural', 'versatil'], pokemon: ['eevee'] },
     ],
     special: [
-      { stage: 1, id: 'swift', name: 'Velocidad', power: 40, pp: 20, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: 'shield-10' },
-      { stage: 2, id: 'hyper-voice', name: 'Vozarrón', power: 70, pp: 10, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: 'colector' },
+      { stage: 1, id: 'swift', name: 'Velocidad', power: 40, pp: 20, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: 'colector' },
+      { stage: 2, id: 'hyper-voice', name: 'Vozarrón', power: 70, pp: 10, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: 'shield-10' },
       { stage: 3, id: 'boomburst', name: 'Estruendo', power: 90, pp: 10, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: 'shield-50' },
       { id: 'tri-attack', name: 'Triataque', power: 80, pp: 10, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: ['burn-10', 'paralize-10', 'freeze-10', 'drain-10'], boss: true },
       { id: 'substitute', mt: true, name: 'Triataque', power: 80, pp: 10, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: ['burn-10', 'paralize-10', 'freeze-10'] },
@@ -86,7 +86,7 @@ var MOVE_POOL = {
     ],
     special: [
       { stage: 1, id: 'water-gun', name: 'Pistola Agua', power: 40, pp: 25, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'lower-atk-10' },
-      { stage: 2, id: 'surf', name: 'Surf', power: 75, pp: 15, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'lower-atk-20' },
+      { stage: 2, id: 'surf', name: 'Surf', power: 75, pp: 15, type: T.WATER, damageClass: DC.SPECIAL },
       { stage: 3, id: 'hydro-pump', name: 'Hidrobomba', power: 90, pp: 99, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'conf-20' },
       { stage: 1, mt: true, id: 'bubble-beam', name: 'Rayo Burbuja', power: 65, pp: 99, type: T.WATER, damageClass: DC.SPECIAL, effectId: ['clear', 'conf-20'] },
       { stage: 1, mt: true, id: 'scald', name: 'Escaldar', power: 60, pp: 99, type: T.WATER, damageClass: DC.SPECIAL, effectId: 'burn-25' },
@@ -114,7 +114,7 @@ var MOVE_POOL = {
     ],
     special: [
       { stage: 1, id: 'thunder-shock', name: 'Impactrueno', power: 35, pp: 30, type: T.ELECTRIC, damageClass: DC.SPECIAL },
-      { stage: 2, id: 'thunderbolt', name: 'Rayo', power: 70, pp: 15, type: T.ELECTRIC, damageClass: DC.SPECIAL, effectId: 'raise-spa-10-100' },
+      { stage: 2, id: 'thunderbolt', name: 'Rayo', power: 70, pp: 15, type: T.ELECTRIC, damageClass: DC.SPECIAL },
       { stage: 3, id: 'thunder', name: 'Trueno', power: 90, pp: 10, type: T.ELECTRIC, damageClass: DC.SPECIAL },
     ],
   },

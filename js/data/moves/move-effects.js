@@ -814,15 +814,16 @@ var ABILITIES = {
   // ── Habilidades ocultas (sin implementar — reservadas para futura mecánica de objetos) ──
 
   'lightning-rod': {
-    trigger: ABILITY_TRIGGERS.PASSIVE,
+    trigger: ABILITY_TRIGGERS.ON_HIT_RECEIVED,
     name: 'Pararrayos',
-    desc: 'Inmune a ataques Eléctricos; los absorbe para subir su Ataque Especial.',
-  },
-
-  'rivalry': {
-    trigger: ABILITY_TRIGGERS.PASSIVE,
-    name: 'Rivalidad',
-    desc: 'Ataque sube si el rival es del mismo sexo; baja si es del opuesto.',
+    desc: 'Reduce el daño Eléctrico recibido y aumenta el SPA un 50%.',
+    fn(ctx) {
+      if (ctx.move?.type !== 'electric') return;
+      if (!ctx.pokemon.combatMods) ctx.pokemon.combatMods = {};
+      ctx.pokemon.combatMods.spa = (ctx.pokemon.combatMods.spa ?? 0) + 0.50;
+      ctx.log(`¡Pararrayos de ${ctx.pokemon.displayName} subió su Ataque Especial!`);
+      ctx.showStatChange(ctx.side, 'SPA', 'up', 50);
+    },
   },
 
   'justified': {
@@ -832,9 +833,16 @@ var ABILITIES = {
   },
 
   'cursed-body': {
-    trigger: ABILITY_TRIGGERS.PASSIVE,
+    trigger: ABILITY_TRIGGERS.ON_HIT_RECEIVED,
     name: 'Cuerpo Maldito',
-    desc: 'Puede deshabilitar el movimiento que lo golpea.',
+    desc: '30% de probabilidad de que el atacante use Forcejeo los próximos 3 turnos. No afecta a Forcejeo.',
+    statusChance: 0.30,
+    fn(ctx) {
+      if (!ctx.attacker || ctx.attacker.currentHp <= 0) return;
+      if (ctx.move?.id === 'forcejeo') return;
+      ctx.attacker._cursedBodyTurns = 3;
+      ctx.log(`¡Cuerpo Maldito bloqueó el movimiento de ${ctx.attacker.displayName}!`);
+    },
   },
 
   'vital-spirit': {

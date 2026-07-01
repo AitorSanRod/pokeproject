@@ -228,6 +228,34 @@ var Storage = {
     }
   },
 
+  // ── Mochila (objetos en la run activa) ──────────────────────────────────
+  // Array de itemIds en pkmn_run.items, sin duplicados.
+  // Estos métodos operan directamente sobre el run guardado en localStorage,
+  // sin pasar por GameState — útiles para import/export.
+
+  getBag() {
+    return this.loadRun()?.items ?? [];
+  },
+
+  addToBag(itemId) {
+    const run = this.loadRun();
+    if (!run) return false;
+    if (!run.items) run.items = [];
+    if (run.items.includes(itemId)) return false;
+    run.items.push(itemId);
+    this.saveRun(run);
+    console.log(`[Storage] Mochila: ${itemId} añadido`);
+    return true;
+  },
+
+  removeFromBag(itemId) {
+    const run = this.loadRun();
+    if (!run) return;
+    run.items = (run.items ?? []).filter(id => id !== itemId);
+    this.saveRun(run);
+    console.log(`[Storage] Mochila: ${itemId} eliminado`);
+  },
+
   // ── Objetos recogidos ─────────────────────────────────────────────────────
   // { [itemId]: true }  — booleano, solo marca que se obtuvo alguna vez.
   // No depende del pokemon activo ni de la partida en curso.

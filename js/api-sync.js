@@ -589,6 +589,19 @@ var ApiSync = (() => {
   }
 
   /**
+   * Envía la mochila de la run activa (array de itemIds).
+   * La mochila vive en run.items — este método la sube de forma independiente.
+   * No hace nada si no hay run activa.
+   * POST /bag → { user_id, bag_items: string[] }
+   */
+  async function syncBag() {
+    const user_id  = _getUserId();
+    const bag_items = Storage.getBag();
+    console.log(`[ApiSync] Enviando mochila — ${bag_items.length} objeto(s)`);
+    return _post('/bag', { user_id, bag_items });
+  }
+
+  /**
    * Envía la partida activa (cabecera + equipo completo).
    * No hace nada si no hay ninguna run guardada.
    * POST /run → { user_id, run_data: RunData, run_team: RunTeamSlot[] }
@@ -664,6 +677,7 @@ var ApiSync = (() => {
       mts,
       badges,
       items,
+      bag_items:       Storage.getBag(),  // mochila de la run activa
       furthest_routes,
       bf_max_floor:    Storage.getBfMaxFloor(),
       run_data:        runPayload?.run_data ?? null,
@@ -882,6 +896,31 @@ var ApiSync = (() => {
   }
 
   /**
+   * Descarga la mochila del servidor y la escribe en la run activa.
+   * No hace nada si no hay run activa.
+   *
+   * GET /bag?user_id=...
+   *
+   * Respuesta esperada del backend:
+   * { "bag_items": ["sitrus-berry", "carbon"] }
+   *
+   * @returns {Promise<string[]>} Array de itemIds cargados
+   */
+  async function loadBag() {
+    const data      = await _get('/bag');
+    const bag_items = data.bag_items ?? [];
+    const run       = Storage.loadRun();
+    if (run) {
+      run.items = [...new Set(bag_items)]; // deduplicar al importar
+      Storage.saveRun(run);
+      console.log(`[ApiSync] Mochila cargada — ${run.items.length} objeto(s)`);
+    } else {
+      console.log('[ApiSync] Mochila: no hay run activa, sin cambios.');
+    }
+    return bag_items;
+  }
+
+  /**
    * Descarga el progreso de ruta más lejana por región y lo escribe en localStorage.
    * El valor del servidor sobreescribe el local (la nube es autoritativa para este dato).
    *
@@ -957,6 +996,7 @@ var ApiSync = (() => {
       ? (typeof data.bf_max_floor === 'number' ? data.bf_max_floor : 0)
       : null;
     const run            = _parseRunPayload(data.run_data, data.run_team);
+    const bag_items      = data.bag_items ? [...new Set(data.bag_items)] : null;
 
     Storage._set('pokedex',          pokedex);
     Storage._set('evs',              evs);
@@ -967,6 +1007,8 @@ var ApiSync = (() => {
     if (bfMaxFloor != null) Storage._set('bf_max_floor', bfMaxFloor);
 
     if (run) {
+      // Si el servidor envía bag_items explícito, sobrescribe el de run_data.items
+      if (bag_items !== null) run.items = bag_items;
       Storage.saveRun(run);
     } else {
       Storage.clearRun();
@@ -987,14 +1029,14 @@ var ApiSync = (() => {
       ` run:${run ? `ruta ${run.routeIndex}` : 'ninguna'}`
     );
 
-    return { pokedex, evs, mts, badges, items, furthestRoutes, bfMaxFloor, run };
+    return { pokedex, evs, mts, badges, items, bag: run?.items ?? [], furthestRoutes, bfMaxFloor, run };
   }
 
   return {
     // Envío
-    syncPokedex, syncEvs, syncMts, syncBadges, syncItems, syncRun, syncFurthestRoutes, syncBfFloor, syncAll,
+    syncPokedex, syncEvs, syncMts, syncBadges, syncItems, syncBag, syncRun, syncFurthestRoutes, syncBfFloor, syncAll,
     // Carga
-    loadPokedex, loadEvs, loadMts, loadBadges, loadItems, loadRun, loadFurthestRoutes, loadBfFloor, loadAll,
+    loadPokedex, loadEvs, loadMts, loadBadges, loadItems, loadBag, loadRun, loadFurthestRoutes, loadBfFloor, loadAll,
   };
 
 })();

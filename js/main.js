@@ -157,7 +157,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   gearPanel.appendChild(resetBtn);
 
-  // ── Botón de notas ────────────────────────────────────────────────────────
+  // ── Botón de notas (independiente del panel) ─────────────────────────────
   const notesBtn = document.createElement('button');
   notesBtn.id = 'btn-notes-global';
   notesBtn.title = 'Notas';
@@ -166,7 +166,7 @@ window.addEventListener('DOMContentLoaded', () => {
   notesBtn.addEventListener('mouseenter', () => notesBtn.style.background = 'rgba(0,0,0,.6)');
   notesBtn.addEventListener('mouseleave', () => notesBtn.style.background = 'rgba(0,0,0,.35)');
   notesBtn.addEventListener('click', () => NotesPopup.open());
-  gearPanel.appendChild(notesBtn);
+  globalControls.appendChild(notesBtn);
 
   // ── Botón SmartRotom ──────────────────────────────────────────────────────
   const smartRotomBtn = document.createElement('button');

@@ -503,6 +503,36 @@ var HELD_ITEMS = {
     revert(ctx) { },
   },
 
+  // ── HABILIDAD ALEATORIA ──────────────────────────────────────────────────────
+
+  // 'cascabel': {
+  //   name: 'Cascabel',
+  //   desc: 'Cambia la habilidad del portador por una aleatoria de todas las disponibles. Se restaura al desequiparlo.',
+  //   img: 'assets/sprites/items/cascabel.png',
+  //   fallbackIcon: '🔔',
+  //   canChange: true,
+  //   trigger: HELD_ITEM_TRIGGERS.PASSIVE,
+  //   fn(ctx) {
+  //     const { user } = ctx;
+  //     const abilityIds = typeof ABILITIES !== 'undefined' ? Object.keys(ABILITIES) : [];
+  //     if (!abilityIds.length) return;
+  //     user._preAbility = user.ability ?? null;
+  //     const newId = abilityIds[Math.floor(Math.random() * abilityIds.length)];
+  //     user.ability = newId;
+  //     const newName = ABILITIES[newId]?.name ?? newId;
+  //     const oldName = user._preAbility ? (ABILITIES[user._preAbility]?.name ?? user._preAbility) : 'ninguna';
+  //     console.log(`[CASCABEL] ${user.displayName}: ${oldName} → ${newName}`);
+  //   },
+  //   revert(ctx) {
+  //     const { user } = ctx;
+  //     const restored = user._preAbility ?? null;
+  //     user.ability = restored;
+  //     delete user._preAbility;
+  //     const restoredName = restored ? (ABILITIES[restored]?.name ?? restored) : 'ninguna';
+  //     console.log(`[CASCABEL] ${user.displayName}: habilidad restaurada → ${restoredName}`);
+  //   },
+  // },
+
   // ── SUPERVIVENCIA ────────────────────────────────────────────────────────────
 
   'focus-sash': {
@@ -656,6 +686,13 @@ function heldItemBlocksMoveChange(pokemon) {
   return !!item?.blocksMoveChange;
 }
 
+// true si el objeto se destruye al ser sustituido (no va a la mochila).
+// Incluye Choice (blocksMoveChange) y objetos con destroyOnSwap explícito.
+function heldItemDestroysOnSwap(itemId) {
+  const item = HELD_ITEMS[itemId];
+  return !!(item?.blocksMoveChange || item?.destroyOnSwap);
+}
+
 // ── ITEM — acceso por clave con guión bajo, igual que POKEMON/MOVES ──────────
 // Permite escribir ITEM.sitrus_berry / ITEM.choice_scarf en routes.js en vez
 // del id real con guión ('sitrus-berry' / 'choice-scarf').
@@ -683,4 +720,30 @@ var ITEM = {
   focus_sash: 'focus-sash',
   metronome: 'metronome',
   shell_bell: 'shell-bell',
+  // cascabel: 'cascabel',
 };
+
+// ── OBJETOS PASIVOS ──────────────────────────────────────────────────────────
+// No se equipan a un pokemon. Viven en la mochila (GameState.items) y tienen
+// un efecto continuo mientras estén ahí. Se añaden como rewardExtras en rutas.
+
+var PASSIVE_ITEMS = {
+
+  'candy-jar': {
+    name: 'Tarro de Caramelos',
+    desc: 'Mientras esté en la mochila, los Caramelorraros dan 2 niveles a todos los pokémon en vez de 1.',
+    img: 'assets/sprites/items/tarro.png',
+    fallbackIcon: '🍬',
+  },
+
+};
+
+// Acceso por guión bajo, como ITEM pero para pasivos.
+var PASSIVE_ITEM = {
+  candy_jar: 'candy-jar',
+};
+
+// true si el id pertenece a un objeto pasivo (no equipable a pokemon).
+function isPassiveItem(itemId) {
+  return typeof PASSIVE_ITEMS !== 'undefined' && itemId in PASSIVE_ITEMS;
+}

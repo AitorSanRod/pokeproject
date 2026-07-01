@@ -182,6 +182,10 @@ img { display: block; image-rendering: pixelated; }
     --combat-hud-name-size:  9px;
     --combat-hud-level-size: 7px;
   }
+
+  /* Footer de selección de ruta: 25% más grande que el original (20×0.75 = 15px) */
+  #route-footer-bar { padding: 10px 20px !important; }
+  #route-footer-bar .icon-btn { width: 30px; height: 30px; }
 }
 
 /* ── Screen transitions ────────────────────────────────────────────────────── */
@@ -217,6 +221,7 @@ img { display: block; image-rendering: pixelated; }
   transition: transform var(--transition), box-shadow var(--transition);
   text-transform: uppercase;
   user-select: none;
+  touch-action: manipulation;
   min-height: 44px; /* touch target */
 }
 

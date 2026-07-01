@@ -1532,12 +1532,10 @@
   line-height: 2;
 }
 
-/* ── MOVE EFFECT TOOLTIP ────────────────────────────────────────────────────── */
+/* ── MOVE EFFECT TOOLTIP (posición fixed via JS, escapa overflow containers) ─ */
 .move-effect-tooltip {
-  display: none;
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 50%;
+  position: fixed;
+  display: block;
   transform: translateX(-50%);
   background: var(--black);
   color: var(--white);
@@ -1546,7 +1544,7 @@
   padding: 5px 10px;
   border-radius: var(--radius-sm);
   white-space: nowrap;
-  z-index: 100;
+  z-index: 9999;
   pointer-events: none;
   line-height: 1.8;
 }
@@ -1558,7 +1556,17 @@
   border: 4px solid transparent;
   border-top-color: var(--black);
 }
-div:hover > .move-effect-tooltip { display: block; }
+
+/* ── MOVES LIST SCROLL (oculta scrollbar para evitar artefactos en móvil) ─── */
+.moves-list-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  max-height: 55vh;
+  scrollbar-width: none;
+}
+.moves-list-scroll::-webkit-scrollbar { display: none; }
 
 /* ── DAMAGE / HEAL FLOATERS ─────────────────────────────────────────────────── */
 .combat-floater {

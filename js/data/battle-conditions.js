@@ -30,8 +30,8 @@
 //                  // daño al final de turno (p.ej. granizo a no-hielo)
 // }
 var WEATHER = {
-  'sun': { name: 'Sol Intenso', damageBoost: [{ type: 'fire', mult: 1.5 }], damagePenalty: [{ type: 'water', mult: 0.5 }] },
-  'rain': { name: 'Lluvia', damageBoost: [{ type: 'water', mult: 1.5 }], damagePenalty: [{ type: 'fire', mult: 0.5 }] },
+  'sun': { name: 'Sol Intenso', damageBoost: [{ type: 'fire', mult: 1.25 }], damagePenalty: [{ type: 'water', mult: 0.5 }] },
+  'rain': { name: 'Lluvia', damageBoost: [{ type: 'water', mult: 1.25 }], damagePenalty: [{ type: 'fire', mult: 0.5 }] },
   'sand': { name: 'Tormenta de Arena', endOfTurnDmg: { pct: 0.0625, excludeTypes: ['rock', 'ground', 'steel'] } },
   'hail': { name: 'Granizo', endOfTurnDmg: { pct: 0.0625, excludeTypes: ['ice'] } },
 };

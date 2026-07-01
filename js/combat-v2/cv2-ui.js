@@ -291,6 +291,18 @@ const cv2UI = {
     }, 450);
   },
 
+  // Actualiza el src del sprite sin animación de entrada.
+  // Usado en combates de continuación para reflejar cambios de pokemon (captura/sustitución).
+  syncSprite(side, pokemon) {
+    const el = document.getElementById(`cv2-${side}-sprite`);
+    if (!el) return;
+    const newSrc = side === 'player'
+      ? (pokemon.backSpriteUrl ?? pokemon.spriteUrl ?? '')
+      : (pokemon.spriteUrl ?? '');
+    if (el.src !== newSrc) el.src = newSrc;
+    el.alt = pokemon.displayName;
+  },
+
   // ── Daño flotante ─────────────────────────────────────────────────────────
 
   showDamageFloat(side, amount, color = null) {
@@ -369,7 +381,13 @@ const cv2UI = {
       const expPct  = p.expToNext > 0
         ? Math.max(0, Math.min(100, Math.round((p.exp / p.expToNext) * 100)))
         : 0;
-      const fainted = p.currentHp <= 0;
+      const fainted  = p.currentHp <= 0;
+      const heldItem = p.heldItem && typeof HELD_ITEMS !== 'undefined' ? HELD_ITEMS[p.heldItem] : null;
+      const itemSlot = heldItem
+        ? `<img src="${heldItem.img}" alt="${heldItem.name}" title="${heldItem.name}"
+             style="width:14px;height:14px;image-rendering:pixelated"
+             onerror="this.outerHTML='<span style=\\'font-size:10px\\'>${heldItem.fallbackIcon ?? ''}</span>'">`
+        : '';
       return `
         <div class="combat-team-pip ${fainted ? 'combat-team-pip--fainted' : ''}">
           <img src="${p.spriteUrl ?? ''}" class="combat-team-pip__sprite" alt="${p.displayName}" onerror="this.style.opacity=0">
@@ -385,7 +403,7 @@ const cv2UI = {
               <div class="combat-team-pip__exp-fill" style="width:${expPct}%"></div>
             </div>
           </div>
-          <div class="combat-team-pip__item-slot"></div>
+          <div class="combat-team-pip__item-slot">${itemSlot}</div>
         </div>`;
     }).join('');
   },

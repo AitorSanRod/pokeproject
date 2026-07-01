@@ -196,6 +196,8 @@ const CombatV2 = {
 
     if (!this.state.skipPlayerEntry) {
       cv2UI.resetSprite('player', p);
+    } else {
+      cv2UI.syncSprite('player', p);
     }
     cv2UI.initHud('player', p);
     this._showPlayerMove();
@@ -372,8 +374,14 @@ const CombatV2 = {
     const { pokemon, move, side } = action;
 
     let effectiveMove = action._confusionSelfHit ? CONFUSION_SELF_HIT : move;
-    if (!action._confusionSelfHit && HELD_ITEMS?.[pokemon.heldItem]?.metronome) {
-      effectiveMove = getMetronomeMove();
+    if (!action._confusionSelfHit) {
+      if ((pokemon._cursedBodyTurns ?? 0) > 0) {
+        effectiveMove = FORCEJEO;
+        pokemon._cursedBodyTurns--;
+        if (pokemon._cursedBodyTurns === 0) delete pokemon._cursedBodyTurns;
+      } else if (HELD_ITEMS?.[pokemon.heldItem]?.metronome) {
+        effectiveMove = getMetronomeMove();
+      }
     }
     const target     = action._confusionSelfHit ? pokemon             : opponent;
     const targetSide = action._confusionSelfHit ? side : this._getOpponentSide(side);
@@ -519,6 +527,7 @@ const CombatV2 = {
       const triggered = await applyAbility(defender, ABILITY_TRIGGERS.ON_HIT_RECEIVED, {
         side:           defenderSide,
         attacker,
+        move,
         dmg:            finalDmg,
         log:            msg => cv2UI.log(msg),
         showStatChange: (s, stat, dir, pct) => { statAnims.push(cv2UI.showStatChange(s, stat, dir, pct)); },
@@ -881,6 +890,7 @@ const CombatV2 = {
   async _stepWin() {
     if (this.state.ended) return;
     this.state.ended = true;
+    for (const pk of this.state.playerTeam ?? []) delete pk._cursedBodyTurns;
     cv2UI.log('¡Ganaste el combate!');
     await cv2UI.wait(CV2_DELAY.LOG_READ);
     this.state.onWin?.();
@@ -889,6 +899,7 @@ const CombatV2 = {
   async _stepLoss() {
     if (this.state.ended) return;
     this.state.ended = true;
+    for (const pk of this.state.playerTeam ?? []) delete pk._cursedBodyTurns;
     cv2UI.log('¡Todos tus Pokémon se han debilitado!');
     await cv2UI.wait(CV2_DELAY.LOG_READ);
     this.state.onLoss?.();
@@ -1006,6 +1017,7 @@ function _calcDamage(attacker, defender, move) {
     return { dmg: 0, isCrit: false, eff: 0 };
   }
 
+
   const isSpecial = move.damageClass === 'special';
   const atkMod    = isSpecial ? (attacker.combatMods?.spa ?? 0) : (attacker.combatMods?.atk ?? 0);
   const defMod    = isSpecial ? (defender.combatMods?.spd ?? 0) : (defender.combatMods?.def ?? 0);
@@ -1061,6 +1073,11 @@ function _calcDamage(attacker, defender, move) {
   if (!isSpecial && hasGutsEffect(attacker)) {
     const gutsMult = ABILITIES['guts']?.dmgMult ?? 1.5;
     dmg = Math.floor(dmg * gutsMult);
+  }
+
+  // Lightning-rod: reduce el daño eléctrico recibido un 75%
+  if (defender.ability === 'lightning-rod' && move.type === 'electric') {
+    dmg = Math.floor(dmg * 0.25);
   }
 
   const critChance = ids.includes('crit-75') ? 0.75 : CV2_COMBAT.CRIT_CHANCE;
