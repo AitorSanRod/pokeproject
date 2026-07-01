@@ -167,6 +167,7 @@ const PokedexScreen = {
         const progression = getMoveProgression(line.type, line.damageClass);
         for (const move of progression) {
           if (move && !move.boss && !move.mt && (move.stage ?? 1) <= pokemonStage && !pokeMovesById.has(move.id)) {
+            if (move.pokemon?.length > 0 && !move.pokemon.includes(name)) continue;
             pokeMovesById.add(move.id);
             pokeMovesList.push(move);
           }
@@ -370,13 +371,12 @@ const PokedexScreen = {
                   return `
                     <div style="display:flex;align-items:center;gap:6px;padding:5px 8px;
                       background:${isMT ? '#eef4ff' : 'var(--off-white)'};
-                      border-radius:var(--radius-sm);position:relative">
+                      border-radius:var(--radius-sm)"${effectDesc ? ` data-effect="${effectDesc.replace(/"/g, '&quot;')}"` : ''}>
                       ${isMT ? `<span style="font-family:var(--font-pixel);font-size:5px;color:var(--white);
                         background:#4a7fc1;border-radius:2px;padding:1px 4px;flex-shrink:0">MT</span>` : ''}
                       <span class="type-badge" data-type="${m.type}" style="font-size:5px;padding:2px 5px;flex-shrink:0">${m.type}</span>
                       <span style="font-family:var(--font-pixel);font-size:7px;flex:1">${m.name}</span>
                       <span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey)">POD:${m.power ?? '—'}</span>
-                      ${effectDesc ? `<div class="move-effect-tooltip">✦ ${effectDesc}</div>` : ''}
                     </div>`;
                 }).join('')}
               </div>
@@ -401,5 +401,25 @@ const PokedexScreen = {
         document.getElementById('dex-shiny-toggle').style.opacity = showingShiny ? '1' : '.7';
       });
     }
+
+    vp.querySelectorAll('[data-effect]').forEach(row => {
+      const effect = row.dataset.effect;
+      let _tip = null, _tipTimer = null;
+      const _removeTip = () => { _tip?.remove(); _tip = null; clearTimeout(_tipTimer); _tipTimer = null; };
+      const _showTip = () => {
+        _removeTip();
+        _tip = document.createElement('div');
+        _tip.className = 'move-effect-tooltip';
+        _tip.textContent = '✦ ' + effect;
+        document.body.appendChild(_tip);
+        const r = row.getBoundingClientRect();
+        _tip.style.left = (r.left + r.width / 2) + 'px';
+        _tip.style.top  = (r.top - _tip.offsetHeight - 8) + 'px';
+        _tipTimer = setTimeout(_removeTip, 5000);
+      };
+      row.addEventListener('mouseenter', _showTip);
+      row.addEventListener('mouseleave', _removeTip);
+      row.addEventListener('click', () => { _tip ? _removeTip() : _showTip(); });
+    });
   },
 };

@@ -277,18 +277,29 @@ const cv2UI = {
     el.style.filter     = '';
     el.style.transition = '';
     el.style.opacity    = '0';
-    el.src = side === 'player'
+    el.alt = pokemon.displayName;
+
+    const newSrc = side === 'player'
       ? (pokemon.backSpriteUrl ?? pokemon.spriteUrl ?? '')
       : (pokemon.spriteUrl ?? '');
-    el.alt = pokemon.displayName;
-    void el.offsetWidth;
     const enterAnim = side === 'foe' ? 'cv2-sprite-enter-foe' : 'cv2-sprite-enter-player';
-    el.style.animation = `${enterAnim} 0.45s ease-out forwards`;
-    el._enterCleanup = setTimeout(() => {
-      el._enterCleanup  = null;
-      el.style.animation = '';
-      el.style.opacity   = '1';
-    }, 450);
+
+    const _startAnim = () => {
+      el.src = newSrc;
+      void el.offsetWidth;
+      el.style.animation = `${enterAnim} 0.45s ease-out forwards`;
+      el._enterCleanup = setTimeout(() => {
+        el._enterCleanup  = null;
+        el.style.animation = '';
+        el.style.opacity   = '1';
+      }, 450);
+    };
+
+    if (!newSrc) { _startAnim(); return; }
+    const img = new Image();
+    img.onload  = _startAnim;
+    img.onerror = _startAnim;
+    img.src = newSrc;
   },
 
   // Actualiza el src del sprite sin animación de entrada.
