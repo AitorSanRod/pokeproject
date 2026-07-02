@@ -326,7 +326,20 @@ Object.assign(ROUTE_DATA, {
     gymLeaderImg: TRAINER_IMG.anton,
     welcome: { title: 'Pueblo Azalea', subtitle: 'Gimnasio de Tipo Bicho', img: BG.JOTHO.puebloAzalea },
     wild: [],
-    trainer: [],
+    trainer: [
+      {
+        name: ENTRENADORES.ChicoGuay.name, img: ENTRENADORES.ChicoGuay.img, rate: 50, pokemon: [
+          { name: POKEMON.rattata, minLv: 16, maxLv: 18, moveId: MOVES.normal.physical.tackle },
+          { name: POKEMON.butterfree, minLv: 18, maxLv: 20, moveId: [MOVES.bug.special.bug_buzz, MOVES.psychic.special.confusion] },
+        ]
+      },
+      {
+        name: ENTRENADORES.Cazabichos.name, img: ENTRENADORES.Cazabichos.img, rate: 50, pokemon: [
+          { name: POKEMON.kakuna, level: 21, moveId: MOVES.bug.physical.bug_bite },
+          { name: POKEMON.beedrill, minLv: 18, maxLv: 21, moveId: MOVES.bug.physical.megahorn },
+        ]
+      },
+    ],
     gym: {
       leader: [
         { name: POKEMON.metapod, level: 21, moveId: MOVES.bug.physical.bug_bite },
@@ -335,7 +348,7 @@ Object.assign(ROUTE_DATA, {
       ]
     },
     paths: [
-      [{ type: PATH_TYPE.Lider }],
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }],
     ],
   },
 
@@ -400,15 +413,22 @@ Object.assign(ROUTE_DATA, {
     gymLeaderImg: TRAINER_IMG.blanca,
     welcome: { title: 'Ciudad Trigal', subtitle: 'Gimnasio de Tipo Normal', img: BG.JOTHO.ciudadTrigal },
     wild: [],
-    trainer: [],
+    trainer: [
+      {
+        name: ENTRENADORES.Chica.name, img: ENTRENADORES.Chica.img, rate: 100, pokemon: [
+          { name: POKEMON.teddiursa, minLv: 22, maxLv: 24, moveId: MOVES.normal.physical.hyper_fang },
+          { name: POKEMON.smeargle, minLv: 22, maxLv: 24, moveId: MOVES.normal.physical.tackle },
+        ]
+      }
+    ],
     gym: {
       leader: [
-        { name: POKEMON.clefairy, level: 25, moveId: MOVES.fairy.special.disarming_voice },
-        { name: POKEMON.miltank, level: 29, moveId: [MOVES.normal.physical.hyper_fang, MOVES.normal.special.hyper_voice, MOVES.dark.physical.crunch, MOVES.normal.special.milk_drink] },
+        { name: POKEMON.clefairy, level: 26, moveId: MOVES.fairy.special.disarming_voice },
+        { name: POKEMON.miltank, level: 30, moveId: [MOVES.normal.physical.hyper_fang, MOVES.normal.special.hyper_voice, MOVES.dark.physical.crunch, MOVES.normal.special.milk_drink] },
       ]
     },
     paths: [
-      [{ type: PATH_TYPE.Lider }],
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }],
     ],
   },
 
@@ -422,7 +442,7 @@ Object.assign(ROUTE_DATA, {
     trainerBg: COMBAT_BG.default,
     rewardPokemon: [],
     wild: [
-      { name: POKEMON.sudowoodo, rate: 100, minLv: 30, maxLv: 30, moveId: MOVES.rock.physical.rock_slide },
+      { name: POKEMON.sudowoodo, rate: 100, minLv: 30, maxLv: 34, moveId: MOVES.rock.physical.rock_slide },
     ],
     trainer: [],
     paths: [
@@ -477,7 +497,7 @@ Object.assign(ROUTE_DATA, {
     bg: BG.JOTHO.torreQuemada,
     combatBg: COMBAT_BG.hierbaAlta,
     trainerBg: COMBAT_BG.default,
-    rewardPokemon: [],
+    rewardPokemon: [POKEMON.teddiursa],
     wild: [],
     trainer: [],
     specialTrainer: {
@@ -615,7 +635,7 @@ Object.assign(ROUTE_DATA, {
     specialTrainer: {
       name: ENTRENADORES.Mewtwo.name, img: ENTRENADORES.Mewtwo.img, pokemon: [
         {
-          name: POKEMON.mewtwo, level: 45, moveId: [MOVES.psychic.special.trick, MOVES.grass.special.giga_drain],
+          name: POKEMON.mewtwo, minLv: 35, maxLv: 40, moveId: [MOVES.psychic.special.trick, MOVES.grass.special.giga_drain],
           heldItem: ITEM.assault_vest, img: POKEMON_SPRITE.armoredMewtwo,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         }

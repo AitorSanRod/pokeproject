@@ -211,8 +211,8 @@ async function runBattleSim(playerPokemon, foePokemon, options = {}) {
 
     const playerMove = options.chosenMove;
     const foeMove    = enemyChooseMove(foePokemon, activePlayer);
-    const playerPrio  = getMovePriority(playerMove);
-    const foePrio     = getMovePriority(foeMove);
+    const playerPrio  = getMovePriority(playerMove, activePlayer);
+    const foePrio     = getMovePriority(foeMove, foePokemon);
     const playerFirst = playerPrio !== foePrio
       ? playerPrio > foePrio
       : activePlayer.stats.spe >= foePokemon.stats.spe;

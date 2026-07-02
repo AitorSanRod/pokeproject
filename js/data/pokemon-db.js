@@ -769,7 +769,8 @@ var POKEMON_DB = {
 
   // ── Normal ────────────────────────────────────────────────────────────────
   porygon: {
-    stage: 2, types: ['normal'], damageClass: 'special', evolvesInto: '',
+    stage: 2, types: ['normal'], damageClass: 'special', evolvesInto: 'porygon2',
+    evolvesAt: 40, ability: 'download',
     moveLines: [{ type: 'normal', damageClass: 'special' }],
   },
 
@@ -856,43 +857,52 @@ var POKEMON_DB = {
     stage: 1, types: ['grass'], damageClass: 'special',
     moveLines: [{ type: 'grass', damageClass: 'special' }],
     evolvesAt: 16, evolvesInto: 'bayleef',
+    ability: 'overgrow'
   },
   bayleef: {
     stage: 2, types: ['grass'], damageClass: 'special',
     moveLines: [{ type: 'grass', damageClass: 'special' }],
     evolvesAt: 32, evolvesInto: 'meganium',
+    ability: 'overgrow'
   },
   meganium: {
     stage: 3, types: ['grass'], damageClass: 'special',
     moveLines: [{ type: 'grass', damageClass: 'special' }],
+    ability: 'overgrow'
   },
   cyndaquil: {
     stage: 1, types: ['fire'], damageClass: 'special',
     moveLines: [{ type: 'fire', damageClass: 'special' }],
     evolvesAt: 14, evolvesInto: 'quilava',
+    ability: 'blaze'
   },
   quilava: {
     stage: 2, types: ['fire'], damageClass: 'special',
     moveLines: [{ type: 'fire', damageClass: 'special' }],
     evolvesAt: 36, evolvesInto: 'typhlosion',
+    ability: 'blaze'
   },
   typhlosion: {
     stage: 3, types: ['fire'], damageClass: 'special',
     moveLines: [{ type: 'fire', damageClass: 'special' }],
+    ability: 'blaze'
   },
   totodile: {
     stage: 1, types: ['water'], damageClass: 'physical',
     moveLines: [{ type: 'water', damageClass: 'physical' }],
     evolvesAt: 18, evolvesInto: 'croconaw',
+    ability: 'prisa-acuatica'
   },
   croconaw: {
     stage: 2, types: ['water'], damageClass: 'physical',
     moveLines: [{ type: 'water', damageClass: 'physical' }],
     evolvesAt: 30, evolvesInto: 'feraligatr',
+    ability: 'prisa-acuatica'
   },
   feraligatr: {
     stage: 3, types: ['water'], damageClass: 'physical',
     moveLines: [{ type: 'water', damageClass: 'physical' }],
+    ability: 'prisa-acuatica'
   },
 
   // ── Normal ────────────────────────────────────────────────────────────────────
@@ -1241,6 +1251,7 @@ var POKEMON_DB = {
   miltank: {
     stage: 2, types: ['normal'], damageClass: 'physical',
     moveLines: [{ type: 'normal', damageClass: 'physical' }],
+    ability: 'rough-skin'
   },
   blissey: {
     stage: 3, types: ['normal'], damageClass: 'special',
@@ -1339,7 +1350,7 @@ var POKEMON_DB = {
 
   // ── Normal ────────────────────────────────────────────────────────────────────
   porygon2: {
-    stage: 2, types: ['normal'], damageClass: 'special',
+    stage: 3, types: ['normal'], damageClass: 'special', ability: 'download',
     moveLines: [{ type: 'normal', damageClass: 'special' }],
   },
 

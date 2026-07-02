@@ -690,11 +690,12 @@ function getEffectDescriptions(move) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 var ABILITY_TRIGGERS = Object.freeze({
-  ON_ENTER:        'on-enter',
-  ON_HIT:          'on-hit',
-  ON_HIT_RECEIVED: 'on-hit-received',
-  ON_TURN_END:     'on-turn-end',
-  PASSIVE:         'passive',
+  ON_ENTER:          'on-enter',
+  ON_OPPONENT_ENTER: 'on-opponent-enter',
+  ON_HIT:            'on-hit',
+  ON_HIT_RECEIVED:   'on-hit-received',
+  ON_TURN_END:       'on-turn-end',
+  PASSIVE:           'passive',
 });
 
 var ABILITIES = {
@@ -878,21 +879,68 @@ var ABILITIES = {
     desc: 'Revela el objeto que porta el rival al entrar en combate.',
   },
 
+  'prisa-acuatica': {
+    trigger: ABILITY_TRIGGERS.PASSIVE,
+    name: 'Prisa Acuática',
+    desc: 'Con más del 50% de salud, los ataques de tipo Agua tienen prioridad +1.',
+  },
+
+  'blaze': {
+    trigger: ABILITY_TRIGGERS.PASSIVE,
+    name: 'Mar llamas',
+    desc: 'Con más del 50% de salud, duplica el Ataque Especial.',
+  },
+
+  'overgrow': {
+    trigger: ABILITY_TRIGGERS.PASSIVE,
+    name: 'Espesura',
+    desc: 'Con más del 50% de salud aumenta su DEF y SPD. Por debajo del 50% de salud aumenta su SPA.',
+  },
+
+  'download': {
+    trigger: [ABILITY_TRIGGERS.ON_ENTER, ABILITY_TRIGGERS.ON_OPPONENT_ENTER],
+    name: 'Descarga',
+    desc: 'Al entrar en combate o al aparecer un nuevo rival, analiza sus stats: si su DEF supera su DEF Esp., sube el ATK un 30%; si no, sube el SPA un 30%.',
+    fn(ctx) {
+      const pokemon  = ctx.pokemon;
+      const opponent = ctx.opponent;
+      if (!opponent) return;
+      if (!pokemon.combatMods) pokemon.combatMods = {};
+      // Revertir boost anterior (en caso de cambio de rival o nueva batalla)
+      if (pokemon._downloadBoost) {
+        const prev = pokemon.combatMods[pokemon._downloadBoost] ?? 0;
+        pokemon.combatMods[pokemon._downloadBoost] = Math.max(0, prev - 0.30);
+      }
+      const boostedStat = opponent.stats.def > opponent.stats.spd ? 'atk' : 'spa';
+      pokemon.combatMods[boostedStat] = (pokemon.combatMods[boostedStat] ?? 0) + 0.30;
+      pokemon._downloadBoost = boostedStat;
+      const statLabel = boostedStat === 'atk' ? 'ATK' : 'Ataque Esp.';
+      ctx.log(`¡${pokemon.displayName} analizó al rival y aumentó su ${statLabel}!`);
+      ctx.showStatChange?.(ctx.side, boostedStat, 'up', 30);
+    },
+  },
+
 };
 
 // Devuelve la prioridad numérica de un movimiento.
+// Acepta un pokemon opcional para aplicar habilidades que modifican la prioridad.
 // Orden de resolución:
 //   1. El effectId (o primer effectId en array) tiene un campo `priority` en MOVE_EFFECTS → usa ese valor.
 //   2. La propiedad `move.priority` directa (legacy / override manual).
-//   3. 0 por defecto (prioridad normal).
-function getMovePriority(move) {
+//   3. Habilidades pasivas (e.g. prisa-acuatica) → +1 si se cumplen condiciones.
+//   4. 0 por defecto (prioridad normal).
+function getMovePriority(move, pokemon = null) {
   if (!move) return 0;
   const ids = Array.isArray(move.effectId) ? move.effectId : [move.effectId ?? ''];
   for (const id of ids) {
     const val = MOVE_EFFECTS[id]?.priority;
     if (val != null) return val;
   }
-  return move.priority ?? 0;
+  let base = move.priority ?? 0;
+  if (pokemon?.ability === 'prisa-acuatica' && move.type === 'water') { //Caso especifico de la habilidad prisa acuatica
+    if (pokemon.currentHp > pokemon.stats.hp * 0.50) base += 1;
+  }
+  return base;
 }
 
 // Ejecuta la habilidad de un pokemon para un trigger dado.
@@ -900,7 +948,9 @@ function getMovePriority(move) {
 async function applyAbility(pokemon, trigger, ctx) {
   if (!pokemon?.ability) return false;
   const ability = ABILITIES[pokemon.ability];
-  if (!ability || ability.trigger !== trigger) return false;
+  if (!ability) return false;
+  const triggers = Array.isArray(ability.trigger) ? ability.trigger : [ability.trigger];
+  if (!triggers.includes(trigger)) return false;
   if (ability.statusChance !== undefined && Math.random() >= ability.statusChance) return false;
   try {
     await ability.fn({ pokemon, ...ctx });

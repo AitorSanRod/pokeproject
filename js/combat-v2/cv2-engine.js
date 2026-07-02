@@ -238,6 +238,27 @@ const CombatV2 = {
     }
   },
 
+  // Dispara ON_OPPONENT_ENTER en el observador cuando un nuevo rival entra al campo.
+  // Solo se llama desde _stepNewFoePokemon y _stepNextPlayerOrLoss, nunca en el inicio
+  // de combate (donde ON_ENTER ya cubre la detección inicial).
+  async _applyOpponentEnterEffects(observer, observerSide, newOpponent) {
+    if (!observer) return;
+    const statAnims = [];
+    const triggered = await applyAbility(observer, ABILITY_TRIGGERS.ON_OPPONENT_ENTER, {
+      side:         observerSide,
+      opponent:     newOpponent,
+      opponentSide: this._getOpponentSide(observerSide),
+      log:            msg => cv2UI.log(msg),
+      showStatChange: (s, stat, dir, pct) => { statAnims.push(cv2UI.showStatChange(s, stat, dir, pct)); },
+    });
+    if (statAnims.length) await Promise.all(statAnims);
+    if (triggered) {
+      cv2UI.updateHp(observerSide, observer);
+      cv2UI.updateStatus(observerSide, observer);
+      await cv2UI.wait(CV2_DELAY.LOG_SHORT);
+    }
+  },
+
   // ═══════════════════════════════════════════════════════════════════════════
   // PASO 2 — Turno
   // ═══════════════════════════════════════════════════════════════════════════
@@ -845,6 +866,8 @@ const CombatV2 = {
 
     // Solo el nuevo foe ejecuta ON_ENTER — el jugador ya estaba en campo
     await this._applyEntryEffects(pokemon, 'foe');
+    // Habilidades del jugador que reaccionan a un nuevo rival (ej. Descarga)
+    await this._applyOpponentEnterEffects(this._getBySide('player'), 'player', pokemon);
 
     this.queue.enqueue(() => this._startTurn());
   },
@@ -878,6 +901,8 @@ const CombatV2 = {
 
       // Solo el nuevo jugador ejecuta ON_ENTER — el foe ya estaba en campo
       await this._applyEntryEffects(next, 'player');
+      // Habilidades del rival que reaccionan a un nuevo jugador (ej. Descarga en el foe)
+      await this._applyOpponentEnterEffects(this._getBySide('foe'), 'foe', next);
 
       this.queue.enqueue(() => this._startTurn());
     } else {
@@ -991,8 +1016,8 @@ function _effectiveSpeed(pokemon, side = null) {
 function _sortByPriority(actions) {
   const trickRoom = _hasTeamEffect('global', 'trick-room');
   return [...actions].sort((a, b) => {
-    const pa = getMovePriority(a.move);
-    const pb = getMovePriority(b.move);
+    const pa = getMovePriority(a.move, a.pokemon);
+    const pb = getMovePriority(b.move, b.pokemon);
     if (pa !== pb) return pb - pa;
     const sa = _effectiveSpeed(a.pokemon, a.side);
     const sb = _effectiveSpeed(b.pokemon, b.side);
@@ -1024,7 +1049,12 @@ function _calcDamage(attacker, defender, move) {
   const atkStat   = isSpecial ? attacker.stats.spa : attacker.stats.atk;
   const defStat   = isSpecial ? defender.stats.spd : defender.stats.def;
   let   atk       = Math.floor(atkStat * Math.max(0.1, 1 + atkMod));
-  const def       = Math.floor(defStat * Math.max(0.1, 1 + defMod));
+  let   def       = Math.floor(defStat * Math.max(0.1, 1 + defMod));
+
+  // Overgrow: +50% DEF y SPD (ambas clases) cuando HP > 50%
+  if (defender.ability === 'overgrow' && defender.currentHp > defender.stats.hp * 0.50) {
+    def = Math.floor(def * 1.5);
+  }
 
   // Penalizaciones de estado: multiplicativas sobre el stat ya modificado por combatMods
   if (!hasGutsEffect(attacker)) {
@@ -1067,6 +1097,16 @@ function _calcDamage(attacker, defender, move) {
   // Huge Power: duplica el ATK físico
   if (!isSpecial && attacker.ability === 'huge-power') {
     dmg = Math.floor(dmg * 2);
+  }
+
+  // Blaze: duplica el SPA especial si HP > 50%
+  if (isSpecial && attacker.ability === 'blaze' && attacker.currentHp > attacker.stats.hp * 0.50) {
+    dmg = Math.floor(dmg * 2);
+  }
+
+  // Overgrow: +50% SPA cuando HP ≤ 50%
+  if (isSpecial && attacker.ability === 'overgrow' && attacker.currentHp <= attacker.stats.hp * 0.50) {
+    dmg = Math.floor(dmg * 1.5);
   }
 
   // Guts: +50% daño físico (habilidad pasiva)
