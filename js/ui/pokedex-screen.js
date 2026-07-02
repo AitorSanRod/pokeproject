@@ -43,13 +43,36 @@ const PokedexScreen = {
         <!-- Header -->
         <div class="screen-header" style="background:var(--red)">
           <button class="btn btn--ghost screen-header__back" id="dex-back">${BACK_ARROW_SVG}</button>
-          <span class="screen-header__title">POKÉDEX</span>
-          <span class="screen-header__extra">${caught}/${total}</span>
+          <span class="screen-header__title" id="dex-header-title">POKÉDEX</span>
+          <button class="btn btn--ghost" id="dex-search-btn"
+            style="position:absolute;right:var(--sp-md);padding:4px;border:none;background:none;color:var(--white)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+          </button>
         </div>
 
         <!-- Lista -->
         <div id="dex-list" style="overflow-y:auto;flex:1;padding:var(--sp-sm)">
           <div style="display:flex;flex-direction:column;gap:4px">
+
+            <!-- Buscador -->
+            <div id="dex-search-bar" style="display:none;align-items:center;gap:6px;
+              background:var(--white);border:var(--border);border-radius:var(--radius-sm);
+              padding:12px 8px;margin-bottom:2px">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                fill="none" stroke="var(--grey)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                style="flex-shrink:0">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input id="dex-search-input" type="text" placeholder="Buscar pokémon..."
+                style="flex:1;border:none;outline:none;font-family:var(--font-pixel);font-size:8px;
+                  background:transparent;color:var(--black)">
+              <button id="dex-search-clear"
+                style="border:none;background:none;cursor:pointer;font-family:var(--font-pixel);
+                  font-size:10px;color:var(--grey);padding:0 2px;line-height:1">✕</button>
+            </div>
 
             <!-- LOGROS -->
             <details>
@@ -69,7 +92,7 @@ const PokedexScreen = {
             ${gens.map(gen => {
               const genCaught = gen.entries.filter(e => dex[e.name]?.caught).length;
               return `
-                <details open>
+                <details data-gen>
                   <summary style="font-family:var(--font-pixel);font-size:8px;color:var(--grey-dark);
                     padding:6px 8px;cursor:pointer;list-style:none;display:flex;align-items:center;
                     justify-content:space-between;background:var(--grey-light);border:var(--border);
@@ -117,6 +140,41 @@ const PokedexScreen = {
       PokedexScreen._scrollPos = 0;
       PokedexScreen._returnFn();
     });
+
+    // ── Buscador ────────────────────────────────────────────────────────────────
+    const _searchBtn  = document.getElementById('dex-search-btn');
+    const _searchBar  = document.getElementById('dex-search-bar');
+    const _searchInput = document.getElementById('dex-search-input');
+    const _searchClear = document.getElementById('dex-search-clear');
+
+    const _openSearch = () => {
+      _searchBar.style.display = 'flex';
+      _searchInput.focus();
+    };
+
+    const _closeSearch = () => {
+      _searchInput.value       = '';
+      _searchBar.style.display = 'none';
+      _filterDex('');
+    };
+
+    const _filterDex = (query) => {
+      const q = query.trim().toLowerCase();
+      document.querySelectorAll('#dex-list details[data-gen]').forEach(det => {
+        if (q) det.open = true;
+      });
+      document.querySelectorAll('#dex-list .dex-entry').forEach(el => {
+        const entryName  = (el.dataset.name ?? '').toLowerCase();
+        const labelEl    = el.querySelector('.dex-entry__name');
+        const labelText  = (labelEl?.textContent ?? '').toLowerCase();
+        const visible    = !q || entryName.includes(q) || labelText.includes(q);
+        el.style.display = visible ? '' : 'none';
+      });
+    };
+
+    _searchBtn.addEventListener('click', _openSearch);
+    _searchClear.addEventListener('click', _closeSearch);
+    _searchInput.addEventListener('input', () => _filterDex(_searchInput.value));
 
     // Click en entrada capturada o vista → detalle
     document.querySelectorAll('.dex-entry--caught, .dex-entry--seen').forEach(el => {

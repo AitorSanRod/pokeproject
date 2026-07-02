@@ -351,7 +351,7 @@ Object.assign(ROUTE_DATA, {
   },
 
   'camino-ciudad-trigal': {
-    bg: BG.ruta22,
+    bg: BG.JOTHO.ciudadTrigal,
     combatBg: COMBAT_BG.hierbaAlta,
     trainerBg: COMBAT_BG.default,
     rewardPokemon: [],
@@ -404,13 +404,116 @@ Object.assign(ROUTE_DATA, {
     gym: {
       leader: [
         { name: POKEMON.clefairy, level: 25, moveId: MOVES.fairy.special.disarming_voice },
-        { name: POKEMON.miltank, level: 29, moveId: [MOVES.normal.physical.hyper_fang, MOVES.normal.special.hyper_voice, MOVES.dark.physical.crunch] },
+        { name: POKEMON.miltank, level: 29, moveId: [MOVES.normal.physical.hyper_fang, MOVES.normal.special.hyper_voice, MOVES.dark.physical.crunch, MOVES.normal.special.milk_drink] },
       ]
     },
     paths: [
       [{ type: PATH_TYPE.Lider }],
     ],
   },
+
+  // ─────────────────────────────────────────────────────────────────────
+  // Arbol extraño - ruta 36
+  // ─────────────────────────────────────────────────────────────────────
+
+  'ruta-36-arbol': {
+    bg: BG.JOTHO.ruta36,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
+    rewardPokemon: [],
+    wild: [
+      { name: POKEMON.sudowoodo, rate: 100, minLv: 30, maxLv: 30, moveId: MOVES.rock.physical.rock_slide },
+    ],
+    trainer: [],
+    paths: [
+      [{ type: PATH_TYPE.Wild }],
+    ],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────
+  // CIUDAD IRIS — Gimnasio de Morti (Fantasma)
+  // ─────────────────────────────────────────────────────────────────────
+
+  'ruta-36': {
+    bg: BG.JOTHO.ruta36,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
+    rewardPokemon: [],
+    wild: [
+      { name: POKEMON.growlithe, rate: 20, minLv: 27, maxLv: 32, moveId: MOVES.fire.physical.flame_wheel },
+      { name: POKEMON.stantler, rate: 10, minLv: 27, maxLv: 32, moveId: MOVES.normal.physical.extreme_speed },
+      { name: POKEMON.ledyba, rate: 10, minLv: 27, maxLv: 32, moveId: MOVES.bug.physical.bug_bite },
+      { name: POKEMON.vulpix, rate: 10, minLv: 27, maxLv: 32, moveId: MOVES.fire.special.flamethrower },
+      { name: POKEMON.nidoran_f, rate: 20, minLv: 27, maxLv: 32, moveId: MOVES.poison.physical.poison_sting },
+      { name: POKEMON.nidoran_m, rate: 20, minLv: 27, maxLv: 32, moveId: MOVES.poison.physical.poison_sting },
+      { name: POKEMON.pichu, rate: 10, minLv: 27, maxLv: 32, moveId: MOVES.electric.special.thunderbolt },
+    ],
+    trainer: [
+      {
+        name: ENTRENADORES.Medium.name, img: ENTRENADORES.Medium.img, rate: 40, pokemon: [
+          { name: POKEMON.abra, level: 29, moveId: MOVES.psychic.special.confusion },
+          { name: POKEMON.abra, level: 29, moveId: MOVES.psychic.special.confusion },
+          { name: POKEMON.kadabra, level: 31, moveId: MOVES.psychic.special.psychic },
+        ]
+      },
+      {
+        name: ENTRENADORES.Chica.name, img: ENTRENADORES.Chica.img, rate: 40, pokemon: [
+          { name: POKEMON.tangela, level: 32, moveId: MOVES.grass.physical.vine_whip },
+        ]
+      },
+      {
+        name: ENTRENADORES.Chica.name, img: ENTRENADORES.Chica.img, rate: 20, pokemon: [
+          { name: POKEMON.xatu, level: 30, moveId: [MOVES.flying.special.gust, MOVES.psychic.special.confusion] },
+          { name: POKEMON.tangela, level: 29, moveId: MOVES.grass.physical.vine_whip },
+          { name: POKEMON.quagsire, level: 32, moveId: MOVES.ground.special.earth_power },
+          { name: POKEMON.yanma, level: 33, moveId: MOVES.bug.physical.x_scissor },
+        ]
+      },
+    ],
+    pathLength: 5
+  },
+
+  'torre-quemada': {
+    bg: BG.JOTHO.torreQuemada,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
+    rewardPokemon: [],
+    wild: [],
+    trainer: [],
+    specialTrainer: {
+      name: ENTRENADORES.Plata.name, img: ENTRENADORES.Plata.img, pokemon: [
+        { name: POKEMON.haunter, level: 30, moveId: MOVES.ghost.special.shadow_ball },
+        { name: POKEMON.zubat, level: 32, moveId: [MOVES.poison.physical.poison_jab, MOVES.flying.physical.wing_attack] },
+        { name: 'RIVAL_STARTER_2', level: 34 },
+        { name: POKEMON.magnemite, level: 28, moveId: MOVES.electric.special.thunderbolt },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Special }],
+    ],
+  },
+
+  // 'ciudad-iris': {
+  //   bg: BG.JOTHO.ciudadIris,
+  //   combatBg: COMBAT_BG.interior,
+  //   trainerBg: COMBAT_BG.interior,
+  //   gymLeader: 'Morti',
+  //   gymType: 'ghost',
+  //   badgeId: 'fog-badge',
+  //   gymLeaderImg: ,
+  //   welcome: { title: 'Ciudad Iris', subtitle: 'Gimnasio de Tipo Fantasma', img: BG.JOTHO.ciudadIris },
+  //   wild: [],
+  //   trainer: [],
+  //   gym: {
+  //     leader: [
+  //       { name: POKEMON.clefairy, level: 25, moveId: MOVES.fairy.special.disarming_voice },
+  //       { name: POKEMON.miltank, level: 29, moveId: [MOVES.normal.physical.hyper_fang, MOVES.normal.special.hyper_voice, MOVES.dark.physical.crunch, MOVES.normal.special.milk_drink] },
+  //     ]
+  //   },
+  //   paths: [
+  //     [{ type: PATH_TYPE.Lider }],
+  //   ],
+  // },
 
   // ─────────────────────────────────────────────────────────────────────
   // OPCIONALES
@@ -503,7 +606,7 @@ Object.assign(ROUTE_DATA, {
   // EXTRAS
   // ─────────────────────────────────────────────────────────────────────
 
-  'espacio-raro': {
+  'espacio-raro-johto': {
     bg: BG.espacioRaro,
     combatBg: COMBAT_BG.espacioRaro,
     rewardPokemon: [POKEMON.celebi],
@@ -561,6 +664,9 @@ var JOHTO_ROUTES = [
   { name: 'Camino a Ciudad Trigal (Combate)', area: 'camino-ciudad-trigal' },
   { name: 'Encinar', area: 'encinar' },
   { name: 'Ciudad Trigal', area: 'ciudad-trigal-gym' },
+  { name: 'Arbol Extaño', area: 'ruta-36-arbol' },
+  { name: 'Ruta 36', area: 'ruta-36' },
+  { name: 'Torre Quemada', area: 'torre-quemada' },
 
   //Hasta aquí todo esta funcionando.
 
@@ -573,7 +679,7 @@ var JOHTO_ROUTES = [
   //   Ciudad Incienso, Ciudad Nogal, Ciudad Olivina, Pueblo Caoba,
   //   Ciudad Amatista → Liga Johto
 
-  { name: '???', area: 'espacio-raro' }
+  { name: '???', area: 'espacio-raro-johto' }
 ];
 
 // ── Helpers específicos de Kanto ───────────────────────────────────────────

@@ -90,6 +90,21 @@ var MOVE_EFFECTS = {
     },
   },
 
+  'heal-50': {
+    trigger: TRIGGERS.AFTER_ATTACK,
+    desc: 'Cura el 50% de la vida máxima.',
+    fn(ctx) {
+      const heal = Math.max(1, Math.floor(ctx.user.stats.hp * 0.50));
+      const before = ctx.user.currentHp;
+      ctx.user.currentHp = Math.min(ctx.user.stats.hp, ctx.user.currentHp + heal);
+      const actual = ctx.user.currentHp - before;
+      if (actual > 0) {
+        ctx.log(`${ctx.user.displayName} curó ${actual} HP!`);
+        if (ctx.updatePlayerHud) ctx.updatePlayerHud();
+      }
+    },
+  },
+
   // ── AFTER_ATTACK — Cambios de estadísticas (rival) ────────────────────────
 
   'lower-atk-10': {

@@ -63,6 +63,7 @@ var MOVE_POOL = {
       { stage: 3, id: 'boomburst', name: 'Estruendo', power: 90, pp: 10, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: 'shield-50' },
       { id: 'tri-attack', name: 'Triataque', power: 80, pp: 10, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: ['burn-10', 'paralize-10', 'freeze-10', 'drain-10'], boss: true },
       { id: 'substitute', mt: true, name: 'Triataque', power: 80, pp: 10, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: ['burn-10', 'paralize-10', 'freeze-10'] },
+      { id: 'milk-drink', name: 'Batido', power: 0, pp: 10, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: 'heal-50', boss: true },
     ],
   },
   fire: {

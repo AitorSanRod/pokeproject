@@ -72,6 +72,9 @@ const BG = {
     puebloAzalea: 'assets/bg/johto/pueblo-azalea.png',
     encinar: 'assets/bg/johto/encinar.png',
     ciudadTrigal: 'assets/bg/johto/ciudad-trigal.png',
+    ruta36: 'assets/bg/johto/ruta-36.png',
+    torreQuemada: 'assets/bg/johto/torre-quemada.png',
+    ciudadIris: 'assets/bg/johto/ciudad-iris.png',
   }
 };
 
