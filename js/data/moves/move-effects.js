@@ -916,7 +916,7 @@ var ABILITIES = {
       pokemon._downloadBoost = boostedStat;
       const statLabel = boostedStat === 'atk' ? 'ATK' : 'Ataque Esp.';
       ctx.log(`¡${pokemon.displayName} analizó al rival y aumentó su ${statLabel}!`);
-      ctx.showStatChange?.(ctx.side, boostedStat, 'up', 30);
+      ctx.showStatChange?.(ctx.side, boostedStat.toUpperCase(), 'up', 30);
     },
   },
 

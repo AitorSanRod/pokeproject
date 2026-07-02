@@ -64,6 +64,47 @@ const cv2UI = {
     }
 
     if (side === 'player') this._syncTeamPip(pokemon);
+    this._syncPassiveAbilityMods(pokemon);
+    this.updateStatus(side, pokemon);
+  },
+
+  // Mantiene combatMods sincronizado con las habilidades pasivas condicionadas al HP
+  // (blaze, overgrow). Se llama desde updateHp para que los badges se actualicen en
+  // tiempo real conforme cambia el HP, sin necesidad de disparar ningún trigger aparte.
+  _syncPassiveAbilityMods(pokemon) {
+    if (!pokemon?.ability) return;
+    if (!pokemon.combatMods) pokemon.combatMods = {};
+
+    // Ajusta un stat de combatMods rastreando la contribución de esta habilidad.
+    // `trackKey` es una propiedad privada en el pokemon que guarda cuánto aportó
+    // la habilidad la última vez. Si combatMods fue reseteado entre batallas,
+    // safePrev lo detecta y recalcula desde 0.
+    const syncStat = (statKey, trackKey, newVal) => {
+      const cur      = pokemon.combatMods[statKey] ?? 0;
+      const prev     = pokemon[trackKey] ?? 0;
+      const safePrev = Math.min(prev, Math.max(0, cur));
+      if (safePrev === newVal && prev === safePrev) return;
+      pokemon.combatMods[statKey] = cur - safePrev + newVal;
+      pokemon[trackKey] = newVal;
+    };
+
+    const hpHigh = pokemon.currentHp > (pokemon.stats?.hp ?? 1) * 0.50;
+
+    if (pokemon.ability === 'blaze') {
+      syncStat('spa', '_blazeMod', hpHigh ? 1.0 : 0);
+    }
+
+    if (pokemon.ability === 'overgrow') {
+      if (hpHigh) {
+        syncStat('def', '_ogDefMod', 0.5);
+        syncStat('spd', '_ogSpdMod', 0.5);
+        syncStat('spa', '_ogSpaMod', 0);
+      } else {
+        syncStat('def', '_ogDefMod', 0);
+        syncStat('spd', '_ogSpdMod', 0);
+        syncStat('spa', '_ogSpaMod', 0.5);
+      }
+    }
   },
 
   _syncTeamPip(pokemon) {

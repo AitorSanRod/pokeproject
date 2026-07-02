@@ -1051,11 +1051,6 @@ function _calcDamage(attacker, defender, move) {
   let   atk       = Math.floor(atkStat * Math.max(0.1, 1 + atkMod));
   let   def       = Math.floor(defStat * Math.max(0.1, 1 + defMod));
 
-  // Overgrow: +50% DEF y SPD (ambas clases) cuando HP > 50%
-  if (defender.ability === 'overgrow' && defender.currentHp > defender.stats.hp * 0.50) {
-    def = Math.floor(def * 1.5);
-  }
-
   // Penalizaciones de estado: multiplicativas sobre el stat ya modificado por combatMods
   if (!hasGutsEffect(attacker)) {
     if (!isSpecial && attacker.statusEffect?.id === StatusEffect.BURN)
@@ -1097,16 +1092,6 @@ function _calcDamage(attacker, defender, move) {
   // Huge Power: duplica el ATK físico
   if (!isSpecial && attacker.ability === 'huge-power') {
     dmg = Math.floor(dmg * 2);
-  }
-
-  // Blaze: duplica el SPA especial si HP > 50%
-  if (isSpecial && attacker.ability === 'blaze' && attacker.currentHp > attacker.stats.hp * 0.50) {
-    dmg = Math.floor(dmg * 2);
-  }
-
-  // Overgrow: +50% SPA cuando HP ≤ 50%
-  if (isSpecial && attacker.ability === 'overgrow' && attacker.currentHp <= attacker.stats.hp * 0.50) {
-    dmg = Math.floor(dmg * 1.5);
   }
 
   // Guts: +50% daño físico (habilidad pasiva)
