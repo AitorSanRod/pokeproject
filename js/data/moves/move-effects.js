@@ -898,9 +898,9 @@ var ABILITIES = {
   },
 
   'download': {
-    trigger: [ABILITY_TRIGGERS.ON_ENTER, ABILITY_TRIGGERS.ON_OPPONENT_ENTER],
+    trigger: ABILITY_TRIGGERS.ON_OPPONENT_ENTER,
     name: 'Descarga',
-    desc: 'Al entrar en combate o al aparecer un nuevo rival, analiza sus stats: si su DEF supera su DEF Esp., sube el ATK un 30%; si no, sube el SPA un 30%.',
+    desc: 'Aumenta un 30% su SPA si el rival tiene mas DEF que SPD, sino aumenta su ATK.',
     fn(ctx) {
       const pokemon  = ctx.pokemon;
       const opponent = ctx.opponent;

@@ -753,6 +753,7 @@ const Screens = {
   _showInformation(route, data) {
     if (route.area === 'info-final-kanto') Storage.setKantoCompleted();
     const bgLayer = Screens._bgLayer(data.bg, true);
+    const optEnabled = !data.optional?.condition || data.optional.condition();
 
     document.getElementById('viewport').innerHTML = `
       <div class="screen" style="position:relative;
@@ -762,7 +763,7 @@ const Screens = {
           ${data.title ? `<span style="font-family:var(--font-pixel);font-size:18px;color:var(--white);text-shadow:3px 3px 0 rgba(0,0,0,.3);line-height:1.6">${data.title.toUpperCase()}</span>` : ''}
           ${data.description ? `<p style="text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">${data.description}</p>` : ''}
           <button class="btn btn--primary btn--wide" id="btn-info-continue" style="max-width:240px">CONTINUAR</button>
-          ${data.optional ? `<button class="btn btn--wide" id="btn-info-optional" style="max-width:240px">${data.optional.btnName.toUpperCase()}</button>` : ''}
+          ${data.optional ? `<button class="btn btn--wide" id="btn-info-optional" style="max-width:240px" ${optEnabled ? '' : 'disabled'}>${data.optional.btnName.toUpperCase()}</button>` : ''}
         </div>
       </div>`;
 

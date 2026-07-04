@@ -203,8 +203,7 @@ const CombatV2 = {
     this._showPlayerMove();
     await cv2UI.wait(CV2_DELAY.ENTRY_HUD);
 
-    // Efectos de entrada (habilidades pasivas "on_entry")
-    // El jugador solo dispara ON_ENTER si realmente entró al campo (no es continuación).
+    // Efectos de entrada (ON_ENTER): el jugador solo dispara si realmente entró al campo.
     const entryActions = [];
     if (!this.state.skipPlayerEntry) entryActions.push({ side: 'player', pokemon: p });
     entryActions.push({ side: 'foe', pokemon: f });
@@ -212,6 +211,18 @@ const CombatV2 = {
 
     for (const ea of entryActions) {
       await this._applyEntryEffects(ea.pokemon, ea.side);
+    }
+
+    // ON_OPPONENT_ENTER: habilidades que reaccionan al rival que acaba de aparecer
+    // (ej. Descarga). Se dispara siempre, incluso con skipPlayerEntry, porque el foe
+    // siempre es "nuevo" para el observador al inicio de cada nodo de combate.
+    const oppEnterActions = [
+      { observer: p, observerSide: 'player', newOpponent: f },
+      { observer: f, observerSide: 'foe',    newOpponent: p },
+    ].sort((a, b) => _effectiveSpeed(b.observer) - _effectiveSpeed(a.observer));
+
+    for (const oa of oppEnterActions) {
+      await this._applyOpponentEnterEffects(oa.observer, oa.observerSide, oa.newOpponent);
     }
 
     this.queue.enqueue(() => this._startTurn());

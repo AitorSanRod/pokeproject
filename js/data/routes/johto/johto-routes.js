@@ -28,6 +28,19 @@
 // Cambia a false para mostrar Johto como "PRONTO" sin eliminar el código.
 var JOHTO_ENABLED = true;
 
+// Condiciones reutilizables — uso: condition: JOHTO_COND.hasBadge('zephyr-badge')
+const JOHTO_ALL_BADGES = [
+  'zephyr-badge', 'hive-badge', 'plain-badge', 'fog-badge',
+  'storm-badge', 'mineral-badge', 'glacier-badge', 'rising-badge',
+];
+
+const JOHTO_COND = {
+  // Comprueba si algún pokemon de la pokédex tiene la medalla (no la partida actual).
+  hasBadge:     (id)  => () => Object.values(Storage.getAllBadges()).some(list => list.includes(id)),
+  hasBadges:    (ids) => () => Object.values(Storage.getAllBadges()).some(list => ids.every(b => list.includes(b))),
+  hasAllBadges: ()    => () => Object.values(Storage.getAllBadges()).some(list => JOHTO_ALL_BADGES.every(b => list.includes(b))),
+};
+
 Object.assign(ROUTE_DATA, {
 
   // ─────────────────────────────────────────────────────────────────────
@@ -80,6 +93,7 @@ Object.assign(ROUTE_DATA, {
     optional: {
       btnName: 'Esperar',
       area: 'ruta-29-noche',
+      condition: JOHTO_COND.hasBadges(['zephyr-badge', 'hive-badge']),
     },
   },
 
@@ -280,12 +294,13 @@ Object.assign(ROUTE_DATA, {
 
   'ruta-32-info-espera': { //Opcional ruta 32 noche
     type: 'information',
-    bg: BG.JOTHO.ruta29,
+    bg: BG.JOTHO.ruta32,
     title: 'Esperar...',
     description: '¿Quieres esperar a la noche?<br>Puede que aparezcan otros pokémon',
     optional: {
       btnName: 'Esperar',
       area: 'ruta-32-noche',
+      condition: JOHTO_COND.hasBadges(['zephyr-badge', 'hive-badge']),
     },
   },
 
@@ -344,7 +359,11 @@ Object.assign(ROUTE_DATA, {
       leader: [
         { name: POKEMON.metapod, level: 21, moveId: MOVES.bug.physical.bug_bite },
         { name: POKEMON.kakuna, level: 21, moveId: MOVES.bug.physical.bug_bite },
-        { name: POKEMON.scyther, level: 23, moveId: [MOVES.bug.physical.x_scissor, MOVES.normal.physical.extreme_speed] },
+        {
+          name: POKEMON.scyther, level: 23,
+          heldItem: ITEM.eviolite,
+          moveId: [MOVES.bug.physical.x_scissor, MOVES.normal.physical.extreme_speed]
+        },
       ]
     },
     paths: [
@@ -374,7 +393,7 @@ Object.assign(ROUTE_DATA, {
       name: ENTRENADORES.Plata.name, img: ENTRENADORES.Plata.img, pokemon: [
         { name: POKEMON.gastly, level: 23, moveId: [MOVES.poison.special.sludge_bomb, MOVES.ghost.special.shadow_ball] },
         { name: POKEMON.zubat, level: 22, moveId: [MOVES.bug.physical.bug_bite, MOVES.flying.physical.wing_attack] },
-        { name: 'RIVAL_STARTER_2', minLv: 23, maxLv: 25 },
+        { name: 'RIVAL_STARTER_2', heldItem: ITEM.assault_vest, minLv: 23, maxLv: 25 },
       ]
     },
     paths: [
@@ -423,8 +442,16 @@ Object.assign(ROUTE_DATA, {
     ],
     gym: {
       leader: [
-        { name: POKEMON.clefairy, level: 26, moveId: MOVES.fairy.special.disarming_voice },
-        { name: POKEMON.miltank, level: 30, moveId: [MOVES.normal.physical.hyper_fang, MOVES.normal.special.hyper_voice, MOVES.dark.physical.crunch, MOVES.normal.special.milk_drink] },
+        {
+          name: POKEMON.clefairy, level: 26,
+          heldItem: ITEM.eviolite,
+          moveId: MOVES.fairy.special.disarming_voice
+        },
+        {
+          name: POKEMON.miltank, level: 30,
+          heldItem: ITEM.lifeorb,
+          moveId: [MOVES.normal.physical.hyper_fang, MOVES.normal.special.hyper_voice, MOVES.normal.special.milk_drink]
+        },
       ]
     },
     paths: [
@@ -502,10 +529,26 @@ Object.assign(ROUTE_DATA, {
     trainer: [],
     specialTrainer: {
       name: ENTRENADORES.Plata.name, img: ENTRENADORES.Plata.img, pokemon: [
-        { name: POKEMON.haunter, level: 30, moveId: MOVES.ghost.special.shadow_ball },
-        { name: POKEMON.zubat, level: 32, moveId: [MOVES.poison.physical.poison_jab, MOVES.flying.physical.wing_attack] },
-        { name: 'RIVAL_STARTER_2', level: 34 },
-        { name: POKEMON.magnemite, level: 28, moveId: MOVES.electric.special.thunderbolt },
+        {
+          name: POKEMON.haunter, level: 30,
+          heldItem: ITEM.eviolite,
+          moveId: MOVES.ghost.special.shadow_ball
+        },
+        {
+          name: POKEMON.zubat, level: 32,
+          moveId: [MOVES.poison.physical.poison_jab, MOVES.flying.physical.wing_attack]
+        },
+        {
+          name: 'RIVAL_STARTER_2',
+          heldItem: ITEM.shell_bell,
+          level: 34
+        },
+        {
+          name: POKEMON.magnemite,
+          heldItem: ITEM.choice_scarf,
+          level: 28,
+          moveId: MOVES.electric.special.thunderbolt
+        },
       ]
     },
     paths: [
@@ -588,18 +631,18 @@ Object.assign(ROUTE_DATA, {
     trainer: [
       {
         name: ENTRENADORES.Pensador.name, img: ENTRENADORES.Pensador.img, rate: 33, pokemon: [
-          { name: POKEMON.bellsprout, rate: 40, minLv: 7, maxLv: 11, moveId: [MOVES.grass.special.absorb, MOVES.poison.special.poison_powder] },
+          { name: POKEMON.bellsprout, minLv: 7, maxLv: 11, moveId: [MOVES.grass.special.absorb, MOVES.poison.special.poison_powder] },
         ]
       },
       {
         name: ENTRENADORES.Pensador.name, img: ENTRENADORES.Pensador.img, rate: 33, pokemon: [
-          { name: POKEMON.bellsprout, rate: 40, minLv: 7, maxLv: 11, moveId: [MOVES.grass.special.absorb, MOVES.poison.special.poison_powder] },
-          { name: POKEMON.hoothoot, rate: 40, minLv: 7, maxLv: 11, moveId: MOVES.flying.special.gust },
+          { name: POKEMON.bellsprout, minLv: 7, maxLv: 11, moveId: [MOVES.grass.special.absorb, MOVES.poison.special.poison_powder] },
+          { name: POKEMON.hoothoot, minLv: 7, maxLv: 11, moveId: MOVES.flying.special.gust },
         ]
       },
       {
         name: ENTRENADORES.Pensador.name, img: ENTRENADORES.Pensador.img, rate: 34, pokemon: [
-          { name: POKEMON.hoothoot, rate: 40, minLv: 7, maxLv: 11, moveId: MOVES.flying.special.gust },
+          { name: POKEMON.hoothoot, minLv: 7, maxLv: 11, moveId: MOVES.flying.special.gust },
         ]
       },
     ],
@@ -612,13 +655,29 @@ Object.assign(ROUTE_DATA, {
     rewardPokemon: [POKEMON.qwilfish],
     title: 'Ruta 32 (Noche)',
     wild: [
-      { name: POKEMON.mareep, rate: 25, minLv: 6, maxLv: 9, moveId: [MOVES.electric.special.thunderbolt, MOVES.normal.physical.tackle] },
-      { name: POKEMON.hoppip, rate: 25, minLv: 6, maxLv: 9, moveId: [MOVES.grass.special.absorb, MOVES.fairy.special.disarming_voice] },
-      { name: POKEMON.bellsprout, rate: 25, minLv: 6, maxLv: 9, moveId: [MOVES.grass.special.absorb, MOVES.poison.special.poison_powder] },
-      { name: POKEMON.qwilfish, rate: 25, minLv: 6, maxLv: 9, moveId: MOVES.poison.physical.poison_sting },],
+      { name: POKEMON.mareep, rate: 25, minLv: 15, maxLv: 18, moveId: [MOVES.electric.special.thunderbolt, MOVES.normal.physical.tackle] },
+      { name: POKEMON.hoppip, rate: 25, minLv: 15, maxLv: 18, moveId: [MOVES.grass.special.absorb, MOVES.fairy.special.disarming_voice] },
+      { name: POKEMON.bellsprout, rate: 25, minLv: 15, maxLv: 18, moveId: [MOVES.grass.special.absorb, MOVES.poison.special.poison_powder] },
+      { name: POKEMON.qwilfish, rate: 25, minLv: 15, maxLv: 18, moveId: MOVES.poison.physical.poison_sting },],
     trainer: [],
     paths: [
       [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
+    ],
+  },
+
+  'torre-quemada-noche': {
+    bg: BG.JOTHO.torreQuemada,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
+    rewardPokemon: [],
+    wild: [
+      { name: POKEMON.suicune, rate: 33, minLv: 50, maxLv: 55, moveId: [MOVES.ice.special.blizzard, MOVES.water.special.scald] },
+      { name: POKEMON.raikou, rate: 33, minLv: 50, maxLv: 55, moveId: [MOVES.electric.special.thunder, MOVES.electric.physical.wild_charge] },
+      { name: POKEMON.entei, rate: 34, minLv: 50, maxLv: 55, moveId: [MOVES.fire.special.fire_blast, MOVES.fire.physical.flare_blitz] },
+    ],
+    trainer: [],
+    paths: [
+      [{ type: PATH_TYPE.Wild }],
     ],
   },
 
@@ -635,8 +694,8 @@ Object.assign(ROUTE_DATA, {
     specialTrainer: {
       name: ENTRENADORES.Mewtwo.name, img: ENTRENADORES.Mewtwo.img, pokemon: [
         {
-          name: POKEMON.mewtwo, minLv: 35, maxLv: 40, moveId: [MOVES.psychic.special.trick, MOVES.grass.special.giga_drain],
-          heldItem: ITEM.assault_vest, img: POKEMON_SPRITE.armoredMewtwo,
+          name: POKEMON.mewtwo, minLv: 40, maxLv: 60, moveId: [MOVES.psychic.special.trick, MOVES.fairy.special.moonblast, MOVES.grass.special.giga_drain],
+          heldItem: ITEM.choice_specs, img: POKEMON_SPRITE.armoredMewtwo,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         }
       ]
@@ -645,7 +704,6 @@ Object.assign(ROUTE_DATA, {
       [{ type: PATH_TYPE.Special }],
     ],
   },
-
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -659,16 +717,9 @@ Object.assign(ROUTE_DATA, {
 // no romper las partidas guardadas.
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Condiciones reutilizables — uso: condition: JOHTO_COND.hasBadge('zephyr-badge')
-const JOHTO_COND = {
-  // Comprueba si algún pokemon de la pokédex tiene la medalla (no la partida actual).
-  hasBadge: (id) => () => Object.values(Storage.getAllBadges()).some(list => list.includes(id)),
-  hasBadges: (ids) => () => Object.values(Storage.getAllBadges()).some(list => ids.every(b => list.includes(b))),
-};
-
 var JOHTO_ROUTES = [
   { name: 'Ruta 29', area: 'ruta-29' },
-  { name: 'Ruta 29 (Descanso)', area: 'ruta-29-info-espera', condition: JOHTO_COND.hasBadges(['zephyr-badge', 'hive-badge']) },
+  { name: 'Ruta 29 (Descanso)', area: 'ruta-29-info-espera' },
   { name: 'Ruta 46', area: 'ruta-46' },
   { name: 'Ciudad Cerezo', area: 'ciudad-cerezo' },
   { name: 'Ciudad Cerezo', area: 'ciudad-cerezo-info' },
@@ -677,16 +728,17 @@ var JOHTO_ROUTES = [
   { name: 'Ciudad Malva', area: 'ciudad-malva-info' },
   { name: 'Gimnasio Ciudad Malva', area: 'ciudad-malva-gym' },
   { name: 'Ruta 32', area: 'ruta-32' },
-  { name: 'Ruta 32', area: 'ruta-32-info-espera', condition: JOHTO_COND.hasBadges(['zephyr-badge', 'hive-badge']) },
+  { name: 'Ruta 32', area: 'ruta-32-info-espera' },
   { name: 'Ruinas Alfa', area: 'ruinas-alfa' },
   { name: 'Pueblo Azalea', area: 'pueblo-azalea-gym' },
   { name: 'Camino a Ciudad Trigal', area: 'camino-ciudad-trigal-info' },
   { name: 'Camino a Ciudad Trigal (Combate)', area: 'camino-ciudad-trigal' },
   { name: 'Encinar', area: 'encinar' },
   { name: 'Ciudad Trigal', area: 'ciudad-trigal-gym' },
-  { name: 'Arbol Extaño', area: 'ruta-36-arbol' },
+  { name: 'Árbol Extraño', area: 'ruta-36-arbol' },
   { name: 'Ruta 36', area: 'ruta-36' },
   { name: 'Torre Quemada', area: 'torre-quemada' },
+  { name: 'Torre Quemada', area: 'torre-quemada-noche', condition: JOHTO_COND.hasAllBadges() },
 
   //Hasta aquí todo esta funcionando.
 

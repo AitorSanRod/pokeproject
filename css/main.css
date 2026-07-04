@@ -227,6 +227,7 @@ img { display: block; image-rendering: pixelated; }
 
 .btn:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--black); }
 .btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--black); }
+.btn:disabled { opacity: .4; cursor: not-allowed; pointer-events: none; transform: none !important; box-shadow: 2px 2px 0 var(--black) !important; }
 
 .btn--primary { background: var(--red); color: var(--white); }
 .btn--primary:hover { background: var(--red-light); }
