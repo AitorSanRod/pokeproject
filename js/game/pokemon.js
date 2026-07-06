@@ -103,8 +103,8 @@ async function createPokemon(nameOrId, level, isPlayer = false, moveId = null, o
                   })(),
     isPlayer,
     shiny,
-    spriteUrl:    shiny ? (apiData.sprites.front_shiny ?? apiData.sprites.front_default) : apiData.sprites.front_default,
-    backSpriteUrl: shiny ? (apiData.sprites.back_shiny  ?? apiData.sprites.back_default)  : apiData.sprites.back_default,
+    spriteUrl:    toCdnSprite(shiny ? (apiData.sprites.front_shiny ?? apiData.sprites.front_default) : apiData.sprites.front_default),
+    backSpriteUrl: toCdnSprite(shiny ? (apiData.sprites.back_shiny  ?? apiData.sprites.back_default)  : apiData.sprites.back_default),
   };
 
   pokemon.stats     = computeStats(pokemon);

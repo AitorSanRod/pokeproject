@@ -267,9 +267,17 @@ const DEX_GENERATIONS = [
   { gen: 2, label: 'GEN II — JOHTO', entries: JOHTO_DEX },
 ];
 
-// Sprite URL (mismo formato que mock-data)
+// jsDelivr CDN mirrors the PokeAPI/sprites repo sin rate limits (GitHub Raw tiene límite ~60/h por IP)
+const _SPRITE_CDN = 'https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master';
+const _SPRITE_RAW = 'https://raw.githubusercontent.com/PokeAPI/sprites/master';
+
+function toCdnSprite(url) {
+  if (!url) return url;
+  return typeof url === 'string' ? url.replace(_SPRITE_RAW, _SPRITE_CDN) : url;
+}
+
 function getDexSpriteUrl(id) {
-  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+  return `${_SPRITE_CDN}/sprites/pokemon/${id}.png`;
 }
 
 // Carga los stats base desde PokeAPI o desde POKEMON_STATS local

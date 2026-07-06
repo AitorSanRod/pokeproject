@@ -644,7 +644,7 @@ const Screens = {
           if (!isShiny) { _startWith(name, false); return; }
 
           // Pokémon capturado shiny — preguntar versión
-          const shinySpriteUrl  = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${el.dataset.id}.png`;
+          const shinySpriteUrl  = toCdnSprite(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${el.dataset.id}.png`);
           const normalSpriteUrl = getDexSpriteUrl(+el.dataset.id);
 
           const overlay = Screens._makeModal(`
@@ -2502,9 +2502,14 @@ const Screens = {
     }
 
     // Batallas salvajes: mostrar selección de captura antes de avanzar ruta
-    const handleWin = isWild
-      ? () => Screens._showCv2CaptureChoice(foeTeam[0], onWin)
-      : onWin;
+    // guardedOnWin es one-shot: si _restoreDom() recrea los botones mientras
+    // _cv2AttemptCatch está en curso, ambos paths apuntan al mismo guardedOnWin
+    // y solo el primero que dispare avanza la ruta.
+    const handleWin = isWild ? () => {
+      let _winFired = false;
+      const guardedOnWin = () => { if (_winFired) return; _winFired = true; onWin?.(); };
+      Screens._showCv2CaptureChoice(foeTeam[0], guardedOnWin);
+    } : onWin;
 
     cv2Screen.start(GameState.team, foeTeam, {
       isWild,
@@ -3445,7 +3450,10 @@ const Screens = {
       cv2Screen._restoreMoveArea = () => Screens._showCv2CaptureChoice(foe, onDone);
     }
 
+    let _doneCalled = false;
     const done = () => {
+      if (_doneCalled) return;
+      _doneCalled = true;
       if (typeof cv2Screen !== 'undefined') cv2Screen._restoreMoveArea = null;
       onDone?.();
     };

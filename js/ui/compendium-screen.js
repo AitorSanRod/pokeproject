@@ -757,9 +757,7 @@ const CompendiumScreen = {
                     const dexEntry = typeof KANTO_DEX !== 'undefined'
                       ? KANTO_DEX.find(e => e.name === u.name)
                       : null;
-                    const spriteUrl = dexEntry
-                      ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dexEntry.id}.png`
-                      : '';
+                    const spriteUrl = dexEntry ? getDexSpriteUrl(dexEntry.id) : '';
                     const isCaught = typeof Storage !== 'undefined' && Storage.isCaught(u.name);
                     return `
                       <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;

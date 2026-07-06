@@ -252,7 +252,7 @@ const BattleFrontierScreen = {
       return;
     }
 
-    const shinySpriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${id}.png`;
+    const shinySpriteUrl = toCdnSprite(`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${id}.png`);
     const normalSpriteUrl = getDexSpriteUrl(id);
 
     const overlay = Screens._makeModal(`

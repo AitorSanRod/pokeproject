@@ -261,23 +261,23 @@ var POKEMON_STATS = {
 function getSpriteUrl(name) {
   var data = POKEMON_STATS[name.toLowerCase()];
   if (!data) return null;
-  return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + data.id + '.png';
+  return 'https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon/' + data.id + '.png';
 }
 
 function getBackSpriteUrl(name) {
   var data = POKEMON_STATS[name.toLowerCase()];
   if (!data) return null;
-  return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/' + data.id + '.png';
+  return 'https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon/back/' + data.id + '.png';
 }
 
 function getShinySpriteUrl(name) {
   var data = POKEMON_STATS[name.toLowerCase()];
   if (!data) return null;
-  return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/' + data.id + '.png';
+  return 'https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon/shiny/' + data.id + '.png';
 }
 
 function getBackShinySpriteUrl(name) {
   var data = POKEMON_STATS[name.toLowerCase()];
   if (!data) return null;
-  return 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/' + data.id + '.png';
+  return 'https://cdn.jsdelivr.net/gh/PokeAPI/sprites@master/sprites/pokemon/back/shiny/' + data.id + '.png';
 }
