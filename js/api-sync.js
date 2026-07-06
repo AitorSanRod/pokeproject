@@ -283,6 +283,7 @@ var ApiSync = (() => {
    *   starter_name: string,    // nombre del pokémon inicial elegido ('bulbasaur'...)
    *   badges:       string[],  // medallas de gimnasio obtenidas en esta run (['boulder-badge'...])
    *   items:        string[],  // objetos consumibles del jugador (['potion', 'pokeball'...])
+   *   balls:        number,    // Poké Balls restantes en el inventario (empieza en 5, +3 por gym)
    * }} RunData
    *
    * ── run_team ──────────────────────────────────────────────────────────────
@@ -336,6 +337,7 @@ var ApiSync = (() => {
       starter_name:        run.starterName,
       badges:              run.badges  ?? [],
       items:               run.items   ?? [],
+      balls:               run.balls   ?? 5,
     };
 
     const run_team = (run.team ?? []).map((pokemon, slot) => ({
@@ -528,6 +530,7 @@ var ApiSync = (() => {
       team,
       badges:             run_data.badges ?? [],
       items:              run_data.items  ?? [],
+      balls:              run_data.balls  ?? 5,
     };
   }
 
@@ -689,7 +692,7 @@ var ApiSync = (() => {
       ` mts:${mts.length} medallas:${badges.length} objetos:${items.length}` +
       ` furthest_routes:${furthest_routes.length}` +
       ` bf_max_floor:${body.bf_max_floor}` +
-      ` run:${runPayload ? `ruta ${body.run_data.route_index}` : 'ninguna'}`
+      ` run:${runPayload ? `ruta ${body.run_data.route_index} balls:${body.run_data.balls}` : 'ninguna'}`
     );
 
     return _post('/sync', body);

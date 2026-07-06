@@ -2,7 +2,7 @@ const GameState = {
   starter:          null,
   starterName:      null,   // nombre original (base form), no cambia al evolucionar
   team:             [],
-  balls:            999,
+  balls:            5,
   badges:           [],
   items:            [],
   autoMode:         true,
@@ -26,7 +26,7 @@ const GameState = {
     this.starter             = starter;
     this.starterName         = starter.name;
     this.team                = [starter];
-    this.balls               = 999;
+    this.balls               = 5;
     this.badges              = [];
     this.items               = [];
     this.autoMode            = true;
@@ -52,7 +52,7 @@ const GameState = {
     this.starter          = null;
     this.starterName      = null;
     this.team             = [];
-    this.balls            = 999;
+    this.balls            = 5;
     this.badges           = [];
     this.items            = [];
     this.autoMode         = true;

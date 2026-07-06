@@ -142,6 +142,7 @@ const TRAINER_IMG = {
   pegaso: 'assets/sprites/trainers/pegaso.png',
   anton: 'assets/sprites/trainers/anton.png',
   blanca: 'assets/sprites/trainers/blanca.png',
+  morti: 'assets/sprites/trainers/morti.png',
 };
 
 // ── Sprites y gifs misceláneos (escenas de historia) ─────────────────────────
@@ -223,5 +224,6 @@ const ENTRENADORES = {
   Pegaso: { name: 'Pegaso', img: TRAINER_IMG.pegaso },
   Blanca: { name: 'Blanca', img: TRAINER_IMG.blanca },
   Anton: { name: 'Antón', img: TRAINER_IMG.anton},
-  Mewtwo: { name: 'Mewtwo', img: TRAINER_IMG.mewtwo }
+  Mewtwo: { name: 'Mewtwo', img: TRAINER_IMG.mewtwo },
+  Morti: { name: 'Morti', img: TRAINER_IMG.morti },
 };

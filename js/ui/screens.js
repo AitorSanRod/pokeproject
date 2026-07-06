@@ -115,6 +115,7 @@ const Screens = {
       team:               GameState.team,
       badges:             GameState.badges,
       items:              GameState.items,
+      balls:              GameState.balls ?? 5,
       hardcoreMode:       GameState.hardcoreMode,
     });
   },
@@ -273,8 +274,9 @@ const Screens = {
         const _savedIdx   = _savedArea ? _allRoutes.findIndex(r => r.area === _savedArea) : -1;
         GameState.furthestRouteIndex = Math.max(GameState.routeIndex, _savedIdx);
         GameState.badges            = save.badges ?? [];
-        GameState.items            = save.items      ?? [];
-        GameState.team             = save.team       ?? [];
+        GameState.items             = save.items  ?? [];
+        GameState.balls             = save.balls  ?? 5;
+        GameState.team              = save.team   ?? [];
         GameState.starter          = save.starterName ? { name: save.starterName } : null;
         GameState.starterName      = save.starterName ?? null;
         // Re-sincronizar MTs desde Storage:
@@ -1206,6 +1208,9 @@ const Screens = {
             GameState.badges.push(data.badgeId);
             console.log(`[GYM] Medalla obtenida: ${data.badgeId}`);
             for (const p of GameState.team) Storage.addBadge(p.name, data.badgeId);
+            GameState.balls = Math.min((GameState.balls ?? 0) + 3, 99);
+            console.log(`[GYM] +3 Poké Balls — total: ${GameState.balls}`);
+            Screens._saveRun();
           }
           GameState._pathRunning = false;
           if (GameState.hardcoreMode && Screens._purgeDefeatedPokemon()) {
@@ -1480,9 +1485,8 @@ const Screens = {
       const effect = btn.dataset.effect;
       if (effect) {
         let _tip = null;
-        let _tipTimer = null;
-        const _removeTip = () => { _tip?.remove(); _tip = null; clearTimeout(_tipTimer); _tipTimer = null; };
-        btn.addEventListener('mouseenter', () => {
+        const _removeTip = () => { _tip?.remove(); _tip = null; };
+        const _showTip = () => {
           _removeTip();
           _tip = document.createElement('div');
           _tip.className = 'move-effect-tooltip';
@@ -1491,9 +1495,13 @@ const Screens = {
           const r = btn.getBoundingClientRect();
           _tip.style.left = (r.left + r.width / 2) + 'px';
           _tip.style.top  = (r.top - _tip.offsetHeight - 8) + 'px';
-          _tipTimer = setTimeout(_removeTip, 5000);
-        });
-        btn.addEventListener('mouseleave', _removeTip);
+        };
+        btn.addEventListener('mousedown',   _showTip);
+        btn.addEventListener('mouseup',     _removeTip);
+        btn.addEventListener('mouseleave',  _removeTip);
+        btn.addEventListener('touchstart',  _showTip,  { passive: true });
+        btn.addEventListener('touchend',    _removeTip);
+        btn.addEventListener('touchcancel', _removeTip);
       }
     });
 
@@ -2196,11 +2204,26 @@ const Screens = {
     const _sectionHeader = (label) =>
       `<div style="font-family:var(--font-pixel);font-size:6px;color:var(--grey);letter-spacing:1px;padding:4px 2px 2px">${label}</div>`;
 
+    const ballCount = GameState.balls ?? 0;
+    const ballsHtml = `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:var(--border);border-radius:var(--radius-sm);background:var(--white);margin-bottom:8px">
+        <svg viewBox="0 0 16 16" width="24" height="24" style="flex-shrink:0">
+          <circle cx="8" cy="8" r="7.5" fill="#1A1A1A"/>
+          <path d="M 1 8 A 7 7 0 0 1 15 8 Z" fill="#E74C3C"/>
+          <path d="M 1 8 A 7 7 0 0 0 15 8 Z" fill="#FFFFFF"/>
+          <rect x="1" y="7" width="14" height="2" fill="#1A1A1A"/>
+          <circle cx="8" cy="8" r="3" fill="#1A1A1A"/>
+          <circle cx="8" cy="8" r="1.7" fill="#FFFFFF"/>
+        </svg>
+        <span style="flex:1;font-family:var(--font-pixel);font-size:7px">Poké Ball</span>
+        <span style="font-family:var(--font-pixel);font-size:9px;color:${ballCount === 0 ? 'var(--grey)' : 'var(--black)'}">x${ballCount}</span>
+      </div>`;
+
     let bodyHtml = '';
     if (heldIds.length === 0 && passiveIds.length === 0) {
-      bodyHtml = `<p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:2;margin:12px 0">La mochila está vacía.</p>`;
+      bodyHtml = ballsHtml + `<p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey);text-align:center;line-height:2;margin:12px 0">No hay otros objetos.</p>`;
     } else {
-      bodyHtml = `<div class="moves-list-scroll">`;
+      bodyHtml = ballsHtml + `<div class="moves-list-scroll">`;
       if (heldIds.length > 0) {
         bodyHtml += _sectionHeader('OBJETOS');
         bodyHtml += heldIds.map(id => _itemRow(id, HELD_ITEMS[id])).join('');
@@ -2467,6 +2490,15 @@ const Screens = {
       const pathHtml = Screens._renderPathProgress();
       if (pathHtml) pathEl.outerHTML = pathHtml;
       else pathEl.remove();
+    }
+
+    // Pokéballs indicator: solo en batallas salvajes
+    if (isWild) {
+      const ind = document.getElementById('cv2-balls-indicator');
+      if (ind) {
+        ind.style.display = 'flex';
+        Screens._renderBallsIndicator();
+      }
     }
 
     // Batallas salvajes: mostrar selección de captura antes de avanzar ruta
@@ -3385,6 +3417,25 @@ const Screens = {
     });
   },
 
+  // ── Contador de Poké Balls en el footer del combate cv2 ──────────────────
+
+  _renderBallsIndicator() {
+    const ind = document.getElementById('cv2-balls-indicator');
+    if (!ind) return;
+    const n = GameState.balls ?? 0;
+    ind.innerHTML = `
+      <svg viewBox="0 0 16 16" width="14" height="14" style="flex-shrink:0">
+        <circle cx="8" cy="8" r="7.5" fill="#1A1A1A"/>
+        <path d="M 1 8 A 7 7 0 0 1 15 8 Z" fill="#E74C3C"/>
+        <path d="M 1 8 A 7 7 0 0 0 15 8 Z" fill="#FFFFFF"/>
+        <rect x="1" y="7" width="14" height="2" fill="#1A1A1A"/>
+        <circle cx="8" cy="8" r="3" fill="#1A1A1A"/>
+        <circle cx="8" cy="8" r="1.7" fill="#FFFFFF"/>
+      </svg>
+      <span>x${n}</span>`;
+    ind.style.color = n === 0 ? 'var(--grey)' : 'var(--black)';
+  },
+
   // ── Captura post-combate para CV2 ─────────────────────────────────────────
 
   _showCv2CaptureChoice(foe, onDone) {
@@ -3401,9 +3452,10 @@ const Screens = {
 
     const area = document.getElementById('cv2-move-area');
     if (!area) { done(); return; }
+    const hasBalls = (GameState.balls ?? 0) > 0;
     area.innerHTML = `
       <div style="display:flex;gap:8px;padding:8px 16px;align-items:center">
-        <button class="btn btn--primary pokeball-btn" style="flex:1" id="cv2-btn-catch" title="Capturar">
+        <button class="btn btn--primary pokeball-btn" style="flex:1" id="cv2-btn-catch" title="Capturar" ${hasBalls ? '' : 'disabled'}>
           <svg class="pokeball-spin" viewBox="0 0 16 16" width="22" height="22">
             <circle cx="8" cy="8" r="7.5" fill="#1A1A1A"/>
             <path d="M 1 8 A 7 7 0 0 1 15 8 Z" fill="#E74C3C"/>
@@ -3415,13 +3467,20 @@ const Screens = {
         </button>
         <button class="btn" style="flex:1" id="cv2-btn-no-catch">CONTINUAR</button>
       </div>`;
-    document.getElementById('cv2-btn-catch').addEventListener('click', () => Screens._cv2AttemptCatch(foe, done));
+    if (hasBalls) {
+      document.getElementById('cv2-btn-catch').addEventListener('click', () => Screens._cv2AttemptCatch(foe, done));
+    }
     document.getElementById('cv2-btn-no-catch').addEventListener('click', done);
   },
 
   async _cv2AttemptCatch(foe, onDone) {
+    // Consumir bola y guardar inmediatamente
+    GameState.balls = Math.max((GameState.balls ?? 1) - 1, 0);
+    Screens._renderBallsIndicator();
+    Screens._saveRun();
+
     const area = document.getElementById('cv2-move-area');
-    if (area) area.innerHTML = `<div style="text-align:center;padding:16px;font-family:var(--font-pixel);font-size:9px">Lanzas una Poke Ball...</div>`;
+    if (area) area.innerHTML = `<div style="text-align:center;padding:16px;font-family:var(--font-pixel);font-size:9px">Lanzas una Poké Ball...</div>`;
 
     cv2UI.log('1...');
     await cv2UI.wait(500);

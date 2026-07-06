@@ -110,6 +110,7 @@ const cv2Screen = {
       <div style="display:flex;gap:6px">
         <img class="icon-btn" id="cv2-settings-btn" src="assets/sprites/others/config.png" title="Ajustes" alt="Ajustes">
       </div>
+      <div id="cv2-balls-indicator" style="display:none;align-items:center;gap:5px;font-family:var(--font-pixel);font-size:8px"></div>
       <div id="cv2-controls-right" style="display:flex;gap:8px;align-items:center">
         <button class="cv2-btn" id="cv2-pause-btn">⏸ Pausa</button>
         <button class="cv2-btn" id="cv2-speed-btn">x1</button>
