@@ -75,6 +75,11 @@ const BG = {
     ruta36: 'assets/bg/johto/ruta-36.png',
     torreQuemada: 'assets/bg/johto/torre-quemada.png',
     ciudadIris: 'assets/bg/johto/ciudad-iris.png',
+    ruta38: 'assets/bg/johto/ruta-38.png',
+    ruta39: 'assets/bg/johto/ruta-39.png',
+    faroCiudadOlivo: 'assets/bg/johto/faro-ciudad-olivo.png',
+    ciudadOlivo: 'assets/bg/johto/ciudad-olivo.png',
+    ciudadOrquidea: 'assets/bg/johto/ciudad-orquidea.png',
   }
 };
 
@@ -143,6 +148,9 @@ const TRAINER_IMG = {
   anton: 'assets/sprites/trainers/anton.png',
   blanca: 'assets/sprites/trainers/blanca.png',
   morti: 'assets/sprites/trainers/morti.png',
+  yasmina: 'assets/sprites/trainers/yasmina.png',
+  anibal: 'assets/sprites/trainers/anibal.png',
+  karateka: 'assets/sprites/trainers/karateka.png',
 };
 
 // ── Sprites y gifs misceláneos (escenas de historia) ─────────────────────────
@@ -226,4 +234,7 @@ const ENTRENADORES = {
   Anton: { name: 'Antón', img: TRAINER_IMG.anton},
   Mewtwo: { name: 'Mewtwo', img: TRAINER_IMG.mewtwo },
   Morti: { name: 'Morti', img: TRAINER_IMG.morti },
+  Yasmina: { name: 'Yasmina', img: TRAINER_IMG.yasmina },
+  Anibal: { name: 'Aníbal', img: TRAINER_IMG.anibal },
+  Karateka: { name: 'Karateka', img: TRAINER_IMG.karateka },
 };

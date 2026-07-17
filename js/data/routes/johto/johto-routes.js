@@ -595,7 +595,7 @@ Object.assign(ROUTE_DATA, {
       },
       {
         name: ENTRENADORES.Medium.name, img: ENTRENADORES.Medium.img, rate: 20, pokemon: [
-          { name: POKEMON.haunter, level: 35, moveId: [MOVES.ghost.special.shadow_ball, MOVES.dark.special.dark_pulse], ability: 'levitate' },
+          { name: POKEMON.haunter, level: 35, moveId: [MOVES.ghost.special.shadow_ball, MOVES.dark.special.dark_pulse], overrides: { ability: 'levitate' } },
         ]
       },
       {
@@ -608,7 +608,7 @@ Object.assign(ROUTE_DATA, {
       {
         name: ENTRENADORES.Medium.name, img: ENTRENADORES.Medium.img, rate: 20, pokemon: [
           { name: POKEMON.misdreavus, level: 34, moveId: MOVES.dark.special.dark_pulse },
-          { name: POKEMON.misdreavus, level: 35, moveId: [MOVES.ghost.special.shadow_ball, MOVES.dark.special.dark_pulse], ability: 'levitate' },
+          { name: POKEMON.misdreavus, level: 35, moveId: [MOVES.ghost.special.shadow_ball, MOVES.dark.special.dark_pulse], overrides: { ability: 'levitate' } },
         ]
       },
     ],
@@ -653,10 +653,264 @@ Object.assign(ROUTE_DATA, {
   // CIUDAD OLIVO — Gimnasio de Yasmina (Acero)
   // ─────────────────────────────────────────────────────────────────────
 
-  //Ruta 38
-  //Ruta 39
-  //Faro ciudad olivo (Enfrentamiento contra Ampharos importante)
-  //Gimnasio
+  'ruta-38': {
+    bg: BG.JOTHO.ruta38,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
+    rewardPokemon: [POKEMON.magnemite],
+    wild: [
+      { name: POKEMON.snubbull, rate: 20, minLv: 40, maxLv: 44, moveId: [MOVES.fairy.physical.play_rough, MOVES.normal.physical.hyper_fang] },
+      { name: POKEMON.exeggcute, rate: 20, minLv: 40, maxLv: 44, moveId: [MOVES.grass.special.giga_drain, MOVES.psychic.special.confusion] },
+      { name: POKEMON.miltank, rate: 20, minLv: 40, maxLv: 44, moveId: MOVES.normal.physical.hyper_fang },
+      { name: POKEMON.tauros, rate: 20, minLv: 40, maxLv: 44, moveId: MOVES.normal.physical.extreme_speed },
+      { name: POKEMON.magnemite, rate: 20, minLv: 40, maxLv: 44, moveId: MOVES.electric.special.thunder_shock },
+    ],
+    trainer: [
+      {
+        name: ENTRENADORES.Marinero.name, img: ENTRENADORES.Marinero.img, rate: 34, pokemon: [
+          { name: POKEMON.wooper, level: 44, moveId: [MOVES.water.special.scald, MOVES.ground.special.earth_power] },
+          { name: POKEMON.mr_mime, level: 42, moveId: MOVES.psychic.special.psychic },
+        ]
+      },
+      {
+        name: ENTRENADORES.Ornitologo.name, img: ENTRENADORES.Ornitologo.img, rate: 33, pokemon: [
+          { name: POKEMON.doduo, level: 43, moveId: MOVES.flying.physical.wing_attack },
+          { name: POKEMON.doduo, level: 43, moveId: MOVES.flying.physical.wing_attack },
+          { name: POKEMON.doduo, level: 44, moveId: MOVES.flying.physical.brave_bird },
+        ]
+      },
+      {
+        name: ENTRENADORES.Chica.name, img: ENTRENADORES.Chica.img, rate: 33, pokemon: [
+          { name: POKEMON.flaaffy, level: 44, moveId: MOVES.electric.special.thunder_shock },
+          { name: POKEMON.skiploom, level: 42, moveId: MOVES.grass.special.solar_beam },
+        ]
+      },
+    ]
+  },
+
+  'ruta-39': {
+    bg: BG.JOTHO.ruta39,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
+    rewardPokemon: [],
+    wild: [
+      { name: POKEMON.raticate, rate: 20, minLv: 43, maxLv: 46, moveId: MOVES.normal.physical.hyper_fang },
+      { name: POKEMON.raticate, rate: 20, minLv: 43, maxLv: 46, moveId: MOVES.normal.physical.extreme_speed },
+      { name: POKEMON.tauros, rate: 20, minLv: 43, maxLv: 46, moveId: MOVES.normal.physical.extreme_speed },
+      { name: POKEMON.miltank, rate: 20, minLv: 43, maxLv: 46, moveId: MOVES.normal.physical.take_down },
+      { name: POKEMON.noctowl, rate: 20, minLv: 43, maxLv: 46, moveId: MOVES.flying.special.hurricane },
+    ],
+    trainer: [],
+    paths: [
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
+    ],
+  },
+
+  'faro-ciudad-olivo-1': {
+    bg: BG.JOTHO.faroCiudadOlivo,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
+    rewardPokemon: [],
+    wild: [],
+    trainer: [
+      {
+        name: ENTRENADORES.Marinero.name, img: ENTRENADORES.Marinero.img, rate: 25, pokemon: [
+          { name: POKEMON.poliwhirl, level: 45, moveId: [MOVES.water.physical.crabhammer, MOVES.fighting.physical.close_combat] },
+          { name: POKEMON.politoed, level: 45, moveId: MOVES.water.special.surf },
+        ]
+      },
+      {
+        name: ENTRENADORES.Ornitologo.name, img: ENTRENADORES.Ornitologo.img, rate: 25, pokemon: [
+          { name: POKEMON.pidgeotto, level: 45, moveId: MOVES.flying.physical.wing_attack },
+          { name: POKEMON.pidgeotto, level: 45, moveId: MOVES.flying.physical.wing_attack },
+          { name: POKEMON.pidgeotto, level: 45, moveId: MOVES.flying.physical.wing_attack },
+          { name: POKEMON.pidgeotto, level: 45, moveId: MOVES.flying.physical.wing_attack },
+          { name: POKEMON.pidgeotto, level: 45, moveId: MOVES.flying.physical.wing_attack },
+        ]
+      },
+      {
+        name: ENTRENADORES.DomingueroFuego.name, img: ENTRENADORES.DomingueroFuego.img, rate: 25, pokemon: [
+          { name: POKEMON.growlithe, level: 45, moveId: [MOVES.fire.physical.flare_blitz, MOVES.normal.physical.extreme_speed] },
+          { name: POKEMON.growlithe, level: 45, moveId: [MOVES.fire.physical.flare_blitz, MOVES.normal.physical.extreme_speed] },
+          { name: POKEMON.arcanine, level: 47, moveId: [MOVES.fire.physical.flare_blitz, MOVES.normal.physical.extreme_speed] },
+        ]
+      },
+      {
+        name: ENTRENADORES.Chica.name, img: ENTRENADORES.Chica.img, rate: 25, pokemon: [
+          { name: POKEMON.marill, level: 50, moveId: [MOVES.water.physical.crabhammer, MOVES.fairy.physical.play_rough] },
+        ]
+      }
+    ],
+    paths: [
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }],
+    ],
+  },
+
+  'faro-ciudad-olivo-2': {
+    bg: BG.JOTHO.faroCiudadOlivo,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
+    rewardPokemon: [],
+    wild: [],
+    trainer: [],
+    specialTrainer: {
+      name: "Colchonero Salgado", img: ENTRENADORES.Pensador.img, pokemon: [
+        {
+          name: POKEMON.quilava, level: 52,
+          heldItem: ITEM.eviolite,
+          moveId: MOVES.fire.special.fire_blast,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'levitate' },
+        },
+        {
+          name: POKEMON.pidgeotto, level: 52,
+          shiny: true,
+          heldItem: ITEM.choice_scarf,
+          moveId: MOVES.flying.physical.brave_bird,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'lightning-rod' },
+        },
+        {
+          name: POKEMON.misdreavus, level: 52,
+          heldItem: ITEM.eviolite,
+          moveId: MOVES.ghost.special.astral_barrage,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'cursed-body' },
+        }
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Special }],
+    ],
+  },
+
+  'faro-ciudad-olivo-3': {
+    bg: BG.JOTHO.faroCiudadOlivo,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
+    rewardPokemon: [],
+    wild: [
+      {
+        name: POKEMON.ampharos, rate: 100, minLv: 52, maxLv: 55, moveId: [MOVES.fairy.special.sparkling_aria, MOVES.electric.special.thunder],
+        overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'levitate' },
+      },
+    ],
+    trainer: [],
+    paths: [
+      [{ type: PATH_TYPE.Wild }],
+    ],
+  },
+
+  'ciudad-olivo': {
+    bg: BG.JOTHO.ciudadOlivo,
+    combatBg: COMBAT_BG.interior,
+    trainerBg: COMBAT_BG.interior,
+    gymLeader: 'Yasmina',
+    gymType: 'steel',
+    badgeId: 'mineral-badge',
+    gymLeaderImg: ENTRENADORES.Yasmina.img,
+    welcome: { title: 'Ciudad Olivo', subtitle: 'Gimnasio de Tipo Acero', img: BG.JOTHO.ciudadOlivo },
+    wild: [],
+    trainer: [],
+    rewardPokemon: [POKEMON.skarmory],
+    gym: {
+      leader: [
+        {
+          name: POKEMON.forretress,
+          level: 55,
+          heldItem: ITEM.focus_sash,
+          moveId: MOVES.steel.special.flash_cannon,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'cursed-body' },
+        },
+        {
+          name: POKEMON.skarmory,
+          level: 53,
+          heldItem: ITEM.assault_vest,
+          moveId: [MOVES.flying.physical.brave_bird, MOVES.steel.physical.iron_head],
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'levitate' },
+        },
+        {
+          name: POKEMON.magneton,
+          level: 52,
+          heldItem: ITEM.safety_goggles,
+          moveId: MOVES.electric.special.thunder,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
+        },
+        {
+          name: POKEMON.steelix,
+          level: 57,
+          heldItem: ITEM.choice_band,
+          moveId: [MOVES.steel.physical.behemoth_blade, MOVES.ground.physical.earthquake],
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'huge-power' },
+        },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Lider }],
+    ],
+  },
+
+  'ciudad-orquidea': {
+    bg: BG.JOTHO.ciudadOrquidea,
+    combatBg: COMBAT_BG.interior,
+    trainerBg: COMBAT_BG.interior,
+    gymLeader: 'Anibal',
+    gymType: 'lucha',
+    badgeId: 'storm-badge',
+    gymLeaderImg: ENTRENADORES.Anibal.img,
+    welcome: { title: 'Ciudad Orquidea', subtitle: 'Gimnasio de Tipo Lucha', img: BG.JOTHO.ciudadOrquidea },
+    wild: [],
+    trainer: [
+      {
+        name: ENTRENADORES.Karateka.name, img: ENTRENADORES.Karateka.img, rate: 25, pokemon: [
+          { name: POKEMON.hitmonlee, level: 53, moveId: MOVES.fighting.physical.karate_chop },
+        ]
+      },
+      {
+        name: ENTRENADORES.Karateka.name, img: ENTRENADORES.Karateka.img, rate: 25, pokemon: [
+          { name: POKEMON.hitmonchan, level: 53, moveId: MOVES.fighting.physical.karate_chop },
+        ]
+      },
+      {
+        name: ENTRENADORES.Karateka.name, img: ENTRENADORES.Karateka.img, rate: 25, pokemon: [
+          { name: POKEMON.machoke, level: 53, moveId: MOVES.fighting.physical.close_combat },
+        ]
+      },
+      {
+        name: ENTRENADORES.Karateka.name, img: ENTRENADORES.Karateka.img, rate: 25, pokemon: [
+          { name: POKEMON.primeape, level: 53, moveId: MOVES.fighting.physical.close_combat },
+        ]
+      },
+    ],
+    gym: {
+      leader: [
+        {
+          name: POKEMON.primeape,
+          level: 57,
+          heldItem: ITEM.choice_scarf,
+          moveId: MOVES.fighting.physical.close_combat,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
+          ability: 'huge-power',
+        },
+        {
+          name: POKEMON.poliwrath,
+          level: 57,
+          heldItem: ITEM.choice_scarf,
+          moveId: [MOVES.fighting.physical.close_combat, MOVES.water.physical.wave_crash],
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
+          ability: 'huge-power',
+        },
+        {
+          name: POKEMON.ursaring,
+          level: 58,
+          heldItem: ITEM.choice_band,
+          moveId: MOVES.normal.physical.extreme_speed,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
+          ability: 'huge-power',
+        },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }],
+    ],
+  },
 
   // ─────────────────────────────────────────────────────────────────────
   // OPCIONALES
@@ -774,7 +1028,7 @@ Object.assign(ROUTE_DATA, {
     specialTrainer: {
       name: ENTRENADORES.Mewtwo.name, img: ENTRENADORES.Mewtwo.img, pokemon: [
         {
-          name: POKEMON.mewtwo, minLv: 55, maxLv: 65, moveId: [MOVES.psychic.special.trick, MOVES.fairy.special.moonblast, MOVES.grass.special.giga_drain],
+          name: POKEMON.mewtwo, minLv: 60, maxLv: 75, moveId: [MOVES.psychic.special.trick, MOVES.fairy.special.moonblast, MOVES.grass.special.giga_drain],
           heldItem: ITEM.choice_specs, img: POKEMON_SPRITE.armoredMewtwo,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         }
@@ -820,6 +1074,15 @@ var JOHTO_ROUTES = [
   { name: 'Torre Quemada', area: 'torre-quemada' },
   { name: 'Torre Quemada', area: 'torre-quemada-noche', condition: JOHTO_COND.hasAllBadges() },
   { name: 'Ciudad Iris', area: 'ciudad-iris' },
+  { name: 'Ruta 38', area: 'ruta-38' },
+  { name: 'Ruta 39', area: 'ruta-39' },
+  { name: 'Faro Ciudad Olivo (Piso 1)', area: 'faro-ciudad-olivo-1' },
+  { name: 'Faro Ciudad Olivo (Piso 2)', area: 'faro-ciudad-olivo-2' },
+  { name: 'Faro Ciudad Olivo (Piso 3)', area: 'faro-ciudad-olivo-3' },
+  { name: 'Ciudad Olivo', area: 'ciudad-olivo' },
+  { name: 'Ciudad Olivo', area: 'ciudad-orquidea' },
+
+
 
 
   //Hasta aquí todo esta funcionando.
