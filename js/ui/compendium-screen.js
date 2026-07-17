@@ -95,8 +95,36 @@ const CompendiumScreen = {
         </div>
       </div>`;
 
+    // ── Tooltip de efectos ────────────────────────────────────────────────────
+    let _tip = null;
+    const _removeTip = () => { _tip?.remove(); _tip = null; };
+    const _showTip = anchor => {
+      _removeTip();
+      _tip = document.createElement('div');
+      _tip.className = 'move-effect-tooltip';
+      _tip.textContent = '✦ ' + anchor.dataset.effect;
+      document.body.appendChild(_tip);
+      const r = anchor.getBoundingClientRect();
+      _tip.style.left = (r.left + r.width / 2) + 'px';
+      _tip.style.top  = (r.top - _tip.offsetHeight - 8) + 'px';
+    };
+    const isMobile = () => window.matchMedia('(hover: none)').matches;
+
+    vp.querySelectorAll('[data-effect]').forEach(row => {
+      // Desktop: hover
+      row.addEventListener('mouseenter', () => { if (!isMobile()) _showTip(row); });
+      row.addEventListener('mouseleave', () => { if (!isMobile()) _removeTip(); });
+      // Móvil: clic (solo filas sin navegación propia; las de data-move-id ya navegan)
+      if (!row.dataset.moveId) {
+        row.addEventListener('click', e => {
+          if (!isMobile()) return;
+          _tip ? _removeTip() : (_showTip(row), e.stopPropagation());
+        });
+      }
+    });
+
     document.getElementById('comp-back')
-      .addEventListener('click', () => CompendiumScreen._returnFn?.());
+      .addEventListener('click', () => { _removeTip(); CompendiumScreen._returnFn?.(); });
 
     vp.querySelectorAll('[data-sec]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -110,7 +138,7 @@ const CompendiumScreen = {
     });
 
     vp.querySelectorAll('[data-move-id]').forEach(el => {
-      el.addEventListener('click', () => CompendiumScreen._renderMoveDetail(el.dataset.moveId));
+      el.addEventListener('click', () => { _removeTip(); CompendiumScreen._renderMoveDetail(el.dataset.moveId); });
     });
 
     vp.querySelectorAll('[data-select-type]').forEach(el => {
@@ -570,9 +598,10 @@ const CompendiumScreen = {
               const effects   = typeof MOVE_EFFECTS !== 'undefined'
                 ? effectIds.map(id => MOVE_EFFECTS[id]).filter(Boolean)
                 : [];
-              const effectDesc = effects.map(e => e.desc).filter(Boolean).join('<br>');
+              const effectDesc = effects.map(e => e.desc).filter(Boolean).join(' • ');
               return `
                 <div class="comp-move-row" data-move-id="${m.id}"
+                  ${effectDesc ? `data-effect="${effectDesc.replace(/"/g, '&quot;')}"` : ''}
                   style="display:flex;align-items:center;gap:8px;padding:6px 10px;
                     background:var(--off-white);border:1px solid var(--grey-light);
                     border-radius:var(--radius-sm);cursor:pointer;position:relative">
@@ -583,7 +612,6 @@ const CompendiumScreen = {
                     POD:${m.power ?? '—'}
                   </span>
                   ${hasEffect ? `<span style="color:var(--yellow);font-size:10px;line-height:1;flex-shrink:0">★</span>` : `<span style="width:10px;flex-shrink:0"></span>`}
-                  ${effectDesc ? `<div class="move-effect-tooltip">✦ ${effectDesc}</div>` : ''}
                 </div>`;
             }).join('')}
         </div>
@@ -649,10 +677,11 @@ const CompendiumScreen = {
                 ? (Array.isArray(move.effectId) ? move.effectId : [move.effectId])
                 : [];
               const effectDesc = (typeof MOVE_EFFECTS !== 'undefined')
-                ? effectIds.map(id => MOVE_EFFECTS[id]?.desc).filter(Boolean).join('<br>')
+                ? effectIds.map(id => MOVE_EFFECTS[id]?.desc).filter(Boolean).join(' • ')
                 : '';
               return `
-                <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;
+                <div ${effectDesc ? `data-effect="${effectDesc.replace(/"/g, '&quot;')}"` : ''}
+                  style="display:flex;align-items:center;gap:8px;padding:6px 10px;
                   background:var(--off-white);border:1px solid var(--grey-light);
                   border-radius:var(--radius-sm);position:relative">
                   <span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;
@@ -664,7 +693,6 @@ const CompendiumScreen = {
                   <span style="font-family:var(--font-pixel);font-size:8px;color:var(--grey);flex-shrink:0">
                     POD:${power ?? '—'}
                   </span>
-                  ${effectDesc ? `<div class="move-effect-tooltip">✦ ${effectDesc}</div>` : ''}
                 </div>`;
             }).join('')}
           </div>

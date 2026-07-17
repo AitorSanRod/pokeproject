@@ -650,7 +650,7 @@ Object.assign(ROUTE_DATA, {
   },
 
   // ─────────────────────────────────────────────────────────────────────
-  // CIUDAD OLIVO — Gimnasio de Yamina (Acero)
+  // CIUDAD OLIVO — Gimnasio de Yasmina (Acero)
   // ─────────────────────────────────────────────────────────────────────
 
   //Ruta 38

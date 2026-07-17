@@ -1466,7 +1466,7 @@ const Screens = {
               data-moveid="${m.id}" data-effect="${effectDesc ?? ''}"
               style="justify-content:space-between"
               ${moveChangeBlocked ? 'disabled' : ''}>
-              <span>${m.name}</span>
+              <span>${m.name} <span style="opacity:.5;font-size:6px">${m.damageClass === 'special' ? '(E)' : m.damageClass === 'physical' ? '(F)' : ''}</span></span>
               <span style="opacity:.6;font-size:6px">${m.type.toUpperCase()} · POD:${m.power ?? '—'}</span>
             </button>`;
         }).join('')}
