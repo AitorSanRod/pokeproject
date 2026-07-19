@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(npx --version)",
+      "Bash(npx serve *)",
+      "Bash(echo \"Server PID: $!\")"
+    ]
+  }
+}

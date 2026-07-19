@@ -1019,6 +1019,46 @@ Object.assign(ROUTE_DATA, {
   // EXTRAS
   // ─────────────────────────────────────────────────────────────────────
 
+  'desarrollador': {
+    bg: BG.ruta1,
+    combatBg: COMBAT_BG.espacioRaro,
+    trainerBg: COMBAT_BG.espacioRaro,
+    rewardPokemon: [POKEMON.charizard],
+    wild: [],
+    trainer: [],
+    specialTrainer: {
+      name: ENTRENADORES.Rojo.name, img: ENTRENADORES.Rojo.img, pokemon: [
+        {
+          name: POKEMON.charizard, level: 50,
+          heldItem: ITEM.choice_scarf,
+          moveId: MOVES.fire.special.fire_blast,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'blaze' },
+        },
+        {
+          name: POKEMON.jolteon, level: 50,
+          heldItem: ITEM.lifeorb,
+          moveId: MOVES.electric.special.thunderbolt,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'static' },
+        },
+        {
+          name: POKEMON.porygon2, level: 50,
+          heldItem: ITEM.eviolite,
+          moveId: MOVES.normal.special.tri_attack,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'download' },
+        },
+        {
+          name: POKEMON.venusaur, level: 50,
+          heldItem: ITEM.leftovers,
+          moveId: MOVES.grass.special.giga_drain,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'cloud-nine' },
+        },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Special }],
+    ],
+  },
+
   'espacio-raro-johto': {
     bg: BG.espacioRaro,
     combatBg: COMBAT_BG.espacioRaro,
@@ -1095,7 +1135,7 @@ var JOHTO_ROUTES = [
   //   Pueblo Nogal, Ruta 30/31, Ciudad Dorada, Ruta 33...
   //   Ciudad Incienso, Ciudad Nogal, Ciudad Olivina, Pueblo Caoba,
   //   Ciudad Amatista → Liga Johto
-
+  { name: 'Desarrollador cabrón', area: 'desarrollador' },
   { name: '???', area: 'espacio-raro-johto' }
 ];
 
