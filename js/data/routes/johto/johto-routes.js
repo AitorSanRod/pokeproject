@@ -900,10 +900,10 @@ Object.assign(ROUTE_DATA, {
         {
           name: POKEMON.ursaring,
           level: 55,
-          heldItem: ITEM.choice_band,
+          heldItem: ITEM.lifeorb,
           moveId: MOVES.normal.physical.extreme_speed,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
-          ability: 'huge-power',
+          ability: 'rough-skin',
         },
       ]
     },
