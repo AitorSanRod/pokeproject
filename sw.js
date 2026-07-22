@@ -31,8 +31,10 @@ self.addEventListener('fetch', event => {
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          const clone = response.clone();
-          caches.open(CACHE).then(cache => cache.put(event.request, clone));
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE).then(cache => cache.put(event.request, clone));
+          }
           return response;
         })
         .catch(() => caches.match(event.request))
@@ -40,13 +42,15 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // El resto (JS, imágenes, etc.) — cache-first como antes
+  // El resto (imágenes, fuentes, etc.) — cache-first; solo se cachean respuestas OK.
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
       return fetch(event.request).then(response => {
-        const clone = response.clone();
-        caches.open(CACHE).then(cache => cache.put(event.request, clone));
+        if (response.ok) {
+          const clone = response.clone();
+          caches.open(CACHE).then(cache => cache.put(event.request, clone));
+        }
         return response;
       });
     })

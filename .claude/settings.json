@@ -15,7 +15,8 @@
       "Bash(Sort-Object)",
       "Bash(grep -v \"^\\\\s*//\")",
       "Bash(grep -v \"//\\\\|html\\\\|pokemon\\\\|sprite\\\\|badge\\\\|Icon\\\\|icon\\\\|image-rendering\\\\|background\\\\|object-fit\\\\|onerror\")",
-      "Bash(grep -v \"//\\\\|onerror\\\\|pokemonImg\\\\|heldItem\")"
+      "Bash(grep -v \"//\\\\|onerror\\\\|pokemonImg\\\\|heldItem\")",
+      "PowerShell(head -10)"
     ]
   }
 }
