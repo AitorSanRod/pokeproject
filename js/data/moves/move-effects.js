@@ -880,9 +880,15 @@ var ABILITIES = {
   },
 
   'prisa-acuatica': {
-    trigger: ABILITY_TRIGGERS.PASSIVE,
+    trigger: [ABILITY_TRIGGERS.PASSIVE, ABILITY_TRIGGERS.ON_ENTER],
     name: 'Prisa Acuática',
-    desc: 'Con más del 50% de salud, los ataques de tipo Agua tienen prioridad +1.',
+    desc: 'Con más del 50% de salud, los ataques de tipo Agua tienen prioridad +1. Aumenta el ATK un 20%.',
+    fn(ctx) {
+      if (!ctx.pokemon.combatMods) ctx.pokemon.combatMods = {};
+      ctx.pokemon.combatMods.atk = (ctx.pokemon.combatMods.atk ?? 0) + 0.20;
+      ctx.log(`¡El ATK de ${ctx.pokemon.displayName} aumentó!`);
+      ctx.showStatChange?.(ctx.side, 'ATK', 'up', 20);
+    },
   },
 
   'blaze': {

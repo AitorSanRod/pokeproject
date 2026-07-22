@@ -847,6 +847,10 @@ Object.assign(ROUTE_DATA, {
     ],
   },
 
+  // ─────────────────────────────────────────────────────────────────────
+  // CIUDAD ORQUIDEA — Gimnasio de Anibal (Lucha)
+  // ─────────────────────────────────────────────────────────────────────
+
   'ciudad-orquidea': {
     bg: BG.JOTHO.ciudadOrquidea,
     combatBg: COMBAT_BG.interior,
@@ -900,7 +904,7 @@ Object.assign(ROUTE_DATA, {
         {
           name: POKEMON.ursaring,
           level: 55,
-          heldItem: ITEM.lifeorb,
+          heldItem: ITEM.focus_sash,
           moveId: MOVES.normal.physical.extreme_speed,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
           ability: 'rough-skin',
@@ -911,6 +915,16 @@ Object.assign(ROUTE_DATA, {
       [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }],
     ],
   },
+
+  // ─────────────────────────────────────────────────────────────────────
+  // CIUDAD CAOBA — Gimnasio de Fredo (Hielo)
+  // ─────────────────────────────────────────────────────────────────────
+
+  //Ruta 42 - Se puede hacer esta ruta tambien de noche
+  //Monte Mortero (Opcional)
+  //Ruta 43 (Tema rocket)
+  //Lago Furia (Gyarados rojo)
+  //Gimasio Fredo
 
   // ─────────────────────────────────────────────────────────────────────
   // OPCIONALES
