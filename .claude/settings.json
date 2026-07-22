@@ -5,7 +5,17 @@
       "Skill(run:*)",
       "Bash(npx --version)",
       "Bash(npx serve *)",
-      "Bash(echo \"Server PID: $!\")"
+      "Bash(echo \"Server PID: $!\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:4321/)",
+      "Bash(node -e \"require\\('puppeteer'\\)\")",
+      "Bash(node -e \"require\\('playwright'\\)\")",
+      "Bash(node \"C:/Users/aitor/AppData/Local/Temp/claude/c--Users-aitor-Desktop-Apps-poke-Game-pokeproject/f5a8f46b-4b85-4d68-9241-0af58d581807/scratchpad/check-routes.js\")",
+      "Bash(grep -n \"â€\\\\|Ã\\\\|Â·\\\\|â\\\\|ÃƒÂ\\\\|\\\\\\\\\\\\\\\\u00\\\\|Ã©\\\\|Ã¡\\\\|Ã³\\\\|Ãº\\\\|Ã\\\\xad\\\\|ñ\\\\|á\\\\|é\\\\|í\\\\|ó\\\\|ú\\\\|ü\\\\|¡\\\\|¿\" \"c:/Users/aitor/Desktop/Apps/poke/Game/pokeproject/js/data/routes/kanto/kanto-routes.js\")",
+      "PowerShell(node \"C:\\\\Users\\\\aitor\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-aitor-Desktop-Apps-poke-Game-pokeproject\\\\f5a8f46b-4b85-4d68-9241-0af58d581807\\\\scratchpad\\\\fix-accents.js\")",
+      "Bash(Sort-Object)",
+      "Bash(grep -v \"^\\\\s*//\")",
+      "Bash(grep -v \"//\\\\|html\\\\|pokemon\\\\|sprite\\\\|badge\\\\|Icon\\\\|icon\\\\|image-rendering\\\\|background\\\\|object-fit\\\\|onerror\")",
+      "Bash(grep -v \"//\\\\|onerror\\\\|pokemonImg\\\\|heldItem\")"
     ]
   }
 }

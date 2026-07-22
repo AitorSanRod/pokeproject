@@ -142,13 +142,6 @@ Object.assign(ROUTE_DATA, {
     combatBg: COMBAT_BG.hierbaAlta,
     trainerBg: COMBAT_BG.default,
     rewardPokemon: [],
-    get wild() {
-      const [primerInicial, segundoInicial] = johtoObtenerSegundoInicial(GameState.starterName ?? POKEMON.chikorita);
-      return [
-        { name: primerInicial, rate: 50, minLv: 6, maxLv: 8 },
-        { name: segundoInicial, rate: 50, minLv: 6, maxLv: 8 },
-      ];
-    },
     trainer: [],
     specialTrainer: {
       name: ENTRENADORES.Plata.name, img: ENTRENADORES.Plata.img, pokemon: [
@@ -156,7 +149,7 @@ Object.assign(ROUTE_DATA, {
       ]
     },
     paths: [
-      [{ type: PATH_TYPE.Special }, { type: PATH_TYPE.Wild }],
+      [{ type: PATH_TYPE.Special }],
     ],
   },
 
@@ -756,7 +749,7 @@ Object.assign(ROUTE_DATA, {
     specialTrainer: {
       name: "Colchonero Salgado", img: ENTRENADORES.Pensador.img, pokemon: [
         {
-          name: POKEMON.quilava, level: 48,
+          name: POKEMON.typhlosion, level: 48,
           heldItem: ITEM.eviolite,
           moveId: MOVES.fire.special.fire_blast,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'levitate' },
@@ -801,7 +794,7 @@ Object.assign(ROUTE_DATA, {
   'ciudad-olivo': {
     bg: BG.JOTHO.ciudadOlivo,
     combatBg: COMBAT_BG.interior,
-    trainerBg: COMBAT_BG.interior,
+    trainerBg: COMBAT_BG.default,
     gymLeader: 'Yasmina',
     gymType: 'steel',
     badgeId: 'mineral-badge',
@@ -890,24 +883,21 @@ Object.assign(ROUTE_DATA, {
           level: 53,
           heldItem: ITEM.choice_scarf,
           moveId: MOVES.fighting.physical.close_combat,
-          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
-          ability: 'huge-power',
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'huge-power' },
         },
         {
           name: POKEMON.poliwrath,
           level: 54,
           heldItem: ITEM.choice_scarf,
           moveId: [MOVES.fighting.physical.close_combat, MOVES.water.physical.wave_crash],
-          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
-          ability: 'huge-power',
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'huge-power' },
         },
         {
           name: POKEMON.ursaring,
           level: 55,
           heldItem: ITEM.focus_sash,
           moveId: MOVES.normal.physical.extreme_speed,
-          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
-          ability: 'rough-skin',
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'rough-skin' },
         },
       ]
     },
@@ -921,10 +911,152 @@ Object.assign(ROUTE_DATA, {
   // ─────────────────────────────────────────────────────────────────────
 
   //Ruta 42 - Se puede hacer esta ruta tambien de noche
-  //Monte Mortero (Opcional)
-  //Ruta 43 (Tema rocket)
+  'ruta-42': {
+    bg: BG.JOTHO.ruta42,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
+    rewardPokemon: [],
+    wild: [
+      { name: POKEMON.ekans, rate: 25, minLv: 50, maxLv: 56, moveId: MOVES.poison.physical.poison_jab },
+      { name: POKEMON.arbok, rate: 25, minLv: 50, maxLv: 56, moveId: MOVES.poison.physical.gunk_shot },
+      { name: POKEMON.marill, rate: 25, minLv: 50, maxLv: 56, moveId: MOVES.water.physical.crabhammer },
+      { name: POKEMON.golbat, rate: 25, minLv: 50, maxLv: 56, moveId: MOVES.poison.physical.poison_jab },
+    ],
+    trainer: [
+      {
+        name: ENTRENADORES.Karateka.name, img: ENTRENADORES.Karateka.img, rate: 25, pokemon: [
+          { name: POKEMON.azumarill, level: 57, moveId: [MOVES.water.physical.wave_crash, MOVES.fairy.physical.play_rough] },
+        ]
+      },
+    ],
+    paths: [
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }],
+    ]
+  },
+
+  'ruta-43': {
+    bg: BG.JOTHO.ruta43,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
+    rewardPokemon: [],
+    wild: [],
+    trainer: [
+      {
+        name: ENTRENADORES.Rocket.name, img: ENTRENADORES.Rocket.img, rate: 25, pokemon: [
+          { name: POKEMON.golbat, level: 55, moveId: MOVES.poison.physical.poison_jab },
+          { name: POKEMON.crobat, level: 57, moveId: MOVES.flying.physical.wing_attack },
+        ]
+      },
+      {
+        name: ENTRENADORES.Rocket.name, img: ENTRENADORES.Rocket.img, rate: 25, pokemon: [
+          { name: POKEMON.wobbuffet, level: 60, moveId: MOVES.psychic.special.psystrike },
+        ]
+      },
+      {
+        name: ENTRENADORES.Rocket.name, img: ENTRENADORES.Rocket.img, rate: 25, pokemon: [
+          { name: POKEMON.golbat, level: 55, moveId: MOVES.poison.physical.poison_jab },
+          { name: POKEMON.crobat, level: 57, moveId: MOVES.flying.physical.wing_attack },
+          { name: POKEMON.arcanine, level: 57, moveId: MOVES.fire.physical.flare_blitz },
+        ]
+      },
+      {
+        name: ENTRENADORES.Rocket.name, img: ENTRENADORES.Rocket.img, rate: 25, pokemon: [
+          { name: POKEMON.ekans, level: 55, moveId: [MOVES.poison.physical.gunk_shot, MOVES.dark.physical.crunch] },
+          { name: POKEMON.ekans, level: 55, moveId: [MOVES.poison.physical.gunk_shot, MOVES.dark.physical.crunch] },
+          { name: POKEMON.arbok, level: 55, moveId: [MOVES.poison.physical.gunk_shot, MOVES.dark.physical.crunch] },
+          { name: POKEMON.arbok, level: 55, moveId: [MOVES.poison.physical.gunk_shot, MOVES.dark.physical.crunch] },
+        ]
+      },
+    ],
+    paths: [
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }],
+    ]
+  },
+
   //Lago Furia (Gyarados rojo)
-  //Gimasio Fredo
+  'lago-furia': {
+    bg: BG.JOTHO.lagoFuria,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
+    rewardPokemon: [],
+    wild: [
+      { name: POKEMON.gyarados, rate: 100, minLv: 58, maxLv: 60, moveId: [MOVES.water.physical.crabhammer, MOVES.dark.physical.crunch], shiny: true },
+    ],
+    trainer: [],
+    paths: [
+      [{ type: PATH_TYPE.Wild }],
+    ]
+  },
+
+  'pueblo-caoba': {
+    bg: BG.JOTHO.puebloCaoba,
+    combatBg: COMBAT_BG.interior,
+    trainerBg: COMBAT_BG.interior,
+    gymLeader: 'Fredo',
+    gymType: 'hielo',
+    badgeId: 'glacier-badge',
+    gymLeaderImg: ENTRENADORES.Fredo.img,
+    welcome: { title: 'Pueblo Caoba', subtitle: 'Gimnasio de Tipo Hielo', img: BG.JOTHO.puebloCaoba },
+    wild: [],
+    trainer: [
+      {
+        name: ENTRENADORES.DomingueroAgua.name, img: ENTRENADORES.DomingueroAgua.img, rate: 25, pokemon: [
+          { name: POKEMON.cloyster, level: 56, moveId: MOVES.ice.special.ice_beam },
+          { name: POKEMON.cloyster, level: 55, moveId: MOVES.water.special.scald },
+        ]
+      },
+      {
+        name: ENTRENADORES.DomingueroAgua.name, img: ENTRENADORES.DomingueroAgua.img, rate: 25, pokemon: [
+          { name: POKEMON.jynx, level: 58, moveId: MOVES.ice.special.blizzard },
+        ]
+      },
+      {
+        name: ENTRENADORES.DomingueroAgua.name, img: ENTRENADORES.DomingueroAgua.img, rate: 25, pokemon: [
+          { name: POKEMON.articuno, level: 57, moveId: MOVES.ice.special.blizzard },
+        ]
+      },
+      {
+        name: ENTRENADORES.DomingueroAgua.name, img: ENTRENADORES.DomingueroAgua.img, rate: 25, pokemon: [
+          { name: POKEMON.lapras, level: 57, moveId: MOVES.ice.special.ice_beam },
+        ]
+      },
+    ],
+    gym: {
+      leader: [
+        {
+          name: POKEMON.seel,
+          level: 58,
+          heldItem: ITEM.eviolite,
+          moveId: MOVES.ice.special.ice_beam,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'lightning-rod' },
+        },
+        {
+          name: POKEMON.dewgong,
+          level: 57,
+          heldItem: ITEM.choice_specs,
+          moveId: [MOVES.ice.special.blizzard, MOVES.water.special.scald],
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'lightning-rod' },
+        },
+        {
+          name: POKEMON.piloswine,
+          level: 58,
+          heldItem: ITEM.focus_sash,
+          moveId: MOVES.ice.special.blizzard,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'rough-skin' },
+        },
+        {
+          name: POKEMON.sneasel,
+          level: 60,
+          heldItem: ITEM.choice_band,
+          moveId: MOVES.ice.physical.ice_fang,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'speed-boost' },
+        },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }],
+    ],
+  },
 
   // ─────────────────────────────────────────────────────────────────────
   // OPCIONALES
@@ -1043,25 +1175,25 @@ Object.assign(ROUTE_DATA, {
     specialTrainer: {
       name: ENTRENADORES.Rojo.name, img: ENTRENADORES.Rojo.img, pokemon: [
         {
-          name: POKEMON.charizard, level: 50,
+          name: POKEMON.charizard, level: 65,
           heldItem: ITEM.choice_scarf,
           moveId: MOVES.fire.special.fire_blast,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'blaze' },
         },
         {
-          name: POKEMON.jolteon, level: 50,
+          name: POKEMON.jolteon, level: 65,
           heldItem: ITEM.lifeorb,
           moveId: MOVES.electric.special.thunderbolt,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'static' },
         },
         {
-          name: POKEMON.porygon2, level: 50,
+          name: POKEMON.porygon2, level: 65,
           heldItem: ITEM.eviolite,
           moveId: MOVES.normal.special.tri_attack,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'download' },
         },
         {
-          name: POKEMON.venusaur, level: 50,
+          name: POKEMON.venusaur, level: 65,
           heldItem: ITEM.leftovers,
           moveId: MOVES.grass.special.giga_drain,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'cloud-nine' },
@@ -1135,9 +1267,9 @@ var JOHTO_ROUTES = [
   { name: 'Faro Ciudad Olivo (Piso 3)', area: 'faro-ciudad-olivo-3' },
   { name: 'Ciudad Olivo', area: 'ciudad-olivo' },
   { name: 'Ciudad Olivo', area: 'ciudad-orquidea' },
-
-
-
+  { name: 'Ruta 42', area: 'ruta-42' },
+  { name: 'Lago Furia', area: 'lago-furia' },
+  { name: 'Pueblo Caoba', area: 'pueblo-caoba' },
 
   //Hasta aquí todo esta funcionando.
 

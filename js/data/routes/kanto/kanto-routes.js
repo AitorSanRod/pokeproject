@@ -1,4 +1,4 @@
-﻿// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// ─────────────────────────────────────────────────────────────────────────────
 // RUTAS DE KANTO
 //
 // Requiere routes-constants.js cargado antes que este archivo.
@@ -6,24 +6,24 @@
 //                      pickTrainer, rollLevel, generatePaths
 //
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// REFERENCIAS RÃPIDAS
+// REFERENCIAS RÁPIDAS
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //
-//   POKEMON.rattata                          â†’ id de pokemon ('rattata')
-//   MOVES.normal.physical.tackle             â†’ id de movimiento ('tackle')
-//   MOVES.fire.special.flamethrower          â†’ id de movimiento ('flamethrower')
-//   ITEM.leftovers                           â†’ id de objeto ('leftovers')
+//   POKEMON.rattata                          → id de pokemon ('rattata')
+//   MOVES.normal.physical.tackle             → id de movimiento ('tackle')
+//   MOVES.fire.special.flamethrower          → id de movimiento ('flamethrower')
+//   ITEM.leftovers                           → id de objeto ('leftovers')
 //   PATH_TYPE.Trainer / Wild / Heal / Special / Lider
-//   ENTRENADORES.Campista.name / .img        â†’ nombre y sprite del entrenador
+//   ENTRENADORES.Campista.name / .img        → nombre y sprite del entrenador
 //
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 // ESTRUCTURA DE ROUTE_DATA
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //
 // Cada clave es el area id que referencia KANTO_ROUTES.
-// Existen dos tipos de ruta: combate e informaciÃ³n.
+// Existen dos tipos de ruta: combate e información.
 //
-// â”€â”€ RUTA DE COMBATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── RUTA DE COMBATE ────────────────────────────────────────────────────────
 //
 //   bg         (requerido) : imagen de fondo de la ruta
 //   combatBg   (requerido) : imagen de fondo del combate (salvajes y gimnasios)
@@ -37,51 +37,51 @@
 //                            usando pathLength como longitud de cada camino.
 //   pathLength (opcional)  : longitud de paths auto-generados. Por defecto 3.
 //
-//   specialTrainer (opcional) : entrenador Ãºnico que aparece en casillas
+//   specialTrainer (opcional) : entrenador único que aparece en casillas
 //                               PATH_TYPE.Special. No tiene rate (siempre
 //                               se muestra). Ver estructura de entrenador abajo.
 //
 //   rewardPokemon (opcional) : array de POKEMON.xxx disponibles como
-//                              recompensa de fin de ruta (opciÃ³n pokemon).
+//                              recompensa de fin de ruta (opción pokemon).
 //   rewardExtras  (opcional) : array de ITEM.xxx disponibles como recompensa
 //                              adicional junto a las 3 opciones base.
 //
-//   welcome    (opcional)  : { title, subtitle, img } â€” pantalla de bienvenida
+//   welcome    (opcional)  : { title, subtitle, img } — pantalla de bienvenida
 //                            que aparece al llegar a una ciudad/gimnasio.
-//   gymLeader  (opcional)  : nombre del lÃ­der de gimnasio (string).
+//   gymLeader  (opcional)  : nombre del líder de gimnasio (string).
 //   gymType    (opcional)  : tipo del gimnasio (string, p.ej. 'rock').
 //   badgeId    (opcional)  : id de medalla definida en kanto-badges.js.
-//   gymLeaderImg (opcional): sprite del lÃ­der de gimnasio.
-//   gym        (opcional)  : { leader: [...] } â€” array de pokemon del lÃ­der.
+//   gymLeaderImg (opcional): sprite del líder de gimnasio.
+//   gym        (opcional)  : { leader: [...] } — array de pokemon del líder.
 //                            Aparece en casillas PATH_TYPE.Lider.
 //
-// â”€â”€ RUTA DE INFORMACIÃ“N â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── RUTA DE INFORMACIÓN ────────────────────────────────────────────────────
 //
 //   type        : 'information'  (requerido para activar este modo)
 //   bg          (requerido) : imagen de fondo
-//   title       (requerido) : tÃ­tulo mostrado en la pantalla
-//   description (opcional)  : HTML mostrado bajo el tÃ­tulo
-//   optional    (opcional)  : { btnName, area } â€” aÃ±ade un botÃ³n secundario
+//   title       (requerido) : título mostrado en la pantalla
+//   description (opcional)  : HTML mostrado bajo el título
+//   optional    (opcional)  : { btnName, area } — añade un botón secundario
 //                             que redirige a una ruta opcional.
 //
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// ENTRADAS DE POKEMON  (wild Â· trainer.pokemon Â· gym.leader Â· specialTrainer.pokemon)
+// ENTRADAS DE POKEMON  (wild · trainer.pokemon · gym.leader · specialTrainer.pokemon)
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //
-//   name     (requerido) : POKEMON.xxx  â€” id del pokemon
-//   minLv    (requerido) : nivel mÃ­nimo (excluir si se usa level)
-//   maxLv    (requerido) : nivel mÃ¡ximo (excluir si se usa level)
-//   level    (requerido) : nivel fijo â€” reemplaza minLv/maxLv (gym leaders)
-//   rate     (requerido en wild) : peso de apariciÃ³n. La suma de todos los
+//   name     (requerido) : POKEMON.xxx  — id del pokemon
+//   minLv    (requerido) : nivel mínimo (excluir si se usa level)
+//   maxLv    (requerido) : nivel máximo (excluir si se usa level)
+//   level    (requerido) : nivel fijo — reemplaza minLv/maxLv (gym leaders)
+//   rate     (requerido en wild) : peso de aparición. La suma de todos los
 //                                  rate de la tabla no tiene que ser 100,
-//                                  el sistema los normaliza automÃ¡ticamente.
+//                                  el sistema los normaliza automáticamente.
 //
-//   moveId   (opcional) : MOVES.tipo.clase.nombre â€” movimiento exclusivo que
-//                         el pokemon usarÃ¡ en combate automÃ¡tico. Puede ser
+//   moveId   (opcional) : MOVES.tipo.clase.nombre — movimiento exclusivo que
+//                         el pokemon usará en combate automático. Puede ser
 //                         un array de dos ids para alternar entre ellos.
 //                         Si se omite, el pokemon usa su movimiento por defecto.
-//   heldItem (opcional) : ITEM.xxx â€” objeto equipado al pokemon.
-//   shiny    (opcional) : true â€” fuerza la apariciÃ³n shiny (ignora SHINY_RATE).
+//   heldItem (opcional) : ITEM.xxx — objeto equipado al pokemon.
+//   shiny    (opcional) : true — fuerza la aparición shiny (ignora SHINY_RATE).
 //   img      (opcional) : ruta a sprite personalizado (sobreescribe el sprite
 //                         por defecto de la PokeAPI).
 //   overrides (opcional): personaliza IVs y/o EVs del pokemon generado.
@@ -89,32 +89,32 @@
 //                         { ivs: { hp, atk, def, spa, spd, spe },
 //                           evs: { hp, atk, def, spa, spd, spe } }
 //
-// â”€â”€ Marcadores especiales en name â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Marcadores especiales en name ──────────────────────────────────────────
 //
-//   'RIVAL_STARTER'   â†’ sustituido en runtime por el contra-tipo del starter
+//   'RIVAL_STARTER'   → sustituido en runtime por el contra-tipo del starter
 //                       del jugador (primera forma).
-//   'RIVAL_STARTER_2' â†’ segunda forma del contra-tipo.
-//   'RIVAL_STARTER_3' â†’ forma final del contra-tipo.
+//   'RIVAL_STARTER_2' → segunda forma del contra-tipo.
+//   'RIVAL_STARTER_3' → forma final del contra-tipo.
 //
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-// ESTRUCTURA DE ENTRENADOR  (trainer[] Â· specialTrainer)
+// ESTRUCTURA DE ENTRENADOR  (trainer[] · specialTrainer)
 // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 //
 //   name    (requerido) : nombre mostrado en combate
 //   img     (requerido) : ruta al sprite del entrenador
-//   rate    (requerido en trainer[]) : peso de selecciÃ³n cuando hay varios
+//   rate    (requerido en trainer[]) : peso de selección cuando hay varios
 //                                      entrenadores en el pool.
 //   pokemon (requerido) : array de entradas de pokemon (ver arriba)
 //
-// â”€â”€ PATH_TYPE â€” tipos de casilla â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── PATH_TYPE — tipos de casilla ──────────────────────────────────────────
 //
-//   PATH_TYPE.Trainer â†’ combate contra entrenador aleatorio de trainer[]
-//   PATH_TYPE.Wild    â†’ encuentro con pokemon salvaje de wild[]
-//   PATH_TYPE.Special â†’ combate contra specialTrainer (Ãºnico, siempre igual)
-//   PATH_TYPE.Heal    â†’ recuperaciÃ³n automÃ¡tica del equipo
-//   PATH_TYPE.Lider   â†’ combate contra el lÃ­der de gimnasio (gym.leader)
+//   PATH_TYPE.Trainer → combate contra entrenador aleatorio de trainer[]
+//   PATH_TYPE.Wild    → encuentro con pokemon salvaje de wild[]
+//   PATH_TYPE.Special → combate contra specialTrainer (único, siempre igual)
+//   PATH_TYPE.Heal    → recuperación automática del equipo
+//   PATH_TYPE.Lider   → combate contra el líder de gimnasio (gym.leader)
 //
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
 
 // ENTRENADORES definido en routes-assets.js
 
@@ -158,7 +158,7 @@ var ROUTE_DATA = {
     type: 'information',
     bg: BG.ciudadVerde,
     title: 'Ciudad Verde',
-    description: 'Es el momento de volver sÃ­<br>se te ha olvidado algo...',
+    description: 'Es el momento de volver sí<br>se te ha olvidado algo...',
     optional: {
       btnName: 'Volver a Pueblo Paleta',
       area: 'pueblo-paleta-1',
@@ -518,13 +518,13 @@ var ROUTE_DATA = {
     title: 'Laboratorio de Bill',
     description: `<div style="display: flex; justify-content: center;"><img src="${GIF.bill}"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">Tienes una charla con Bill y vuelves al camino</p>`,
     optional: {
-      btnName: 'Visita el jardÃ­n de Bill',
+      btnName: 'Visita el jardín de Bill',
       area: 'jardin-bill',
     },
   },
 
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-  // Gimasio de Lt. Surge (Ciudad CarmÃ­n)
+  // Gimasio de Lt. Surge (Ciudad Carmín)
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
   'ruta-5': {
@@ -578,7 +578,7 @@ var ROUTE_DATA = {
     type: 'information',
     bg: BG.ssAnne,
     title: 'SS Anne',
-    description: `<div style="display: flex; justify-content: center;"><img src="${GIF.rojo}"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">Â¿Quien es ese tÃ­o?</p>`,
+    description: `<div style="display: flex; justify-content: center;"><img src="${GIF.rojo}"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">¿Quien es ese tío?</p>`,
   },
 
   'ss-anne': {
@@ -605,7 +605,7 @@ var ROUTE_DATA = {
     wild: [],
     welcome: {
       title: 'Ciudad Carmin',
-      subtitle: 'Gimnasio Pokemon de tipo ElÃ©ctrico',
+      subtitle: 'Gimnasio Pokemon de tipo Eléctrico',
       img: BG.ciudadCarmin,
     },
     gymLeader: 'Lt. Surge',
@@ -733,7 +733,7 @@ var ROUTE_DATA = {
     type: 'information',
     bg: BG.tunelRoca,
     title: 'Entrada del Tunel Roca',
-    description: `<div style="display: flex; justify-content: center;"><img src="${GIF.montanero}"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">Un montaÃ±ero bloquea la entrada al Tunel Roca</p>`,
+    description: `<div style="display: flex; justify-content: center;"><img src="${GIF.montanero}"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">Un montañero bloquea la entrada al Tunel Roca</p>`,
   },
 
   'entrada-tunel-roca': {
@@ -743,7 +743,7 @@ var ROUTE_DATA = {
     wild: [],
     trainer: [],
     specialTrainer: {
-      name: 'MontaÃ±ero Ninja David', img: ENTRENADORES.Montanero.img, pokemon: [
+      name: 'Montañero Ninja David', img: ENTRENADORES.Montanero.img, pokemon: [
         { name: POKEMON.slowpoke, minLv: 25, maxLv: 35, moveId: MOVES.water.special.surf },
         { name: POKEMON.psyduck, minLv: 22, maxLv: 31, moveId: MOVES.psychic.special.confusion },
         { name: POKEMON.drowzee, minLv: 25, maxLv: 35, moveId: MOVES.psychic.special.psychic },
@@ -849,8 +849,8 @@ var ROUTE_DATA = {
   'ultima-planta-rocket-info': {
     type: 'information',
     bg: BG.oficinaRocket,
-    title: 'Ãšltima planta Rocket',
-    description: `<div style="display: flex; justify-content: center;"><img src="${ENTRENADORES.Giovanni.gif}"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">Â¡PrepÃ¡rate para el combate!</p>`,
+    title: 'Última planta Rocket',
+    description: `<div style="display: flex; justify-content: center;"><img src="${ENTRENADORES.Giovanni.gif}"></div><br><p style="text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;font-family: var(--font-pixel);font-size: 8px;color: rgba(255, 255, 255, .85);line-height: 1.8;">¡Prepárate para el combate!</p>`,
   },
 
   'combate-giovanni': {
@@ -954,7 +954,7 @@ var ROUTE_DATA = {
   },
 
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-  // Torre PokÃ©mon
+  // Torre Pokémon
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
   'torre-pokemon': {
@@ -994,10 +994,10 @@ var ROUTE_DATA = {
   'ultima-planta-torre-pokemon': {
     type: 'information',
     bg: BG.torrePokemon,
-    title: 'Ãšltima planta',
-    description: `<div style="display:flex;justify-content:center"><img src="${GIF.gastly}"></div><br><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">Ya has terminado aquÃ­, pero hay una planta mas...</p>`,
+    title: 'Última planta',
+    description: `<div style="display:flex;justify-content:center"><img src="${GIF.gastly}"></div><br><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">Ya has terminado aquí, pero hay una planta mas...</p>`,
     optional: {
-      btnName: 'Subir a la Ãºltima planta',
+      btnName: 'Subir a la última planta',
       area: 'combate-victor',
     },
   },
@@ -1063,7 +1063,7 @@ var ROUTE_DATA = {
     type: 'information',
     bg: BG.ciudadFucsia,
     title: 'Ciudad Fucsia',
-    description: 'Puedes ir directo al gimnasio o tambiÃ©n podrÃ­as...',
+    description: 'Puedes ir directo al gimnasio o también podrías...',
     optional: {
       btnName: 'Explorar la Zona Safari',
       area: 'zona-safari',
@@ -1138,14 +1138,14 @@ var ROUTE_DATA = {
   },
 
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-  // Gimasio Sabrina (Ciudad AzafrÃ¡n)
+  // Gimasio Sabrina (Ciudad Azafrán)
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
   'info-ciudad-azafran': {
     type: 'information',
     bg: BG.ciudadAzafran,
-    title: 'Ciudad AzafrÃ¡n',
-    description: 'Llegas a Ciudad AzafrÃ¡n',
+    title: 'Ciudad Azafrán',
+    description: 'Llegas a Ciudad Azafrán',
     optional: {
       btnName: 'Silph S.A.',
       area: 'silph',
@@ -1156,7 +1156,7 @@ var ROUTE_DATA = {
     bg: BG.ciudadAzafran,
     combatBg: COMBAT_BG.interior,
     welcome: {
-      title: 'Ciudad AzafrÃ¡n',
+      title: 'Ciudad Azafrán',
       subtitle: 'Gimnasio Pokemon de tipo Psiquico',
       img: BG.ciudadAzafran,
     },
@@ -1304,7 +1304,7 @@ var ROUTE_DATA = {
     type: 'information',
     bg: BG.ciudadVerde,
     title: 'Ciudad Verde',
-    description: 'Te acercas al Ãºltimo gimnasio de la regiÃ³n.',
+    description: 'Te acercas al último gimnasio de la región.',
   },
 
   'ciudad-verde-gym': {
@@ -1387,7 +1387,7 @@ var ROUTE_DATA = {
     type: 'information',
     bg: BG.kantoLeague,
     title: 'ALTO MANDO',
-    description: 'Â¡Preparate, el reto te espera!',
+    description: '¡Preparate, el reto te espera!',
   },
 
   //LORELEI
@@ -1568,7 +1568,7 @@ var ROUTE_DATA = {
     type: 'information',
     bg: BG.kantoLeague,
     title: 'AZUL',
-    description: `<div style="display:flex;justify-content:center"><img src="${GIF.azul}"></div><br><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">CampeÃ³n de la Liga PokÃ©mon</p>`,
+    description: `<div style="display:flex;justify-content:center"><img src="${GIF.azul}"></div><br><p style="text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.85);line-height:1.8">Campeón de la Liga Pokémon</p>`,
   },
 
   'campeon-pokemon': {
@@ -1605,8 +1605,8 @@ var ROUTE_DATA = {
   'info-final-kanto': {
     type: 'information',
     bg: BG.final,
-    title: 'Â¡Enhorabuena!',
-    description: 'Has superado la aventura.<br>Â¡Gracias por jugar!',
+    title: '¡Enhorabuena!',
+    description: 'Has superado la aventura.<br>¡Gracias por jugar!',
   },
 
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -1683,8 +1683,8 @@ var ROUTE_DATA = {
   'info-final': {
     type: 'information',
     bg: BG.final,
-    title: 'Â¡Enhorabuena!',
-    description: 'Â¡Has superado el contenido extra!',
+    title: '¡Enhorabuena!',
+    description: '¡Has superado el contenido extra!',
   },
 
   // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -1719,13 +1719,13 @@ var ROUTE_DATA = {
     bg: BG.ruta25,
     combatBg: COMBAT_BG.hierbaAlta,
     trainerBg: COMBAT_BG.default,
-    title: 'JardÃ­n de Bill',
+    title: 'Jardín de Bill',
     rewardPokemon: [POKEMON.pinsir],
     rewardExtras: [ITEM.flame_orb, ITEM.safety_goggles],
     wild: [],
     trainer: [
       {
-        name: 'AdriÃ¡n el dominguero', img: ENTRENADORES.Campista.img, rate: 100, pokemon: [
+        name: 'Adrián el dominguero', img: ENTRENADORES.Campista.img, rate: 100, pokemon: [
           { name: POKEMON.mr_mime, minLv: 25, maxLv: 30, moveId: MOVES.psychic.special.psychic },
           { name: POKEMON.pinsir, minLv: 26, maxLv: 34, moveId: MOVES.bug.physical.megahorn, shiny: true },
         ]
@@ -1739,13 +1739,13 @@ var ROUTE_DATA = {
   'combate-victor': {
     bg: BG.torrePokemon,
     combatBg: COMBAT_BG.interior,
-    title: 'Ãšltima planta de la torre',
+    title: 'Última planta de la torre',
     wild: [],
     trainer: [],
     rewardPokemon: [POKEMON.kangaskhan],
     rewardExtras: [ITEM.lifeorb],
     specialTrainer: {
-      name: 'AtlÃ©tico VÃ­ctor', img: ENTRENADORES.ChicoGuay.img, pokemon: [
+      name: 'Atlético Víctor', img: ENTRENADORES.ChicoGuay.img, pokemon: [
         { name: POKEMON.marowak, minLv: 38, maxLv: 43, moveId: MOVES.normal.physical.extreme_speed },
         { name: POKEMON.pikachu, minLv: 38, maxLv: 43, moveId: MOVES.electric.special.thunder },
         { name: POKEMON.chansey, minLv: 38, maxLv: 43, moveId: MOVES.normal.special.hyper_voice },
@@ -1868,9 +1868,9 @@ var ROUTE_DATA = {
 
 };
 
-// â”€â”€ Pantalla final â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Pantalla final ────────────────────────────────────────
 var FINAL_SCREEN = {
-  title: 'Â¡HAS GANADO!',
+  title: '¡HAS GANADO!',
   subtitle: 'Enhorabuena, gracias por jugar!',
   bg: BG.final,
   btnText: 'NUEVA PARTIDA',
@@ -1898,30 +1898,30 @@ var KANTO_ROUTES = [
   { name: 'Ruta 6', area: 'ruta-6' },
   { name: 'Llega un barco', area: 'info-cgoob' },
   { name: 'SS Anne', area: 'ss-anne' },
-  { name: 'Ciudad CarmÃ­n', area: 'ciudad-carmin' },
+  { name: 'Ciudad Carmín', area: 'ciudad-carmin' },
   { name: 'Ruta 9', area: 'ruta-9' },
   { name: 'Ruta 10', area: 'ruta-10' },
-  { name: 'Ãrea del Tunel Roca', area: 'entrada-tunel-roca-info' },
+  { name: 'Área del Tunel Roca', area: 'entrada-tunel-roca-info' },
   { name: 'Tunel Roca (Entrada)', area: 'entrada-tunel-roca' },
   { name: 'Tunel Roca (Interior)', area: 'tunel-roca' },
   { name: 'Ciudad Azulona', area: 'ciudad-azulona' },
   { name: 'Guarida Rocket', area: 'guarida-rocket' },
   { name: 'Oficina Rocket', area: 'ultima-planta-rocket-info' },
-  { name: 'LÃ­der Rocket Giovanni', area: 'combate-giovanni' },
+  { name: 'Líder Rocket Giovanni', area: 'combate-giovanni' },
   { name: 'Gimnasio de Ciudad Azulona', area: 'ciudad-azulona-gym' },
-  { name: 'Torre PokÃ©mon', area: 'torre-pokemon' },
-  { name: 'Torre PokÃ©mon (Ãšltima planta)', area: 'ultima-planta-torre-pokemon' },
+  { name: 'Torre Pokémon', area: 'torre-pokemon' },
+  { name: 'Torre Pokémon (Última planta)', area: 'ultima-planta-torre-pokemon' },
   { name: 'Ruta 15', area: 'ruta-15' },
   { name: 'Ciudad Fucsia', area: 'ciudad-fucsia' },
   { name: 'Gimnasio de Ciudad Fucsia', area: 'ciudad-fucsia-gym' },
-  { name: 'Ciudad AzafrÃ¡n', area: 'info-ciudad-azafran' },
-  { name: 'Gimnasio de Ciudad AzafrÃ¡n', area: 'ciudad-azafran-gym' },
+  { name: 'Ciudad Azafrán', area: 'info-ciudad-azafran' },
+  { name: 'Gimnasio de Ciudad Azafrán', area: 'ciudad-azafran-gym' },
   { name: 'Ruta 20', area: 'ruta-20' },
-  { name: 'MansiÃ³n PokÃ©mon', area: 'mansion-pokemon' },
+  { name: 'Mansión Pokémon', area: 'mansion-pokemon' },
   { name: 'Gimnasio de Isla Canela', area: 'isla-canela-gym' },
   { name: 'Ciudad Verde', area: 'ciudad-verde-info-2' },
   { name: 'Gimnasio de Ciudad Verde', area: 'ciudad-verde-gym' },
-  { name: 'Â¡Enhorabuena!', area: 'mensaje-medallas' },
+  { name: '¡Enhorabuena!', area: 'mensaje-medallas' },
   { name: 'Calle Victoria', area: 'calle-victoria' },
 
   //ALTO MANDO
@@ -1940,9 +1940,9 @@ var KANTO_ROUTES = [
   { name: 'ALTO MANDO LANCE', area: 'combate-lance' },
 
   { name: 'AZUL', area: 'campeon-pokemon-info' },
-  { name: 'CAMPEÃ“N DE LA LIGA POKÃ‰MON', area: 'campeon-pokemon' },
+  { name: 'CAMPEÓN DE LA LIGA POKÉMON', area: 'campeon-pokemon' },
 
-  { name: 'CAMPEÃ“N DE LA LIGA', area: 'info-final-kanto' },
+  { name: 'CAMPEÓN DE LA LIGA', area: 'info-final-kanto' },
 
   //Extra
   { name: '???', area: 'espacio-raro' },
@@ -1951,7 +1951,7 @@ var KANTO_ROUTES = [
   { name: 'Final', area: 'info-final' },
 ];
 
-// â”€â”€ Helpers especÃ­ficos de Kanto â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Helpers específicos de Kanto ───────────────────────────────────────────
 
 function ObtenerSegundoInicial(playerPokemon) {
   if (playerPokemon === POKEMON.bulbasaur) return [POKEMON.charmander, POKEMON.squirtle];

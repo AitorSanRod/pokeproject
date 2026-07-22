@@ -239,7 +239,7 @@ var POKEMON_DB = {
     evolvesAt: 22, evolvesInto: 'golbat',
   },
   golbat: {
-    stage: 2, types: ['poison', 'flying'], damageClass: 'physical', evolvesInto: '',
+    stage: 2, types: ['poison', 'flying'], damageClass: 'physical', evolvesInto: 'crobat', evolvesAt: 35,
     moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'poison', damageClass: 'physical' }],
   },
 
@@ -539,7 +539,7 @@ var POKEMON_DB = {
 
   // ── Rock / Ground ─────────────────────────────────────────────────────────
   onix: {
-    stage: 2, types: ['rock', 'ground'], damageClass: 'physical', evolvesInto: '',
+    stage: 2, types: ['rock', 'ground'], damageClass: 'physical', evolvesInto: 'steelix', evolvesAt: 50,
     moveLines: [{ type: 'rock', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }],
   },
 

@@ -80,6 +80,10 @@ const BG = {
     faroCiudadOlivo: 'assets/bg/johto/faro-ciudad-olivo.png',
     ciudadOlivo: 'assets/bg/johto/ciudad-olivo.png',
     ciudadOrquidea: 'assets/bg/johto/ciudad-orquidea.png',
+    ruta42: 'assets/bg/johto/ruta-42.png',
+    ruta43: 'assets/bg/johto/ruta-43.png',
+    lagoFuria: 'assets/bg/johto/lago-furia.png',
+    puebloCaoba: 'assets/bg/johto/pueblo-caoba.png',
   }
 };
 
@@ -151,6 +155,7 @@ const TRAINER_IMG = {
   yasmina: 'assets/sprites/trainers/yasmina.png',
   anibal: 'assets/sprites/trainers/anibal.png',
   karateka: 'assets/sprites/trainers/karateka.png',
+  fredo: 'assets/sprites/trainers/fredo.png',
 };
 
 // ── Sprites y gifs misceláneos (escenas de historia) ─────────────────────────
@@ -237,4 +242,5 @@ const ENTRENADORES = {
   Yasmina: { name: 'Yasmina', img: TRAINER_IMG.yasmina },
   Anibal: { name: 'Aníbal', img: TRAINER_IMG.anibal },
   Karateka: { name: 'Karateka', img: TRAINER_IMG.karateka },
+  Fredo: { name: 'Fredo', img: TRAINER_IMG.fredo },
 };
