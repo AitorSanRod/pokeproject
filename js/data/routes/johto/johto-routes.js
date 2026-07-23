@@ -1025,32 +1025,25 @@ Object.assign(ROUTE_DATA, {
       leader: [
         {
           name: POKEMON.seel,
-          level: 58,
+          level: 55,
           heldItem: ITEM.eviolite,
           moveId: MOVES.ice.special.ice_beam,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'lightning-rod' },
         },
         {
           name: POKEMON.dewgong,
-          level: 57,
-          heldItem: ITEM.choice_specs,
-          moveId: [MOVES.ice.special.blizzard, MOVES.water.special.scald],
+          level: 55,
+          heldItem: ITEM.leftovers,
+          moveId: [MOVES.ice.special.icy_wind, MOVES.water.special.scald],
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'lightning-rod' },
         },
         {
           name: POKEMON.piloswine,
           level: 58,
           heldItem: ITEM.focus_sash,
-          moveId: MOVES.ice.special.blizzard,
+          moveId: [MOVES.ice.special.blizzard, MOVES.ground.special.earth_power],
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'rough-skin' },
-        },
-        {
-          name: POKEMON.sneasel,
-          level: 60,
-          heldItem: ITEM.choice_band,
-          moveId: MOVES.ice.physical.ice_fang,
-          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'speed-boost' },
-        },
+        }
       ]
     },
     paths: [

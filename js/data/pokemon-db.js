@@ -1218,7 +1218,7 @@ var POKEMON_DB = {
 
   // ── Bug / Fighting ────────────────────────────────────────────────────────────
   heracross: {
-    stage: 2, types: ['bug', 'fighting'], damageClass: 'physical',
+    stage: 2, types: ['bug', 'fighting'], damageClass: 'physical', ability: 'guts', 
     moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'fighting', damageClass: 'physical' }],
   },
 
