@@ -411,7 +411,7 @@ const CombatV2 = {
         effectiveMove = FORCEJEO;
         pokemon._cursedBodyTurns--;
         if (pokemon._cursedBodyTurns === 0) delete pokemon._cursedBodyTurns;
-      } else if (HELD_ITEMS?.[pokemon.heldItem]?.metronome) {
+      } else if (HELD_ITEMS?.[pokemon.heldItem]?.metronome || move.id === 'metronome') {
         effectiveMove = getMetronomeMove();
       }
     }

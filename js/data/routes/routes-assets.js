@@ -84,6 +84,9 @@ const BG = {
     ruta43: 'assets/bg/johto/ruta-43.png',
     lagoFuria: 'assets/bg/johto/lago-furia.png',
     puebloCaoba: 'assets/bg/johto/pueblo-caoba.png',
+    torreRadio: 'assets/bg/johto/torre-radio.png',
+    rutaHelada: 'assets/bg/johto/ruta-helada.png',
+    ciudadEndrino: 'assets/bg/johto/ciudad-endrino.png',
   }
 };
 
@@ -156,6 +159,7 @@ const TRAINER_IMG = {
   anibal: 'assets/sprites/trainers/anibal.png',
   karateka: 'assets/sprites/trainers/karateka.png',
   fredo: 'assets/sprites/trainers/fredo.png',
+  debora: 'assets/sprites/trainers/debora.png',
 };
 
 // ── Sprites y gifs misceláneos (escenas de historia) ─────────────────────────
@@ -243,4 +247,5 @@ const ENTRENADORES = {
   Anibal: { name: 'Aníbal', img: TRAINER_IMG.anibal },
   Karateka: { name: 'Karateka', img: TRAINER_IMG.karateka },
   Fredo: { name: 'Fredo', img: TRAINER_IMG.fredo },
+  Debora: { name: 'Debora', img: TRAINER_IMG.debora },
 };

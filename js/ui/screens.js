@@ -2897,8 +2897,8 @@ const Screens = {
     foe._ventaja      = false;
 
     // Metrónomo — sobreescribe el movimiento con uno aleatorio de toda la pool
-    const playerFinalMove = HELD_ITEMS[player.heldItem]?.metronome ? getMetronomeMove() : playerMove;
-    const foeFinalMove    = HELD_ITEMS[foe.heldItem]?.metronome    ? getMetronomeMove() : foeMove;
+    const playerFinalMove = (HELD_ITEMS[player.heldItem]?.metronome || playerMove.id === 'metronome') ? getMetronomeMove() : playerMove;
+    const foeFinalMove    = (HELD_ITEMS[foe.heldItem]?.metronome    || foeMove.id === 'metronome')    ? getMetronomeMove() : foeMove;
 
     // before-attack: se evalúa para AMBOS movimientos antes de decidir el orden
     // de turno, ya que efectos como 'priority' (ataca primero) deben poder

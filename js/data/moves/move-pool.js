@@ -64,6 +64,7 @@ var MOVE_POOL = {
       { id: 'tri-attack', name: 'Triataque', power: 80, pp: 10, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: ['burn-10', 'paralize-10', 'freeze-10', 'drain-10'], boss: true },
       { id: 'substitute', mt: true, name: 'Triataque', power: 80, pp: 10, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: ['burn-10', 'paralize-10', 'freeze-10'] },
       { id: 'milk-drink', name: 'Batido', power: 0, pp: 10, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: 'heal-50', boss: true },
+      { stage: 1, id: 'metronome', name: 'Metrónomo', power: 0, pp: 10, type: T.NORMAL, damageClass: DC.SPECIAL, effectId: 'versatil', pokemon: ['smeargle'] },
     ],
   },
   fire: {
@@ -112,6 +113,7 @@ var MOVE_POOL = {
       { stage: 1, id: 'thunder-punch', name: 'Puño Trueno', power: 60, pp: 15, type: T.ELECTRIC, damageClass: DC.PHYSICAL },
       { stage: 2, id: 'wild-charge', name: 'Voltiocruel', power: 90, pp: 15, type: T.ELECTRIC, damageClass: DC.PHYSICAL },
       { stage: 3, id: 'volt-tackle', name: 'Placaje Eléctrico', power: 150, pp: 15, type: T.ELECTRIC, damageClass: DC.PHYSICAL },
+      { stage: 4, mt: true, id: 'wild-charge', name: 'Voltio Cruel', power: 110, pp: 15, type: T.ELECTRIC, damageClass: DC.PHYSICAL },
     ],
     special: [
       { stage: 1, id: 'thunder-shock', name: 'Impactrueno', power: 35, pp: 30, type: T.ELECTRIC, damageClass: DC.SPECIAL },
@@ -254,6 +256,7 @@ var MOVE_POOL = {
       { stage: 1, id: 'feint-attack', name: 'Finta', power: 40, pp: 20, type: T.DARK, damageClass: DC.SPECIAL },
       { stage: 2, id: 'dark-pulse', name: 'Pulso Umbrio', power: 70, pp: 15, type: T.DARK, damageClass: DC.SPECIAL },
       { stage: 3, id: 'fiery-wrath', name: 'Furia Candente', power: 90, pp: 10, type: T.DARK, damageClass: DC.SPECIAL },
+      { stage: 1, mt: true,  id: 'snarl', name: 'Alarido', power: 95, pp: 10, type: T.DARK, damageClass: DC.SPECIAL },
     ],
   },
   steel: {

@@ -1,8 +1,8 @@
 const NOTES_DATA = {
   "title": "Johto",
   "lines": [
-    "Varios gimnasios de Johto disponibles.",
-    "Nuevas habilidades.",
+    "Todos los gimnasios de Johto disponibles.",
+    "Cambios en MTs y pokemon de ruta.",
     "Balance de entrenadores."
   ]
 };

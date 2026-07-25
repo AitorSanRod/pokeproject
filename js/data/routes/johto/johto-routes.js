@@ -55,7 +55,7 @@ Object.assign(ROUTE_DATA, {
     wild: [
       { name: POKEMON.sentret, rate: 40, minLv: 3, maxLv: 5, moveId: MOVES.normal.physical.tackle },
       { name: POKEMON.hoothoot, rate: 30, minLv: 3, maxLv: 5, moveId: MOVES.normal.physical.tackle },
-      { name: POKEMON.pidgey, rate: 10, minLv: 3, maxLv: 5, moveId: MOVES.flying.physical.peck },
+      { name: POKEMON.igglybuff, rate: 10, minLv: 3, maxLv: 5, moveId: MOVES.normal.physical.tackle },
       { name: POKEMON.hoppip, rate: 20, minLv: 3, maxLv: 5, moveId: MOVES.flying.physical.peck },
     ],
     trainer: [
@@ -120,7 +120,7 @@ Object.assign(ROUTE_DATA, {
     trainerBg: COMBAT_BG.default,
     rewardPokemon: [POKEMON.corsola],
     wild: [
-      { name: POKEMON.tentacool, rate: 25, minLv: 5, maxLv: 8, moveId: MOVES.poison.physical.poison_sting },
+      { name: POKEMON.chinchou, rate: 25, minLv: 5, maxLv: 8, moveId: [MOVES.electric.special.thunder_shock, MOVES.water.special.water_gun] },
       { name: POKEMON.staryu, rate: 25, minLv: 5, maxLv: 8, moveId: MOVES.water.special.bubble_beam },
       { name: POKEMON.corsola, rate: 50, minLv: 5, maxLv: 8, moveId: MOVES.water.special.bubble_beam },
     ],
@@ -489,11 +489,11 @@ Object.assign(ROUTE_DATA, {
     rewardPokemon: [],
     wild: [
       { name: POKEMON.growlithe, rate: 20, minLv: 32, maxLv: 37, moveId: MOVES.fire.physical.flame_wheel },
-      { name: POKEMON.stantler, rate: 10, minLv: 32, maxLv: 37, moveId: MOVES.normal.physical.extreme_speed },
+      { name: POKEMON.bellossom, rate: 10, minLv: 32, maxLv: 37, moveId: MOVES.grass.special.absorb },
       { name: POKEMON.ledyba, rate: 10, minLv: 32, maxLv: 37, moveId: MOVES.bug.physical.bug_bite },
       { name: POKEMON.vulpix, rate: 10, minLv: 32, maxLv: 37, moveId: MOVES.fire.special.flamethrower },
-      { name: POKEMON.nidoran_f, rate: 20, minLv: 32, maxLv: 37, moveId: MOVES.poison.physical.poison_sting },
-      { name: POKEMON.nidoran_m, rate: 20, minLv: 32, maxLv: 37, moveId: MOVES.poison.physical.poison_sting },
+      { name: POKEMON.togepi, rate: 20, minLv: 32, maxLv: 37, moveId: MOVES.fairy.special.moonblast },
+      { name: POKEMON.sunkern, rate: 20, minLv: 32, maxLv: 37, moveId: [MOVES.poison.physical.poison_sting, MOVES.grass.special.absorb] },
       { name: POKEMON.pichu, rate: 10, minLv: 32, maxLv: 37, moveId: MOVES.electric.special.thunderbolt },
     ],
     trainer: [
@@ -690,7 +690,7 @@ Object.assign(ROUTE_DATA, {
       { name: POKEMON.raticate, rate: 20, minLv: 38, maxLv: 41, moveId: MOVES.normal.physical.hyper_fang },
       { name: POKEMON.raticate, rate: 20, minLv: 38, maxLv: 41, moveId: MOVES.normal.physical.extreme_speed },
       { name: POKEMON.tauros, rate: 20, minLv: 38, maxLv: 41, moveId: MOVES.normal.physical.extreme_speed },
-      { name: POKEMON.miltank, rate: 20, minLv: 38, maxLv: 41, moveId: MOVES.normal.physical.take_down },
+      { name: POKEMON.miltank, rate: 20, minLv: 38, maxLv: 41, moveId: MOVES.normal.physical.hyper_fang },
       { name: POKEMON.noctowl, rate: 20, minLv: 38, maxLv: 41, moveId: MOVES.flying.special.hurricane },
     ],
     trainer: [],
@@ -849,7 +849,7 @@ Object.assign(ROUTE_DATA, {
     combatBg: COMBAT_BG.interior,
     trainerBg: COMBAT_BG.interior,
     gymLeader: 'Anibal',
-    gymType: 'lucha',
+    gymType: 'fighting',
     badgeId: 'storm-badge',
     gymLeaderImg: ENTRENADORES.Anibal.img,
     welcome: { title: 'Ciudad Orquidea', subtitle: 'Gimnasio de Tipo Lucha', img: BG.JOTHO.ciudadOrquidea },
@@ -934,43 +934,59 @@ Object.assign(ROUTE_DATA, {
     ]
   },
 
+  'ruta-42-info-espera': { //Opcional ruta 32 noche
+    type: 'information',
+    bg: BG.JOTHO.ruta42,
+    title: 'Esperar...',
+    description: '¿Quieres esperar a la noche?<br>Puede que aparezcan otros pokémon',
+    optional: {
+      btnName: 'Esperar',
+      area: 'ruta-42-noche',
+      condition: JOHTO_COND.hasAllBadges(),
+    },
+  },
+
   'ruta-43': {
     bg: BG.JOTHO.ruta43,
     combatBg: COMBAT_BG.hierbaAlta,
     trainerBg: COMBAT_BG.default,
     rewardPokemon: [],
-    wild: [],
+    wild: [
+      { name: POKEMON.wobbuffet, rate: 20, minLv: 50, maxLv: 56, moveId: MOVES.psychic.special.confusion },
+      { name: POKEMON.girafarig, rate: 20, minLv: 50, maxLv: 56, moveId: MOVES.psychic.special.psystrike },
+      { name: POKEMON.murkrow, rate: 20, minLv: 50, maxLv: 56, moveId: MOVES.dark.special.dark_pulse },
+      { name: POKEMON.umbreon, rate: 20, minLv: 50, maxLv: 56, moveId: [MOVES.dark.special.dark_pulse, MOVES.normal.physical.extreme_speed] },
+      { name: POKEMON.gligar, rate: 20, minLv: 50, maxLv: 56, moveId: [MOVES.poison.physical.poison_jab, MOVES.poison.physical.gunk_shot] },
+    ],
     trainer: [
       {
         name: ENTRENADORES.Rocket.name, img: ENTRENADORES.Rocket.img, rate: 25, pokemon: [
-          { name: POKEMON.golbat, level: 55, moveId: MOVES.poison.physical.poison_jab },
-          { name: POKEMON.crobat, level: 57, moveId: MOVES.flying.physical.wing_attack },
+          { name: POKEMON.golbat, level: 53, moveId: MOVES.poison.physical.poison_jab },
+          { name: POKEMON.crobat, level: 55, moveId: MOVES.flying.physical.wing_attack },
         ]
       },
       {
         name: ENTRENADORES.Rocket.name, img: ENTRENADORES.Rocket.img, rate: 25, pokemon: [
-          { name: POKEMON.wobbuffet, level: 60, moveId: MOVES.psychic.special.psystrike },
+          { name: POKEMON.wobbuffet, level: 58, moveId: MOVES.psychic.special.psystrike },
         ]
       },
       {
         name: ENTRENADORES.Rocket.name, img: ENTRENADORES.Rocket.img, rate: 25, pokemon: [
-          { name: POKEMON.golbat, level: 55, moveId: MOVES.poison.physical.poison_jab },
-          { name: POKEMON.crobat, level: 57, moveId: MOVES.flying.physical.wing_attack },
-          { name: POKEMON.arcanine, level: 57, moveId: MOVES.fire.physical.flare_blitz },
+          { name: POKEMON.golbat, level: 53, moveId: MOVES.poison.physical.poison_jab },
+          { name: POKEMON.crobat, level: 54, moveId: MOVES.flying.physical.wing_attack },
+          { name: POKEMON.arcanine, level: 54, moveId: MOVES.fire.physical.flare_blitz },
         ]
       },
       {
         name: ENTRENADORES.Rocket.name, img: ENTRENADORES.Rocket.img, rate: 25, pokemon: [
-          { name: POKEMON.ekans, level: 55, moveId: [MOVES.poison.physical.gunk_shot, MOVES.dark.physical.crunch] },
-          { name: POKEMON.ekans, level: 55, moveId: [MOVES.poison.physical.gunk_shot, MOVES.dark.physical.crunch] },
-          { name: POKEMON.arbok, level: 55, moveId: [MOVES.poison.physical.gunk_shot, MOVES.dark.physical.crunch] },
-          { name: POKEMON.arbok, level: 55, moveId: [MOVES.poison.physical.gunk_shot, MOVES.dark.physical.crunch] },
+          { name: POKEMON.ekans, level: 53, moveId: [MOVES.poison.physical.gunk_shot, MOVES.dark.physical.crunch] },
+          { name: POKEMON.ekans, level: 53, moveId: [MOVES.poison.physical.gunk_shot, MOVES.dark.physical.crunch] },
+          { name: POKEMON.arbok, level: 53, moveId: [MOVES.poison.physical.gunk_shot, MOVES.dark.physical.crunch] },
+          { name: POKEMON.arbok, level: 53, moveId: [MOVES.poison.physical.gunk_shot, MOVES.dark.physical.crunch] },
         ]
       },
     ],
-    paths: [
-      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }],
-    ]
+    pathLength: 6
   },
 
   //Lago Furia (Gyarados rojo)
@@ -993,7 +1009,7 @@ Object.assign(ROUTE_DATA, {
     combatBg: COMBAT_BG.interior,
     trainerBg: COMBAT_BG.interior,
     gymLeader: 'Fredo',
-    gymType: 'hielo',
+    gymType: 'ice',
     badgeId: 'glacier-badge',
     gymLeaderImg: ENTRENADORES.Fredo.img,
     welcome: { title: 'Pueblo Caoba', subtitle: 'Gimnasio de Tipo Hielo', img: BG.JOTHO.puebloCaoba },
@@ -1001,23 +1017,23 @@ Object.assign(ROUTE_DATA, {
     trainer: [
       {
         name: ENTRENADORES.DomingueroAgua.name, img: ENTRENADORES.DomingueroAgua.img, rate: 25, pokemon: [
-          { name: POKEMON.cloyster, level: 56, moveId: MOVES.ice.special.ice_beam },
-          { name: POKEMON.cloyster, level: 55, moveId: MOVES.water.special.scald },
+          { name: POKEMON.cloyster, level: 54, moveId: MOVES.ice.special.ice_beam },
+          { name: POKEMON.cloyster, level: 53, moveId: MOVES.water.special.scald },
         ]
       },
       {
         name: ENTRENADORES.DomingueroAgua.name, img: ENTRENADORES.DomingueroAgua.img, rate: 25, pokemon: [
-          { name: POKEMON.jynx, level: 58, moveId: MOVES.ice.special.blizzard },
+          { name: POKEMON.jynx, level: 56, moveId: MOVES.ice.special.blizzard },
         ]
       },
       {
         name: ENTRENADORES.DomingueroAgua.name, img: ENTRENADORES.DomingueroAgua.img, rate: 25, pokemon: [
-          { name: POKEMON.articuno, level: 57, moveId: MOVES.ice.special.blizzard },
+          { name: POKEMON.articuno, level: 54, moveId: MOVES.ice.special.blizzard },
         ]
       },
       {
         name: ENTRENADORES.DomingueroAgua.name, img: ENTRENADORES.DomingueroAgua.img, rate: 25, pokemon: [
-          { name: POKEMON.lapras, level: 57, moveId: MOVES.ice.special.ice_beam },
+          { name: POKEMON.lapras, level: 54, moveId: MOVES.ice.special.ice_beam },
         ]
       },
     ],
@@ -1049,6 +1065,211 @@ Object.assign(ROUTE_DATA, {
     paths: [
       [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }],
     ],
+  },
+
+  // ─────────────────────────────────────────────────────────────────────
+  // CIUDAD ENDRINO — Gimnasio de Debora (Dragón)
+  // ─────────────────────────────────────────────────────────────────────
+
+  'torre-radio': {
+    bg: BG.JOTHO.torreRadio,
+    combatBg: COMBAT_BG.interior,
+    trainerBg: COMBAT_BG.default,
+    rewardPokemon: [],
+    wild: [
+      { name: POKEMON.murkrow, rate: 20, minLv: 54, maxLv: 58, moveId: MOVES.dark.special.dark_pulse },
+      { name: POKEMON.yanma, rate: 20, minLv: 54, maxLv: 58, moveId: MOVES.bug.special.signal_beam },
+      { name: POKEMON.politoed, rate: 20, minLv: 54, maxLv: 58, moveId: MOVES.water.special.scald },
+      { name: POKEMON.crobat, rate: 20, minLv: 54, maxLv: 58, moveId: [MOVES.poison.physical.gunk_shot, MOVES.flying.physical.brave_bird] },
+      { name: POKEMON.espeon, rate: 20, minLv: 54, maxLv: 58, moveId: MOVES.fairy.special.sparkling_aria },
+    ],
+    trainer: [
+      {
+        name: ENTRENADORES.Rocket.name, img: ENTRENADORES.Rocket.img, rate: 25, pokemon: [
+          { name: POKEMON.golbat, level: 57, moveId: MOVES.poison.physical.poison_jab },
+          { name: POKEMON.crobat, level: 58, moveId: MOVES.flying.physical.wing_attack },
+          { name: POKEMON.mantine, level: 56, moveId: MOVES.water.special.surf },
+        ]
+      },
+      {
+        name: ENTRENADORES.Rocket.name, img: ENTRENADORES.Rocket.img, rate: 25, pokemon: [
+          { name: POKEMON.zapdos, level: 58, moveId: MOVES.electric.special.thunder },
+        ]
+      },
+      {
+        name: ENTRENADORES.Rocket.name, img: ENTRENADORES.Rocket.img, rate: 25, pokemon: [
+          { name: POKEMON.delibird, level: 57, moveId: MOVES.ice.special.ice_beam },
+          { name: POKEMON.donphan, level: 57, moveId: MOVES.ground.physical.earthquake },
+          { name: POKEMON.houndoom, level: 59, moveId: MOVES.fire.physical.flare_blitz },
+        ]
+      },
+      {
+        name: ENTRENADORES.Rocket.name, img: ENTRENADORES.Rocket.img, rate: 25, pokemon: [
+          { name: POKEMON.skarmory, level: 55, moveId: MOVES.steel.physical.iron_head },
+          { name: POKEMON.kingdra, level: 55, moveId: MOVES.dragon.physical.outrage },
+          { name: POKEMON.heracross, level: 55, moveId: MOVES.fighting.physical.karate_chop },
+          { name: POKEMON.qwilfish, level: 55, moveId: [MOVES.poison.physical.gunk_shot, MOVES.water.special.surf] },
+        ]
+      },
+    ],
+    specialTrainer: {
+      name: ENTRENADORES.Plata.name, img: ENTRENADORES.Plata.img, pokemon: [
+        {
+          name: POKEMON.sneasel, level: 60,
+          heldItem: ITEM.choice_scarf,
+          moveId: MOVES.ice.physical.icicle_crash,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'speed-boost' },
+        },
+        {
+          name: POKEMON.magneton, level: 60,
+          heldItem: ITEM.lifeorb,
+          moveId: MOVES.electric.special.thunder,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'static' },
+        },
+        {
+          name: POKEMON.haunter, level: 60,
+          heldItem: ITEM.eviolite,
+          moveId: MOVES.ghost.special.shadow_ball,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'levitate' },
+        },
+        {
+          name: POKEMON.golbat, level: 60,
+          heldItem: ITEM.leftovers,
+          moveId: MOVES.poison.physical.gunk_shot,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'levitate' },
+        },
+        {
+          name: 'RIVAL_STARTER_3',
+          heldItem: ITEM.assault_vest,
+          level: 60,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
+        },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Special }],
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Special }],
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Special }],
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Special }],
+    ],
+  },
+
+  'ruta-helada': {
+    bg: BG.JOTHO.rutaHelada,
+    combatBg: COMBAT_BG.cueva,
+    trainerBg: COMBAT_BG.cueva,
+    rewardPokemon: [POKEMON.tyrogue, POKEMON.hitmontop],
+    wild: [
+      { name: POKEMON.swinub, rate: 20, minLv: 57, maxLv: 61, moveId: MOVES.ice.special.ice_beam },
+      { name: POKEMON.delibird, rate: 10, minLv: 57, maxLv: 61, moveId: MOVES.ice.physical.ice_punch },
+      { name: POKEMON.smoochum, rate: 20, minLv: 57, maxLv: 61, moveId: MOVES.ice.special.powder_snow },
+      { name: POKEMON.elekid, rate: 20, minLv: 57, maxLv: 61, moveId: MOVES.electric.physical.volt_tackle },
+      { name: POKEMON.magby, rate: 20, minLv: 57, maxLv: 61, moveId: MOVES.fire.physical.fire_fang },
+      { name: POKEMON.sneasel, rate: 10, minLv: 57, maxLv: 61, moveId: MOVES.ice.physical.icicle_crash },
+    ],
+    trainer: [
+      {
+        name: ENTRENADORES.ChicaGuay.name, img: ENTRENADORES.ChicaGuay.img, rate: 25, pokemon: [
+          { name: POKEMON.tyrogue, level: 62, moveId: MOVES.fighting.physical.karate_chop },
+          { name: POKEMON.hitmontop, level: 62, moveId: MOVES.fighting.physical.karate_chop },
+        ]
+      },
+      {
+        name: ENTRENADORES.ChicaGuay.name, img: ENTRENADORES.ChicaGuay.img, rate: 25, pokemon: [
+          { name: POKEMON.octillery, level: 62, moveId: MOVES.water.special.surf },
+        ]
+      },
+      {
+        name: ENTRENADORES.ChicaGuay.name, img: ENTRENADORES.ChicaGuay.img, rate: 25, pokemon: [
+          { name: POKEMON.slowking, level: 62, moveId: [MOVES.water.special.surf, MOVES.psychic.special.confusion] },
+          { name: POKEMON.espeon, level: 62, moveId: MOVES.fairy.special.moonblast },
+          { name: POKEMON.umbreon, level: 62, moveId: MOVES.dark.special.dark_pulse },
+        ]
+      },
+      {
+        name: ENTRENADORES.ChicaGuay.name, img: ENTRENADORES.ChicaGuay.img, rate: 25, pokemon: [
+          { name: POKEMON.tyranitar, level: 64, moveId: [MOVES.rock.physical.stone_edge, MOVES.dark.physical.wicked_blow] },
+        ]
+      },
+    ],
+    pathLength: 5
+  },
+
+  'ciudad-endrino': {
+    bg: BG.JOTHO.ciudadEndrino,
+    combatBg: COMBAT_BG.interior,
+    trainerBg: COMBAT_BG.interior,
+    gymLeader: 'Debora',
+    gymType: 'dragon',
+    badgeId: 'rising-badge',
+    gymLeaderImg: ENTRENADORES.Debora.img,
+    welcome: { title: 'Ciudad Endrino', subtitle: 'Gimnasio de Tipo Dragón', img: BG.JOTHO.ciudadEndrino },
+    wild: [],
+    trainer: [
+      {
+        name: ENTRENADORES.Pokemaniaco.name, img: ENTRENADORES.Pokemaniaco.img, rate: 25, pokemon: [
+          { name: POKEMON.gyarados, level: 65, moveId: MOVES.dark.physical.crunch },
+          { name: POKEMON.charizard, level: 65, moveId: MOVES.fire.special.fire_blast },
+        ]
+      },
+      {
+        name: ENTRENADORES.Pokemaniaco.name, img: ENTRENADORES.Pokemaniaco.img, rate: 25, pokemon: [
+          { name: POKEMON.aerodactyl, level: 65, moveId: MOVES.rock.physical.rock_slide },
+        ]
+      },
+      {
+        name: ENTRENADORES.Pokemaniaco.name, img: ENTRENADORES.Pokemaniaco.img, rate: 25, pokemon: [
+          { name: POKEMON.kingdra, level: 65, moveId: MOVES.dragon.physical.dragon_tail },
+        ]
+      },
+      {
+        name: ENTRENADORES.Pokemaniaco.name, img: ENTRENADORES.Pokemaniaco.img, rate: 25, pokemon: [
+          { name: POKEMON.lapras, level: 65, moveId: MOVES.ice.special.ice_beam },
+        ]
+      },
+    ],
+    gym: {
+      leader: [
+        {
+          name: POKEMON.gyarados,
+          level: 65,
+          heldItem: ITEM.mystic_water,
+          moveId: MOVES.water.physical.crabhammer,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'drizzle' },
+        },
+        {
+          name: POKEMON.dragonair,
+          level: 65,
+          heldItem: ITEM.mystic_water,
+          moveId: MOVES.dragon.physical.dragon_tail,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'intimidate' },
+        },
+        {
+          name: POKEMON.dragonair,
+          level: 65,
+          heldItem: ITEM.mystic_water,
+          moveId: MOVES.water.physical.wave_crash,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'rough-skin' },
+        },
+        {
+          name: POKEMON.kingdra,
+          level: 67,
+          heldItem: ITEM.mystic_water,
+          moveId: [MOVES.water.physical.wave_crash, MOVES.dragon.physical.outrage],
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'prisa-acuatica' },
+        },
+      ]
+    },
+    paths: [
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Lider }],
+    ],
+  },
+
+  'mensaje-medallas-johto': {
+    type: 'information',
+    bg: BG.kantoLeague,
+    title: 'ENHORABUENA',
+    description: 'Has conseguido todas las medallas de Johto.',
   },
 
   // ─────────────────────────────────────────────────────────────────────
@@ -1130,7 +1351,7 @@ Object.assign(ROUTE_DATA, {
     wild: [
       { name: POKEMON.mareep, rate: 25, minLv: 17, maxLv: 19, moveId: [MOVES.electric.special.thunderbolt, MOVES.normal.physical.tackle] },
       { name: POKEMON.hoppip, rate: 25, minLv: 17, maxLv: 19, moveId: [MOVES.grass.special.absorb, MOVES.fairy.special.disarming_voice] },
-      { name: POKEMON.bellsprout, rate: 25, minLv: 17, maxLv: 19, moveId: [MOVES.grass.special.absorb, MOVES.poison.special.poison_powder] },
+      { name: POKEMON.dunsparce, rate: 25, minLv: 17, maxLv: 19, moveId: MOVES.ground.physical.bulldoze },
       { name: POKEMON.qwilfish, rate: 25, minLv: 17, maxLv: 19, moveId: MOVES.poison.physical.poison_sting },],
     trainer: [],
     paths: [
@@ -1154,6 +1375,23 @@ Object.assign(ROUTE_DATA, {
     ],
   },
 
+  'ruta-42-noche': {
+    bg: BG.JOTHO.ruta42,
+    combatBg: COMBAT_BG.hierbaAlta,
+    trainerBg: COMBAT_BG.default,
+    rewardPokemon: [POKEMON.qwilfish],
+    title: 'Ruta 42 (Noche)',
+    wild: [
+      { name: POKEMON.blissey, rate: 25, minLv: 56, maxLv: 60, moveId: MOVES.normal.special.hyper_voice },
+      { name: POKEMON.larvitar, rate: 25, minLv: 56, maxLv: 60, moveId: [MOVES.rock.physical.rock_slide, MOVES.dark.physical.crunch] },
+      { name: POKEMON.stantler, rate: 25, minLv: 56, maxLv: 60, moveId: MOVES.normal.physical.extreme_speed },
+      { name: POKEMON.slugma, rate: 25, minLv: 56, maxLv: 60, moveId: MOVES.fire.special.flamethrower },],
+    trainer: [],
+    paths: [
+      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
+    ],
+  },
+
   // ─────────────────────────────────────────────────────────────────────
   // EXTRAS
   // ─────────────────────────────────────────────────────────────────────
@@ -1168,25 +1406,25 @@ Object.assign(ROUTE_DATA, {
     specialTrainer: {
       name: ENTRENADORES.Rojo.name, img: ENTRENADORES.Rojo.img, pokemon: [
         {
-          name: POKEMON.charizard, level: 65,
+          name: POKEMON.charizard, level: 80,
           heldItem: ITEM.choice_scarf,
           moveId: MOVES.fire.special.fire_blast,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'blaze' },
         },
         {
-          name: POKEMON.jolteon, level: 65,
+          name: POKEMON.jolteon, level: 80,
           heldItem: ITEM.lifeorb,
           moveId: MOVES.electric.special.thunderbolt,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'static' },
         },
         {
-          name: POKEMON.porygon2, level: 65,
+          name: POKEMON.porygon2, level: 80,
           heldItem: ITEM.eviolite,
           moveId: MOVES.normal.special.tri_attack,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'download' },
         },
         {
-          name: POKEMON.venusaur, level: 65,
+          name: POKEMON.venusaur, level: 80,
           heldItem: ITEM.leftovers,
           moveId: MOVES.grass.special.giga_drain,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'cloud-nine' },
@@ -1207,7 +1445,7 @@ Object.assign(ROUTE_DATA, {
     specialTrainer: {
       name: ENTRENADORES.Mewtwo.name, img: ENTRENADORES.Mewtwo.img, pokemon: [
         {
-          name: POKEMON.mewtwo, minLv: 60, maxLv: 75, moveId: [MOVES.psychic.special.trick, MOVES.fairy.special.moonblast, MOVES.grass.special.giga_drain],
+          name: POKEMON.mewtwo, minLv: 70, maxLv: 80, moveId: [MOVES.psychic.special.trick, MOVES.fairy.special.moonblast, MOVES.grass.special.giga_drain],
           heldItem: ITEM.choice_specs, img: POKEMON_SPRITE.armoredMewtwo,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         }
@@ -1259,12 +1497,16 @@ var JOHTO_ROUTES = [
   { name: 'Faro Ciudad Olivo (Piso 2)', area: 'faro-ciudad-olivo-2' },
   { name: 'Faro Ciudad Olivo (Piso 3)', area: 'faro-ciudad-olivo-3' },
   { name: 'Ciudad Olivo', area: 'ciudad-olivo' },
-  { name: 'Ciudad Olivo', area: 'ciudad-orquidea' },
+  { name: 'Ciudad Orquídea', area: 'ciudad-orquidea' },
   { name: 'Ruta 42', area: 'ruta-42' },
+  { name: 'Ruta 42 (Noche)', area: 'ruta-42-info-espera' },
   { name: 'Lago Furia', area: 'lago-furia' },
   { name: 'Pueblo Caoba', area: 'pueblo-caoba' },
-
-  //Hasta aquí todo esta funcionando.
+  { name: 'Ruta 43', area: 'ruta-43' },
+  { name: 'Torre Radio', area: 'torre-radio' },
+  { name: 'Ruta Helada', area: 'ruta-helada' },
+  { name: 'Ciudad Endrino', area: 'ciudad-endrino' },
+  { name: '¡Enhorabuena!', area: 'mensaje-medallas-johto' },
 
 
   // Ejemplo — ruta solo disponible tras conseguir la Medalla Ascua:

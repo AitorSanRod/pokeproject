@@ -647,7 +647,8 @@ function getMetronomeMove() {
   for (const typeData of Object.values(MOVE_POOL)) {
     allMoves.push(...typeData.physical, ...typeData.special);
   }
-  const move = allMoves[Math.floor(Math.random() * allMoves.length)];
+  const pool = allMoves.filter(m => m.id !== 'metronome');
+  const move = pool[Math.floor(Math.random() * pool.length)];
   console.log(`[METRONOMO] Movimiento elegido: ${move.name}`);
   return { ...move, maxPp: move.pp };
 }
