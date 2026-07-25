@@ -1246,7 +1246,7 @@ var POKEMON_DB = {
   },
   smeargle: {
     stage: 2, types: ['normal'], damageClass: 'physical',
-    moveLines: [{ type: 'normal', damageClass: 'physical' }],
+    moveLines: [{ type: 'normal', damageClass: 'physical' }, { type: 'normal', damageClass: 'special' }],
   },
   miltank: {
     stage: 2, types: ['normal'], damageClass: 'physical',
