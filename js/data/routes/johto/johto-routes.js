@@ -403,7 +403,7 @@ Object.assign(ROUTE_DATA, {
   'encinar': {
     bg: BG.JOTHO.encinar,
     combatBg: COMBAT_BG.hierbaAlta,
-    trainerBg: COMBAT_BG.noche,
+    trainerBg: COMBAT_BG.hierbaAlta,
     rewardPokemon: [],
     wild: [
       { name: POKEMON.drowzee, rate: 25, minLv: 24, maxLv: 28, moveId: MOVES.psychic.special.confusion },
@@ -559,6 +559,18 @@ Object.assign(ROUTE_DATA, {
     paths: [
       [{ type: PATH_TYPE.Special }],
     ],
+  },
+
+  'torre-quemada-noche-espera': {
+    type: 'information',
+    bg: BG.JOTHO.torreQuemada,
+    title: 'Esperar...',
+    description: 'Por la noche aparecen pokemon muy fuertes, preparate.',
+    optional: {
+      btnName: 'Esperar',
+      area: 'torre-quemada-noche',
+      condition: JOHTO_COND.hasAllBadges()
+    },
   },
 
   'ciudad-iris': {
@@ -1140,9 +1152,9 @@ Object.assign(ROUTE_DATA, {
         },
         {
           name: 'RIVAL_STARTER_3',
-          heldItem: ITEM.assault_vest,
+          heldItem: ITEM.mystic_water,
           level: 60,
-          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 } },
+          overrides: { evs: { hp: 20, def: 20, spd: 20, spe: 20, atk: 32 } },
         },
       ]
     },
@@ -1489,7 +1501,7 @@ var JOHTO_ROUTES = [
   { name: 'Árbol Extraño', area: 'ruta-36-arbol' },
   { name: 'Ruta 36', area: 'ruta-36' },
   { name: 'Torre Quemada', area: 'torre-quemada' },
-  { name: 'Torre Quemada', area: 'torre-quemada-noche', condition: JOHTO_COND.hasAllBadges() },
+  { name: 'Torre Quemada', area: 'torre-quemada-noche-espera', condition: JOHTO_COND.hasAllBadges() },
   { name: 'Ciudad Iris', area: 'ciudad-iris' },
   { name: 'Ruta 38', area: 'ruta-38' },
   { name: 'Ruta 39', area: 'ruta-39' },
