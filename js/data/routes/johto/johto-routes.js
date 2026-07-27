@@ -28,6 +28,10 @@
 // Cambia a false para mostrar Johto como "PRONTO" sin eliminar el código.
 var JOHTO_ENABLED = true;
 
+// Cambia a true para desbloquear la opción de elegir cualquier Pokémon de la
+// Pokédex como inicial en la aventura de Johto.
+var JOHTO_CUSTOM_STARTER_ENABLED = false;
+
 // Condiciones reutilizables — uso: condition: JOHTO_COND.hasBadge('zephyr-badge')
 const JOHTO_ALL_BADGES = [
   'zephyr-badge', 'hive-badge', 'plain-badge', 'fog-badge',
@@ -1127,42 +1131,42 @@ Object.assign(ROUTE_DATA, {
     specialTrainer: {
       name: ENTRENADORES.Plata.name, img: ENTRENADORES.Plata.img, pokemon: [
         {
-          name: POKEMON.sneasel, level: 60,
+          name: POKEMON.sneasel, level: 58,
           heldItem: ITEM.choice_scarf,
           moveId: MOVES.ice.physical.icicle_crash,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'speed-boost' },
         },
         {
-          name: POKEMON.magneton, level: 60,
+          name: POKEMON.magneton, level: 58,
           heldItem: ITEM.lifeorb,
           moveId: MOVES.electric.special.thunder,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'static' },
         },
         {
-          name: POKEMON.haunter, level: 60,
+          name: POKEMON.haunter, level: 58,
           heldItem: ITEM.eviolite,
           moveId: MOVES.ghost.special.shadow_ball,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'levitate' },
         },
         {
-          name: POKEMON.golbat, level: 60,
+          name: POKEMON.golbat, level: 58,
           heldItem: ITEM.leftovers,
           moveId: MOVES.poison.physical.gunk_shot,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'levitate' },
         },
         {
           name: 'RIVAL_STARTER_3',
-          heldItem: ITEM.mystic_water,
-          level: 60,
+          heldItem: ITEM.safety_goggles,
+          level: 59,
           overrides: { evs: { hp: 20, def: 20, spd: 20, spe: 20, atk: 32 } },
         },
       ]
     },
     paths: [
-      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Special }],
-      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Special }],
-      [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Special }],
-      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Special }],
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Special }],
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Special }],
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Special }],
+      [{ type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Trainer }, { type: PATH_TYPE.Special }],
     ],
   },
 

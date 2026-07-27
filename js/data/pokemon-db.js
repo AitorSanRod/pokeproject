@@ -1428,6 +1428,740 @@ var POKEMON_DB = {
     stage: 3, types: ['psychic', 'grass'], damageClass: 'special',
     moveLines: [{ type: 'psychic', damageClass: 'special' }, { type: 'grass', damageClass: 'special' }],
   },
+
+  //══════════════════════════════════════════════════════════════════════════════
+  // GEN III — HOENN
+  //══════════════════════════════════════════════════════════════════════════════
+
+  // ── Starters ─────────────────────────────────────────────────────────────────
+  treecko: {
+    stage: 1, types: ['grass'], damageClass: 'physical',
+    moveLines: [{ type: 'grass', damageClass: 'physical' }],
+    evolvesAt: 16, evolvesInto: 'grovyle', ability: 'overgrow',
+  },
+  grovyle: {
+    stage: 2, types: ['grass'], damageClass: 'physical',
+    moveLines: [{ type: 'grass', damageClass: 'physical' }],
+    evolvesAt: 36, evolvesInto: 'sceptile', ability: 'overgrow',
+  },
+  sceptile: {
+    stage: 3, types: ['grass'], damageClass: 'special',
+    moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'grass', damageClass: 'physical' }],
+    ability: 'overgrow',
+  },
+  torchic: {
+    stage: 1, types: ['fire'], damageClass: 'special',
+    moveLines: [{ type: 'fire', damageClass: 'special' }],
+    evolvesAt: 16, evolvesInto: 'combusken', ability: 'blaze',
+  },
+  combusken: {
+    stage: 2, types: ['fire', 'fighting'], damageClass: 'physical',
+    moveLines: [{ type: 'fire', damageClass: 'special' }, { type: 'fighting', damageClass: 'physical' }],
+    evolvesAt: 36, evolvesInto: 'blaziken', ability: 'blaze',
+  },
+  blaziken: {
+    stage: 3, types: ['fire', 'fighting'], damageClass: 'physical',
+    moveLines: [{ type: 'fire', damageClass: 'special' }, { type: 'fighting', damageClass: 'physical' }],
+    ability: 'speed-boost',
+  },
+  mudkip: {
+    stage: 1, types: ['water'], damageClass: 'physical',
+    moveLines: [{ type: 'water', damageClass: 'physical' }],
+    evolvesAt: 16, evolvesInto: 'marshtomp',
+  },
+  marshtomp: {
+    stage: 2, types: ['water', 'ground'], damageClass: 'physical',
+    moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }],
+    evolvesAt: 36, evolvesInto: 'swampert',
+  },
+  swampert: {
+    stage: 3, types: ['water', 'ground'], damageClass: 'physical',
+    moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }],
+  },
+
+  // ── Dark ─────────────────────────────────────────────────────────────────────
+  poochyena: {
+    stage: 1, types: ['dark'], damageClass: 'physical',
+    moveLines: [{ type: 'dark', damageClass: 'physical' }],
+    evolvesAt: 18, evolvesInto: 'mightyena',
+  },
+  mightyena: {
+    stage: 2, types: ['dark'], damageClass: 'physical',
+    moveLines: [{ type: 'dark', damageClass: 'physical' }],
+    ability: 'intimidate',
+  },
+
+  // ── Normal ────────────────────────────────────────────────────────────────────
+  zigzagoon: {
+    stage: 1, types: ['normal'], damageClass: 'physical',
+    moveLines: [{ type: 'normal', damageClass: 'physical' }],
+    evolvesAt: 20, evolvesInto: 'linoone',
+  },
+  linoone: {
+    stage: 2, types: ['normal'], damageClass: 'physical',
+    moveLines: [{ type: 'normal', damageClass: 'physical' }],
+    ability: 'guts',
+  },
+
+  // ── Bug ───────────────────────────────────────────────────────────────────────
+  wurmple: {
+    stage: 1, types: ['bug'], damageClass: 'physical',
+    moveLines: [{ type: 'bug', damageClass: 'physical' }],
+    evolvesAt: 7, evolvesInto: 'silcoon',
+  },
+  silcoon: {
+    stage: 2, types: ['bug'], damageClass: 'physical',
+    moveLines: [{ type: 'bug', damageClass: 'physical' }],
+    evolvesAt: 10, evolvesInto: 'beautifly',
+  },
+  beautifly: {
+    stage: 3, types: ['bug', 'flying'], damageClass: 'special',
+    moveLines: [{ type: 'bug', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }],
+  },
+  cascoon: {
+    stage: 2, types: ['bug'], damageClass: 'physical',
+    moveLines: [{ type: 'bug', damageClass: 'physical' }],
+    evolvesAt: 10, evolvesInto: 'dustox',
+  },
+  dustox: {
+    stage: 3, types: ['bug', 'poison'], damageClass: 'special',
+    moveLines: [{ type: 'bug', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }],
+  },
+
+  // ── Water / Grass ─────────────────────────────────────────────────────────────
+  lotad: {
+    stage: 1, types: ['water', 'grass'], damageClass: 'special',
+    moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'grass', damageClass: 'special' }],
+    evolvesAt: 14, evolvesInto: 'lombre',
+  },
+  lombre: {
+    stage: 2, types: ['water', 'grass'], damageClass: 'special',
+    moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'grass', damageClass: 'special' }],
+    evolvesAt: 35, evolvesInto: 'ludicolo',
+  },
+  ludicolo: {
+    stage: 3, types: ['water', 'grass'], damageClass: 'special',
+    moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'grass', damageClass: 'special' }],
+  },
+
+  // ── Grass / Dark ──────────────────────────────────────────────────────────────
+  seedot: {
+    stage: 1, types: ['grass'], damageClass: 'physical',
+    moveLines: [{ type: 'grass', damageClass: 'physical' }],
+    evolvesAt: 14, evolvesInto: 'nuzleaf',
+  },
+  nuzleaf: {
+    stage: 2, types: ['grass', 'dark'], damageClass: 'physical',
+    moveLines: [{ type: 'grass', damageClass: 'physical' }, { type: 'dark', damageClass: 'physical' }],
+    evolvesAt: 30, evolvesInto: 'shiftry',
+  },
+  shiftry: {
+    stage: 3, types: ['grass', 'dark'], damageClass: 'physical',
+    moveLines: [{ type: 'grass', damageClass: 'physical' }, { type: 'dark', damageClass: 'physical' }],
+  },
+
+  // ── Normal / Flying ───────────────────────────────────────────────────────────
+  taillow: {
+    stage: 1, types: ['normal', 'flying'], damageClass: 'physical',
+    moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }],
+    evolvesAt: 22, evolvesInto: 'swellow',
+  },
+  swellow: {
+    stage: 2, types: ['normal', 'flying'], damageClass: 'physical',
+    moveLines: [{ type: 'flying', damageClass: 'physical' }, { type: 'normal', damageClass: 'physical' }],
+    ability: 'guts',
+  },
+
+  // ── Water / Flying ────────────────────────────────────────────────────────────
+  wingull: {
+    stage: 1, types: ['water', 'flying'], damageClass: 'special',
+    moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }],
+    evolvesAt: 25, evolvesInto: 'pelipper',
+  },
+  pelipper: {
+    stage: 2, types: ['water', 'flying'], damageClass: 'special',
+    moveLines: [{ type: 'water', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }],
+    ability: 'drizzle',
+  },
+
+  // ── Psychic / Fairy ───────────────────────────────────────────────────────────
+  ralts: {
+    stage: 1, types: ['psychic', 'fairy'], damageClass: 'special',
+    moveLines: [{ type: 'psychic', damageClass: 'special' }, { type: 'fairy', damageClass: 'special' }],
+    evolvesAt: 20, evolvesInto: 'kirlia',
+  },
+  kirlia: {
+    stage: 2, types: ['psychic', 'fairy'], damageClass: 'special',
+    moveLines: [{ type: 'psychic', damageClass: 'special' }, { type: 'fairy', damageClass: 'special' }],
+    evolvesAt: 30, evolvesInto: 'gardevoir',
+  },
+  gardevoir: {
+    stage: 3, types: ['psychic', 'fairy'], damageClass: 'special',
+    moveLines: [{ type: 'psychic', damageClass: 'special' }, { type: 'fairy', damageClass: 'special' }],
+  },
+
+  // ── Bug / Water → Bug / Flying ────────────────────────────────────────────────
+  surskit: {
+    stage: 1, types: ['bug', 'water'], damageClass: 'special',
+    moveLines: [{ type: 'bug', damageClass: 'special' }, { type: 'water', damageClass: 'special' }],
+    evolvesAt: 22, evolvesInto: 'masquerain',
+  },
+  masquerain: {
+    stage: 2, types: ['bug', 'flying'], damageClass: 'special',
+    moveLines: [{ type: 'bug', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }],
+  },
+
+  // ── Grass → Grass / Fighting ──────────────────────────────────────────────────
+  shroomish: {
+    stage: 1, types: ['grass'], damageClass: 'special',
+    moveLines: [{ type: 'grass', damageClass: 'special' }],
+    evolvesAt: 23, evolvesInto: 'breloom',
+  },
+  breloom: {
+    stage: 2, types: ['grass', 'fighting'], damageClass: 'physical',
+    moveLines: [{ type: 'grass', damageClass: 'physical' }, { type: 'fighting', damageClass: 'physical' }],
+  },
+
+  // ── Normal ────────────────────────────────────────────────────────────────────
+  slakoth: {
+    stage: 1, types: ['normal'], damageClass: 'physical',
+    moveLines: [{ type: 'normal', damageClass: 'physical' }],
+    evolvesAt: 18, evolvesInto: 'vigoroth',
+  },
+  vigoroth: {
+    stage: 2, types: ['normal'], damageClass: 'physical',
+    moveLines: [{ type: 'normal', damageClass: 'physical' }],
+    evolvesAt: 36, evolvesInto: 'slaking', ability: 'vital-spirit',
+  },
+  slaking: {
+    stage: 3, types: ['normal'], damageClass: 'physical',
+    moveLines: [{ type: 'normal', damageClass: 'physical' }],
+  },
+
+  // ── Bug / Ground ──────────────────────────────────────────────────────────────
+  nincada: {
+    stage: 1, types: ['bug', 'ground'], damageClass: 'physical',
+    moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }],
+    evolvesAt: 20, evolvesInto: 'ninjask',
+  },
+  ninjask: {
+    stage: 2, types: ['bug', 'flying'], damageClass: 'physical',
+    moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'flying', damageClass: 'physical' }],
+    ability: 'speed-boost',
+  },
+  shedinja: {
+    stage: 2, types: ['bug', 'ghost'], damageClass: 'physical',
+    moveLines: [{ type: 'bug', damageClass: 'physical' }, { type: 'ghost', damageClass: 'special' }],
+  },
+
+  // ── Normal ────────────────────────────────────────────────────────────────────
+  whismur: {
+    stage: 1, types: ['normal'], damageClass: 'special',
+    moveLines: [{ type: 'normal', damageClass: 'special' }],
+    evolvesAt: 20, evolvesInto: 'loudred',
+  },
+  loudred: {
+    stage: 2, types: ['normal'], damageClass: 'special',
+    moveLines: [{ type: 'normal', damageClass: 'special' }],
+    evolvesAt: 40, evolvesInto: 'exploud',
+  },
+  exploud: {
+    stage: 3, types: ['normal'], damageClass: 'special',
+    moveLines: [{ type: 'normal', damageClass: 'special' }],
+  },
+
+  // ── Fighting ─────────────────────────────────────────────────────────────────
+  makuhita: {
+    stage: 1, types: ['fighting'], damageClass: 'physical',
+    moveLines: [{ type: 'fighting', damageClass: 'physical' }],
+    evolvesAt: 24, evolvesInto: 'hariyama',
+  },
+  hariyama: {
+    stage: 2, types: ['fighting'], damageClass: 'physical',
+    moveLines: [{ type: 'fighting', damageClass: 'physical' }],
+    ability: 'guts',
+  },
+
+  // ── Normal / Fairy (bebé) ─────────────────────────────────────────────────────
+  azurill: {
+    stage: 1, types: ['normal', 'fairy'], damageClass: 'special',
+    moveLines: [{ type: 'normal', damageClass: 'special' }, { type: 'fairy', damageClass: 'special' }],
+    evolvesAt: 12, evolvesInto: 'marill',
+  },
+
+  // ── Rock ─────────────────────────────────────────────────────────────────────
+  nosepass: {
+    stage: 1, types: ['rock'], damageClass: 'physical',
+    moveLines: [{ type: 'rock', damageClass: 'physical' }],
+  },
+
+  // ── Normal ────────────────────────────────────────────────────────────────────
+  skitty: {
+    stage: 1, types: ['normal'], damageClass: 'physical',
+    moveLines: [{ type: 'normal', damageClass: 'physical' }],
+    evolvesAt: 20, evolvesInto: 'delcatty',
+  },
+  delcatty: {
+    stage: 2, types: ['normal'], damageClass: 'physical',
+    moveLines: [{ type: 'normal', damageClass: 'physical' }],
+  },
+
+  // ── Dark / Ghost ──────────────────────────────────────────────────────────────
+  sableye: {
+    stage: 2, types: ['dark', 'ghost'], damageClass: 'physical',
+    moveLines: [{ type: 'dark', damageClass: 'physical' }, { type: 'ghost', damageClass: 'special' }],
+  },
+
+  // ── Steel / Fairy ─────────────────────────────────────────────────────────────
+  mawile: {
+    stage: 2, types: ['steel', 'fairy'], damageClass: 'physical',
+    moveLines: [{ type: 'steel', damageClass: 'physical' }, { type: 'fairy', damageClass: 'special' }],
+    ability: 'intimidate',
+  },
+
+  // ── Steel / Rock ──────────────────────────────────────────────────────────────
+  aron: {
+    stage: 1, types: ['steel', 'rock'], damageClass: 'physical',
+    moveLines: [{ type: 'steel', damageClass: 'physical' }, { type: 'rock', damageClass: 'physical' }],
+    evolvesAt: 32, evolvesInto: 'lairon',
+  },
+  lairon: {
+    stage: 2, types: ['steel', 'rock'], damageClass: 'physical',
+    moveLines: [{ type: 'steel', damageClass: 'physical' }, { type: 'rock', damageClass: 'physical' }],
+    evolvesAt: 42, evolvesInto: 'aggron',
+  },
+  aggron: {
+    stage: 3, types: ['steel', 'rock'], damageClass: 'physical',
+    moveLines: [{ type: 'steel', damageClass: 'physical' }, { type: 'rock', damageClass: 'physical' }],
+  },
+
+  // ── Fighting / Psychic ────────────────────────────────────────────────────────
+  meditite: {
+    stage: 1, types: ['fighting', 'psychic'], damageClass: 'physical',
+    moveLines: [{ type: 'fighting', damageClass: 'physical' }, { type: 'psychic', damageClass: 'special' }],
+    evolvesAt: 37, evolvesInto: 'medicham',
+  },
+  medicham: {
+    stage: 2, types: ['fighting', 'psychic'], damageClass: 'physical',
+    moveLines: [{ type: 'fighting', damageClass: 'physical' }, { type: 'psychic', damageClass: 'special' }],
+    ability: 'huge-power',
+  },
+
+  // ── Electric ─────────────────────────────────────────────────────────────────
+  electrike: {
+    stage: 1, types: ['electric'], damageClass: 'special',
+    moveLines: [{ type: 'electric', damageClass: 'special' }],
+    evolvesAt: 26, evolvesInto: 'manectric',
+  },
+  manectric: {
+    stage: 2, types: ['electric'], damageClass: 'special',
+    moveLines: [{ type: 'electric', damageClass: 'special' }],
+    ability: 'lightning-rod',
+  },
+  plusle: {
+    stage: 2, types: ['electric'], damageClass: 'special',
+    moveLines: [{ type: 'electric', damageClass: 'special' }],
+  },
+  minun: {
+    stage: 2, types: ['electric'], damageClass: 'special',
+    moveLines: [{ type: 'electric', damageClass: 'special' }],
+  },
+
+  // ── Bug ───────────────────────────────────────────────────────────────────────
+  volbeat: {
+    stage: 2, types: ['bug'], damageClass: 'physical',
+    moveLines: [{ type: 'bug', damageClass: 'physical' }],
+  },
+  illumise: {
+    stage: 2, types: ['bug'], damageClass: 'special',
+    moveLines: [{ type: 'bug', damageClass: 'special' }],
+  },
+
+  // ── Grass / Poison ────────────────────────────────────────────────────────────
+  roselia: {
+    stage: 2, types: ['grass', 'poison'], damageClass: 'special',
+    moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'poison', damageClass: 'special' }],
+  },
+
+  // ── Poison ────────────────────────────────────────────────────────────────────
+  gulpin: {
+    stage: 1, types: ['poison'], damageClass: 'special',
+    moveLines: [{ type: 'poison', damageClass: 'special' }],
+    evolvesAt: 26, evolvesInto: 'swalot',
+  },
+  swalot: {
+    stage: 2, types: ['poison'], damageClass: 'special',
+    moveLines: [{ type: 'poison', damageClass: 'special' }],
+  },
+
+  // ── Water / Dark ──────────────────────────────────────────────────────────────
+  carvanha: {
+    stage: 1, types: ['water', 'dark'], damageClass: 'physical',
+    moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'dark', damageClass: 'physical' }],
+    evolvesAt: 30, evolvesInto: 'sharpedo',
+  },
+  sharpedo: {
+    stage: 2, types: ['water', 'dark'], damageClass: 'physical',
+    moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'dark', damageClass: 'physical' }],
+    ability: 'rough-skin',
+  },
+
+  // ── Water ─────────────────────────────────────────────────────────────────────
+  wailmer: {
+    stage: 1, types: ['water'], damageClass: 'special',
+    moveLines: [{ type: 'water', damageClass: 'special' }],
+    evolvesAt: 40, evolvesInto: 'wailord',
+  },
+  wailord: {
+    stage: 2, types: ['water'], damageClass: 'special',
+    moveLines: [{ type: 'water', damageClass: 'special' }],
+  },
+
+  // ── Fire / Ground ─────────────────────────────────────────────────────────────
+  numel: {
+    stage: 1, types: ['fire', 'ground'], damageClass: 'special',
+    moveLines: [{ type: 'fire', damageClass: 'special' }, { type: 'ground', damageClass: 'physical' }],
+    evolvesAt: 33, evolvesInto: 'camerupt',
+  },
+  camerupt: {
+    stage: 2, types: ['fire', 'ground'], damageClass: 'special',
+    moveLines: [{ type: 'fire', damageClass: 'special' }, { type: 'ground', damageClass: 'physical' }],
+  },
+
+  // ── Fire ─────────────────────────────────────────────────────────────────────
+  torkoal: {
+    stage: 2, types: ['fire'], damageClass: 'special',
+    moveLines: [{ type: 'fire', damageClass: 'special' }],
+    ability: 'drought',
+  },
+
+  // ── Psychic ───────────────────────────────────────────────────────────────────
+  spoink: {
+    stage: 1, types: ['psychic'], damageClass: 'special',
+    moveLines: [{ type: 'psychic', damageClass: 'special' }],
+    evolvesAt: 32, evolvesInto: 'grumpig',
+  },
+  grumpig: {
+    stage: 2, types: ['psychic'], damageClass: 'special',
+    moveLines: [{ type: 'psychic', damageClass: 'special' }],
+  },
+
+  // ── Normal ────────────────────────────────────────────────────────────────────
+  spinda: {
+    stage: 2, types: ['normal'], damageClass: 'physical',
+    moveLines: [{ type: 'normal', damageClass: 'physical' }],
+  },
+
+  // ── Ground / Dragon ───────────────────────────────────────────────────────────
+  trapinch: {
+    stage: 1, types: ['ground'], damageClass: 'physical',
+    moveLines: [{ type: 'ground', damageClass: 'physical' }],
+    evolvesAt: 35, evolvesInto: 'vibrava',
+  },
+  vibrava: {
+    stage: 2, types: ['ground', 'dragon'], damageClass: 'physical',
+    moveLines: [{ type: 'ground', damageClass: 'physical' }, { type: 'dragon', damageClass: 'physical' }],
+    evolvesAt: 45, evolvesInto: 'flygon',
+  },
+  flygon: {
+    stage: 3, types: ['ground', 'dragon'], damageClass: 'physical',
+    moveLines: [{ type: 'ground', damageClass: 'physical' }, { type: 'dragon', damageClass: 'physical' }],
+  },
+
+  // ── Grass / Dark ──────────────────────────────────────────────────────────────
+  cacnea: {
+    stage: 1, types: ['grass', 'dark'], damageClass: 'physical',
+    moveLines: [{ type: 'grass', damageClass: 'physical' }, { type: 'dark', damageClass: 'physical' }],
+    evolvesAt: 32, evolvesInto: 'cacturne',
+  },
+  cacturne: {
+    stage: 2, types: ['grass', 'dark'], damageClass: 'physical',
+    moveLines: [{ type: 'grass', damageClass: 'physical' }, { type: 'dark', damageClass: 'physical' }],
+  },
+
+  // ── Normal / Flying → Dragon / Flying ─────────────────────────────────────────
+  swablu: {
+    stage: 1, types: ['normal', 'flying'], damageClass: 'special',
+    moveLines: [{ type: 'flying', damageClass: 'special' }, { type: 'normal', damageClass: 'special' }],
+    evolvesAt: 35, evolvesInto: 'altaria',
+  },
+  altaria: {
+    stage: 2, types: ['dragon', 'flying'], damageClass: 'special',
+    moveLines: [{ type: 'dragon', damageClass: 'special' }, { type: 'flying', damageClass: 'special' }],
+  },
+
+  // ── Normal ────────────────────────────────────────────────────────────────────
+  zangoose: {
+    stage: 2, types: ['normal'], damageClass: 'physical',
+    moveLines: [{ type: 'normal', damageClass: 'physical' }],
+  },
+
+  // ── Poison ────────────────────────────────────────────────────────────────────
+  seviper: {
+    stage: 2, types: ['poison'], damageClass: 'physical',
+    moveLines: [{ type: 'poison', damageClass: 'physical' }],
+    ability: 'poison-point',
+  },
+
+  // ── Rock / Psychic ────────────────────────────────────────────────────────────
+  lunatone: {
+    stage: 2, types: ['rock', 'psychic'], damageClass: 'special',
+    moveLines: [{ type: 'rock', damageClass: 'physical' }, { type: 'psychic', damageClass: 'special' }],
+  },
+  solrock: {
+    stage: 2, types: ['rock', 'psychic'], damageClass: 'physical',
+    moveLines: [{ type: 'rock', damageClass: 'physical' }, { type: 'psychic', damageClass: 'physical' }],
+  },
+
+  // ── Water / Ground ────────────────────────────────────────────────────────────
+  barboach: {
+    stage: 1, types: ['water', 'ground'], damageClass: 'physical',
+    moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }],
+    evolvesAt: 30, evolvesInto: 'whiscash',
+  },
+  whiscash: {
+    stage: 2, types: ['water', 'ground'], damageClass: 'physical',
+    moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'ground', damageClass: 'physical' }],
+  },
+
+  // ── Water / Dark ──────────────────────────────────────────────────────────────
+  corphish: {
+    stage: 1, types: ['water'], damageClass: 'physical',
+    moveLines: [{ type: 'water', damageClass: 'physical' }],
+    evolvesAt: 30, evolvesInto: 'crawdaunt',
+  },
+  crawdaunt: {
+    stage: 2, types: ['water', 'dark'], damageClass: 'physical',
+    moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'dark', damageClass: 'physical' }],
+  },
+
+  // ── Ground / Psychic ─────────────────────────────────────────────────────────
+  baltoy: {
+    stage: 1, types: ['ground', 'psychic'], damageClass: 'special',
+    moveLines: [{ type: 'ground', damageClass: 'physical' }, { type: 'psychic', damageClass: 'special' }],
+    evolvesAt: 36, evolvesInto: 'claydol',
+  },
+  claydol: {
+    stage: 2, types: ['ground', 'psychic'], damageClass: 'special',
+    moveLines: [{ type: 'ground', damageClass: 'physical' }, { type: 'psychic', damageClass: 'special' }],
+    ability: 'levitate',
+  },
+
+  // ── Rock / Grass (fósil) ──────────────────────────────────────────────────────
+  lileep: {
+    stage: 1, types: ['rock', 'grass'], damageClass: 'special',
+    moveLines: [{ type: 'rock', damageClass: 'physical' }, { type: 'grass', damageClass: 'special' }],
+    evolvesAt: 40, evolvesInto: 'cradily',
+  },
+  cradily: {
+    stage: 2, types: ['rock', 'grass'], damageClass: 'special',
+    moveLines: [{ type: 'rock', damageClass: 'physical' }, { type: 'grass', damageClass: 'special' }],
+  },
+
+  // ── Rock / Bug (fósil) ────────────────────────────────────────────────────────
+  anorith: {
+    stage: 1, types: ['rock', 'bug'], damageClass: 'physical',
+    moveLines: [{ type: 'rock', damageClass: 'physical' }, { type: 'bug', damageClass: 'physical' }],
+    evolvesAt: 40, evolvesInto: 'armaldo',
+  },
+  armaldo: {
+    stage: 2, types: ['rock', 'bug'], damageClass: 'physical',
+    moveLines: [{ type: 'rock', damageClass: 'physical' }, { type: 'bug', damageClass: 'physical' }],
+  },
+
+  // ── Water ─────────────────────────────────────────────────────────────────────
+  feebas: {
+    stage: 1, types: ['water'], damageClass: 'special',
+    moveLines: [{ type: 'water', damageClass: 'special' }],
+    evolvesAt: 30, evolvesInto: 'milotic',
+  },
+  milotic: {
+    stage: 2, types: ['water'], damageClass: 'special',
+    moveLines: [{ type: 'water', damageClass: 'special' }],
+  },
+  castform: {
+    stage: 2, types: ['normal'], damageClass: 'special',
+    moveLines: [{ type: 'normal', damageClass: 'special' }],
+  },
+
+  // ── Normal ────────────────────────────────────────────────────────────────────
+  kecleon: {
+    stage: 2, types: ['normal'], damageClass: 'physical',
+    moveLines: [{ type: 'normal', damageClass: 'physical' }],
+  },
+
+  // ── Ghost ─────────────────────────────────────────────────────────────────────
+  shuppet: {
+    stage: 1, types: ['ghost'], damageClass: 'special',
+    moveLines: [{ type: 'ghost', damageClass: 'special' }],
+    evolvesAt: 37, evolvesInto: 'banette',
+  },
+  banette: {
+    stage: 2, types: ['ghost'], damageClass: 'special',
+    moveLines: [{ type: 'ghost', damageClass: 'special' }],
+    ability: 'cursed-body',
+  },
+  duskull: {
+    stage: 1, types: ['ghost'], damageClass: 'special',
+    moveLines: [{ type: 'ghost', damageClass: 'special' }],
+    evolvesAt: 37, evolvesInto: 'dusclops',
+  },
+  dusclops: {
+    stage: 2, types: ['ghost'], damageClass: 'special',
+    moveLines: [{ type: 'ghost', damageClass: 'special' }],
+  },
+
+  // ── Grass / Flying ────────────────────────────────────────────────────────────
+  tropius: {
+    stage: 2, types: ['grass', 'flying'], damageClass: 'special',
+    moveLines: [{ type: 'grass', damageClass: 'special' }, { type: 'flying', damageClass: 'physical' }],
+  },
+
+  // ── Psychic ───────────────────────────────────────────────────────────────────
+  chimecho: {
+    stage: 2, types: ['psychic'], damageClass: 'special',
+    moveLines: [{ type: 'psychic', damageClass: 'special' }],
+  },
+
+  // ── Dark ─────────────────────────────────────────────────────────────────────
+  absol: {
+    stage: 2, types: ['dark'], damageClass: 'physical',
+    moveLines: [{ type: 'dark', damageClass: 'physical' }],
+  },
+
+  // ── Psychic (bebé) ────────────────────────────────────────────────────────────
+  wynaut: {
+    stage: 1, types: ['psychic'], damageClass: 'special',
+    moveLines: [{ type: 'psychic', damageClass: 'special' }],
+    evolvesAt: 15, evolvesInto: 'wobbuffet',
+  },
+
+  // ── Ice ───────────────────────────────────────────────────────────────────────
+  snorunt: {
+    stage: 1, types: ['ice'], damageClass: 'special',
+    moveLines: [{ type: 'ice', damageClass: 'special' }],
+    evolvesAt: 42, evolvesInto: 'glalie',
+  },
+  glalie: {
+    stage: 2, types: ['ice'], damageClass: 'special',
+    moveLines: [{ type: 'ice', damageClass: 'special' }],
+  },
+
+  // ── Ice / Water ───────────────────────────────────────────────────────────────
+  spheal: {
+    stage: 1, types: ['ice', 'water'], damageClass: 'special',
+    moveLines: [{ type: 'ice', damageClass: 'special' }, { type: 'water', damageClass: 'special' }],
+    evolvesAt: 32, evolvesInto: 'sealeo',
+  },
+  sealeo: {
+    stage: 2, types: ['ice', 'water'], damageClass: 'special',
+    moveLines: [{ type: 'ice', damageClass: 'special' }, { type: 'water', damageClass: 'special' }],
+    evolvesAt: 44, evolvesInto: 'walrein',
+  },
+  walrein: {
+    stage: 3, types: ['ice', 'water'], damageClass: 'special',
+    moveLines: [{ type: 'ice', damageClass: 'special' }, { type: 'water', damageClass: 'special' }],
+  },
+
+  // ── Water ─────────────────────────────────────────────────────────────────────
+  clamperl: {
+    stage: 1, types: ['water'], damageClass: 'special',
+    moveLines: [{ type: 'water', damageClass: 'special' }],
+    evolvesAt: 30, evolvesInto: 'huntail',
+  },
+  huntail: {
+    stage: 2, types: ['water'], damageClass: 'physical',
+    moveLines: [{ type: 'water', damageClass: 'physical' }],
+  },
+  gorebyss: {
+    stage: 2, types: ['water'], damageClass: 'special',
+    moveLines: [{ type: 'water', damageClass: 'special' }],
+  },
+  relicanth: {
+    stage: 2, types: ['water', 'rock'], damageClass: 'physical',
+    moveLines: [{ type: 'water', damageClass: 'physical' }, { type: 'rock', damageClass: 'physical' }],
+  },
+  luvdisc: {
+    stage: 2, types: ['water'], damageClass: 'special',
+    moveLines: [{ type: 'water', damageClass: 'special' }],
+  },
+
+  // ── Dragon / Flying ───────────────────────────────────────────────────────────
+  bagon: {
+    stage: 1, types: ['dragon'], damageClass: 'physical',
+    moveLines: [{ type: 'dragon', damageClass: 'physical' }],
+    evolvesAt: 30, evolvesInto: 'shelgon',
+  },
+  shelgon: {
+    stage: 2, types: ['dragon'], damageClass: 'physical',
+    moveLines: [{ type: 'dragon', damageClass: 'physical' }],
+    evolvesAt: 50, evolvesInto: 'salamence',
+  },
+  salamence: {
+    stage: 3, types: ['dragon', 'flying'], damageClass: 'physical',
+    moveLines: [{ type: 'dragon', damageClass: 'physical' }, { type: 'flying', damageClass: 'physical' }],
+    ability: 'intimidate',
+  },
+
+  // ── Steel / Psychic ───────────────────────────────────────────────────────────
+  beldum: {
+    stage: 1, types: ['steel', 'psychic'], damageClass: 'physical',
+    moveLines: [{ type: 'steel', damageClass: 'physical' }],
+    evolvesAt: 20, evolvesInto: 'metang',
+  },
+  metang: {
+    stage: 2, types: ['steel', 'psychic'], damageClass: 'physical',
+    moveLines: [{ type: 'steel', damageClass: 'physical' }, { type: 'psychic', damageClass: 'special' }],
+    evolvesAt: 45, evolvesInto: 'metagross',
+  },
+  metagross: {
+    stage: 3, types: ['steel', 'psychic'], damageClass: 'physical',
+    moveLines: [{ type: 'steel', damageClass: 'physical' }, { type: 'psychic', damageClass: 'special' }],
+  },
+
+  // ── Legendarios ───────────────────────────────────────────────────────────────
+  regirock: {
+    stage: 3, types: ['rock'], damageClass: 'physical',
+    moveLines: [{ type: 'rock', damageClass: 'physical' }],
+  },
+  regice: {
+    stage: 3, types: ['ice'], damageClass: 'special',
+    moveLines: [{ type: 'ice', damageClass: 'special' }],
+  },
+  registeel: {
+    stage: 3, types: ['steel'], damageClass: 'physical',
+    moveLines: [{ type: 'steel', damageClass: 'physical' }],
+  },
+  latias: {
+    stage: 3, types: ['dragon', 'psychic'], damageClass: 'special',
+    moveLines: [{ type: 'dragon', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }],
+  },
+  latios: {
+    stage: 3, types: ['dragon', 'psychic'], damageClass: 'special',
+    moveLines: [{ type: 'dragon', damageClass: 'special' }, { type: 'psychic', damageClass: 'special' }],
+  },
+  kyogre: {
+    stage: 3, types: ['water'], damageClass: 'special',
+    moveLines: [{ type: 'water', damageClass: 'special' }],
+    ability: 'drizzle',
+  },
+  groudon: {
+    stage: 3, types: ['ground'], damageClass: 'physical',
+    moveLines: [{ type: 'ground', damageClass: 'physical' }],
+    ability: 'drought',
+  },
+  rayquaza: {
+    stage: 3, types: ['dragon', 'flying'], damageClass: 'physical',
+    moveLines: [{ type: 'dragon', damageClass: 'physical' }, { type: 'flying', damageClass: 'physical' }],
+  },
+  jirachi: {
+    stage: 3, types: ['steel', 'psychic'], damageClass: 'special',
+    moveLines: [{ type: 'steel', damageClass: 'physical' }, { type: 'psychic', damageClass: 'special' }],
+  },
+  deoxys: {
+    stage: 3, types: ['psychic'], damageClass: 'special',
+    moveLines: [{ type: 'psychic', damageClass: 'special' }],
+  },
 };
 
 // ── POKEMON_LIST / POKEMON ────────────────────────────────────────────────────
@@ -1746,6 +2480,143 @@ var POKEMON_LIST = {
   lugia: 'lugia',
   ho_oh: 'ho-oh',
   celebi: 'celebi',
+
+  // ── Gen III — Hoenn ───────────────────────────────────────────────────────────
+  treecko: 'treecko',
+  grovyle: 'grovyle',
+  sceptile: 'sceptile',
+  torchic: 'torchic',
+  combusken: 'combusken',
+  blaziken: 'blaziken',
+  mudkip: 'mudkip',
+  marshtomp: 'marshtomp',
+  swampert: 'swampert',
+  poochyena: 'poochyena',
+  mightyena: 'mightyena',
+  zigzagoon: 'zigzagoon',
+  linoone: 'linoone',
+  wurmple: 'wurmple',
+  silcoon: 'silcoon',
+  beautifly: 'beautifly',
+  cascoon: 'cascoon',
+  dustox: 'dustox',
+  lotad: 'lotad',
+  lombre: 'lombre',
+  ludicolo: 'ludicolo',
+  seedot: 'seedot',
+  nuzleaf: 'nuzleaf',
+  shiftry: 'shiftry',
+  taillow: 'taillow',
+  swellow: 'swellow',
+  wingull: 'wingull',
+  pelipper: 'pelipper',
+  ralts: 'ralts',
+  kirlia: 'kirlia',
+  gardevoir: 'gardevoir',
+  surskit: 'surskit',
+  masquerain: 'masquerain',
+  shroomish: 'shroomish',
+  breloom: 'breloom',
+  slakoth: 'slakoth',
+  vigoroth: 'vigoroth',
+  slaking: 'slaking',
+  nincada: 'nincada',
+  ninjask: 'ninjask',
+  shedinja: 'shedinja',
+  whismur: 'whismur',
+  loudred: 'loudred',
+  exploud: 'exploud',
+  makuhita: 'makuhita',
+  hariyama: 'hariyama',
+  azurill: 'azurill',
+  nosepass: 'nosepass',
+  skitty: 'skitty',
+  delcatty: 'delcatty',
+  sableye: 'sableye',
+  mawile: 'mawile',
+  aron: 'aron',
+  lairon: 'lairon',
+  aggron: 'aggron',
+  meditite: 'meditite',
+  medicham: 'medicham',
+  electrike: 'electrike',
+  manectric: 'manectric',
+  plusle: 'plusle',
+  minun: 'minun',
+  volbeat: 'volbeat',
+  illumise: 'illumise',
+  roselia: 'roselia',
+  gulpin: 'gulpin',
+  swalot: 'swalot',
+  carvanha: 'carvanha',
+  sharpedo: 'sharpedo',
+  wailmer: 'wailmer',
+  wailord: 'wailord',
+  numel: 'numel',
+  camerupt: 'camerupt',
+  torkoal: 'torkoal',
+  spoink: 'spoink',
+  grumpig: 'grumpig',
+  spinda: 'spinda',
+  trapinch: 'trapinch',
+  vibrava: 'vibrava',
+  flygon: 'flygon',
+  cacnea: 'cacnea',
+  cacturne: 'cacturne',
+  swablu: 'swablu',
+  altaria: 'altaria',
+  zangoose: 'zangoose',
+  seviper: 'seviper',
+  lunatone: 'lunatone',
+  solrock: 'solrock',
+  barboach: 'barboach',
+  whiscash: 'whiscash',
+  corphish: 'corphish',
+  crawdaunt: 'crawdaunt',
+  baltoy: 'baltoy',
+  claydol: 'claydol',
+  lileep: 'lileep',
+  cradily: 'cradily',
+  anorith: 'anorith',
+  armaldo: 'armaldo',
+  feebas: 'feebas',
+  milotic: 'milotic',
+  castform: 'castform',
+  kecleon: 'kecleon',
+  shuppet: 'shuppet',
+  banette: 'banette',
+  duskull: 'duskull',
+  dusclops: 'dusclops',
+  tropius: 'tropius',
+  chimecho: 'chimecho',
+  absol: 'absol',
+  wynaut: 'wynaut',
+  snorunt: 'snorunt',
+  glalie: 'glalie',
+  spheal: 'spheal',
+  sealeo: 'sealeo',
+  walrein: 'walrein',
+  clamperl: 'clamperl',
+  huntail: 'huntail',
+  gorebyss: 'gorebyss',
+  relicanth: 'relicanth',
+  luvdisc: 'luvdisc',
+  bagon: 'bagon',
+  shelgon: 'shelgon',
+  salamence: 'salamence',
+  beldum: 'beldum',
+  metang: 'metang',
+  metagross: 'metagross',
+  regirock: 'regirock',
+  regice: 'regice',
+  registeel: 'registeel',
+  latias: 'latias',
+  latios: 'latios',
+  kyogre: 'kyogre',
+  groudon: 'groudon',
+  rayquaza: 'rayquaza',
+  jirachi: 'jirachi',
+  deoxys: 'deoxys',
 };
 
 // Alias global — disponible en routes.js, tms.js y cualquier archivo cargado después

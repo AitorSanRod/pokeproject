@@ -29,11 +29,29 @@ const SCREENS_CONFIG = {
       routesGlobal: 'JOHTO_ROUTES',
       badges: ['zephyr-badge','hive-badge','plain-badge','fog-badge','storm-badge','mineral-badge','glacier-badge','rising-badge'],
       available: typeof JOHTO_ENABLED !== 'undefined' && JOHTO_ENABLED,
-      customStarter: false,
+      customStarter: true,
+      customStarterReady: () => typeof JOHTO_CUSTOM_STARTER_ENABLED !== 'undefined' && JOHTO_CUSTOM_STARTER_ENABLED,
+      customStarterLockedMsg: 'Próximamente disponible',
       starters: [
         { name: 'chikorita', label: 'Chikorita' },
         { name: 'cyndaquil', label: 'Cyndaquil' },
         { name: 'totodile',  label: 'Totodile'  },
+      ],
+    },
+    {
+      id: 'hoenn',
+      gen: 'GEN III',
+      name: 'HOENN',
+      routesGlobal: 'HOENN_ROUTES',
+      badges: ['stone-badge','knuckle-badge','dynamo-badge','heat-badge','balance-badge','feather-badge','mind-badge','rain-badge'],
+      available: typeof HOENN_ENABLED !== 'undefined' && HOENN_ENABLED,
+      customStarter: true,
+      customStarterReady: () => typeof HOENN_CUSTOM_STARTER_ENABLED !== 'undefined' && HOENN_CUSTOM_STARTER_ENABLED,
+      customStarterLockedMsg: 'Próximamente disponible',
+      starters: [
+        { name: 'treecko', label: 'Treecko' },
+        { name: 'torchic', label: 'Torchic' },
+        { name: 'mudkip',  label: 'Mudkip'  },
       ],
     },
   ],
@@ -456,10 +474,11 @@ const Screens = {
               <div class="starter-card__arrow">→</div>
             </div>`).join('')}
           ${region.customStarter ? (() => {
-            const unlocked = !GameState.hardcoreMode && Object.values(Storage.getAllBadges()).some(b => b.length >= 8);
+            const customReady = region.customStarterReady ? region.customStarterReady() : true;
+            const unlocked = customReady && !GameState.hardcoreMode && Object.values(Storage.getAllBadges()).some(b => b.length >= 8);
             const lockedMsg = GameState.hardcoreMode
               ? 'No disponible en modo Hardcore'
-              : 'Consigue las 8 medallas con cualquier Pokémon';
+              : (region.customStarterLockedMsg ?? 'Consigue las 8 medallas con cualquier Pokémon');
             return `
               <div id="card-custom"
                 class="starter-card${unlocked ? '' : ' starter-card--locked'}"
@@ -551,7 +570,7 @@ const Screens = {
       }
     });
 
-    if (region.customStarter && !GameState.hardcoreMode && Object.values(Storage.getAllBadges()).some(b => b.length >= 8)) {
+    if (region.customStarter && (!region.customStarterReady || region.customStarterReady()) && !GameState.hardcoreMode && Object.values(Storage.getAllBadges()).some(b => b.length >= 8)) {
       document.getElementById('card-custom').addEventListener('click', () => {
         const anyShiny = Object.values(_loadedStarters).some(p => p.shiny);
         if (anyShiny) {
