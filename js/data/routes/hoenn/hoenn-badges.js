@@ -10,7 +10,7 @@
 
 Object.assign(BADGE_IMG, {
   stone:   'assets/sprites/badges/hoenn/medalla-piedra.png',
-  knuckle: 'assets/sprites/badges/hoenn/medalla-nudillo.png',
+  knuckle: 'assets/sprites/badges/hoenn/medalla-puno.png',
   dynamo:  'assets/sprites/badges/hoenn/medalla-dinamo.png',
   heat:    'assets/sprites/badges/hoenn/medalla-calor.png',
   balance: 'assets/sprites/badges/hoenn/medalla-equilibrio.png',
