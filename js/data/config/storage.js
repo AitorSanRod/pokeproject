@@ -276,6 +276,29 @@ var Storage = {
     return this.getCollectedItems()[itemId] === true;
   },
 
+  // ── MOs (Movimientos Ocultos) por región ─────────────────────────────────────
+  // Permanentes entre runs: una vez desbloqueada una MO queda disponible para
+  // siempre en esa región, igual que los logros. No se borran con clearRun().
+  // Estructura en localStorage: { hoenn: { surf: true, corte: true }, ... }
+
+  getHMs(regionId) {
+    return this._get('hms')?.[regionId] ?? {};
+  },
+
+  unlockHM(regionId, hmId) {
+    const all = this._get('hms') ?? {};
+    if (!all[regionId]) all[regionId] = {};
+    if (all[regionId][hmId]) return false; // ya obtenida
+    all[regionId][hmId] = true;
+    this._set('hms', all);
+    console.log(`[Storage] MO desbloqueada: ${regionId}/${hmId}`);
+    return true; // true = era nueva
+  },
+
+  hasHM(regionId, hmId) {
+    return this._get('hms')?.[regionId]?.[hmId] === true;
+  },
+
   // ── Frente Batalla ───────────────────────────────────────────────────────
   // Guarda el piso máximo alcanzado (1-20). No se reinicia con la run de aventura.
   // Se usará para desbloquear puntos de entrada en pisos 20, 40, 60, 80 y 100.

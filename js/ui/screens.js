@@ -1231,6 +1231,10 @@ const Screens = {
             console.log(`[GYM] +3 Poké Balls — total: ${GameState.balls}`);
             Screens._saveRun();
           }
+          if (data.rewardHM) {
+            const _rid = Screens._region?.id ?? 'hoenn';
+            Storage.unlockHM(_rid, data.rewardHM);
+          }
           GameState._pathRunning = false;
           if (GameState.hardcoreMode && Screens._purgeDefeatedPokemon()) {
             Screens.show(Screens.defeat); return;
@@ -1646,6 +1650,12 @@ const Screens = {
     const route = { area: GameState.currentArea, name: routeEntry?.name ?? data?.title ?? GameState.currentArea };
     const REWARD_BG = "url('assets/bg/price.png') center/cover no-repeat";
 
+    // ── MO automática ─────────────────────────────────────────────────────────
+    const _hmId     = data?.rewardHM ?? null;
+    const _hmMeta   = _hmId && typeof HOENN_HM_DATA !== 'undefined' ? HOENN_HM_DATA[_hmId] : null;
+    const _regionId = Screens._region?.id ?? 'hoenn';
+    const _hmIsNew  = _hmId ? Storage.unlockHM(_regionId, _hmId) : false;
+
     const maxLevel = Math.max(...GameState.team.map(p => p.level));
 
     // ── Helpers ───────────────────────────────────────────────────────────────
@@ -1826,6 +1836,16 @@ const Screens = {
           align-items:center;justify-content:center;gap:20px;padding:32px 24px;text-align:center;display:flex;flex-direction:column;">
           <span style="font-family:var(--font-pixel);font-size:8px;color:rgba(255,255,255,.7);letter-spacing:2px">COMPLETADA</span>
           <span style="font-family:var(--font-pixel);font-size:16px;color:var(--white);text-shadow:3px 3px 0 rgba(0,0,0,.3);line-height:1.6">${route.name.toUpperCase()}</span>
+          ${_hmId ? `
+          <div style="background:rgba(0,0,0,.45);border:2px solid ${_hmIsNew ? 'var(--yellow)' : 'rgba(255,255,255,.35)'};border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:12px;max-width:320px;width:100%">
+            <img src="assets/sprites/mts/tm-normal.png" style="width:40px;height:40px;image-rendering:pixelated;flex-shrink:0"
+              onerror="this.outerHTML='<span style=font-size:32px>📀</span>'">
+            <div style="text-align:left">
+              <div style="font-family:var(--font-pixel);font-size:7px;color:${_hmIsNew ? 'var(--yellow)' : 'rgba(255,255,255,.45)'};letter-spacing:1px;margin-bottom:3px">${_hmIsNew ? '¡MO OBTENIDA!' : 'MO YA OBTENIDA'}</div>
+              <div style="font-family:var(--font-pixel);font-size:9px;color:var(--white)">${_hmMeta?.name ?? _hmId.toUpperCase()}</div>
+              ${_hmMeta?.desc ? `<div style="font-family:var(--font-pixel);font-size:6px;color:rgba(255,255,255,.65);margin-top:3px;line-height:1.6">${_hmMeta.desc}</div>` : ''}
+            </div>
+          </div>` : ''}
           <span style="font-family:var(--font-pixel);font-size:8px;color:var(--yellow)">Elige una recompensa:</span>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:340px">
             ${prizes.map(p => `

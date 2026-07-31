@@ -1422,27 +1422,27 @@ Object.assign(ROUTE_DATA, {
     specialTrainer: {
       name: ENTRENADORES.Rojo.name, img: ENTRENADORES.Rojo.img, pokemon: [
         {
-          name: POKEMON.charizard, level: 80,
+          name: POKEMON.charizard, level: 85,
           heldItem: ITEM.choice_scarf,
           moveId: MOVES.fire.special.fire_blast,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'blaze' },
         },
         {
-          name: POKEMON.jolteon, level: 80,
+          name: POKEMON.hariyama, level: 85,
           heldItem: ITEM.lifeorb,
-          moveId: MOVES.electric.special.thunderbolt,
-          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'static' },
+          moveId: MOVES.fighting.physical.close_combat,
+          overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'guts' },
         },
         {
-          name: POKEMON.porygon2, level: 80,
+          name: POKEMON.porygon2, level: 85,
           heldItem: ITEM.eviolite,
           moveId: MOVES.normal.special.tri_attack,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'download' },
         },
         {
-          name: POKEMON.venusaur, level: 80,
+          name: POKEMON.swampert, level: 85,
           heldItem: ITEM.leftovers,
-          moveId: MOVES.grass.special.giga_drain,
+          moveId: [MOVES.water.physical.crabhammer, MOVES.ground.physical.earthquake],
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32 }, ability: 'cloud-nine' },
         },
       ]
@@ -1461,7 +1461,7 @@ Object.assign(ROUTE_DATA, {
     specialTrainer: {
       name: ENTRENADORES.Mewtwo.name, img: ENTRENADORES.Mewtwo.img, pokemon: [
         {
-          name: POKEMON.mewtwo, minLv: 70, maxLv: 80, moveId: [MOVES.psychic.special.trick, MOVES.fairy.special.moonblast, MOVES.grass.special.giga_drain],
+          name: POKEMON.mewtwo, minLv: 80, maxLv: 100, moveId: [MOVES.psychic.special.trick, MOVES.fairy.special.moonblast],
           heldItem: ITEM.choice_specs, img: POKEMON_SPRITE.armoredMewtwo,
           overrides: { evs: { hp: 32, def: 32, spd: 32, spe: 32, atk: 32, spa: 32 } },
         }
