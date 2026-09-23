@@ -48,6 +48,13 @@ function pickWildEncounter(wildTable) {
   return wildTable[wildTable.length - 1];
 }
 
+// Modo Aleatorio: devuelve un nombre al azar de entre todos los pokemon de
+// POKEMON_DB (actualmente Gen 1-3). Crece solo al añadir nuevas generaciones.
+function pickRandomPokemonName() {
+  const names = Object.keys(POKEMON_DB);
+  return names[Math.floor(Math.random() * names.length)];
+}
+
 function pickTrainer(trainerData) {
   if (!trainerData) return null;
   const pool = Array.isArray(trainerData) ? trainerData : [trainerData];

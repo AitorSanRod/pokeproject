@@ -15,6 +15,7 @@ const SCREENS_CONFIG = {
       routesGlobal: 'KANTO_ROUTES',
       badges: ['boulder-badge','cascade-badge','thunder-badge','rainbow-badge','soul-badge','marsh-badge','volcano-badge','earth-badge'],
       available: true,
+      randomAvailable: true,  // región jugable en modo Aleatorio
       customStarter: true,
       starters: [
         { name: 'bulbasaur',  label: 'Bulbasaur' },
@@ -63,6 +64,15 @@ const SCREENS_CONFIG = {
   // usar el starter elegido (y sus evoluciones). No se pueden capturar ni recibir
   // pokemon como premio de ruta.
   HARDCORE_ENABLED: true,
+  // ── Modo Aleatorio ────────────────────────────────────────────────────────
+  // Cambia a false para ocultar el modo en la pantalla de selección de modos.
+  // Reglas: los iniciales, los pokemon salvajes, los de entrenadores/líderes y
+  // los de premio de ruta se eligen al azar entre todo POKEMON_DB.
+  // Solo las regiones con randomAvailable: true se pueden jugar en este modo.
+  RANDOM_ENABLED: true,
+  RANDOM_STARTER_COUNT: 3,
+  // Iniciales de relleno cuando hay menos capturados que RANDOM_STARTER_COUNT
+  RANDOM_STARTER_FALLBACK: ['pikachu', 'eevee', 'togepi'],
 };
 
 if (SCREENS_CONFIG.DEV_POKEDEX) {
@@ -135,6 +145,7 @@ const Screens = {
       items:              GameState.items,
       balls:              GameState.balls ?? 5,
       hardcoreMode:       GameState.hardcoreMode,
+      randomMode:         GameState.randomMode,
     });
   },
 
@@ -324,7 +335,8 @@ const Screens = {
         });
         GameState.autoMode         = true;
         GameState.hardcoreMode     = save.hardcoreMode ?? false;
-        console.log(`[Storage] Run cargada — ruta ${GameState.routeIndex}, equipo: ${GameState.team.map(p => p.displayName).join(', ')}${GameState.hardcoreMode ? ' [HARDCORE]' : ''}`);
+        GameState.randomMode       = save.randomMode ?? false;
+        console.log(`[Storage] Run cargada — ruta ${GameState.routeIndex}, equipo: ${GameState.team.map(p => p.displayName).join(', ')}${GameState.hardcoreMode ? ' [HARDCORE]' : ''}${GameState.randomMode ? ' [ALEATORIO]' : ''}`);
         Screens.show(Screens.adventure);
       });
     }
@@ -396,12 +408,14 @@ const Screens = {
   // REGION SELECT
   // ═══════════════════════════════════════════════════════════════════════
   regionSelect() {
+    // En modo Aleatorio solo se pueden jugar las regiones con randomAvailable
+    const isPlayable = r => r.available && (!GameState.randomMode || r.randomAvailable === true);
     const cards = SCREENS_CONFIG.REGIONS.map(r => `
-      <div class="region-card${r.available ? '' : ' region-card--locked'}" id="region-${r.id}">
+      <div class="region-card${isPlayable(r) ? '' : ' region-card--locked'}" id="region-${r.id}">
         <span class="region-card__gen">${r.gen}</span>
         <span class="region-card__name">${r.name}</span>
-        <span class="region-card__badge ${r.available ? 'region-card__badge--available' : 'region-card__badge--soon'}">
-          ${r.available ? 'DISPONIBLE' : 'PRONTO'}
+        <span class="region-card__badge ${isPlayable(r) ? 'region-card__badge--available' : 'region-card__badge--soon'}">
+          ${isPlayable(r) ? 'DISPONIBLE' : 'PRONTO'}
         </span>
       </div>`).join('');
 
@@ -417,7 +431,7 @@ const Screens = {
     document.getElementById('btn-back')
       .addEventListener('click', () => GameModesScreen.show());
 
-    SCREENS_CONFIG.REGIONS.filter(r => r.available).forEach(r => {
+    SCREENS_CONFIG.REGIONS.filter(isPlayable).forEach(r => {
       document.getElementById(`region-${r.id}`)
         ?.addEventListener('click', () => {
           Screens._region = r;
@@ -435,7 +449,30 @@ const Screens = {
   // muestra sus stats/tipos y permite elegir uno para comenzar la partida.
   starterSelect() {
     const region   = Screens._region ?? SCREENS_CONFIG.REGIONS[0];
-    const starters = region.starters;
+    // Modo Aleatorio: iniciales al azar (sin repetir) de entre los pokemon
+    // capturados en la pokédex. Si hay menos capturados que RANDOM_STARTER_COUNT,
+    // se completan con RANDOM_STARTER_FALLBACK (en orden, sin repetir). Se guardan en
+    // Screens._randomStarters para que no cambien al volver a esta pantalla;
+    // se regeneran al empezar una nueva partida desde el menú de modos o al reintentar.
+    if (GameState.randomMode && !Screens._randomStarters) {
+      const count  = SCREENS_CONFIG.RANDOM_STARTER_COUNT;
+      const dex    = Storage.getPokedex();
+      const caught = Object.keys(POKEMON_DB).filter(name => dex[name]?.caught);
+      const picked = new Set();
+      while (picked.size < Math.min(count, caught.length)) {
+        picked.add(caught[Math.floor(Math.random() * caught.length)]);
+      }
+      for (const name of SCREENS_CONFIG.RANDOM_STARTER_FALLBACK) {
+        if (picked.size >= count) break;
+        picked.add(name);
+      }
+      Screens._randomStarters = [...picked].map(name => ({
+        name,
+        label: name.charAt(0).toUpperCase() + name.slice(1),
+      }));
+    }
+    const starters = GameState.randomMode ? Screens._randomStarters : region.starters;
+    const showCustomStarter = region.customStarter && !GameState.randomMode;
 
     document.getElementById('viewport').innerHTML = `
       <div class="screen screen--starter">
@@ -451,7 +488,9 @@ const Screens = {
             style="scale: 1.3; padding: 2em; image-rendering:pixelated;"
             onerror="this.style.display='none'">
           <p style="font-family:var(--font-pixel);font-size:7px;color:var(--grey-dark);text-align:center;line-height:1.8;margin-top:6px; margin-bottom:4px">
-            El Profesor Oak tiene<br>tres pokemon para ti.
+            ${GameState.randomMode
+              ? 'El Profesor Oak ha encontrado<br>tres pokemon misteriosos para ti.'
+              : 'El Profesor Oak tiene<br>tres pokemon para ti.'}
           </p>
         </div>
 
@@ -473,7 +512,7 @@ const Screens = {
               </div>
               <div class="starter-card__arrow">→</div>
             </div>`).join('')}
-          ${region.customStarter ? (() => {
+          ${showCustomStarter ? (() => {
             const customReady = region.customStarterReady ? region.customStarterReady() : true;
             const unlocked = customReady && !GameState.hardcoreMode && Object.values(Storage.getAllBadges()).some(b => b.length >= 8);
             const lockedMsg = GameState.hardcoreMode
@@ -570,7 +609,7 @@ const Screens = {
       }
     });
 
-    if (region.customStarter && (!region.customStarterReady || region.customStarterReady()) && !GameState.hardcoreMode && Object.values(Storage.getAllBadges()).some(b => b.length >= 8)) {
+    if (showCustomStarter && (!region.customStarterReady || region.customStarterReady()) && !GameState.hardcoreMode && Object.values(Storage.getAllBadges()).some(b => b.length >= 8)) {
       document.getElementById('card-custom').addEventListener('click', () => {
         const anyShiny = Object.values(_loadedStarters).some(p => p.shiny);
         if (anyShiny) {
@@ -788,7 +827,7 @@ const Screens = {
         </div>
       </div>`;
 
-    document.getElementById('btn-info-continue').addEventListener('click', () => {
+    const onContinue = () => {
       GameState.routeIndex++;
       if (GameState.routeIndex >= Screens._routes().length) {
         const lastBadge = GameState.badges[GameState.badges.length - 1];
@@ -797,7 +836,11 @@ const Screens = {
         Screens._saveRun();
         Screens.show(Screens.adventure);
       }
-    });
+    };
+    document.getElementById('btn-info-continue').addEventListener('click', onContinue);
+
+    // Modo Auto: si hay camino opcional, se salta y se continúa
+    if (data.optional) AutoMode.run(onContinue, 'btn-info-continue');
 
     document.getElementById('btn-info-optional')?.addEventListener('click', () => {
       GameState._optionalArea = data.optional.area;
@@ -823,10 +866,12 @@ const Screens = {
         <button class="btn btn--primary btn--wide" id="btn-welcome-continue" style="position:relative;max-width:240px">CONTINUAR</button>
       </div>`;
 
-    document.getElementById('btn-welcome-continue').addEventListener('click', () => {
+    const onContinue = () => {
       Screens._renderAdventureShell(route);
       Screens._showPathSelection(route);
-    });
+    };
+    document.getElementById('btn-welcome-continue').addEventListener('click', onContinue);
+    AutoMode.run(onContinue, 'btn-welcome-continue');
   },
 
   // Pinta el contenedor vacío de la pantalla de aventura con fondo y botones
@@ -895,6 +940,21 @@ const Screens = {
   },
 
   _initPauseBtn() {},  // no-op — pause solo en combate
+
+  // ── Modo Aleatorio: sustituye la especie de un pokemon rival ────────────
+  // Recibe una entrada de ruta (salvaje, entrenador o líder) y, si el modo
+  // Aleatorio está activo, devuelve una copia con una especie al azar. Conserva
+  // nivel, objeto equipado e IVs/EVs (dificultad de la ruta) y descarta lo que
+  // depende de la especie original: sprite, movimiento fijo y shiny forzado.
+  _randomizeFoe(entry) {
+    if (!GameState.randomMode) return entry;
+    return {
+      name:      pickRandomPokemonName(),
+      level:     rollLevel(entry),
+      heldItem:  entry.heldItem,
+      overrides: entry.overrides,
+    };
+  },
 
   // Elimina del equipo todos los pokemon con HP ≤ 0. Sólo se usa en modo hardcore.
   // Se llama DESPUÉS de que cv2 haya terminado (onWin) para no romper el estado interno
@@ -1031,6 +1091,12 @@ const Screens = {
       });
     });
 
+    // Modo Auto: elige un camino al azar entre los disponibles
+    AutoMode.run(() => {
+      const pi = Math.floor(Math.random() * paths.length);
+      document.getElementById(`path-${pi}`)?.click();
+    }, 'path-0');
+
     // Botón de ajustes del footer — restaura sin regenerar rutas
     document.getElementById('route-settings-btn')?.addEventListener('click', () => {
       Screens._openRouteSettings(route);
@@ -1069,6 +1135,7 @@ const Screens = {
         </div>
         <button class="cv2-settings-option" id="rsopt-dex">Pokédex</button>
         <button class="cv2-settings-option" id="rsopt-comp">Compendio</button>
+        ${AutoMode.settingsHtml()}
         <button class="cv2-settings-option" id="rsopt-exit" style="background:var(--red);color:var(--white)">Salir</button>
       </div>`;
     document.body.appendChild(panel);
@@ -1079,6 +1146,8 @@ const Screens = {
     panel.addEventListener('click', e => { if (e.target === panel) close(); });
 
     panel.querySelector('.cv2-settings-close').addEventListener('click', close);
+
+    AutoMode.bindSettings(panel);
 
     panel.querySelector('#rsopt-dex').addEventListener('click', () => {
       panel.remove();
@@ -1206,7 +1275,7 @@ const Screens = {
       }
       const foeTeam = [];
       try {
-        for (const p of gym.leader) {
+        for (const p of gym.leader.map(Screens._randomizeFoe)) {
           const foe = await createPokemon(p.name, rollLevel(p), false, p.moveId ?? null, p.overrides ?? null, p.shiny ?? false);
           if (p.img) foe.spriteUrl = p.img;
           if (p.heldItem) equipHeldItem(foe, p.heldItem);
@@ -1276,7 +1345,7 @@ const Screens = {
       if (!trainer) { GameState._pathRunning = false; Screens._runNextInPath(); return; }
       const foeTeam = [];
       try {
-        for (const p of trainer.pokemon) {
+        for (const p of trainer.pokemon.map(Screens._randomizeFoe)) {
           const foe = await createPokemon(p.name, rollLevel(p), false, p.moveId ?? null, p.overrides ?? null, p.shiny ?? false);
           if (p.img) foe.spriteUrl = p.img;
           if (p.heldItem) equipHeldItem(foe, p.heldItem);
@@ -1302,7 +1371,7 @@ const Screens = {
       });
     } else {
       // Salvaje — combate automático + captura automática
-      const entry   = pickWildEncounter(data.wild);
+      const entry   = Screens._randomizeFoe(pickWildEncounter(data.wild));
       const isShiny = entry.shiny === true || Math.random() < (typeof getActiveShinyRate !== 'undefined' ? getActiveShinyRate() : 0);
       let foePoke;
       try {
@@ -1678,7 +1747,9 @@ const Screens = {
     let rewardPoke = null;
     let pokemonPrize = null;
     if (data.rewardPokemon?.length) {
-      const rewardName = data.rewardPokemon[Math.floor(Math.random() * data.rewardPokemon.length)];
+      const rewardName = GameState.randomMode
+        ? pickRandomPokemonName()
+        : data.rewardPokemon[Math.floor(Math.random() * data.rewardPokemon.length)];
       rewardPoke = await createPokemon(rewardName, maxLevel, true);
       const pokeAlreadyCaught = Storage.isCaught(rewardPoke.name);
       Storage.markCaught(rewardPoke.name);
@@ -1863,6 +1934,7 @@ const Screens = {
         </div>`;
 
       document.getElementById('reward-skip').addEventListener('click', advance);
+      AutoMode.run(advance, 'reward-skip');
 
       document.querySelectorAll('.item-card').forEach(el => {
         let tipEl = null;
@@ -3443,6 +3515,7 @@ const Screens = {
       </div>`;
     document.getElementById('btn-catch').addEventListener('click', () => Screens._attemptCatch(foe));
     document.getElementById('btn-no-catch').addEventListener('click', () => Screens._advanceFoeOrEnd());
+    AutoMode.run(() => Screens._advanceFoeOrEnd(), 'btn-no-catch');
     [['btn-dex-combat', PokedexScreen], ['btn-compendium-combat', CompendiumScreen]].forEach(([id, screen]) => {
       const b = document.getElementById(id);
       if (!b) return;
@@ -3518,6 +3591,7 @@ const Screens = {
       document.getElementById('cv2-btn-catch').addEventListener('click', () => Screens._cv2AttemptCatch(foe, done));
     }
     document.getElementById('cv2-btn-no-catch').addEventListener('click', done);
+    AutoMode.run(done, 'cv2-btn-no-catch');
   },
 
   async _cv2AttemptCatch(foe, onDone) {
@@ -4124,6 +4198,7 @@ const Screens = {
   // ═══════════════════════════════════════════════════════════════════════
   defeat() {
     const wasHardcore = GameState.hardcoreMode;
+    const wasRandom   = GameState.randomMode;
     Storage.clearRun();
     document.getElementById('viewport').innerHTML = `
       <div class="screen screen--defeat">
@@ -4144,6 +4219,8 @@ const Screens = {
     document.getElementById('btn-retry').addEventListener('click', () => {
       GameState.reset();
       GameState.hardcoreMode = wasHardcore;  // mantener el mismo modo al reintentar
+      GameState.randomMode   = wasRandom;
+      Screens._randomStarters = null;        // nuevos iniciales aleatorios en cada intento
       Screens.show(Screens.starterSelect);
     });
     document.getElementById('btn-title').addEventListener('click', () => {

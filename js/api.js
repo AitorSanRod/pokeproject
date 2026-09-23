@@ -4,18 +4,28 @@
 const PokeAPI = {
   _cache: {},
 
+  // Pokemon cuyo recurso /pokemon/ en PokeAPI no coincide con el nombre interno
+  // del juego (p.ej. Deoxys no tiene /pokemon/deoxys — solo existen las 4 formas:
+  // deoxys-normal, deoxys-attack, deoxys-defense y deoxys-speed).
+  _API_SLUG_ALIASES: {
+    deoxys: 'deoxys-normal',
+  },
+
   async getPokemon(name) {
     const key = name.toLowerCase();
     if (this._cache[key]) return this._cache[key];
 
+    const apiSlug = this._API_SLUG_ALIASES[key] ?? key;
+
     // Intentar PokeAPI
     try {
-      const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${key}`);
+      const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${apiSlug}`);
       if (res.ok) {
         const data = await res.json();
         const normalized = this._normalizePokeAPIData(data);
+        normalized.name = key; // mantener el nombre interno del juego (POKEMON_DB, pokédex, storage), no el slug de la API
         this._cache[key] = normalized;
-        console.log(`[API] ${key} cargado desde PokeAPI`);
+        console.log(`[API] ${key} cargado desde PokeAPI (${apiSlug})`);
         return normalized;
       }
     } catch (e) {

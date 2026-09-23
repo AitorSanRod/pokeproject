@@ -461,6 +461,20 @@
   transition: var(--transition);
 }
 
+.cv2-settings-check {
+  flex: 0 0 auto;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cv2-settings-check input {
+  margin: 0;
+  width: 14px;
+  height: 14px;
+  accent-color: var(--blue);
+  cursor: pointer;
+}
+
 .cv2-settings-option:hover {
   background: #e8f4ff;
   border-color: var(--blue);

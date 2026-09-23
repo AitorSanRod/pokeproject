@@ -292,6 +292,7 @@ const cv2Screen = {
         </div>
         <button class="cv2-settings-option" id="cv2-sopt-dex">Pokédex</button>
         <button class="cv2-settings-option" id="cv2-sopt-comp">Compendio</button>
+        ${AutoMode.settingsHtml()}
         <button class="cv2-settings-option" id="cv2-sopt-exit" style="background:var(--red);color:var(--white)">Salir</button>
       </div>`;
     document.body.appendChild(panel);
@@ -301,6 +302,8 @@ const cv2Screen = {
     const close  = () => panel.remove();
 
     panel.addEventListener('click', e => { if (e.target === panel) { close(); resume(); } });
+
+    AutoMode.bindSettings(panel);
 
     panel.querySelector('.cv2-settings-close').addEventListener('click', () => {
       close(); resume();

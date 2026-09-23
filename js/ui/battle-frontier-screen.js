@@ -821,6 +821,7 @@ const BattleFrontierScreen = {
       });
 
       document.getElementById('bf-reward-continue').addEventListener('click', onDone);
+      AutoMode.run(onDone, 'bf-reward-continue');
     };
 
     _renderReward();

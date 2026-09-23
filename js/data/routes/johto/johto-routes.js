@@ -30,7 +30,7 @@ var JOHTO_ENABLED = true;
 
 // Cambia a true para desbloquear la opción de elegir cualquier Pokémon de la
 // Pokédex como inicial en la aventura de Johto.
-var JOHTO_CUSTOM_STARTER_ENABLED = false;
+var JOHTO_CUSTOM_STARTER_ENABLED = true;
 
 // Condiciones reutilizables — uso: condition: JOHTO_COND.hasBadge('zephyr-badge')
 const JOHTO_ALL_BADGES = [

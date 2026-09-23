@@ -1,3 +1,39 @@
+// ── Limpieza de pokédex por generación ──────────────────────────────────────
+// Si alguno de estos booleanos está en true, al abrir el juego se eliminan de
+// la pokédex guardada (capturado/visto/shiny) todos los pokemon de esa
+// generación. Por defecto todas están en false — son un interruptor manual
+// de depuración, no algo que se active desde la UI.
+var cleanPokedexGen1 = false;
+var cleanPokedexGen2 = false;
+var cleanPokedexGen3 = false;
+
+function cleanPokedexGenerations() {
+  if (typeof DEX_GENERATIONS === 'undefined') return;
+
+  const flags = [
+    { flag: cleanPokedexGen1, gen: 1 },
+    { flag: cleanPokedexGen2, gen: 2 },
+    { flag: cleanPokedexGen3, gen: 3 },
+  ];
+  const gensToClean = flags.filter(f => f.flag).map(f => f.gen);
+  if (gensToClean.length === 0) return;
+
+  const dex = Storage._get('pokedex') ?? {};
+  let removed = 0;
+  for (const genNum of gensToClean) {
+    const genData = DEX_GENERATIONS.find(g => g.gen === genNum);
+    if (!genData) continue;
+    for (const entry of genData.entries) {
+      if (dex[entry.name]) {
+        delete dex[entry.name];
+        removed++;
+      }
+    }
+  }
+  Storage._set('pokedex', dex);
+  console.log(`[GAME] Pokédex: generación(es) [${gensToClean.join(', ')}] limpiada(s) — ${removed} entradas eliminadas`);
+}
+
 const GameState = {
   starter:          null,
   starterName:      null,   // nombre original (base form), no cambia al evolucionar
@@ -7,6 +43,7 @@ const GameState = {
   items:            [],
   autoMode:         true,
   hardcoreMode:     false,  // modo hardcore: debilitados = eliminados, solo starter
+  randomMode:       false,  // modo aleatorio: inicial, salvajes y premios al azar (solo Kanto)
   routeIndex:          0,
   furthestRouteIndex:  0,
   currentEncounter: 0,
@@ -57,6 +94,7 @@ const GameState = {
     this.items            = [];
     this.autoMode         = true;
     this.hardcoreMode     = false;
+    this.randomMode       = false;
     this.routeIndex         = 0;
     this.furthestRouteIndex = 0;
     this.currentEncounter   = 0;
@@ -76,6 +114,7 @@ const GameState = {
 window.addEventListener('DOMContentLoaded', () => {
   console.log('[GAME] Pokemon Adventure — version web');
   console.log('[GAME] Abre las DevTools (F12) para ver el log de combate');
+  cleanPokedexGenerations();
   Storage.propagateShinyLineAll();
 
   // Contenedor compartido para todos los botones globales flotantes

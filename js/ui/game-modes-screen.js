@@ -14,6 +14,13 @@ const GAME_MODES = [
     accentColor: 'var(--red)',
   },
   {
+    id: 'random',
+    name: 'ALEATORIO (BETA)',
+    desc: 'Como la Aventura, pero tu pokémon inicial, los pokémon salvajes y los de entrenadores y líderes son totalmente aleatorios. Solo disponible en Kanto.',
+    accentColor: '#ffffff',
+    get enabled() { return typeof SCREENS_CONFIG !== 'undefined' ? SCREENS_CONFIG.RANDOM_ENABLED : false; },
+  },
+  {
     id: 'hardcore',
     name: 'HARDCORE',
     desc: 'Como la Aventura, pero si un pokémon se debilita es eliminado para siempre. ¿Llegarás al final?',
@@ -27,7 +34,7 @@ const GAME_MODES = [
     accentColor: 'var(--green)',
     // Getter evaluado en tiempo de llamada (BF_ENABLED se carga después de este archivo)
     get enabled() { return typeof BF_ENABLED !== 'undefined' ? BF_ENABLED : true; },
-  },
+  }
 ];
 
 const GameModesScreen = {
@@ -78,6 +85,20 @@ const GameModesScreen = {
           Storage.clearRun();
         }
         GameState.hardcoreMode = false;
+        GameState.randomMode   = false;
+        Screens.show(Screens.regionSelect);
+        break;
+      }
+      case 'random': {
+        const hasSave = Storage.hasRun(GameState.version);
+        if (hasSave) {
+          const ok = confirm('¿Iniciar una nueva partida ALEATORIA?\n\nSe perderá el progreso guardado.');
+          if (!ok) return;
+          Storage.clearRun();
+        }
+        GameState.hardcoreMode    = false;
+        GameState.randomMode      = true;
+        Screens._randomStarters   = null;  // se generan al entrar en la selección de inicial
         Screens.show(Screens.regionSelect);
         break;
       }
@@ -89,6 +110,7 @@ const GameModesScreen = {
           Storage.clearRun();
         }
         GameState.hardcoreMode = true;
+        GameState.randomMode   = false;
         Screens.show(Screens.regionSelect);
         break;
       }

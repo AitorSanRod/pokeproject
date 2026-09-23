@@ -405,6 +405,15 @@ var Storage = {
     this._set('furthest_routes', all);
   },
 
+  // ── Preferencia: modo Auto (desactivado por defecto) ──────────────────────
+  getAutoMode() {
+    return this._get('auto_mode') === true;
+  },
+
+  setAutoMode(on) {
+    this._set('auto_mode', !!on);
+  },
+
   clearAll() {
     const prefix = this._PREFIX;
     try {
