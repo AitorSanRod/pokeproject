@@ -1846,7 +1846,7 @@ var ROUTE_DATA = {
       const exclude = this.wildExclude ?? [];
       const { min, max } = this.wildLevel ?? { min: 30, max: 45 };
       return Object.keys(POKEMON_DB)
-        .filter(name => !exclude.includes(name) && (POKEMON_STATS[name]?.id ?? 0) <= 151)
+        .filter(name => !exclude.includes(name) && (POKEMON_STATS[name]?.id ?? Infinity) <= 151)
         .map(name => ({ name, rate: 1, minLv: min, maxLv: max }));
     },
     trainer: [],

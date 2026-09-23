@@ -87,6 +87,8 @@ const BG = {
     torreRadio: 'assets/bg/johto/torre-radio.png',
     rutaHelada: 'assets/bg/johto/ruta-helada.png',
     ciudadEndrino: 'assets/bg/johto/ciudad-endrino.png',
+    torreCampana: 'assets/bg/johto/torre-campana.png',
+    islaRemolino: 'assets/bg/johto/isla-remolino.png',
   }
 };
 

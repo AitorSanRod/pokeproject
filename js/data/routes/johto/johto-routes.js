@@ -414,6 +414,7 @@ Object.assign(ROUTE_DATA, {
       { name: POKEMON.snubbull, rate: 25, minLv: 24, maxLv: 28, moveId: MOVES.fairy.physical.play_rough },
       { name: POKEMON.abra, rate: 25, minLv: 24, maxLv: 28, moveId: MOVES.psychic.special.teleport },
       { name: POKEMON.magikarp, rate: 25, minLv: 24, maxLv: 28, moveId: MOVES.water.special.scald },
+      { name: POKEMON.cleffa, rate: 25, minLv: 24, maxLv: 28, moveId: MOVES.fairy.special.disarming_voice },
     ],
     trainer: [
       {
@@ -1288,6 +1289,81 @@ Object.assign(ROUTE_DATA, {
     description: 'Has conseguido todas las medallas de Johto.',
   },
 
+  'torre-campana': {
+    bg: BG.JOTHO.torreCampana,
+    combatBg: COMBAT_BG.interior,
+    trainerBg: COMBAT_BG.interior,
+    title: 'Torre Campana',
+    wild: [
+      { name: POKEMON.steelix, rate: 20, minLv: 60, maxLv: 65, moveId: [MOVES.steel.physical.iron_head, MOVES.ground.physical.earthquake] },
+      { name: POKEMON.misdreavus, rate: 40, minLv: 60, maxLv: 65, moveId: MOVES.ghost.special.astral_barrage },
+      { name: POKEMON.porygon2, rate: 40, minLv: 60, maxLv: 65, moveId: [MOVES.normal.special.tri_attack, MOVES.ice.special.blizzard] },
+    ],
+    trainer: [
+      {
+        name: ENTRENADORES.Medium.name, img: ENTRENADORES.Medium.img, rate: 50, pokemon: [
+          { name: POKEMON.scizor, minLv: 60, maxLv: 65, moveId: [MOVES.steel.physical.behemoth_blade, MOVES.bug.physical.x_scissor] },
+          { name: POKEMON.arcanine, minLv: 60, maxLv: 65, moveId: [MOVES.fire.physical.flare_blitz, MOVES.normal.physical.extreme_speed] },
+          { name: POKEMON.aerodactyl, minLv: 60, maxLv: 65, moveId: [MOVES.rock.physical.rock_slide, MOVES.flying.physical.wing_attack] },
+        ]
+      },
+      {
+        name: ENTRENADORES.Medium.name, img: ENTRENADORES.Medium.img, rate: 50, pokemon: [
+          { name: POKEMON.arcanine, minLv: 60, maxLv: 65, moveId: [MOVES.fire.physical.flare_blitz, MOVES.normal.physical.extreme_speed] },
+          { name: POKEMON.misdreavus, rate: 40, minLv: 60, maxLv: 65, moveId: MOVES.ghost.special.astral_barrage },
+          { name: POKEMON.scizor, minLv: 60, maxLv: 65, moveId: [MOVES.steel.physical.behemoth_blade, MOVES.bug.physical.x_scissor] },
+        ]
+      },
+    ],
+  },
+
+  'torre-campana-boss': {
+    bg: BG.JOTHO.torreCampana,
+    combatBg: COMBAT_BG.interior,
+    trainerBg: COMBAT_BG.interior,
+    title: 'Torre Campana',
+    wild: [
+      { name: POKEMON.ho_oh, rate: 100, minLv: 60, maxLv: 70, moveId: [MOVES.fire.special.fire_blast, MOVES.dark.special.dark_pulse] },
+    ],
+    paths: [
+      [{ type: PATH_TYPE.Wild }],
+    ],
+  },
+
+  'isla-remolino': {
+    bg: BG.JOTHO.islaRemolino,
+    combatBg: COMBAT_BG.agua,
+    trainerBg: COMBAT_BG.agua,
+    title: 'Islas Remolino',
+    wild: [
+      { name: POKEMON.remoraid, rate: 25, minLv: 60, maxLv: 65, moveId: MOVES.water.special.surf },
+      { name: POKEMON.kingdra, rate: 25, minLv: 60, maxLv: 65, moveId: [MOVES.water.special.hydro_pump, MOVES.dragon.special.draco_meteor] },
+      { name: POKEMON.mantine, rate: 25, minLv: 60, maxLv: 65, moveId: MOVES.water.special.scald },
+      { name: POKEMON.slowking, rate: 25, minLv: 60, maxLv: 65, moveId: [MOVES.water.special.hydro_pump, MOVES.psychic.special.psystrike] },
+    ],
+    trainer: [
+      {
+        name: ENTRENADORES.Medium.name, img: ENTRENADORES.Medium.img, rate: 50, pokemon: [
+          { name: POKEMON.porygon2, minLv: 60, maxLv: 65, moveId: MOVES.normal.special.hyper_voice },
+          { name: POKEMON.porygon2, minLv: 60, maxLv: 65, moveId: MOVES.ice.special.blizzard },
+          { name: POKEMON.porygon2, minLv: 60, maxLv: 65, moveId: MOVES.psychic.special.confusion },]
+      }
+    ],
+  },
+
+  'isla-remolino-boss': {
+    bg: BG.JOTHO.islaRemolino,
+    combatBg: COMBAT_BG.agua,
+    trainerBg: COMBAT_BG.agua,
+    title: 'Islas Remolino',
+    wild: [
+      { name: POKEMON.lugia, rate: 100, minLv: 60, maxLv: 70, moveId: [MOVES.water.special.hydro_pump, MOVES.dragon.special.draco_meteor] },
+    ],
+    paths: [
+      [{ type: PATH_TYPE.Wild }],
+    ],
+  },
+
   // ─────────────────────────────────────────────────────────────────────
   // OPCIONALES
   // ─────────────────────────────────────────────────────────────────────
@@ -1401,7 +1477,9 @@ Object.assign(ROUTE_DATA, {
       { name: POKEMON.blissey, rate: 25, minLv: 56, maxLv: 60, moveId: MOVES.normal.special.hyper_voice },
       { name: POKEMON.larvitar, rate: 25, minLv: 56, maxLv: 60, moveId: [MOVES.rock.physical.rock_slide, MOVES.dark.physical.crunch] },
       { name: POKEMON.stantler, rate: 25, minLv: 56, maxLv: 60, moveId: MOVES.normal.physical.extreme_speed },
-      { name: POKEMON.slugma, rate: 25, minLv: 56, maxLv: 60, moveId: MOVES.fire.special.flamethrower },],
+      { name: POKEMON.slugma, rate: 25, minLv: 56, maxLv: 60, moveId: MOVES.fire.special.flamethrower },
+      { name: POKEMON.shuckle, rate: 25, minLv: 56, maxLv: 60, moveId: MOVES.bug.special.infestation },
+    ],
     trainer: [],
     paths: [
       [{ type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }, { type: PATH_TYPE.Wild }],
@@ -1524,6 +1602,13 @@ var JOHTO_ROUTES = [
   { name: 'Ciudad Endrino', area: 'ciudad-endrino' },
   { name: '¡Enhorabuena!', area: 'mensaje-medallas-johto' },
 
+  //Ho-Ho
+  { name: 'Torre Campana', area: 'torre-campana', condition: JOHTO_COND.hasAllBadges() },
+  { name: 'Torre Campana', area: 'torre-campana-boss', condition: JOHTO_COND.hasAllBadges() },
+
+  //Lugia
+  { name: 'Islas Remolino', area: 'isla-remolino', condition: JOHTO_COND.hasAllBadges() },
+  { name: 'Islas Remolino', area: 'isla-remolino-boss', condition: JOHTO_COND.hasAllBadges() },
 
   // Ejemplo — ruta solo disponible tras conseguir la Medalla Ascua:
   // { name: 'Ruta 31', area: 'ruta-31', condition: JOHTO_COND.hasBadge('zephyr-badge') },
