@@ -260,7 +260,7 @@ var HELD_ITEMS = {
     trigger: HELD_ITEM_TRIGGERS.ON_TURN_END,
     fn(ctx) {
       const { user, log } = ctx;
-      if (user.currentHp <= 0) return false;
+      if (user.currentHp <= 0 || hasSheerForce(user)) return false;
       if (user.statusEffect?.id === StatusEffect.BURN) return false;
       StatusEffects.apply(user, StatusEffect.BURN, log);
       return true;
@@ -302,7 +302,7 @@ var HELD_ITEMS = {
     dmgBoost: { mult: 1.0 },
     fn(ctx) {
       const { user, log, updateHud } = ctx;
-      if (user.currentHp <= 0) return false;
+      if (user.currentHp <= 0 || hasSheerForce(user)) return false;
 
       const drain = Math.max(1, Math.floor(user.stats.hp * 0.10));
       user.currentHp = Math.max(0, user.currentHp - drain);

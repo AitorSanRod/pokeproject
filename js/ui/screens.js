@@ -323,6 +323,18 @@ const Screens = {
                           ? savedAbility : dbAbility;
           p.hideAbility = dbHideAbility;
 
+          // Migración: Mar Llamas / Espesura antes escribían su bonus en combatMods
+          // (con contadores _blazeMod/_og*Mod). Ahora se calcula al vuelo en
+          // getCombatMods(), así que se reconstruyen los combatMods de estos pokemon
+          // para no sumar el bonus dos veces: reset + reaplicar objetos pasivos.
+          const legacyKeys = ['_blazeMod', '_ogDefMod', '_ogSpdMod', '_ogSpaMod'];
+          if (legacyKeys.some(k => k in p)) {
+            legacyKeys.forEach(k => delete p[k]);
+            p.combatMods = {};
+            const item = HELD_ITEMS?.[p.heldItem];
+            if (item?.trigger === HELD_ITEM_TRIGGERS.PASSIVE && item.fn) item.fn({ user: p });
+          }
+
           const storageMTs = Storage.getLearnedMTs(p.name);
           const runMTs     = p.learnedMTs ?? [];
           const validMTs   = [...new Set([...storageMTs, ...runMTs])];
@@ -3846,7 +3858,7 @@ const Screens = {
       if (statusBadge) parts.push(statusBadge);
 
       // Modificadores de stat activos
-      const mods = poke.combatMods ?? {};
+      const mods = getCombatMods(poke);
       const STAT_LABEL = { atk:'ATK', def:'DEF', spa:'SPA', spd:'SPD', spe:'VEL' };
       const activeMods = Object.entries(mods).filter(([k, v]) => !k.startsWith('_') && v !== 0);
       if (activeMods.length > 3) {

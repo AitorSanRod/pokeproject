@@ -233,6 +233,32 @@ function hasGutsEffect(pokemon) {
   return pokemon?.ability === 'guts';
 }
 
+// Modificadores de stat de habilidades condicionadas al HP (Mar Llamas, Espesura).
+// Se calculan al vuelo — NO se guardan en combatMods — para que no se mezclen
+// con objetos (Gafas Elección) ni con subidas/bajadas al resetear combatMods.
+function getAbilityStatMods(pokemon) {
+  const hpHigh = (pokemon?.currentHp ?? 0) > (pokemon?.stats?.hp ?? 1) * 0.50;
+  switch (pokemon?.ability) {
+    case 'blaze':    return hpHigh ? { spa: 1.0 } : {};
+    case 'overgrow': return hpHigh ? { def: 0.5, spd: 0.5 } : { spa: 0.5 };
+    default:         return {};
+  }
+}
+
+// combatMods + modificadores de habilidad. Usar para calcular daño y pintar badges.
+function getCombatMods(pokemon) {
+  const mods = { ...(pokemon?.combatMods ?? {}) };
+  for (const [k, v] of Object.entries(getAbilityStatMods(pokemon))) mods[k] = (mods[k] ?? 0) + v;
+  return mods;
+}
+
+// Comprueba si el pokemon tiene la habilidad 'fuerza-bruta'.
+// Fuerza Bruta anula el daño propio de objetos y movimientos, las bajadas de
+// stats autoinfligidas y añade daño físico y especial.
+function hasSheerForce(pokemon) {
+  return pokemon?.ability === 'fuerza-bruta';
+}
+
 // ── Evoluciones ───────────────────────────────────────────────────────────────
 
 // Comprueba si el pokemon debe evolucionar. Devuelve el nombre de la evolución

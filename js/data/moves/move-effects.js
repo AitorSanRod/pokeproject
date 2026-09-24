@@ -298,6 +298,7 @@ var MOVE_EFFECTS = {
     trigger: TRIGGERS.AFTER_ATTACK,
     desc: 'Baja la DEF y SPD del usuario un 50% en cada ataque.',
     fn(ctx) {
+      if (hasSheerForce(ctx.user)) return;
       if (!ctx.user.combatMods) ctx.user.combatMods = {};
       ctx.user.combatMods.def = (ctx.user.combatMods.def ?? 0) - 0.50;
       ctx.user.combatMods.spd = (ctx.user.combatMods.spd ?? 0) - 0.50;
@@ -443,7 +444,7 @@ var MOVE_EFFECTS = {
     desc: 'El usuario pierde el 15% de su HP máximo tras atacar.',
     fn(ctx) {
       const { user, log, updatePlayerHud } = ctx;
-      if (user.currentHp <= 0) return;
+      if (user.currentHp <= 0 || hasSheerForce(user)) return;
       const dmg = Math.max(1, Math.floor(user.stats.hp * 0.15));
       user.currentHp = Math.max(0, user.currentHp - dmg);
       log(`${user.displayName} sufrió ${dmg} HP de daño de retroceso!`);
@@ -827,6 +828,41 @@ var ABILITIES = {
     dmgMult: 1.5,
   },
 
+  'fuerza-bruta': {
+    trigger: ABILITY_TRIGGERS.PASSIVE,
+    name: 'Fuerza Bruta',
+    desc: 'No recibe daño de sus objetos ni de sus propios movimientos, ni bajadas de stats autoinfligidas. Aumenta el ATK y el SPA un 25%.',
+    dmgMult: 1.25,
+    badgeStats: ['atk', 'spa'],  // stats en los que se muestra el bonus en la badge de combate
+  },
+
+  'versatil': {
+    // Sin fn — igual que el efecto de movimiento 'versatil', pero para todos
+    // los ataques del pokemon: la lógica vive en _calcDamage (cv2-engine.js).
+    trigger: ABILITY_TRIGGERS.PASSIVE,
+    name: 'Versátil',
+    desc: 'Ignora las inmunidades de tipo: sus ataques tratan x0 como x1.',
+  },
+
+  'pereza': {
+    // Sin fn — el ×2 físico vive en _calcDamage y la probabilidad de no
+    // atacar en _stepPreAttack (cv2-engine.js).
+    trigger: ABILITY_TRIGGERS.PASSIVE,
+    name: 'Pereza',
+    desc: 'Aumenta el daño físico un 100%, pero tiene un 30% de probabilidad de no atacar en su turno.',
+    dmgMult:    2,
+    skipChance: 0.30,
+    badgeStats: ['atk'],
+  },
+
+  'caparazon': {
+    // Sin fn — la lógica vive en _applyDamage (cv2-engine.js): si recibe un
+    // golpe crítico, el daño se devuelve íntegro al atacante y recibe 0.
+    trigger: ABILITY_TRIGGERS.PASSIVE,
+    name: 'Caparazón',
+    desc: 'Si recibe un golpe crítico, devuelve todo el daño al atacante y no recibe ninguno.',
+  },
+
   // ── Habilidades ocultas (sin implementar — reservadas para futura mecánica de objetos) ──
 
   'lightning-rod': {
@@ -926,6 +962,22 @@ var ABILITIES = {
     },
   },
 
+  'regeneracion': {
+    trigger: ABILITY_TRIGGERS.ON_OPPONENT_ENTER,
+    name: 'Regeneración',
+    desc: 'Cada vez que aparece un nuevo rival, recupera el 25% de su HP máximo.',
+    fn(ctx) {
+      const pokemon = ctx.pokemon;
+      if (pokemon.currentHp <= 0) return false;
+      const heal   = Math.max(1, Math.floor(pokemon.stats.hp * 0.25));
+      const before = pokemon.currentHp;
+      pokemon.currentHp = Math.min(pokemon.stats.hp, pokemon.currentHp + heal);
+      const actual = pokemon.currentHp - before;
+      if (actual <= 0) return false;
+      ctx.log(`¡${pokemon.displayName} se regeneró ${actual} HP!`);
+    },
+  },
+
 };
 
 // Devuelve la prioridad numérica de un movimiento.
@@ -959,8 +1011,9 @@ async function applyAbility(pokemon, trigger, ctx) {
   if (!triggers.includes(trigger)) return false;
   if (ability.statusChance !== undefined && Math.random() >= ability.statusChance) return false;
   try {
-    await ability.fn({ pokemon, ...ctx });
-    return true;
+    // fn puede devolver false para indicar que no hizo nada (p.ej. Regeneración a HP lleno)
+    const result = await ability.fn({ pokemon, ...ctx });
+    return result !== false;
   } catch (e) {
     console.error(`[ABILITY] Error en "${pokemon.ability}":`, e.message);
     return false;

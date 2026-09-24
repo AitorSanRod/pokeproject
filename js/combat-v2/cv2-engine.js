@@ -255,6 +255,7 @@ const CombatV2 = {
   async _applyOpponentEnterEffects(observer, observerSide, newOpponent) {
     if (!observer) return;
     const statAnims = [];
+    const hpBefore  = observer.currentHp;
     const triggered = await applyAbility(observer, ABILITY_TRIGGERS.ON_OPPONENT_ENTER, {
       side:         observerSide,
       opponent:     newOpponent,
@@ -264,6 +265,9 @@ const CombatV2 = {
     });
     if (statAnims.length) await Promise.all(statAnims);
     if (triggered) {
+      // Curación por habilidad (ej. Regeneración)
+      const healed = observer.currentHp - hpBefore;
+      if (healed > 0) cv2UI.showHealFloat(observerSide, healed);
       cv2UI.updateHp(observerSide, observer);
       cv2UI.updateStatus(observerSide, observer);
       await cv2UI.wait(CV2_DELAY.LOG_SHORT);
@@ -388,6 +392,14 @@ const CombatV2 = {
       return;
     }
 
+    // Pereza: probabilidad de holgazanear y perder el turno
+    if (pokemon.ability === 'pereza' && Math.random() < (ABILITIES['pereza']?.skipChance ?? 0.30)) {
+      cv2UI.log(`¡${pokemon.displayName} está holgazaneando!`);
+      await cv2UI.wait(CV2_DELAY.LOG_READ);
+      action._skip = true;
+      return;
+    }
+
     // Autogolpe por confusión
     if (check.hitSelf) {
       action._confusionSelfHit = true;
@@ -422,6 +434,7 @@ const CombatV2 = {
     cv2UI.log(`${pokemon.displayName} usó ${effectiveMove.name}!`);
     await cv2UI.wait(CV2_DELAY.ATTACK_ANNOUNCE);
 
+    action._reflected = false;
     if (effectiveMove.power) {
       await this._applyDamage(effectiveMove, pokemon, target, targetSide, action);
     } else {
@@ -431,7 +444,9 @@ const CombatV2 = {
     }
 
     // Aplicar efectos AFTER_ATTACK
-    if (!action._confusionSelfHit) {
+    // Se omiten si el golpe fue devuelto (Caparazón) o si el atacante ya cayó:
+    // p.ej. un drenaje con daño 0 curaría 1 HP y "reviviría" al atacante.
+    if (!action._confusionSelfHit && !action._reflected && pokemon.currentHp > 0) {
       const statAnims = [];
       const ctx = _makeCtx(pokemon, target, action._lastDmg ?? 0);
       ctx.showStatChange = (pk, stat, dir, pct) => {
@@ -447,7 +462,7 @@ const CombatV2 = {
     }
 
     // Double-hit: enqueue un segundo ataque inmediatamente
-    if (pokemon._doubleHit && !action._doubleHitDone) {
+    if (pokemon._doubleHit && !action._doubleHitDone && pokemon.currentHp > 0 && target.currentHp > 0) {
       action._doubleHitDone = true;
       this.queue.prepend(() => this._stepDoAttack(action, opponent));
     }
@@ -496,6 +511,24 @@ const CombatV2 = {
     let finalDmg = onHittedCtx.dmg;
     if (attacker._ventaja && defender.statusEffect) {
       finalDmg = Math.floor(finalDmg * 2);
+    }
+
+    // Caparazón: un golpe crítico se devuelve íntegro al atacante y el defensor no recibe daño.
+    // No aplica a autogolpes (confusión), donde atacante y defensor son el mismo.
+    if (isCrit && defender.ability === 'caparazon' && attacker !== defender && finalDmg > 0) {
+      action._lastDmg   = 0;
+      action._reflected = true;
+      cv2UI.log('¡Golpe crítico!');
+      await cv2UI.wait(CV2_DELAY.CRIT_LOG);
+
+      attacker.currentHp = Math.max(0, attacker.currentHp - finalDmg);
+      cv2UI.flashSprite(attackerSide);
+      cv2UI.showDamageFloat(attackerSide, finalDmg);
+      await cv2UI.wait(CV2_DELAY.HIT_FLASH);
+      cv2UI.updateHp(attackerSide, attacker);
+      cv2UI.log(`¡El Caparazón de ${defender.displayName} devolvió ${finalDmg} de daño a ${attacker.displayName}!`);
+      await cv2UI.wait(CV2_DELAY.AFTER_HIT);
+      return;
     }
 
     // Supervivencia (Banda Aguante): solo a HP completo, solo una vez por ruta
@@ -1055,8 +1088,10 @@ function _calcDamage(attacker, defender, move) {
 
 
   const isSpecial = move.damageClass === 'special';
-  const atkMod    = isSpecial ? (attacker.combatMods?.spa ?? 0) : (attacker.combatMods?.atk ?? 0);
-  const defMod    = isSpecial ? (defender.combatMods?.spd ?? 0) : (defender.combatMods?.def ?? 0);
+  const atkMods   = getCombatMods(attacker);
+  const defMods   = getCombatMods(defender);
+  const atkMod    = isSpecial ? (atkMods.spa ?? 0) : (atkMods.atk ?? 0);
+  const defMod    = isSpecial ? (defMods.spd ?? 0) : (defMods.def ?? 0);
   const atkStat   = isSpecial ? attacker.stats.spa : attacker.stats.atk;
   const defStat   = isSpecial ? defender.stats.spd : defender.stats.def;
   let   atk       = Math.floor(atkStat * Math.max(0.1, 1 + atkMod));
@@ -1074,7 +1109,7 @@ function _calcDamage(attacker, defender, move) {
 
   const stab = attacker.types.includes(move.type) ? CV2_COMBAT.STAB_MULTIPLIER : 1.0;
   let eff    = getEffectiveness(move.type, defender.types);
-  if (eff === 0 && ids.includes('versatil')) eff = 1;
+  if (eff === 0 && (ids.includes('versatil') || attacker.ability === 'versatil')) eff = 1;
 
   const rnd = CV2_COMBAT.RANDOM_MIN + Math.random() * (CV2_COMBAT.RANDOM_MAX - CV2_COMBAT.RANDOM_MIN);
   dmg = Math.floor(dmg * stab * eff * rnd);
@@ -1109,6 +1144,16 @@ function _calcDamage(attacker, defender, move) {
   if (!isSpecial && hasGutsEffect(attacker)) {
     const gutsMult = ABILITIES['guts']?.dmgMult ?? 1.5;
     dmg = Math.floor(dmg * gutsMult);
+  }
+
+  // Pereza: ×2 daño físico (la probabilidad de no atacar está en _stepPreAttack)
+  if (!isSpecial && attacker.ability === 'pereza') {
+    dmg = Math.floor(dmg * (ABILITIES['pereza']?.dmgMult ?? 2));
+  }
+
+  // Fuerza Bruta: +25% daño físico y especial (habilidad pasiva)
+  if (hasSheerForce(attacker)) {
+    dmg = Math.floor(dmg * (ABILITIES['fuerza-bruta']?.dmgMult ?? 1.25));
   }
 
   // Lightning-rod: reduce el daño eléctrico recibido un 75%

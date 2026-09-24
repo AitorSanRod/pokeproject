@@ -19,10 +19,12 @@ function calcDamage(attacker, defender, move) {
 
   // Modificadores aditivos sobre la base: mod=0 → ×1.0, mod=0.4 → ×1.4, mod=-0.4 → ×0.6
   // Mínimo multiplicador: 0.1 (no puede llegar a 0 ni negativo)
-  const atkMod  = attacker.combatMods?.atk ?? 0;
-  const spaMod  = attacker.combatMods?.spa ?? 0;
-  const defMod  = defender.combatMods?.def ?? 0;
-  const spdMod  = defender.combatMods?.spd ?? 0;
+  const atkMods = getCombatMods(attacker);
+  const defMods = getCombatMods(defender);
+  const atkMod  = atkMods.atk ?? 0;
+  const spaMod  = atkMods.spa ?? 0;
+  const defMod  = defMods.def ?? 0;
+  const spdMod  = defMods.spd ?? 0;
 
   const atkMult = Math.max(0.1, 1 + atkMod);
   const spaMult = Math.max(0.1, 1 + spaMod);
@@ -42,7 +44,7 @@ function calcDamage(attacker, defender, move) {
   let eff      = getEffectiveness(move.type, defender.types);
   if (eff === 0) {
     const ids = Array.isArray(move.effectId) ? move.effectId : [move.effectId];
-    if (ids.includes('versatil')) eff = 1;
+    if (ids.includes('versatil') || attacker.ability === 'versatil') eff = 1;
   }
   const rnd    = COMBAT_CONFIG.RANDOM_MIN + Math.random() * (COMBAT_CONFIG.RANDOM_MAX - COMBAT_CONFIG.RANDOM_MIN);
 
@@ -102,6 +104,20 @@ function calcDamage(attacker, defender, move) {
     modifiers.push({ label: `Agallas (${attacker.displayName}) +${Math.round((gutsMult - 1) * 100)}%`, mult: gutsMult });
   }
 
+  // ── Pereza — ×2 daño físico (la probabilidad de no atacar solo existe en cv2-engine)
+  if (!isSpecial && attacker.ability === 'pereza') {
+    const lazyMult = (typeof ABILITIES !== 'undefined' && ABILITIES['pereza']?.dmgMult) ?? 2;
+    dmg = Math.floor(dmg * lazyMult);
+    modifiers.push({ label: `Pereza (${attacker.displayName}) ×${lazyMult}`, mult: lazyMult });
+  }
+
+  // ── Fuerza Bruta — +25% daño físico y especial (habilidad pasiva)
+  if (hasSheerForce(attacker)) {
+    const sfMult = (typeof ABILITIES !== 'undefined' && ABILITIES['fuerza-bruta']?.dmgMult) ?? 1.25;
+    dmg = Math.floor(dmg * sfMult);
+    modifiers.push({ label: `Fuerza Bruta (${attacker.displayName}) +${Math.round((sfMult - 1) * 100)}%`, mult: sfMult });
+  }
+
   const _effectIds = Array.isArray(move.effectId) ? move.effectId : [move.effectId];
   const critChance = _effectIds.includes('crit-75') ? 0.75 : COMBAT_CONFIG.CRIT_CHANCE;
   const isCrit = Math.random() < critChance;
@@ -134,7 +150,11 @@ function enemyChooseMove(enemy, player) {
   let best = null, bestScore = -1;
   for (const move of enemy.moves) {
     if (!move.power) continue;
-    const eff   = getEffectiveness(move.type, player.types);
+    let eff     = getEffectiveness(move.type, player.types);
+    if (eff === 0) {
+      const ids = Array.isArray(move.effectId) ? move.effectId : [move.effectId];
+      if (ids.includes('versatil') || enemy.ability === 'versatil') eff = 1;
+    }
     const score = move.power * eff * (enemy.types.includes(move.type) ? COMBAT_CONFIG.STAB_MULTIPLIER : 1);
     if (score > bestScore) { bestScore = score; best = move; }
   }
