@@ -109,6 +109,16 @@
   --hp-bar-height-sm:      6px;    /* mini-pip del team bar de ruta */
 }
 
+/* Pantallas bajas: el escenario de 300px deja la lista de equipo sin sitio.
+   Se reduce el campo (y sus sprites) para que quepan al menos 2 pips. */
+@media (max-height: 700px) {
+  :root {
+    --combat-field-height:       clamp(200px, 44vh, 300px);
+    --combat-sprite-foe-size:    clamp(110px, 24vh, 162px);
+    --combat-sprite-player-size: clamp(150px, 32vh, 220px);
+  }
+}
+
 /* ── Reset ─────────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
